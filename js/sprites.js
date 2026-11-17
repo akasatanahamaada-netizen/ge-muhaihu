@@ -31,6 +31,8 @@ const HOOD_SPRITE={
   motherRight:{src:'assets/character/マリミニ (3).webp', box:[18,13,290,387], flip:true},
   grannyLeft: {src:'assets/character/マリミニ (2).webp', box:[43,24,282,378]},
   grannyRight:{src:'assets/character/マリミニ (2).webp', box:[43,24,282,378], flip:true},
+  grannyScaredLeft: {src:'assets/character/怯えるおばあちゃんミニ.webp', box:[21,23,269,385]},              // 怯えるおばあさん（狼におそわれている）
+  grannyScaredRight:{src:'assets/character/怯えるおばあちゃんミニ.webp', box:[21,23,269,385], flip:true},
   // 狼（ミニ。左向き。右を向くときは反転）。立ち姿と、走る姿
   wolfLeft:    {src:'assets/character/狼ミニ.webp',   box:[11,1,266,392]},
   wolfRight:   {src:'assets/character/狼ミニ.webp',   box:[11,1,266,392], flip:true},

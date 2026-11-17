@@ -761,6 +761,8 @@ function showPortrait(c, line){
   if(typeof src==='function') src=src(line||{});  // 向きやセリフの中身で絵を変えるとき（playlist.js の mari・narr など）
   if(!src || !dlg.classList.contains('show')){ portrait.style.opacity='0'; portraitKey=null; return; }
   if(portraitKey!==src){ portrait.src=encodeURI(src); portraitKey=src; }
+  // 右向きに描かれた絵は、左右反転して左向きにする（GT.portraitMirror に入っている絵。playlist.js）
+  portrait.style.transform = (GT.portraitMirror||[]).includes(src) ? 'scaleX(-1)' : '';
   portrait.style.opacity='1';
 }
 // 会話の枠が閉じたら、立ち絵も消す

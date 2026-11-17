@@ -115,18 +115,20 @@ GT.sceneFootsteps = {
 // 会話の立ち絵（キーはセリフの c）。しゃべっているあいだ、会話の枠の右に出る。
 // 主人公（少年）：『物憂げな琥珀眼の少年.png』（向きは1枚だけ）
 const BOY_PORTRAIT=()=> 'assets/character/物憂げな琥珀眼の少年.webp';
+/* 会話の立ち絵は、だれでも左向き（会話の枠の右はしに出るので、枠の文字のほうを向く）。
+   右向きに描かれた絵は GT.portraitMirror に入れておくと、左右反転して左向きにする。
+   表情：セリフに f:'smile'（笑顔）/ f:'surprise'（驚き）/ f:'scared'（怯え）/ f:'granny'（おばあさんに化けた狼）と書くと、その表情の絵になる */
+const P='assets/character/';
+GT.portraitMirror = [ P+'水彩タッチの赤ずきん少女.webp', P+'赤ずきんの驚き顔バスケット少女.webp' ];   // どちらも少し右向きの絵
 GT.portraits = {
   boy:   BOY_PORTRAIT,                                           // 少年のセリフ（c:'boy'）
-  // 狼：主人公より右にいれば右向き『狡猾な人狼の立ち姿(右).png』、左にいれば左向き『狡猾な人狼の立ち姿.png』
-  // （ステージに狼の人物がいないとき（おばあさんの家など）は、右向き）
-  wolf:  ()=>{ const w=GT.getNpcs().find(n=>n.who==='wolf'), pl=GT.player;
-    const right = !w || w.x<=-100 || (pl.x+pl.w/2) <= w.x+w.w/2;
-    return right ? 'assets/character/狡猾な人狼の立ち姿(右).webp' : 'assets/character/狡猾な人狼の立ち姿.webp'; },
-  hood:  'assets/character/水彩タッチの赤ずきん少女.webp',      // 赤ずきん
-  mother:'assets/character/水彩風の優しいお母さん.webp',        // お母さん
-  granny:'assets/character/優しい笑顔の祖母キャラクター.webp',  // おばあさん
-  // マリ：ステージ上のマリと同じ向きにする（主人公より右にいれば左向き『mari honnmono (hidari).png』、左にいれば右向き『mari honnmono (migi).png』）
-  mari:  ()=>{ const m=GT.getNpcs().find(n=>n.who==='mari'), pl=GT.player;
-    const mx = m && m.x>-100 ? m.x+m.w/2 : 520;    // ステージにいないとき（結末の外など）は、520 のあたりに立っている
-    return (pl.x+pl.w/2) <= mx ? 'assets/character/mari honnmono (hidari).webp' : 'assets/character/mari honnmono (migi).webp'; },
+  // 狼：左向き『狡猾な人狼の立ち姿』。おばあさんに化けているセリフ（f:'granny'）は『おばあちゃん狼の不敵な微笑み』
+  wolf:  l=> l.f==='granny' ? P+'おばあちゃん狼の不敵な微笑み.webp' : P+'狡猾な人狼の立ち姿.webp',
+  // 赤ずきん：ふだん『水彩タッチの赤ずきん少女』／笑顔（f:'smile'）『笑顔の赤ずきんと basket』／驚き（f:'surprise'）『赤ずきんの驚き顔バスケット少女』
+  hood:  l=> l.f==='smile' ? P+'笑顔の赤ずきんと basket.webp' : l.f==='surprise' ? P+'赤ずきんの驚き顔バスケット少女.webp' : P+'水彩タッチの赤ずきん少女.webp',
+  mother:P+'水彩風の優しいお母さん.webp',                         // お母さん
+  // おばあさん：ふだん『優しい笑顔の祖母キャラクター』／怯え（f:'scared'）『杖を握る不安げなおばあさん』
+  granny:l=> l.f==='scared' ? P+'杖を握る不安げなおばあさん.webp' : P+'優しい笑顔の祖母キャラクター.webp',
+  // マリ：左向き『mari honnmono (hidari)』。たずねる・声をあげるセリフ（？ か ！ がある）は『マリ：口を開いている』
+  mari:  l=> /[？！?!]/.test(String(l.t||'')) ? P+'マリ：口を開いている.webp' : P+'mari honnmono (hidari).webp',
 };
