@@ -1151,12 +1151,16 @@ function pickSide(body,axis,plat){
   // はじめの位置が分からない体（拡張側の独自キャラなど）は、動いてきた向きの反対へ
   return axis==='x' ? (body.vx>0?'L':body.vx<0?'R':null) : (body.vy>0?'U':body.vy<0?'D':null);
 }
+const LAND_SQUASH_SPEED=150;   // これより速く落ちてきて着地したときだけ、つぶれる（px/秒）
 function pushOut(body,plat,side){
   if(side==='L'){ body.x=plat.x-body.w; body.vx=0; return; }
   if(side==='R'){ body.x=plat.x+plat.w; body.vx=0; return; }
   const g = GT.gravity[GT.pageOf(body)];
-  if(side==='U'){ body.y=plat.y-body.h; body.vy=0; if(g===1){ body.onGround=true; body.squash=1.28; } }
-  else          { body.y=plat.y+plat.h; body.vy=0; if(g===-1){ body.onGround=true; body.squash=1.28; } }
+  // つぶれる演出（squash）は、勢いよく着地したときだけ。床に置いてあるだけの箱は、毎フレーム少しだけ沈んで押し戻されるので、
+  // そこでつぶすと、ずっと横に広がったまま ぷるぷる震えて見える
+  const impact = body.vy*g;
+  if(side==='U'){ body.y=plat.y-body.h; body.vy=0; if(g===1){ body.onGround=true; if(impact>LAND_SQUASH_SPEED) body.squash=1.28; } }
+  else          { body.y=plat.y+plat.h; body.vy=0; if(g===-1){ body.onGround=true; if(impact>LAND_SQUASH_SPEED) body.squash=1.28; } }
 }
 GT.resolveBodyCollisions=resolveBodyCollisions;
 
