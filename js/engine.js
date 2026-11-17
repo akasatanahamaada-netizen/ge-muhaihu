@@ -837,12 +837,16 @@ Object.assign(resetBtn.style,{ position:'absolute', top:'0.67cqw', right:'0.9cqw
 // 1回目のタップでは「もう一度で やり直す」と出すだけ。2.5 秒以内にもう一度押したら、やり直す
 // （スマホで会話を進めようと画面の端をタップしたとき、うっかりやり直さないように）
 let resetArmT=0;
-const resetLabel=()=>{ resetBtn.textContent='↺ やり直す'; resetBtn.style.background='rgba(43,36,24,0.72)'; };
+// 表示の文字は dataset で変えられる（js/page.js が「Reset」の旗にする）。押した1回目は .armed が付く
+const resetLabel=()=>{ resetBtn.textContent=resetBtn.dataset.label||'↺ やり直す'; resetBtn.classList.remove('armed');
+  if(!resetBtn.dataset.label) resetBtn.style.background='rgba(43,36,24,0.72)'; };
 resetBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation();
   if(performance.now()<resetArmT){ resetArmT=0; resetLabel(); restartStage(); return; }
-  resetArmT=performance.now()+2500; resetBtn.textContent='もう一度で やり直す'; resetBtn.style.background='rgba(139,47,38,0.85)';
+  resetArmT=performance.now()+2500; resetBtn.classList.add('armed');
+  if(resetBtn.dataset.label) resetBtn.textContent=resetBtn.dataset.arm||'Reset?';
+  else { resetBtn.textContent='もう一度で やり直す'; resetBtn.style.background='rgba(139,47,38,0.85)'; }
   setTimeout(()=>{ if(performance.now()>=resetArmT) resetLabel(); },2600); });
-canvas.parentNode.appendChild(resetBtn);
+canvas.parentNode.appendChild(resetBtn); resetBtn.id='resetBtn';
 window.addEventListener('keydown',e=>{ if(e.key==='r'||e.key==='R'){ e.preventDefault(); restartStage(); } });
 
 /* 操作の説明の枠（チュートリアル用）。ステージ側から GT.drawHint(中心x, 中心y, 行の配列) で描く。

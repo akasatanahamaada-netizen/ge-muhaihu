@@ -306,3 +306,6 @@ canvas#game{ border-radius:0; }
   -webkit-mask-composite:source-in; mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%),linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%);
   mask-composite:intersect; border-radius:0; }
 .gt-tab .num{ position:absolute; left:0; right:0; top:3cqw; text-align:center; line-height:1; }   /* 数字は、ページから出ている部分に */
+
+.gt-flag:nth-child(3){ transform:translateX(0) rotate(-0.6deg); }
+.gt-flag.reset.armed{ transform:translateX(-3.4cqw) rotate(0); background:#c2453b; }   /* 1回押したとき：出たまま、明るい赤で「Again?」 */
