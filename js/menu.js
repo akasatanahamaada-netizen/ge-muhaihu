@@ -278,6 +278,7 @@ window.addEventListener('keydown',e=>{
 }, true);
 
 GT.showMenu=showMenu; GT.hideMenu=hideMenu;
+GT.startFrom=startFrom; GT.canStartFrom=id=>!!save.scenes[id];   // 本を読み返す画面の「このページへもどる」で使う
 
 /* ---- しおり：メニューの「しおりを挟む」で、いまのステージにしおりを挟む。本の上に色ちがいのしおりが増え、
    押すと、そのステージのはじめにもどれる（挟んだときの分岐・本のページも、いっしょにもどる）。

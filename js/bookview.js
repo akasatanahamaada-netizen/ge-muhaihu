@@ -70,6 +70,9 @@ const css=`
   padding:7px 16px; font-family:inherit; font-size:14px; cursor:pointer; }
 .bv-bar button:hover:not([disabled]){ background:rgba(232,220,192,0.2); }
 .bv-bar button[disabled]{ opacity:0.35; cursor:default; }
+.bv-go{ position:absolute; z-index:6; right:7%; bottom:8%; font-family:'Zen Old Mincho',serif; font-size:clamp(10px,1.3cqw,30px); color:#f3ead0; cursor:pointer;
+  background:#7a2e28; border:none; border-radius:2em; padding:0.45em 1.1em; letter-spacing:0.06em; box-shadow:0 2px 4px rgba(0,0,0,0.25); }
+.bv-go:hover{ background:#9a3a32; }
 .bv-hit{ position:absolute; top:0; height:100%; width:50%; z-index:5; cursor:pointer; background:none; border:none; padding:0; }
 .bv-hit.l{ left:0; } .bv-hit.r{ left:50%; }
 .bv-hit[disabled]{ cursor:default; }
@@ -160,8 +163,13 @@ function slotInner(slot){
   const base=(GT.pageBases&&GT.pageBases[p.key]) || p.base || '';
   const text=(p.filled && p.text) ? p.text : base;
   const body=(p.filled ? art : '') + `<div class="bv-body">${damagedText(text, pc, slot, !p.filled)}</div>` + (worm>0 ? holes(slot,worm) : '');
-  return head+body+`<div class="bv-no">— ${pno} —</div>`;
+  // このページの場面へもどる（一度来たことのある場面だけ。menu.js の GT.canStartFrom / GT.startFrom）
+  const sid=PAGE_SCENE[p.key];
+  const go = (sid && GT.canStartFrom && GT.canStartFrom(sid)) ? `<button type="button" class="bv-go" data-scene="${esc(sid)}">このページへもどる</button>` : '';
+  return head+body+go+`<div class="bv-no">— ${pno} —</div>`;
 }
+/* ページ（playlist.js の GT.definePages の key）と、そのページの場面（シーンの id） */
+const PAGE_SCENE={ prologue:'opening', komichi:'komichi1', window:'house_peek', meet:'meet_hood', wolf:'wolf_talk', front:'house_front', granny:'arrive' };
 /* そのページのお話のかけら（engine.js）。かけらのないページは、いつも完全 */
 function pieces(p){ return GT.pagePieces ? GT.pagePieces(p.key) : {found:0,total:0,ids:[],foundIds:[],extra:[]}; }
 /* 欠けた文章：かけらが足りないぶんだけ、ところどころの文字がにじんだり、なくなったりしている。
@@ -404,6 +412,13 @@ if(GT.bookArt) GT.bookArt.onReady(()=>{ if(modal.classList.contains('show') && !
 btnPrev.addEventListener('click',()=>turn(-1)); btnNext.addEventListener('click',()=>turn(1));
 hitL.addEventListener('click',()=>turn(-1));    hitR.addEventListener('click',()=>turn(1));
 modal.querySelector('.bv-close').addEventListener('click',close);
+// 「このページへもどる」：本をすぐに閉じて、その場面のはじめから（来たときの分岐・本のページの状態にもどる）
+//   1回押すと「もう一度押すと、もどる」。2.5秒以内にもう一度押すと、もどる（うっかり押して、いまの進みがなくならないように）
+modal.addEventListener('click',e=>{ const g=e.target.closest('.bv-go'); if(!g) return; e.stopPropagation();
+  if(!(g._armT>performance.now())){ g._armT=performance.now()+2500; g.textContent='もう一度押すと、もどる';
+    setTimeout(()=>{ if(!(g._armT>performance.now())) g.textContent='このページへもどる'; },2600); return; }
+  const id=g.dataset.scene; modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=false;
+  if(GT.startFrom) GT.startFrom(id); }, true);
 modal.addEventListener('click',e=>{ if(e.target===modal) close(); });
 // スワイプ
 let sx=null;
