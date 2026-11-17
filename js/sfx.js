@@ -92,43 +92,54 @@ GT.registerSceneReset(()=>{ wasGround=true; airT=0; });
 
 /* 沼：沼の中にいるあいだ、ループで鳴らしつづける。出たら、すっと小さくして止める。
    会話中・ページをめくっているあいだ・メニューや本を開いているあいだも止める */
+/* iPhone・iPad の Safari では、音の大きさ（audio.volume）を変えられない（いつも最大のまま）。
+   なので、大きさはこちらで覚えておき（swampVol / stepVol）、それが 0 になったら止める。
+   （audio.volume を読んで判断すると、iPhone ではいつまでも 0 にならず、鳴りっぱなしになる）
+   画面を切りかえた・スマホの画面を消したときも止める（そのあいだは描画が止まり、判断ができないため） */
+const hidden=()=>document.hidden;
+const talking=()=>{ const d=document.getElementById('dlg'); return !!(d && d.classList.contains('show')); };
 const swampLoop=new Audio(encodeURI(SRC.swamp)); swampLoop.loop=true; swampLoop.volume=0;
+let swampVol=0;
 const SWAMP_VOL=SFX_VOLUME*(VOL.swamp||1);
 let swampLast=performance.now();
 function swampTick(now){
   const dt=Math.max(0,Math.min(0.1,(now-swampLast)/1000)); swampLast=now;
   const pl=GT.player;
-  const inSwamp = GT.mode==='play' && !GT.paused && (GT.swamps||[]).some(s=>GT.rectsOverlap(pl,s));
+  const inSwamp = GT.mode==='play' && !GT.paused && !talking() && !hidden() && (GT.swamps||[]).some(s=>GT.rectsOverlap(pl,s));
   const target = inSwamp ? SWAMP_VOL*seVol() : 0;
-  let v=swampLoop.volume;
+  let v=swampVol;
   v = v<target ? Math.min(target, v+dt*SWAMP_VOL*6) : Math.max(target, v-dt*SWAMP_VOL*4);   // 入ると すぐ、出ると 0.25秒ほどで消える
-  swampLoop.volume=v;
+  swampVol=v; swampLoop.volume=v;
   if(inSwamp && swampLoop.paused) swampLoop.play().catch(()=>{});
   if(!inSwamp && v===0 && !swampLoop.paused) swampLoop.pause();
   requestAnimationFrame(swampTick);
 }
 requestAnimationFrame(swampTick);
-GT.swampSoundNow=()=>({playing:!swampLoop.paused, volume:+swampLoop.volume.toFixed(2), loop:swampLoop.loop});   // 確認用
+GT.swampSoundNow=()=>({playing:!swampLoop.paused, volume:+swampVol.toFixed(2), loop:swampLoop.loop});   // 確認用
 
 /* 足音：床（重力が逆なら天井）を走っているあいだ、地面に合った足音をループで鳴らす。
    止まる・跳ぶ・沼に入る・会話になると、すっと消える */
 const STEP_SRC={ grass:'assets/koukaonn/芝生の上を走る.mp3', leaves:'assets/koukaonn/落ち葉の上を走る.mp3', dirt:'assets/koukaonn/土の上を走る.mp3' };
 const STEP_VOL=SFX_VOLUME*0.55;
 const steps={};
-for(const k in STEP_SRC){ const a=new Audio(encodeURI(STEP_SRC[k])); a.loop=true; a.volume=0; steps[k]=a; }
+const stepVol={};
+for(const k in STEP_SRC){ const a=new Audio(encodeURI(STEP_SRC[k])); a.loop=true; a.volume=0; steps[k]=a; stepVol[k]=0; }
 let stepLast=performance.now();
 function stepTick(now){
   const dt=Math.max(0,Math.min(0.1,(now-stepLast)/1000)); stepLast=now;
   const pl=GT.player, ground=GT.scene && (GT.sceneFootsteps||{})[GT.scene.id];
   const inSwamp=(GT.swamps||[]).some(s=>GT.rectsOverlap(pl,s));
-  const running = GT.mode==='play' && !GT.paused && pl.onGround && Math.abs(pl.vx)>40 && !inSwamp;
+  const running = GT.mode==='play' && !GT.paused && !talking() && !hidden() && pl.onGround && Math.abs(pl.vx)>40 && !inSwamp;
   for(const k in steps){ const a=steps[k], target=(running && k===ground)?STEP_VOL*seVol():0;
-    let v=a.volume; v = v<target ? Math.min(target,v+dt*STEP_VOL*10) : Math.max(target,v-dt*STEP_VOL*6);
-    a.volume=v;
+    let v=stepVol[k]; v = v<target ? Math.min(target,v+dt*STEP_VOL*10) : Math.max(target,v-dt*STEP_VOL*6);
+    stepVol[k]=v; a.volume=v;
     if(target>0 && a.paused) a.play().catch(()=>{});
     if(target===0 && v===0 && !a.paused) a.pause(); }
   requestAnimationFrame(stepTick);
 }
 requestAnimationFrame(stepTick);
-GT.footstepNow=()=>{ for(const k in steps) if(!steps[k].paused) return {ground:k, volume:+steps[k].volume.toFixed(2)}; return null; };   // 確認用
+GT.footstepNow=()=>{ for(const k in steps) if(!steps[k].paused) return {ground:k, volume:+stepVol[k].toFixed(2)}; return null; };
+// 画面を切りかえた・スマホの画面を消したら、すぐに止める（描画が止まると、上の判断も止まるため）
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) return;
+  swampVol=0; swampLoop.pause(); for(const k in steps){ stepVol[k]=0; steps[k].pause(); } });   // 確認用
 })();

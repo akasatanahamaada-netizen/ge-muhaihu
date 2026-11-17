@@ -45,7 +45,7 @@ GT.onSceneStart(scene=>{
 let last=performance.now();
 function tick(now){
   const dt=Math.max(0,Math.min(0.1,(now-last)/1000)), step=dt/FADE*VOLUME; last=now;
-  const w=wantNow(); if(w) player(w);
+  const w=document.hidden ? null : wantNow(); if(w) player(w);   // 画面が隠れているあいだは流さない
   for(const src in players){ const p=players[src], target= src===w ? bgmVol() : 0;
     p.vol = p.vol<target ? Math.min(target,p.vol+step) : Math.max(target,p.vol-step);
     p.el.volume=p.vol;
@@ -54,5 +54,8 @@ function tick(now){
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
+// 画面を切りかえた・スマホの画面を消したら BGM を止める。もどってきたら、上の tick が続きから流しなおす
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) return;
+  for(const src in players){ const p=players[src]; p.vol=0; p.el.volume=0; p.el.pause(); } });
 GT.musicNow=()=>{ const w=wantNow(), p=w&&players[w]; return p?{src:p.src, playing:!p.el.paused, volume:+p.vol.toFixed(2), time:+p.el.currentTime.toFixed(1), loop:p.el.loop}:null; };   // いま流れている曲（確認用）
 })();
