@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Gravity Tale — 第一章「赤い頭巾」</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Zen+Old+Mincho:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="stage">
+  <header class="masthead">
+    <h1>GRAVITY TALE</h1>
+    <div class="flourish"><span class="sub">第一章「赤い頭巾」</span></div>
+    <div class="tagline">── 本を裏返すと、世界の重力が反転する ──</div>
+  </header>
+
+  <div class="book-frame">
+    <div class="ribbon" aria-hidden="true"></div>
+    <div class="hud">
+      <span id="hudLeft">← 左ページ</span>
+      <span id="hudStage">序章 ── 森</span>
+      <span id="hudRight">右ページ →</span>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="game" width="900" height="480"></canvas>
+      <div class="qte" id="qte">
+        <div class="big" id="qteBig">！</div>
+        <div class="flipnow" id="qteBtn">今だ！ 本を裏返せ</div>
+      </div>
+      <div class="dialogue" id="dlg">
+        <div class="speaker" id="dlgSpeaker">　</div>
+        <div class="dline" id="dlgLine">　</div>
+        <div class="choices" id="dlgChoices"></div>
+        <div class="dhint" id="dlgHint">▶ タップ／クリックで進む</div>
+      </div>
+    </div>
+
+    <div class="under">
+      <div class="controls">
+        <span><kbd>←</kbd><kbd>→</kbd> 移動</span>
+        <span><kbd>↑</kbd><kbd>W</kbd> ジャンプ</span>
+        <span><kbd>F</kbd><kbd>Space</kbd> 重力反転</span>
+        <span>キャラの近くで <kbd>Enter</kbd> かタップで話す</span>
+        <span><kbd>R</kbd> やり直す</span>
+        <span><kbd>Esc</kbd> メニュー</span>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+      <button class="bookbtn fsbtn" id="fsBtn" title="全画面にする／もどす">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        <span id="fsLabel">全画面</span>
+      </button>
+      <button class="bookbtn" id="openBook">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2-1.4-4.6-2-8-2v14c3.4 0 6 .6 8 2 2-1.4 4.6-2 8-2V4c-3.4 0-6 .6-8 2z"/><path d="M12 6v14"/></svg>
+        本を開く<small style="opacity:.7;font-size:11px">（ページを読み返す）</small>
+      </button>
+      </div>
+    </div>
+
+    <div class="touch-ui">
+      <div class="touch-group">
+        <div class="btn" id="btnLeft">◀</div>
+        <div class="btn" id="btnRight">▶</div>
+      </div>
+      <div class="btn flip" id="btnFlip">本を<br>裏返す</div>
+      <div class="touch-group">
+        <div class="btn" id="btnJump">▲</div>
+      </div>
+    </div>
+    <div class="rotate-hint">📱 スマホを横向きにすると、大きな画面で遊べます</div>
+  </div>
+  <div class="credit">右ページの右の端まで進むと、ページがめくれて物語が進む</div>
+</div>
+
+<div class="modal" id="bookModal">
+  <div class="book-inner">
+    <h2>『Gravity Tale』</h2>
+    <div id="pageList"></div>
+    <div class="close"><button id="closeBook">閉じる</button></div>
+  </div>
+</div>
+
+<!-- ====================================================================== -->
+<!-- スクリプトの読み込み順：                                                -->
+<!--   1) js/engine.js … 共通エンジン（GT を作る。最初に読む）                -->
+<!--   2) stages/*.js  … 各ステージ（順不同でOK。並び順は playlist が決める）   -->
+<!--   3) js/playlist.js … 並び順・ページ・初期状態                          -->
+<!--   4) js/menu.js   … メニュー画面・セーブ（js/page.js の前）              -->
+<!-- ステージを足したら、stages/ の行をここに1行コピーして増やすだけ。        -->
+<!-- ====================================================================== -->
+<script src="js/engine.js"></script>
+<script src="js/paper.js"></script>     <!-- 本の紙（engine.js のすぐあと） -->
+<script src="js/sprites.js"></script>   <!-- キャラクターの絵 -->
+<script src="stages/_decor.js"></script>
+
+<script src="stages/00_opening.js"></script>
+<script src="stages/01_komichi1.js"></script>
+<script src="stages/02_komichi2.js"></script>
+<script src="stages/03_house_peek.js"></script>
+<script src="stages/04_path1.js"></script>
+<script src="stages/05_meet_hood.js"></script>
+<script src="stages/06_wolf_talk.js"></script>
+<script src="stages/07_crossroads.js"></script>
+<script src="stages/08_path2.js"></script>
+<script src="stages/09_path3.js"></script>
+<script src="stages/10_path4.js"></script>
+<script src="stages/11_house_front.js"></script>
+<script src="stages/12a_room_art.js"></script>   <!-- おばあさんの家：部屋の絵 -->
+<script src="stages/12b_wolf_boss.js"></script>   <!-- おばあさんの家：狼とのボス戦 -->
+<script src="stages/12_grannys_house.js"></script>   <!-- おばあさんの家：お話（到着・QTE・結末） -->
+
+<script src="js/playlist.js"></script>
+<script src="js/sfx_data.js"></script>   <!-- 大きく鳴らす効果音の中身 -->
+<script src="js/sfx.js"></script>       <!-- 効果音 -->
+<script src="js/music.js"></script>     <!-- 音楽（BGM。playlist.js のあとに読む） -->
+<script src="js/bookart.js"></script>   <!-- 本の挿絵 -->
+<script src="js/bookview.js"></script>  <!-- 本を読みかえす画面（ページをめくる） -->
+<script src="js/menu.js"></script>      <!-- メニュー画面（playlist.js のあとに読む） -->
+<script src="js/page.js"></script>     <!-- 画面外の飾り・全画面・見出しの色 -->
+</body>
+</html>

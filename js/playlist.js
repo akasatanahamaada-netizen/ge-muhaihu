@@ -1,0 +1,132 @@
+/* ============================================================================
+   Gravity Tale ── 第一章のマニフェスト (playlist.js)
+   ----------------------------------------------------------------------------
+   ★ ステージの並び順・本のページ・最初の状態は、このファイルだけで決まります。
+     ステージを増やす / 並べ替える / 統合するときは、ここを直してください。
+
+   【並べ替える】   GT.playlist の中の id の順番を入れ替えるだけ。
+   【ステージを足す】 stages/ に新しいファイルを作って id を登録 →
+                     index.html に <script> を1行足す →
+                     この GT.playlist の好きな位置に id を1つ足す。
+   【別の話を合体】   相手のステージ各ファイルと、相手の id を playlist に並べる。
+                     id がかぶらないようにだけ注意（例：wolf_talk → ep2_wolf_talk）。
+   ========================================================================== */
+
+// 本の章。ページの chapter と合わせる（本を読みかえす画面で、章ごとに とびら が入る）
+GT.chapters = [
+  {name:'序章',   sub:'森で目覚める'},     // マリと出会う・チュートリアル（森の小道 ①②）
+  {name:'第一章', sub:'赤い頭巾'},         // 赤ずきんの家から
+];
+
+// 本（読み返し）に並ぶページ。stages 側の GT.fillPage(key,...) の key と合わせる。
+// extraPieces … かけら以外で手に入るピース（会話など）。GT.addPagePiece(key,id) で手に入る。
+//                reveal に書いた文は、そのピースが埋まるまで、かならず読めない
+// base … 本に最初から書いてある文章（ステージで GT.fillPage が書き込む文章と同じ）。虫食いで、ところどころ読めない。
+//        そのページの「お話のかけら」を集めるほど読めるようになる。
+//        分岐のあるページは、たどり着く前はこの文章で、たどり着くと、選んだ道の文章（GT.fillPage）になる。
+GT.definePages([
+  {key:'prologue', chapter:'序章',   title:'森で目覚める',
+   base:'――少年は、ところどころ欠けた本とともに森で目を覚ました。そして、木の陰にいた少女と出会った。少女は、マリと名乗った。',
+   // かけら（オープニングの3つ）のほかに、マリとの会話で手に入るピース。これが埋まるまで、reveal の文は読めない
+   extraPieces:[{id:'opening:mari', reveal:'そして、木の陰にいた少女と出会った。少女は、マリと名乗った。'}]},
+  {key:'komichi',  chapter:'序章',   title:'森の小道',
+   base:'――少年は、マリと別れて、森の小道を進んだ。本を裏返すと、そのページの重さの向きが変わる。少年は天井を歩いて大木を越え、木箱を押して道をひらいた。'},
+  {key:'window',   chapter:'第一章', title:'窓の向こう',
+   base:'――窓の向こうで、母親が赤ずきんにお使いを頼んでいた。カスタードとバターの小瓶を、おばあさんのもとへ。'},
+  {key:'meet',     chapter:'第一章', title:'赤い頭巾の少女',
+   base:'――赤い頭巾の少女と出会い、道連れになった。少年が本を裏返すと、少女も一緒に、水たまりの上を越えた。'},
+  {key:'wolf',     chapter:'第一章', title:'森で出会った狼',
+   base:'――狼は、脇道へ消えていった。'},
+  {key:'front',    chapter:'第一章', title:'おばあさんの家の前',
+   base:'――赤ずきんは掛け金を引き、おばあさんの家へ入っていった。'},
+  {key:'granny',   chapter:'第一章', title:'おばあさんの家',
+   base:'――家に着いたとき、おばあさんの姿は、もうどこにもなかった。'},
+  {key:'result',   chapter:'第一章', title:'第一章の結末',
+   base:'――少年は、間に合わなかった。'},
+]);
+
+// 分岐フラグの初期値（各ステージの choices が書き換える）
+GT.flags = { playerName:null, warnedHood:false, route:null, stoppedAtDoor:false, saved:null, grannyAlive:null,
+             wolfClues:0, houseClues:0, ending:null };
+
+// シーンの並び順（= ゲームの進行順）。id は各ステージファイルで登録したもの。
+GT.playlist = [
+  'opening',      // 序章 ── 森（マリと出会う / story）
+  'komichi1',     // 森の小道①（play）
+  'komichi2',     // 森の小道②（play）
+  'house_peek',   // 赤ずきんの家・窓のぞき（story）
+  'path1',        // 森の道①（play）
+  'meet_hood',    // 赤ずきんと道連れに（story）
+  'wolf_talk',    // 狼（story・分岐：危険を告げるか）
+  'crossroads',   // 分かれ道（story・分岐：近道か遠回りか）
+  'path2',        // 近道（play・近道のときだけ）
+  'path3',        // 遠回りの道①（play・遠回りのときだけ）
+  'path4',        // 遠回りの道②（play・遠回りのときだけ）
+  'house_front',  // おばあさんの家の前（story・分岐：赤ずきんを止めるか）
+  'arrive',       // おばあさんの家に到着（分岐→ボス戦 or QTE）
+  'ending',       // 結末（戦いのあと・部屋の中）
+  'epilogue',     // 外に出て、マリたちと話す（夕暮れ／夜明け）→ エンディングの画面
+];
+
+// ステージの背景画像（キーは地形の id）。
+// 分かれ道までは昼。近道を行くと、おばあさんの家に着いてもまだ昼。遠回りをすると、着くころには夕方。
+// （flags を受けとる関数にすると、分岐で背景を変えられる）
+// どのステージも、見開き全体に敷く（page:'spread'）。
+// 片方のページだけに置きたいときは {src, page:'left'} / {src, page:'right'}（大きさは w, h, y で変えられる）。
+// 書いていないステージ（家の中など）は、背景画像なし。
+// （水彩の森と遠い城の絵 'assets/background/水彩で描く静かな森と遠い城.webp' も使える）
+const BG_DAY='assets/background/ohiru no mori.webp', BG_EVENING='assets/background/yuugata no mori.webp';
+const S=src=>({src,page:'spread'});
+GT.stageBackgrounds = {
+  opening:S(BG_DAY), komichi1:S(BG_DAY), komichi2:S(BG_DAY), house_peek:S(BG_DAY), path1:S(BG_DAY), meet_hood:S(BG_DAY),
+  wolf_talk:S(BG_DAY), crossroads:S(BG_DAY),
+  path2:S(BG_DAY),                                   // 近道
+  path3:S(BG_DAY), path4:S(BG_EVENING),              // 遠回り：歩くうちに日が傾く
+  house_front:f=>S(f.route==='shortcut'?BG_DAY:BG_EVENING),
+};
+
+// 音楽（BGM）：シーンの id ごとに流す曲（assets/music/ フォルダの mp3）。ループ再生する。
+// 書いていないシーンは無音（前の曲はフェードアウトする）。
+const BGM_ADVENTURE='assets/music/小さな勇者の探検.mp3';   // 冒険（アクションのステージ）。前は『不思議な森(Mysterious_forest).mp3』
+const BGM_FOREST='assets/music/時を刻む森.mp3';
+GT.sceneMusic = {
+  opening:  'assets/music/異世界へようこそ.mp3',        // 最初の物語ステージ（序章 ── 森）
+  komichi1: BGM_ADVENTURE, komichi2: BGM_ADVENTURE, path1: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
+  wolf_talk:'assets/music/お騒がせなオバケたち.mp3',   // 狼の初登場
+  crossroads:'assets/music/かくれんぼの庭。.mp3',       // 分かれ道（近道か遠回りかを選ぶ）
+  path2:    'assets/music/悪魔の悪戯.mp3', path3: 'assets/music/悪魔の悪戯.mp3', path4: 'assets/music/悪魔の悪戯.mp3',   // 近道・遠回りの道（続けて流れる）
+  // 曲の入っていなかったステージ
+  house_peek: 'assets/music/魔法使いの箱庭.mp3',                          // 赤ずきんの家（窓のぞき）
+  meet_hood: 'assets/music/魔法使いの箱庭.mp3',                          // 赤ずきんと出会う・水たまりを越える
+  house_front:BGM_FOREST, arrive: BGM_FOREST, ending: BGM_FOREST, // おばあさんの家の前・家に到着・戦いのあと
+  epilogue: 'assets/music/世界の最果てで、自由を謳う.mp3',   // 外に出た場面（夕暮れ／夜明け）〜エンディングの画面
+};
+// 最終戦闘（おばあさんの家で差しこまれるボス戦・QTE。id が無いので、シーンの種類で決める）
+GT.sceneTypeMusic = { boss:'assets/music/Foehn_Wind.mp3', qte:'assets/music/Foehn_Wind.mp3' };
+GT.titleMusic = 'assets/music/世界の最果てで、自由を謳う.mp3';   // タイトル（メニュー）画面
+
+// 走るときの足音（シーンの id ごとの地面）。'grass'=芝生 / 'leaves'=落ち葉 / 'dirt'=土。書いていないシーン（家の中など）は足音なし。
+GT.sceneFootsteps = {
+  opening:'grass', komichi1:'grass', komichi2:'grass', house_peek:'grass', path1:'grass', meet_hood:'grass',
+  wolf_talk:'leaves', path3:'leaves', path4:'leaves',          // 森の奥・遠回りの道（落ち葉）
+  crossroads:'dirt', path2:'dirt', house_front:'dirt',          // 分かれ道・近道・家の前（土の道）
+};
+
+// 会話の立ち絵（キーはセリフの c）。しゃべっているあいだ、会話の枠の右に出る。
+// 主人公（少年）：『物憂げな琥珀眼の少年.png』（向きは1枚だけ）
+const BOY_PORTRAIT=()=> 'assets/character/物憂げな琥珀眼の少年.webp';
+GT.portraits = {
+  boy:   BOY_PORTRAIT,                                           // 少年のセリフ（c:'boy'）
+  // 狼：主人公より右にいれば右向き『狡猾な人狼の立ち姿(右).png』、左にいれば左向き『狡猾な人狼の立ち姿.png』
+  // （ステージに狼の人物がいないとき（おばあさんの家など）は、右向き）
+  wolf:  ()=>{ const w=GT.getNpcs().find(n=>n.who==='wolf'), pl=GT.player;
+    const right = !w || w.x<=-100 || (pl.x+pl.w/2) <= w.x+w.w/2;
+    return right ? 'assets/character/狡猾な人狼の立ち姿(右).webp' : 'assets/character/狡猾な人狼の立ち姿.webp'; },
+  hood:  'assets/character/水彩タッチの赤ずきん少女.webp',      // 赤ずきん
+  mother:'assets/character/水彩風の優しいお母さん.webp',        // お母さん
+  granny:'assets/character/優しい笑顔の祖母キャラクター.webp',  // おばあさん
+  // マリ：ステージ上のマリと同じ向きにする（主人公より右にいれば左向き『mari honnmono (hidari).png』、左にいれば右向き『mari honnmono (migi).png』）
+  mari:  ()=>{ const m=GT.getNpcs().find(n=>n.who==='mari'), pl=GT.player;
+    const mx = m && m.x>-100 ? m.x+m.w/2 : 520;    // ステージにいないとき（結末の外など）は、520 のあたりに立っている
+    return (pl.x+pl.w/2) <= mx ? 'assets/character/mari honnmono (hidari).webp' : 'assets/character/mari honnmono (migi).webp'; },
+};
