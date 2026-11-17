@@ -1707,6 +1707,8 @@ function drawGothicWorld(){
   ctx.globalCompositeOperation='saturation'; ctx.globalAlpha=0.3; ctx.fillStyle='#808080'; ctx.fillRect(0,0,W,H);   // 色を少し抜く（明るい緑の木などを、なじませる）
   ctx.globalCompositeOperation='color'; ctx.globalAlpha=GRADE_HUE; ctx.fillStyle='#8a3d62'; ctx.fillRect(0,0,W,H);  // 赤紫の色みに寄せる（明るさはそのまま）
   ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
+  const sp=stageBackgroundSpec();                                                     // 背景の shade（0〜1）… そのステージだけ、世界ぜんたいを暗くする（暗い森など）
+  if(sp&&sp.shade){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgba(40,14,30,${sp.shade})`; ctx.fillRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; }
   if(!gothVig){ gothVig=ctx.createRadialGradient(W/2,H*0.5,H*0.35,W/2,H*0.5,W*0.62);
     gothVig.addColorStop(0,'rgba(24,6,16,0)'); gothVig.addColorStop(1,`rgba(24,6,16,${GRADE_VIG})`); }
   ctx.fillStyle=gothVig; ctx.fillRect(0,0,W,H);
