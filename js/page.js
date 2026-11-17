@@ -23,7 +23,7 @@
     if(!full){                                   // 全画面でないとき：本（表紙・旗・しおりの余白もふくめて）が窓に入るだけの大きさ
       frame.style.removeProperty('--gs');
       // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.42（左右 0.21 ずつ）、たて gw×(480/900 + 0.14 + 0.06)
-      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.25, (window.innerHeight-40)/(480/900+0.26), 1100));   // しおりのひも・引き出した旗のぶんも入れる
+      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.17, (window.innerHeight-46)/(480/900+0.2), 1800));   // しおりのひも・引き出した旗のぶんも入れる
       frame.style.setProperty('--gw', Math.floor(gw)+'px'); return; }
     const parts=['.hud','.canvas-wrap','.gt-cover','.gt-marks','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
@@ -88,17 +88,17 @@
         <stop offset="0.5" stop-color="#5a473c" stop-opacity="0.6"/><stop offset="0.65" stop-color="#2c221c" stop-opacity="0.55"/><stop offset="1" stop-color="#2c221c" stop-opacity="0"/></linearGradient>
       <filter id="gtShadow" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="7"/></filter>
     </defs>
-    <rect x="-78" y="-48" width="1068" height="596" rx="6" fill="rgba(20,14,10,0.45)" filter="url(#gtShadow)"/>
-    <rect x="-81" y="-54" width="1068" height="604" rx="5" fill="#261c17"/>
-    <rect x="-84" y="-58" width="1068" height="604" rx="5" fill="url(#gtCoverG)" stroke="#2a201b" stroke-width="2"/>
-    <path d="M -78 -55 L 978 -55" stroke="rgba(255,228,196,0.16)" stroke-width="2" stroke-linecap="round"/>
-    <rect x="420" y="-58" width="60" height="604" fill="url(#gtSpineG)"/>
-    <path d="M 432 -58 Q 450 -64 468 -58 L 468 -50 Q 450 -55 432 -50 Z" fill="#7a2e28"/>
-    <path d="M 432 546 Q 450 552 468 546 L 468 538 Q 450 543 432 538 Z" fill="#7a2e28"/>`;
+    <rect x="-52" y="-28" width="1016" height="560" rx="6" fill="rgba(20,14,10,0.45)" filter="url(#gtShadow)"/>
+    <rect x="-55" y="-32" width="1016" height="566" rx="5" fill="#261c17"/>
+    <rect x="-58" y="-36" width="1016" height="566" rx="5" fill="url(#gtCoverG)" stroke="#2a201b" stroke-width="2"/>
+    <path d="M -52 -33 L 952 -33" stroke="rgba(255,228,196,0.16)" stroke-width="2" stroke-linecap="round"/>
+    <rect x="420" y="-36" width="60" height="566" fill="url(#gtSpineG)"/>
+    <path d="M 432 -36 Q 450 -42 468 -36 L 468 -28 Q 450 -33 432 -28 Z" fill="#7a2e28"/>
+    <path d="M 432 530 Q 450 536 468 530 L 468 522 Q 450 527 432 522 Z" fill="#7a2e28"/>`;
   // ページ：ちゃんとした開いた本の形。背表紙に向かって紙が沈み、外がわへ ふくらむ。
   //   外がわ（左右）と下には、重なった紙の層（少しずつずらした紙を、奥から順に重ねる）。まん中は、のどの陰
-  const pg=(dx,dy,fill,o)=>`<path d="M ${-60-dx} ${-34+dy} C 120 ${-54+dy} 330 ${-50+dy} 446 ${-20+dy} L 454 ${-20+dy} C 570 ${-50+dy} 780 ${-54+dy} ${960+dx} ${-34+dy}
-      L ${962+dx} ${524+dy} C 780 ${508+dy} 570 ${510+dy} 454 ${534+dy} L 446 ${534+dy} C 330 ${510+dy} 120 ${508+dy} ${-62-dx} ${524+dy} Z"
+  const pg=(dx,dy,fill,o)=>`<path d="M ${-40-dx} ${-20+dy} C 120 ${-36+dy} 330 ${-32+dy} 446 ${-6+dy} L 454 ${-6+dy} C 570 ${-32+dy} 780 ${-36+dy} ${940+dx} ${-20+dy}
+      L ${942+dx} ${504+dy} C 780 ${492+dy} 570 ${494+dy} 454 ${516+dy} L 446 ${516+dy} C 330 ${494+dy} 120 ${492+dy} ${-42-dx} ${504+dy} Z"
       fill="${fill}" stroke="${L}" stroke-width="1.3" stroke-opacity="${o}" stroke-linejoin="round"/>`;
   pages.innerHTML=`
     <defs>
@@ -107,7 +107,7 @@
     </defs>
     ${pg(10,10,'#ddd0b8',0.7)}${pg(8,8,'#e5d9c4',0.7)}${pg(6,6,'#ddd0b8',0.7)}${pg(4,4,'#e8ddca',0.75)}${pg(2,2,'#e2d6c1',0.8)}
     ${pg(0,0,'url(#gtPaperL)',1)}
-    <rect x="390" y="-58" width="120" height="604" fill="url(#gtGutter)"/>`;
+    <rect x="390" y="-36" width="120" height="566" fill="url(#gtGutter)"/>`;
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 本の上に横にして置いた栞（作者の絵 assets/komono/栞.png）：「Reread」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）
   //   カーソルを乗せると、すこし持ち上がる。やり直すボタンは、ゲーム画面の右上（engine.js の「↺ やり直す」）

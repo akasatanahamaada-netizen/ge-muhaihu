@@ -617,15 +617,15 @@ const flipLive=document.createElement('canvas'); flipLive.width=W; flipLive.heig
 /* めくる紙は、ゲーム画面のまわりのページのふくらみ（js/page.js の .gt-pages）までふくめた大きさで描く。
    ・ページの大きさ：ゲーム画面の左右に PAGE_PAD_X、上に PAGE_PAD_TOP、下に PAGE_PAD_BOT ずつ広い（EW×EH）
    ・めくりは、ゲーム画面より一回り大きい専用の層（flipCv。.gt-pages と同じ位置・大きさ。座標も同じ）に描く */
-const PAGE_PAD_X=62, PAGE_PAD_TOP=34, PAGE_PAD_BOT=54, PAGE_COLOR='#efe7da';
+const PAGE_PAD_X=42, PAGE_PAD_TOP=20, PAGE_PAD_BOT=36, PAGE_COLOR='#efe7da';
 const EW=W+PAGE_PAD_X*2, EH=H+PAGE_PAD_TOP+PAGE_PAD_BOT, ESP=EW/2;
 const extOld=document.createElement('canvas'); extOld.width=EW; extOld.height=EH;
 const extLive=document.createElement('canvas'); extLive.width=EW; extLive.height=EH;
 // ページの形（js/page.js の .gt-pages と同じ線。上下のふちがゆるく曲がっている）。座標は、ページの紙（EW×EH）の中
 function pagePath(g){ const X=x=>x+PAGE_PAD_X, Y=y=>y+PAGE_PAD_TOP;
-  g.beginPath(); g.moveTo(X(-60),Y(-34)); g.bezierCurveTo(X(120),Y(-54),X(330),Y(-50),X(446),Y(-20)); g.lineTo(X(454),Y(-20));
-  g.bezierCurveTo(X(570),Y(-50),X(780),Y(-54),X(960),Y(-34)); g.lineTo(X(962),Y(524)); g.bezierCurveTo(X(780),Y(508),X(570),Y(510),X(454),Y(534));
-  g.lineTo(X(446),Y(534)); g.bezierCurveTo(X(330),Y(510),X(120),Y(508),X(-62),Y(524)); g.closePath(); }
+  g.beginPath(); g.moveTo(X(-40),Y(-20)); g.bezierCurveTo(X(120),Y(-36),X(330),Y(-32),X(446),Y(-6)); g.lineTo(X(454),Y(-6));
+  g.bezierCurveTo(X(570),Y(-32),X(780),Y(-36),X(940),Y(-20)); g.lineTo(X(942),Y(504)); g.bezierCurveTo(X(780),Y(492),X(570),Y(494),X(454),Y(516));
+  g.lineTo(X(446),Y(516)); g.bezierCurveTo(X(330),Y(494),X(120),Y(492),X(-42),Y(504)); g.closePath(); }
 function toPage(dst){ const g=dst.getContext('2d'); g.clearRect(0,0,EW,EH); g.save(); pagePath(g); g.clip();   // ゲーム画面を、ページの形の紙に写す（形の外は透明）
   g.fillStyle=PAGE_COLOR; g.fillRect(0,0,EW,EH); g.drawImage(canvas,PAGE_PAD_X,PAGE_PAD_TOP); g.restore(); }
 const flipCv=document.createElement('canvas'); flipCv.width=1100; flipCv.height=620;   // viewBox「-100 -70 1100 620」と同じ
