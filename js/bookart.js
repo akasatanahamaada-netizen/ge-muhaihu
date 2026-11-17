@@ -15,7 +15,7 @@
 const AW=600, AH=330;                    // 挿絵の大きさ
 const SRC={
   day:'assets/background/ohiru no mori.webp', eve:'assets/background/yuugata no mori.webp', castle:'assets/background/水彩で描く静かな森と遠い城.webp',
-  boy:'assets/character/syuzinkou1.webp',   // 主人公（ちびキャラ・立ち姿）
+  boy:{src:'assets/character/syuzinkou1.webp', box:[3,15,282,402]},   // 主人公（ちびキャラ・立ち姿。box はゲームと同じ、余白を切った範囲）
   // ゲームの中と同じ二頭身の絵（マリミニ (1)〜(5)）。box＝使う範囲、flip＝左右反転（元の絵はどれも少し左向き）
   mari:  {src:'assets/character/マリミニ (1).webp', box:[6,39,244,361]},
   mother:{src:'assets/character/マリミニ (3).webp', box:[18,13,290,387], flip:true},    // 右向き
@@ -50,15 +50,15 @@ function figure(c,im,x,y,h,opt){
   else c.drawImage(im,bx,by,bw,bh,x-w/2,y-h,w,h);
   c.restore();
 }
-// 少年（ゲームの主人公と同じ形）。lying で寝ころぶ
+// 少年（ゲームの主人公と同じ形）。lying で寝ころぶ。s=1.4 で、となりに立つ人物（高さ 150）と同じくらい
+const BOY_H=108;
 function boy(c,x,y,s,opt){
   opt=opt||{};
-  if(ok(IMG.boy)){                                   // 主人公のちびキャラの絵（syuzinkou1.png）。高さは前の形（約50×s）より少し大きく
-    const h=62*s, w=h*IMG.boy.naturalWidth/IMG.boy.naturalHeight;
-    c.save(); c.translate(x,y);
-    if(opt.lying){ c.rotate(-Math.PI/2); c.drawImage(IMG.boy,-w/2,-h*0.75,w,h); }
-    else c.drawImage(IMG.boy,-w/2,-h*0.97,w,h);       // 絵の下の余白ぶん、少し下げて足もとを合わせる
-    c.restore(); return;
+  if(ok(IMG.boy)){                                   // 主人公のちびキャラの絵（syuzinkou1）。ほかの人物（2頭身の絵）と同じくらいの大きさ：高さ 108×s
+    const h=BOY_H*s;
+    if(opt.lying){ c.save(); c.translate(x,y); c.rotate(-Math.PI/2); figure(c,IMG.boy,0,h*0.25,h); c.restore(); }
+    else figure(c,IMG.boy,x,y,h);
+    return;
   }
   c.save(); c.translate(x,y); c.scale(s*(opt.face||1),s);
   if(opt.lying){ c.rotate(-Math.PI/2); }
@@ -228,7 +228,7 @@ const SCENES={
     bg(c,IMG.day,0.25,0.75,1.1); wash(c,'rgba(244,236,214,0.15)');
     rays(c,[[150,60],[330,40]],'rgba(255,236,170,0.22)');
     pages(c,[[120,300,-0.3],[260,312,0.2],[340,296,0.5],[90,270,0.1]]);
-    boy(c,210,302,1.25,{lying:true,book:true});
+    boy(c,210,272,1.25,{lying:true,book:true});
     // 木の幹とマリ
     c.beginPath(); c.moveTo(470,AH); c.lineTo(486,60); c.lineTo(548,60); c.lineTo(566,AH); c.closePath(); inked(c,'#5a4632',2.4);
     c.strokeStyle='rgba(30,20,10,0.35)'; c.lineWidth=1.4; for(let i=0;i<4;i++){ c.beginPath(); c.moveTo(498+i*12,90); c.lineTo(494+i*13,AH); c.stroke(); }
@@ -273,8 +273,8 @@ const SCENES={
     ell(c,250,300,190,26,'rgba(120,150,170,0.55)'); ell(c,250,296,170,18,'rgba(200,220,230,0.35)');    // 水たまり
     flowers(c,[[40,316,0],[70,322,1],[540,318,2],[570,324,3],[512,326,1]]);
     figure(c,IMG.hoodWalkR,430,316,210);                                                                     // 歩いていく赤ずきん（2頭身）
-    boy(c,200,286,1.4,{face:1});
-    c.save(); c.globalAlpha=0.35; c.translate(0,572); c.scale(1,-1); boy(c,200,286,1.4,{face:1}); c.restore();   // 水にうつる
+    boy(c,200,286,1.85,{face:1});                                                                            // 赤ずきんと同じくらいの高さ
+    c.save(); c.globalAlpha=0.35; c.translate(0,572); c.scale(1,-1); boy(c,200,286,1.85,{face:1}); c.restore();   // 水にうつる
   },
   // 森で出会った狼：告げたか、黙ったか
   wolf(c,f){
@@ -283,12 +283,12 @@ const SCENES={
     if(f.warnedHood){
       wolf(c,470,262,1.25,-1);
       figure(c,IMG.hoodR,150,318,190,{filter:'brightness(0.92)'});
-      boy(c,300,300,1.5,{face:1});
+      boy(c,300,300,1.7,{face:1});
       c.font="700 40px 'Zen Old Mincho',serif"; c.fillStyle='#f3ead0'; c.textAlign='center'; c.fillText('！',300,200);
     } else {
       wolf(c,500,262,1.1,1);                                                                             // 脇道へ去っていく
       figure(c,IMG.hoodR,200,318,190,{filter:'brightness(0.92)'});
-      boy(c,340,300,1.3,{face:1});
+      boy(c,340,300,1.7,{face:1});
     }
   },
   // おばあさんの家の前
