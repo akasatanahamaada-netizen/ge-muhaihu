@@ -88,7 +88,7 @@ const BG_TITLE='assets/background/タイトル背景.webp';   // タイトル画
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
-  opening:Object.assign({},DARK,{shade:0.45}),       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
+  opening:Object.assign({},DARK,{shade:0.3}),       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
   komichi1:G(BG_DAY), komichi2:G(BG_DAY), house_peek:G(BG_DAY), path1:G(BG_DAY), meet_hood:G(BG_DAY), cliff:G(BG_DAY),
   wolf_talk:DARK,                                    // 狼（暗い森）
   crossroads:{src:BG_TITLE,page:'spread',wash:'rgba(244,240,230,0.08)'},   // 分かれ道（道のある、霧の薔薇の森）

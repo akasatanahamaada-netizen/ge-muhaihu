@@ -56,10 +56,7 @@ GT.defineStage('opening', {
   bookPage:'prologue',   // ここのかけらは、本の序章「森での目覚め」のページのもの（このステージのかけらで完結。全部拾うと、欠けた文字・挿絵が埋まる）
   // 見た目：輪郭線なしのフラットな絵本ふう（背景は playlist.js で見開き全体に敷く）
   decor:[
-    {layer:'back',  kind:'tree',      x:16,  y:150, w:100, h:314},
-    {layer:'back',  kind:'tree',      x:172, y:110, w:132, h:270},
-    {layer:'back',  kind:'tree',      x:462, y:180, w:124, h:284},
-    
+    // 奥の木は、ゴシックの枯れ木（下の GOTH.back で描く）
     {layer:'back',  kind:'rockFlat',  x:604, y:422, w:62,  h:42},
     {layer:'back',  kind:'bushFlat',  x:786, y:420, w:82,  h:44},
     {layer:'front', kind:'fernFlat',  x:-6,  y:386, w:96,  h:80},   // かけらを隠す葉
@@ -245,21 +242,21 @@ function drawScrapHint(){
   GT.drawHint(it.x+it.w/2, it.y-58, ['落ちている紙きれ ＝ お話のかけら','さわると 拾える']);
 }
 
-/* 木漏れ日 */
+/* 月あかりの筋（青白く、うすく） */
 function drawLightShafts(){
   const t=performance.now()/1000;
   ctx.save(); ctx.globalCompositeOperation='lighter';
   [[120,70,0.6],[330,50,1.7],[600,90,2.9],[760,40,4.1]].forEach(([x,w,s])=>{
-    const a=0.022+0.012*Math.sin(t*0.7+s);
+    const a=0.026+0.012*Math.sin(t*0.7+s);
     const g=ctx.createLinearGradient(0,EDGE,0,FLOOR);
-    g.addColorStop(0,`rgba(255,236,170,${a*1.6})`); g.addColorStop(1,'rgba(255,236,170,0)');
+    g.addColorStop(0,`rgba(200,185,255,${a*1.6})`); g.addColorStop(1,'rgba(200,185,255,0)');
     ctx.fillStyle=g; ctx.beginPath();
     ctx.moveTo(x,EDGE); ctx.lineTo(x+w,EDGE); ctx.lineTo(x+w-110,FLOOR); ctx.lineTo(x-150,FLOOR); ctx.closePath(); ctx.fill();
   });
   // 光の中を漂うちり
   for(let i=0;i<22;i++){
     const x=(rnd(i)*W+Math.sin(t*0.3+i)*20)%W, y=EDGE+((rnd(i+50)*H+t*(6+rnd(i+9)*8))%(FLOOR-EDGE));
-    ctx.globalAlpha=0.25+0.25*Math.sin(t*2+i); ell(x,y,1.2,1.2,'#fff2c0');
+    ctx.globalAlpha=0.25+0.25*Math.sin(t*2+i); ell(x,y,1.2,1.2,'#e8dcff');
   }
   ctx.restore();
 }
@@ -272,12 +269,13 @@ function drawLeaves(){
     const y=EDGE-20+((t*sp+rnd(i)*span)%span);
     const x=rnd(i+20)*W+Math.sin(t*1.3+i*2)*26;
     const r=t*2+i;
-    ell(x,y,5,2.4*Math.abs(Math.cos(r)),i%3?'rgba(122,128,74,0.75)':'rgba(176,141,87,0.75)',Math.sin(r)*0.8);
+    ell(x,y,4.6,2.6*Math.abs(Math.cos(r)),i%3?'rgba(150,26,52,0.85)':'rgba(196,52,77,0.85)',Math.sin(r)*0.8);   // 薔薇の花びら
   }
 }
 
 /* マリが隠れる大きな木（マリより手前・少年より奥）：凝った木（GTDecor.paint） */
 function drawMariTree(){
+  GOTH.big(TRUNK.x, TRUNK.w); return;                // ゴシックの木（下は、前の丸い木。もどすときは、この行を消す）
   const x=TRUNK.x, w=TRUNK.w, P=GTDecor.paint;
   P.trunk(ctx, x, 104, FLOOR, w, 41, { hollow:{x:x+w*0.55,y:250,rx:8,ry:13},
     branches:[{y:150,dir:-1,len:80},{y:132,dir:1,len:84},{y:190,dir:1,len:46}] });
@@ -421,12 +419,100 @@ function drawWake(){
 
 /* 3段の丘：森の小道①と同じ「苔むした岩」（stages/_decor.js の GTDecor.forest.rock）。
    段の形を変えたら、下の番号（platforms の何番目か）も合わせて直すこと。 */
+/* ---- ゴシックの森（タイトル画面の、霧の薔薇の森に合わせる） --------------------------
+   ・奥の木：葉のない、ねじれた枯れ木。枝先にとげ、幹にいばらのつると薔薇。片がわに月あかりのふち
+   ・上のすみ：いばらの枝が、画面のふちから伸びてくる（少年より手前）
+   ・地面の霧（ゆっくり流れる）と、ただよう淡い光の粒
+   動かない絵は、一度だけ別のキャンバスに描いておく（重くならないように） */
+const GOTH=(()=>{
+  const R=seed=>{ let s=seed; return ()=>((s=(s*16807)%2147483647)/2147483647); };
+  function branch(c,r,x,y,len,ang,w,d){
+    const x2=x+Math.cos(ang)*len, y2=y+Math.sin(ang)*len, mx=(x+x2)/2+(r()-0.5)*len*0.35, my=(y+y2)/2+(r()-0.5)*len*0.35;
+    c.lineWidth=w; c.beginPath(); c.moveTo(x,y); c.quadraticCurveTo(mx,my,x2,y2); c.stroke();
+    if(d<=2) for(let i=0;i<3;i++){ const u=0.3+r()*0.6, tx=x+(x2-x)*u, ty=y+(y2-y)*u, ta=ang+(r()<0.5?-1:1)*1.15;   // とげ
+      c.lineWidth=1; c.beginPath(); c.moveTo(tx,ty); c.lineTo(tx+Math.cos(ta)*4.5,ty+Math.sin(ta)*4.5); c.stroke(); }
+    if(d<=0) return;
+    const n=d>2?2:(r()<0.5?2:3);
+    for(let i=0;i<n;i++){ const a=ang+(i-(n-1)/2)*(0.5+r()*0.35)+(r()-0.5)*0.35;
+      branch(c,r,x2,y2,len*(0.62+r()*0.16),a,Math.max(1,w*0.62),d-1); }
+  }
+  function rose(c,x,y,s){
+    c.fillStyle='#6e1024'; c.beginPath(); c.arc(x,y,s,0,Math.PI*2); c.fill();
+    c.fillStyle='#a8243f'; c.beginPath(); c.arc(x-s*0.25,y-s*0.25,s*0.62,0,Math.PI*2); c.fill();
+    c.strokeStyle='#3e0812'; c.lineWidth=1; c.beginPath(); c.arc(x-s*0.15,y-s*0.15,s*0.35,0.4,5.6); c.stroke();
+    c.fillStyle='#1f2a1c'; c.beginPath(); c.ellipse(x+s*0.9,y+s*0.6,s*0.7,s*0.32,0.6,0,Math.PI*2); c.fill();   // 葉
+  }
+  function vine(c,r,x,base,topY,tw,lean){
+    const at=y=>{ const u=(base-y)/(base-topY); return x+lean*u+Math.sin(y*0.055)*tw*0.95; };
+    c.strokeStyle='#2c2026'; c.lineWidth=1.8; c.beginPath();
+    for(let y=base;y>topY+16;y-=4){ y===base?c.moveTo(at(y),y):c.lineTo(at(y),y); } c.stroke();
+    c.lineWidth=1; for(let y=base-10;y>topY+24;y-=13){ const vx=at(y), s=r()<0.5?-1:1; c.beginPath(); c.moveTo(vx,y); c.lineTo(vx+s*4,y-3); c.stroke(); }
+    for(let i=0;i<3;i++){ const y=base-(base-topY)*(0.12+r()*0.62); rose(c,at(y),y,4+r()*2.5); }
+  }
+  function tree(c,x,base,h,seed,lean){
+    const r=R(seed), topY=base-h*0.55, tw=Math.max(13,h*0.065);
+    c.fillStyle=c.strokeStyle='#22141b'; c.lineCap='round';
+    c.beginPath(); c.moveTo(x-tw*1.35,base); c.quadraticCurveTo(x-tw*0.55+lean*0.3,base-h*0.3,x-tw*0.32+lean,topY);
+    c.lineTo(x+tw*0.32+lean,topY); c.quadraticCurveTo(x+tw*0.55+lean*0.3,base-h*0.3,x+tw*1.35,base); c.closePath(); c.fill();
+    for(const s of [-1,1]){ c.lineWidth=tw*0.38; c.beginPath(); c.moveTo(x+s*tw*0.8,base-8); c.quadraticCurveTo(x+s*tw*1.7,base-3,x+s*tw*2.6,base); c.stroke(); }   // 根
+    branch(c,r,x+lean,topY,h*0.23,-Math.PI/2-0.55,tw*0.55,4);
+    branch(c,r,x+lean,topY,h*0.25,-Math.PI/2+0.5,tw*0.55,4);
+    branch(c,r,x+lean*0.6,topY+h*0.16,h*0.18,-Math.PI/2+(r()<0.5?-1:1)*1.15,tw*0.4,3);
+    c.fillStyle='#0f070b'; c.beginPath(); c.ellipse(x+lean*0.4,base-h*0.3,tw*0.24,tw*0.42,0,0,Math.PI*2); c.fill();   // うろ
+    c.strokeStyle='rgba(200,165,215,0.3)'; c.lineWidth=1.6; c.beginPath();                                          // 月あかりのふち
+    c.moveTo(x+tw*1.15,base-6); c.quadraticCurveTo(x+tw*0.5+lean*0.3,base-h*0.3,x+tw*0.28+lean,topY); c.stroke();
+    vine(c,r,x,base,topY,tw,lean);
+  }
+  // マリが隠れる大きな木：幹の太さ・場所は前と同じ（マリがかくれられるように）。丸い葉のかたまりのかわりに、ねじれた枝の冠
+  function bigTree(c,x,w,top,base){
+    const r=R(97); c.fillStyle=c.strokeStyle='#22141b'; c.lineCap='round';
+    c.beginPath(); c.moveTo(x-10,base); c.quadraticCurveTo(x+4,base-80,x+6,top+60); c.lineTo(x+w*0.3,top); c.lineTo(x+w*0.7,top); c.lineTo(x+w-6,top+60);
+    c.quadraticCurveTo(x+w-4,base-80,x+w+10,base); c.closePath(); c.fill();
+    for(const [sx,ex] of [[x+6,x-34],[x+w-6,x+w+34],[x+w*0.4,x+w*0.2-6]]){ c.lineWidth=12; c.beginPath(); c.moveTo(sx,base-14); c.quadraticCurveTo((sx+ex)/2,base-4,ex,base); c.stroke(); }   // 根
+    c.strokeStyle='rgba(0,0,0,0.35)'; c.lineWidth=1.4;                                                                                    // 樹皮のすじ
+    for(let i=0;i<5;i++){ const bx=x+10+i*(w-20)/4; c.beginPath(); c.moveTo(bx,top+70); c.quadraticCurveTo(bx+(r()-0.5)*10,(top+base)/2,bx+(r()-0.5)*6,base-10); c.stroke(); }
+    c.fillStyle='#0f070b'; c.beginPath(); c.ellipse(x+w*0.55,250,8,13,0,0,Math.PI*2); c.fill();                                          // うろ
+    c.strokeStyle='rgba(200,165,215,0.3)'; c.lineWidth=1.8; c.beginPath(); c.moveTo(x+w+8,base-4); c.quadraticCurveTo(x+w-4,base-80,x+w-6,top+60); c.stroke();
+    c.strokeStyle='#22141b';
+    branch(c,r,x+w*0.35,top+6,96,-Math.PI/2-0.75,13,4); branch(c,r,x+w*0.65,top+6,100,-Math.PI/2+0.7,13,4);
+    branch(c,r,x+w*0.5,top,70,-Math.PI/2+0.05,10,4); branch(c,r,x+6,top+70,74,Math.PI+0.35,9,3); branch(c,r,x+w-6,top+86,64,-0.3,8,3);
+    vine(c,r,x+w*0.5,base,top+40,w*0.42,0);
+  }
+  let backCv=null, topCv=null, bigCv=null;
+  const mk=()=>{ const cv=document.createElement('canvas'); cv.width=W; cv.height=H; return cv; };
+  return {
+    back(){ if(!backCv){ backCv=mk(); const c=backCv.getContext('2d');
+        tree(c,64,FLOOR+6,340,11,10); tree(c,252,FLOOR+6,300,23,-12); tree(c,468,FLOOR+6,286,37,14); }
+      ctx.drawImage(backCv,0,0); },
+    big(x,w){ if(!bigCv){ bigCv=mk(); bigTree(bigCv.getContext('2d'),x,w,104,FLOOR+4); } ctx.drawImage(bigCv,0,0); },
+    top(){ if(!topCv){ topCv=mk(); const c=topCv.getContext('2d'); c.strokeStyle='#1a0e14'; c.lineCap='round';
+        let r=R(71); branch(c,r,-8,EDGE-4,96,0.32,10,4); branch(c,r,-8,EDGE+40,70,0.62,6,3);
+        r=R(83); branch(c,r,W+8,EDGE-4,96,Math.PI-0.32,10,4); branch(c,r,W+8,EDGE+44,64,Math.PI-0.66,6,3);
+        rose(c,58,EDGE+22,6); rose(c,92,EDGE+12,4.5); rose(c,W-64,EDGE+20,6); rose(c,W-104,EDGE+34,4.5); }
+      ctx.drawImage(topCv,0,0); },
+    fog(near){ const t=performance.now()/1000;
+      ctx.save();
+      for(let k=0;k<(near?1:2);k++){ const y=near?FLOOR-6:FLOOR-34-k*34, a=near?0.07:0.11-k*0.03, sp=near?14:7+k*4;
+        for(let i=0;i<7;i++){ const x=((i*190+t*sp+k*90)%(W+340))-170;
+          const g=ctx.createRadialGradient(x,y,0,x,y,170); g.addColorStop(0,`rgba(228,200,222,${a})`); g.addColorStop(1,'rgba(228,200,222,0)');
+          ctx.fillStyle=g; ctx.save(); ctx.translate(x,y); ctx.scale(1,0.2); ctx.translate(-x,-y); ctx.fillRect(x-170,y-170,340,340); ctx.restore(); } }
+      ctx.restore(); },
+    wisps(){ const t=performance.now()/1000;
+      ctx.save(); ctx.globalCompositeOperation='lighter';
+      for(let i=0;i<12;i++){ const x=rnd(i+300)*W+Math.sin(t*0.4+i)*30, y=EDGE+70+rnd(i+310)*(FLOOR-EDGE-130)+Math.sin(t*0.6+i*2)*22;
+        const a=0.22+0.18*Math.sin(t*1.7+i*1.3);
+        const g=ctx.createRadialGradient(x,y,0,x,y,9); g.addColorStop(0,`rgba(255,205,225,${a})`); g.addColorStop(1,'rgba(255,205,225,0)');
+        ctx.fillStyle=g; ctx.fillRect(x-9,y-9,18,18); ell(x,y,1.3,1.3,`rgba(255,235,245,${a+0.3})`); }
+      ctx.restore(); },
+  };
+})();
+
 function drawHill(){
   const P=i=>GT.STAGE_DEFS.opening.platforms[i];
   GTDecor.forest.rock([P(0),P(1),P(2)],3);
 }
 
-GT.registerDraw(()=>{ if(!isOpening()) return; drawLightShafts(); }, 'back');
+GT.registerDraw(()=>{ if(!isOpening()) return; drawLightShafts(); GOTH.back(); GOTH.fog(false); }, 'back');
 GT.registerDraw(()=>{ if(!isOpening()) return; drawHill(); drawPages(); drawStump(); drawMariTree(); drawLeaves(); drawMarks(); }, 'world');
-GT.registerDraw(()=>{ if(!isOpening()) return; drawHiddenGlint(); drawScrapHint(); drawBookView(); drawWake(); }, 'overlay');
+GT.registerDraw(()=>{ if(!isOpening()) return; GOTH.fog(true); GOTH.top(); GOTH.wisps(); drawHiddenGlint(); drawScrapHint(); drawBookView(); drawWake(); }, 'overlay');
 })();
