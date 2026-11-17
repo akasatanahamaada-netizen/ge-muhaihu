@@ -361,13 +361,37 @@ window.addEventListener('keydown',e=>{ keys[e.key]=true;
 window.addEventListener('keyup',e=>keys[e.key]=false);
 
 function flipCurrentPage(){ const p=GT.currentPage(); GT.gravity[p]*=-1; flashPage[p]=1; updateHud(); GT.sfx&&GT.sfx('flip'); }
+/* 本を裏返せるのは、床（反転中は天井）に立っているときだけ。
+   空中で押したときは、すぐには裏返さず 0.35 秒だけ覚えておき、そのあいだに着地したら裏返す
+   （スマホでは、着地の少し前にボタンを押してしまいやすいため）。間に合わなければ「立っているときだけ」と知らせる */
+const FLIP_BUFFER=0.35;
+let flipBuffered=0, flipDenyT=0;
+function canFlipNow(){ return !flipping && !dlg.classList.contains('show') && !storyTalking && GT.flipModes.has(GT.mode); }
 function onFlipKey(){
   if(flipping) return;
   for(const f of flipIntercepts){ if(f()) return; }     // QTE などが横取り
   if(dlg.classList.contains('show') || storyTalking) return;   // 会話のあいだは、本を裏返せない
-  // 本を裏返せるのは、床（反転中は天井）に立っているときだけ。空中では裏返せない
-  if(GT.flipModes.has(GT.mode) && GT.player.onGround){ flipCurrentPage(); }
+  if(!GT.flipModes.has(GT.mode)) return;
+  if(GT.player.onGround){ flipBuffered=0; flipCurrentPage(); }
+  else flipBuffered=FLIP_BUFFER;
 }
+function updateFlipBuffer(dt){
+  flipDenyT=Math.max(0,flipDenyT-dt);
+  if(flipBuffered<=0) return;
+  if(!canFlipNow()){ flipBuffered=0; return; }
+  if(GT.player.onGround){ flipBuffered=0; flipCurrentPage(); return; }
+  flipBuffered-=dt;
+  if(flipBuffered<=0){ flipDenyT=1.4; const b=document.getElementById('btnFlip'); b.classList.remove('deny'); void b.offsetWidth; b.classList.add('deny'); }
+}
+GT.registerDraw(()=>{
+  if(flipDenyT<=0) return;
+  const pl=GT.player, g=GT.gravity[GT.currentPage()];
+  ctx.save(); ctx.globalAlpha=Math.min(1,flipDenyT/0.4); ctx.font="700 13px 'Zen Old Mincho',serif"; ctx.textAlign='center';
+  ctx.lineWidth=3; ctx.strokeStyle='rgba(255,248,230,0.85)'; ctx.fillStyle='#8b2f26';
+  const t='床か天井に立っているときだけ 裏返せる', hw=ctx.measureText(t).width/2+6;
+  const x=Math.max(EDGE+hw,Math.min(W-EDGE-hw,pl.x+pl.w/2)), y=Math.max(EDGE+40,Math.min(H-EDGE-10, g>0 ? pl.y-20 : pl.y+pl.h+28));
+  ctx.strokeText(t,x,y); ctx.fillText(t,x,y); ctx.restore();
+},'speech');
 GT.onFlipKey = onFlipKey;
 
 function updateHud(){
@@ -759,7 +783,14 @@ resetBtn.title='このステージを最初からやり直す（R キー）';
 Object.assign(resetBtn.style,{ position:'absolute', top:'0.67cqw', right:'0.9cqw', padding:'0.25em 0.85em', zIndex:'2',
   background:'rgba(43,36,24,0.72)', border:'1px solid rgba(176,141,87,0.6)', borderRadius:'12px',
   color:'#e8dcc0', fontFamily:"'Zen Old Mincho',serif", fontSize:'clamp(11px,1.33cqw,32px)', letterSpacing:'0.06em', cursor:'pointer' });
-resetBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); restartStage(); });
+// 1回目のタップでは「もう一度で やり直す」と出すだけ。2.5 秒以内にもう一度押したら、やり直す
+// （スマホで会話を進めようと画面の端をタップしたとき、うっかりやり直さないように）
+let resetArmT=0;
+const resetLabel=()=>{ resetBtn.textContent='↺ やり直す'; resetBtn.style.background='rgba(43,36,24,0.72)'; };
+resetBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation();
+  if(performance.now()<resetArmT){ resetArmT=0; resetLabel(); restartStage(); return; }
+  resetArmT=performance.now()+2500; resetBtn.textContent='もう一度で やり直す'; resetBtn.style.background='rgba(139,47,38,0.85)';
+  setTimeout(()=>{ if(performance.now()>=resetArmT) resetLabel(); },2600); });
 canvas.parentNode.appendChild(resetBtn);
 window.addEventListener('keydown',e=>{ if(e.key==='r'||e.key==='R'){ e.preventDefault(); restartStage(); } });
 
@@ -917,7 +948,7 @@ function typeLoop(now){ const dt=(now-ttLast)/1000; ttLast=now; typeTick(dt); re
 /* ========================================================================== */
 let lastTime=performance.now();
 GT.paused=false;                     // true のあいだ、ゲームは止まる（メニューを開いているときなど）
-function loop(now){ let dt=(now-lastTime)/1000; dt=Math.min(dt,1/30); lastTime=now; if(!GT.paused) update(dt); applyShake(dt); render(); requestAnimationFrame(loop); }
+function loop(now){ let dt=(now-lastTime)/1000; dt=Math.min(dt,1/30); lastTime=now; if(!GT.paused){ update(dt); updateFlipBuffer(dt); } applyShake(dt); render(); requestAnimationFrame(loop); }
 
 function update(dt){
   const player=GT.player, gravity=GT.gravity, boxes=GT.boxes, enemies=GT.enemies;
