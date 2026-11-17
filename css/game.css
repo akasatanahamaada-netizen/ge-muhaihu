@@ -241,7 +241,9 @@ html{ touch-action:manipulation; }                       /* ダブルタップ�
 html,body{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024px 512px repeat; background-attachment:fixed; color:#3a2f2a; }
 body.gt-full{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024px 512px repeat; }
 .ambient, .masthead, .credit, .ribbon, .hud{ display:none !important; }
-.stage{ max-width:1100px; padding-top:96px; }
+.stage{ max-width:none; padding:20px 10px; }
+.book-frame:not(.is-full){ width:auto; max-width:none; }
+.book-frame:not(.is-full) .canvas-wrap{ width:var(--gw,900px); }   /* 全画面でないときも、窓に入る大きさ（js/page.js の fit） */
 .book-frame{ background:none; box-shadow:none; border-radius:0; padding:0; }
 .book-frame::before, .book-frame::after{ display:none; }
 /* ゲーム画面のまわりに、表紙とページのふちのぶんの余白（--gw … 全画面のときのゲーム画面の幅。js/page.js） */

@@ -20,10 +20,14 @@
   let full=false;
   // ゲーム画面の幅：本の枠からはみ出さない、いちばん大きな幅をさがす（ボタンの並びが変わっても使える）
   function fit(){
-    if(!full){ frame.style.removeProperty('--gw'); frame.style.removeProperty('--gs'); return; }
+    if(!full){                                   // 全画面でないとき：本（表紙・旗・しおりの余白もふくめて）が窓に入るだけの大きさ
+      frame.style.removeProperty('--gs');
+      // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.25（左0.18・右0.07）、たて gw×(480/900 + 0.12 + 0.05)
+      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.25, (window.innerHeight-40)/(480/900+0.17), 1100));
+      frame.style.setProperty('--gw', Math.floor(gw)+'px'); return; }
     const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
-      return parts.every(el=>{ if(!el || !el.offsetParent) return true; const r=el.getBoundingClientRect();
+      return parts.every(el=>{ if(!el) return true; const r=el.getBoundingClientRect(); if(!r.width && !r.height) return true;   // 見えていない部品は数えない（SVG は offsetParent を持たないので、大きさで見る）
         return r.left>=f.left+4 && r.right<=f.right-4 && r.top>=f.top+4 && r.bottom<=f.bottom-4; }); };
     let lo=200, hi=Math.min(frame.clientWidth, window.innerHeight*900/480);
     if(fits(hi)) return;
@@ -48,6 +52,7 @@
   const onFsChange=()=>{ if(canFs && !fsEl() && full) setFull(false); };
   document.addEventListener('fullscreenchange',onFsChange); document.addEventListener('webkitfullscreenchange',onFsChange);
   window.addEventListener('resize',fit);
+  fit();                                         // 開いたときも、窓の大きさに合わせる
   GT.enterFullscreen=enter; GT.exitFullscreen=exit;
 })();
 /* ページの見出し：重力が反転しているページは赤くする（engine.js が文字を書きかえるのを見張る） */
