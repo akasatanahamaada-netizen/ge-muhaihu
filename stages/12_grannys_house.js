@@ -460,7 +460,7 @@ GT.registerScene({
   npcs:[
     { who:'granny', name:'おばあさん', page:'left', x:-300, noExit:true, lines:[{s:'おばあさん',c:'granny',t:'……。'}] },   // セリフは epi-setup で入れる
     { who:'hood',   name:'赤ずきん',   page:'left', x:-300, noExit:true, lines:[{s:'赤ずきん',c:'hood',t:'……。'}] },
-    { who:'mari',   name:'マリ',       page:'right', x:690, noExit:true,
+    { who:'mari',   name:'マリ',       page:'right', x:690, noExit:true, required:true,   // 話すとエンディング（右の端は開かないが、話さないと進めない）
       lines:[{s:'マリ',c:'mari',t:'おかえり。'}],
       onEnd:()=>{ GT.mode='idle'; showEndChoices(); } },
   ],

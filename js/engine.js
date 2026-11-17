@@ -592,7 +592,7 @@ function paintSpeech(cx,headY,text,alpha,below,angry){
 function setupNpcs(defs){
   npcs=(defs||[]).map(d=>({
     who:d.who, name:d.name||'', page:d.page||'right', x:d.x, w:d.w||32, h:d.h||40, y:H-EDGE-(d.h||40), vy:0, g:1,
-    lines:d.lines||null, choices:d.choices||null, onEnd:d.onEnd||null, noExit:!!d.noExit,
+    lines:d.lines||null, choices:d.choices||null, onEnd:d.onEnd||null, noExit:!!d.noExit, required:d.required,
     talkable:!!(d.lines), talked:false
   }));
   activeNpc=null; storyTalking=false;
@@ -606,7 +606,7 @@ function tryTalk(){
   beginDialogue(n.lines, n.choices, ()=>{
     storyTalking=false; hideDialogue();
     if(n.onEnd) n.onEnd();
-    n.talked=true;
+    n.talked=true; n.talkedOnce=true;
     // 自動ではめくらない。右端まで自分で歩いたら次ページへ。（noExit の人と話しても、右端は開かない）
     if(!n.noExit){ exitWanted=true; storyExitReady=true; updateExitGate(); }
   });
@@ -921,7 +921,7 @@ GT.drawHint=function(cx,cy,lines){
 GT.beginDialogue=beginDialogue; GT.hideDialogue=hideDialogue;
 /* 吹き出しマーク（話しかけられる人の頭の上）。(cx,cy)＝マークの中心、g＝重力（-1 なら しっぽが上を向く）、
    near＝話しかけられる近さにいる（金色にして、少し大きく） */
-function drawTalkMark(cx,cy,g,near){
+function drawTalkMark(cx,cy,g,near,must){
   const t=performance.now()/1000, bob=Math.sin(t*3)*2.5, k=near?1.15+0.06*Math.sin(t*6):1;
   ctx.save(); ctx.translate(cx,cy+bob*g); ctx.scale(k,k);
   const w=30, h=20;
@@ -932,8 +932,14 @@ function drawTalkMark(cx,cy,g,near){
   const ty=g>0 ? h/2 : -h/2, tip=g>0 ? h/2+8 : -h/2-8, d=g>0?-2:2;
   ctx.beginPath(); ctx.moveTo(-5,ty+d); ctx.lineTo(-1,tip); ctx.lineTo(4,ty+d); ctx.closePath(); ctx.fill();
   ctx.beginPath(); ctx.moveTo(-5,ty); ctx.lineTo(-1,tip); ctx.lineTo(4,ty); ctx.stroke();
-  ctx.fillStyle='#5a4630';
-  for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.arc(i*7, 0, 2.2, 0, Math.PI*2); ctx.fill(); }   // 「…」
+  if(must){                                                                            // 「！」（話さないと進めない）
+    ctx.fillStyle='#b8423f';
+    ctx.beginPath(); ctx.moveTo(-2.6,-6.5); ctx.lineTo(2.6,-6.5); ctx.lineTo(1.4,2.5); ctx.lineTo(-1.4,2.5); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(0,5.6,1.9,0,Math.PI*2); ctx.fill();
+  } else {
+    ctx.fillStyle='#5a4630';
+    for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.arc(i*7, 0, 2.2, 0, Math.PI*2); ctx.fill(); }   // 「…」（話さなくても進める）
+  }
   ctx.restore();
 }
 
@@ -1526,7 +1532,11 @@ function drawNpc(n){
     ctx.fillStyle='rgba(74,70,60,0.85)'; ctx.fillText(n.name, cx, g>0 ? headY-12 : headY+20); ctx.restore(); }
   // 話しかけられる人：頭の上に吹き出しマーク（まだ話していない人だけ。会話中は出さない）
   const canTalk = n.talkable && !n.talked && n.lines && !storyTalking && !dlg.classList.contains('show') && GT.mode==='play';
-  if(canTalk) drawTalkMark(cx, g>0 ? headY-38 : headY+44, g, n===activeNpc);
+  // 話しかけないと先へ進めない人は「！」、話さなくても進める人（ヒント・寄り道の会話）は「…」
+  //   ふつうは、話し終えると右の端が開く人（noExit でない人）で、まだ一度も話していない人が「！」。
+  //   ステージ側で n.required = true / false と書けば、そちらが優先
+  const must = n.required!=null ? !!n.required : (!n.noExit && !n.talkedOnce);
+  if(canTalk) drawTalkMark(cx, g>0 ? headY-38 : headY+44, g, n===activeNpc, must);
   if(n===activeNpc && !storyTalking){
     const p=0.5+0.5*Math.sin(goalPulse*5);
     ctx.save(); ctx.textAlign='center'; ctx.globalAlpha=0.65+0.35*p;
