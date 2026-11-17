@@ -119,7 +119,9 @@ const BOY_PORTRAIT=()=> 'assets/character/物憂げな琥珀眼の少年.webp';
    右向きに描かれた絵は GT.portraitMirror に入れておくと、左右反転して左向きにする。
    表情：セリフに f:'smile'（笑顔）/ f:'surprise'（驚き）/ f:'scared'（怯え）/ f:'granny'（おばあさんに化けた狼）と書くと、その表情の絵になる */
 const P='assets/character/';
-GT.portraitMirror = [ P+'水彩タッチの赤ずきん少女.webp', P+'赤ずきんの驚き顔バスケット少女.webp' ];   // どちらも少し右向きの絵
+GT.portraitMirror = [ P+'水彩タッチの赤ずきん少女.webp' ];   // 少し右向きの絵
+/* 表情の差分（笑顔・驚き・怯え・口を開いたマリ・化けた狼）の webp は、元の PNG から作るときに
+   ふだんの絵にぴったり重なる位置・大きさ（赤ずきんは反転したあとの姿）に合わせてある。表情を変えても、人物がずれない */
 GT.portraits = {
   boy:   BOY_PORTRAIT,                                           // 少年のセリフ（c:'boy'）
   // 狼：左向き『狡猾な人狼の立ち姿』。おばあさんに化けているセリフ（f:'granny'）は『おばあちゃん狼の不敵な微笑み』
