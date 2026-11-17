@@ -405,7 +405,7 @@ GT.registerSceneReset(()=>{ if(isEpi()){ ending.epilogue=true; ending.card=false
 // 最後の選択肢（本を開いたあとも、ここに戻ってくる）
 function showEndChoices(){
   GT.beginDialogue([], [
-    { label:'📖 本を開いて、読み返す', set:()=>GT.openBookModal(), after:[] },
+    { label:'本を開いて、読み返す', set:()=>GT.openBookModal(), after:[] },
     { label:'はじめから読む', set:()=>location.reload(), after:[] },
   ], showEndChoices);
 }
