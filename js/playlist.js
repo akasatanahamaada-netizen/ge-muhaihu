@@ -79,13 +79,15 @@ GT.playlist = [
 // 書いていないステージ（家の中など）は、背景画像なし。
 // （水彩の森と遠い城の絵 'assets/background/水彩で描く静かな森と遠い城.webp' も使える）
 const BG_DAY='assets/background/ohiru no mori.webp', BG_EVENING='assets/background/yuugata no mori.webp';
-const BG_DARK='assets/background/霧深き森のゴシック童話.webp';   // 霧の深い、暗い森（近道：狼を追って、いばらの中へ）
+const BG_DARK='assets/background/霧深き森のゴシック童話.webp';   // 霧の深い、暗い森（近道①：狼を追って、森の奥へ）
+const BG_ROSE='assets/background/霧深き薔薇の森１.webp';          // 霧の深い、いばらと薔薇の森（近道②：いばらのトンネル）
 const S=src=>({src,page:'spread'});
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
+const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
   opening:S(BG_DAY), komichi1:S(BG_DAY), komichi2:S(BG_DAY), house_peek:S(BG_DAY), path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),
   wolf_talk:S(BG_DAY), crossroads:S(BG_DAY),
-  path2:DARK, path2b:DARK,                           // 近道（暗い森）
+  path2:DARK, path2b:ROSE,                           // 近道（①暗い森 ②いばらと薔薇の森）
   flowers:S(BG_DAY),                                 // お花畑（遠回りの はじめ）
   path3:S(BG_DAY), path4:S(BG_EVENING),              // 遠回り：歩くうちに日が傾く
   house_front:f=>S(f.route==='shortcut'?BG_DAY:BG_EVENING),
