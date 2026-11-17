@@ -132,6 +132,6 @@ GT.portraits = {
   mother:P+'水彩風の優しいお母さん.webp',                         // お母さん
   // おばあさん：ふだん『優しい笑顔の祖母キャラクター』／怯え（f:'scared'）『杖を握る不安げなおばあさん』
   granny:l=> l.f==='scared' ? P+'杖を握る不安げなおばあさん.webp' : P+'優しい笑顔の祖母キャラクター.webp',
-  // マリ：左向き『mari honnmono (hidari)』。たずねる・声をあげるセリフ（？ か ！ がある）は『マリ：口を開いている』
-  mari:  l=> /[？！?!]/.test(String(l.t||'')) ? P+'マリ：口を開いている.webp' : P+'mari honnmono (hidari).webp',
+  // マリ：左向き『mari honnmono (hidari)』。たずねる・声をあげるセリフ（？ か ！ がある）は『マリ口開いている』
+  mari:  l=> /[？！?!]/.test(String(l.t||'')) ? P+'マリ口開いている.webp' : P+'mari honnmono (hidari).webp',
 };
