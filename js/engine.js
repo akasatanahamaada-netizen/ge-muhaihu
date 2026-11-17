@@ -654,8 +654,21 @@ function nextLine(){
   const line=dq.shift();
   for(const h of lineHooks) h(line);
   if(line.act && actHooks[line.act]) actHooks[line.act]();
+  if(holdFn){ startHold(line); return; }      // 人物が動いているあいだは、会話の枠を消して待つ
   showLine(line);
 }
+/* 動いているところを見せる：act の中で GT.holdDialogue(終わったか) を呼ぶと、
+   その動き（赤ずきんが駆けだす・狼が去る など）が終わるまで、会話の枠と立ち絵を消して待ち、終わってからその行の文を出す。
+   待っているあいだは、タップしても進まない（いつまでも終わらないときのために、最長 HOLD_MAX 秒で先へ進む） */
+const HOLD_MAX=6;
+let holdFn=null, holdWait=null;
+GT.holdDialogue=fn=>{ holdFn=fn; };
+function startHold(line){
+  const f=holdFn, t0=performance.now(); holdFn=null;
+  dlg.classList.add('hold'); showPortrait(null); dlgLine.textContent=''; dlgSpeaker.textContent='';
+  holdWait=()=>{ if(f() || performance.now()-t0>HOLD_MAX*1000){ holdWait=null; dlg.classList.remove('hold'); showLine(line); } };
+}
+function endHold(){ if(holdWait){ holdWait=null; dlg.classList.remove('hold'); } }
 /* 主人公の名前（序で入力する。GT.flags.playerName にしまうので、セーブにも入る）。
    セリフの t に {name} と書くと、その名前に置きかわる。主人公のセリフ（c:'boy'）の名前の欄にも出る */
 GT.playerName=()=>(GT.flags && GT.flags.playerName) || '少年';
@@ -710,6 +723,7 @@ function finishDialogue(){ const cb=dOnComplete; dOnComplete=null; if(cb) cb(); 
 function hideDialogue(){ dlg.classList.remove('show'); }
 function tryAdvanceDialogue(){
   if(!dlg.classList.contains('show')) return false;
+  if(holdWait) return true;                     // 動きを見せているあいだは進まない
   if(choicesShown) return false;
   if(typing){ dlgLine.textContent=typeTarget; typing=false; return true; }
   nextLine(); return true;
@@ -718,11 +732,12 @@ function tryAdvanceDialogue(){
    飛ばした行の act（窓のぞきの開閉など）も順番どおりに実行するので、ステージの状態はずれない。 */
 function skipDialogue(){
   if(!dlg.classList.contains('show') || choicesShown) return;
-  typing=false;
+  typing=false; endHold(); holdFn=null;
   while(dq.length){
     const line=dq.shift();
     for(const h of lineHooks) h(line);
     if(line.act && actHooks[line.act]) actHooks[line.act]();
+    holdFn=null;                                // 飛ばすときは、動きを待たない
     if(line.ask){ showLine(line); typing=false; dlgLine.textContent=typeTarget; return; }   // 名前の入力では止まる
   }
   if(dChoices){ showChoices(dChoices); return; }
@@ -964,7 +979,7 @@ function typeTick(dt){
   dlgLine.textContent=typeTarget.slice(0,typeI); if(typeI>=typeTarget.length) typing=false;
 }
 let ttLast=performance.now();
-function typeLoop(now){ const dt=(now-ttLast)/1000; ttLast=now; typeTick(dt); requestAnimationFrame(typeLoop); }
+function typeLoop(now){ const dt=(now-ttLast)/1000; ttLast=now; if(holdWait) holdWait(); typeTick(dt); requestAnimationFrame(typeLoop); }
 
 /* ========================================================================== */
 /*  物理                                                                      */

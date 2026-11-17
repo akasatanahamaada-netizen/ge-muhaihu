@@ -240,7 +240,7 @@ const ENDINGS={
 };
 const ending={ kind:'true', hoodIn:false, hoodInT:0, epilogue:false, card:false, cardT:0 };
 GT.defineStage('ending_room', { label:'第一章 ── おばあさんの家', platforms:[], boxes:[], enemies:[] });
-GT.registerAct('end-hood-in', ()=>{ ending.hoodIn=true; ending.hoodInT=performance.now(); });
+GT.registerAct('end-hood-in', ()=>{ ending.hoodIn=true; ending.hoodInT=performance.now(); GT.holdDialogue(()=>performance.now()-ending.hoodInT>700); });   // 赤ずきんが入ってくるまで、会話の枠を消して見せる
 // 近道で昼のうちに着いたら、外に出るのは夕暮れ。遠回りで夕方に着いたら、一夜明けて夜明け
 const epilogueDusk=()=>GT.flags.route==='shortcut';
 const isEpi=()=>GT.scene&&GT.scene.id==='epilogue';

@@ -134,7 +134,8 @@ GT.registerSceneReset(()=>{ if(!isWolf()) return;
   st.phase='walk'; st.busy=false; st.rustled=false; st.found={}; st.appearT0=0; st.leaveT0=0; GT.flags.wolfClues=0; });
 GT.registerAct('wolf-setup',()=>{ const h=npc('hood'), w=npc('wolf');
   if(h) h.x=EDGE; if(w){ w.x=WOLF_HIDE; w.talkable=false; } });
-GT.registerAct('wolf-leave',()=>{ st.leaveT0=performance.now(); });
+GT.registerAct('wolf-leave',()=>{ st.leaveT0=performance.now(); const w=npc('wolf');
+  GT.holdDialogue(()=>{ const w=npc('wolf'); return !w || w.x>=W+20; }); });   // 狼が画面の外へ去るまで、会話の枠を消して見せる
 
 function autoTalk(lines,after){
   st.busy=true; GT.mode='idle'; GT.player.vx=0;
@@ -191,7 +192,7 @@ function moveActors(){
     w.x = WOLF_HIDE-(WOLF_HIDE-WOLF_STAND)*Math.min(1,Math.max(0,(k-0.9)/0.9));
     if(k>2.0){ st.phase='wolf'; GT.mode='play'; autoTalk(APPEAR); }
   }
-  if(st.leaveT0){ w.x = WOLF_STAND+Math.max(0,(now-st.leaveT0)/1000-0.3)*80; if(w.x>W+80) w.x=W+80; }
+  if(st.leaveT0){ w.x = WOLF_STAND+Math.max(0,(now-st.leaveT0)/1000-0.3)*120; if(w.x>W+80) w.x=W+80; }   // 去っていく（120px/秒。約2秒で見えなくなる）
 }
 
 /* 昼の森の奥（地形より奥） */

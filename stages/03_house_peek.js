@@ -115,8 +115,9 @@ const DOOR={x:800, y:372, w:52};
 const st={ briefed:false, peeked:false, busy:false, runT0:0 };
 const isHouse=()=>GT.scene&&GT.scene.id==='house_peek';
 GT.registerSceneReset(()=>{ if(isHouse()){ st.briefed=false; st.peeked=false; st.busy=false; st.runT0=0; } });
-GT.registerAct('house-hood-run',()=>{ st.runT0=performance.now(); setTimeout(()=>{ if(st.runT0) GT.sfx&&GT.sfx('door'); },1300); });   // 赤ずきんが出ていって、戸が閉まる
-GT.registerAct('peek-off-run',()=>{ peek.on=false; st.runT0=performance.now(); setTimeout(()=>{ if(st.runT0) GT.sfx&&GT.sfx('door'); },1300); });   // 窓から離れる ＋ 赤ずきんが駆けだしていく
+GT.registerAct('house-hood-run',()=>{ st.runT0=performance.now(); setTimeout(()=>{ if(st.runT0) GT.sfx&&GT.sfx('door'); },1300); GT.holdDialogue(()=>!st.runT0); });   // 赤ずきんが出ていって、戸が閉まる
+GT.registerAct('peek-off-run',()=>{ peek.on=false; st.runT0=performance.now(); setTimeout(()=>{ if(st.runT0) GT.sfx&&GT.sfx('door'); },1300);
+  GT.holdDialogue(()=>!st.runT0); });   // 赤ずきんが画面の外へ駆けていくまで、会話の枠を消して見せる   // 窓から離れる ＋ 赤ずきんが駆けだしていく
 
 function autoTalk(lines, then){
   st.busy=true; GT.mode='idle'; GT.player.vx=0;

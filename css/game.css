@@ -91,6 +91,7 @@ canvas#game{ display:block; border-radius:3px; width:100%; height:auto; aspect-r
   display:none; flex-direction:column; gap:0.9cqw; border-radius:0 0 3px 3px;
 }
 .dialogue.show{ display:flex; }
+.dialogue.hold{ opacity:0; pointer-events:none; }   /* 人物が動いているあいだは、会話の枠を消す（GT.holdDialogue） */
 .speaker{ font-family:'Cormorant Garamond',serif; font-size:clamp(12px,1.67cqw,40px); letter-spacing:0.1em; color:#d9b877; font-weight:700; }
 .speaker.mari{ color:#a9b0d6; } .speaker.wolf{ color:#c9503f; } .speaker.hood{ color:#d98a90; }
 .speaker.granny{ color:#c8b78f; } .speaker.narr{ color:#8a8266; font-style:italic; }

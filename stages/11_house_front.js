@@ -165,10 +165,10 @@ GT.registerAct('front-setup',()=>{
   else { if(h) h.x=EDGE; GT.flags.stoppedAtDoor=false; }
 });
 GT.registerAct('front-knock',()=>{ st.knockT0=performance.now(); });
-GT.registerAct('front-hood-enter',()=>{ st.hoodEnterT0=performance.now(); });
+GT.registerAct('front-hood-enter',()=>{ st.hoodEnterT0=performance.now(); GT.holdDialogue(()=>st.hoodInside); });   // 赤ずきんが戸の中へ入るまで、会話の枠を消して見せる
 // 赤ずきんを止める：少年が、戸の前の赤ずきんのそばまで自動で駆けよる
 GT.registerAct('front-run',()=>{ const pcx=GT.player.x+GT.player.w/2;
-  st.runTo = pcx<HOOD_DOOR ? HOOD_DOOR-30 : HOOD_DOOR+44; });
+  st.runTo = pcx<HOOD_DOOR ? HOOD_DOOR-30 : HOOD_DOOR+44; GT.holdDialogue(()=>st.runTo==null); });   // 少年が駆けよるまで、会話の枠を消して見せる
 
 function autoTalk(lines){
   st.busy=true; GT.mode='idle'; GT.player.vx=0;
