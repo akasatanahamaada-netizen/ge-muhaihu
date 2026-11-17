@@ -864,13 +864,22 @@ window.addEventListener('keydown',e=>{ if(e.key==='r'||e.key==='R'){ e.preventDe
 
 /* 操作の説明の枠（チュートリアル用）。ステージ側から GT.drawHint(中心x, 中心y, 行の配列) で描く。
    行は '文字' か [['キー','キー'], '説明'] の形。キーはキーボードのキーの形で描く。 */
-function drawKeycap(x,y,label){
+function drawKeycap(x,y,label){                     // ゴシック：暗い板に、くすんだ金のふち（下に厚み）
   ctx.font="700 12px 'Zen Old Mincho',serif";
   const w=Math.max(20,ctx.measureText(label).width+12);
-  roundRect(x,y-11,w,22,5); ctx.fillStyle='#f3ead0'; ctx.fill();
-  ctx.strokeStyle='#8a7a5a'; ctx.lineWidth=1.2; ctx.stroke();
-  ctx.fillStyle='#3a2f2a'; ctx.textAlign='center'; ctx.fillText(label,x+w/2,y+1);
+  roundRect(x,y-9,w,22,4); ctx.fillStyle='#120609'; ctx.fill();                       // 厚み
+  roundRect(x,y-11,w,21,4); const g=ctx.createLinearGradient(0,y-11,0,y+10); g.addColorStop(0,'#4a2a3a'); g.addColorStop(1,'#2a1420');
+  ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle='rgba(214,176,118,0.85)'; ctx.lineWidth=1.1; ctx.stroke();
+  ctx.fillStyle='#f3dfb0'; ctx.textAlign='center'; ctx.fillText(label,x+w/2,y);
   return w;
+}
+/* 案内の枠のかざり：すみの、いばらの巻きひげ（dx,dy … 向き） */
+function hintCorner(x,y,dx,dy){
+  ctx.save(); ctx.translate(x,y); ctx.scale(dx,dy); ctx.strokeStyle='rgba(214,176,118,0.9)'; ctx.lineWidth=1.2; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(0,16); ctx.quadraticCurveTo(0,0,16,0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(5,13); ctx.bezierCurveTo(5,4,13,4,13,9); ctx.bezierCurveTo(13,12,9,12,9,9); ctx.stroke();   // 巻きひげ
+  ctx.beginPath(); ctx.moveTo(18,0); ctx.lineTo(22,-2); ctx.moveTo(0,18); ctx.lineTo(-2,22); ctx.stroke();                 // とげ
+  ctx.restore();
 }
 /* 虫食い：古い本のページが、虫に食べられたあと。
    GT.wormEaten(ctx, x, y, 幅, 高さ, 種, {edges:['left','top','bottom'], under:'#色', count:6, avoid:[{x,y,w,h}]})
@@ -970,17 +979,27 @@ GT.drawHint=function(cx,cy,lines){
   const widths=lines.map(l=>{ ctx.font=FONT; if(typeof l==='string') return ctx.measureText(l).width;
     ctx.font="700 12px 'Zen Old Mincho',serif"; const kw=touchKeys(l[0]).reduce((a,k)=>a+Math.max(20,ctx.measureText(k).width+12)+14,0);
     ctx.font=FONT; return kw+ctx.measureText(l[1]).width+6; });
-  const bw=Math.max(...widths)+28, bh=lines.length*26+16;
-  const bx=Math.max(EDGE+6,Math.min(W-EDGE-6-bw,cx-bw/2)), by=Math.max(EDGE+30,Math.min(H-EDGE-6-bh,cy-bh/2));
-  ctx.globalAlpha=0.88+0.12*Math.sin(performance.now()/300);
-  roundRect(bx,by,bw,bh,12); ctx.fillStyle='rgba(43,36,24,0.82)'; ctx.fill();
-  ctx.strokeStyle='rgba(232,195,90,0.7)'; ctx.lineWidth=1.5; ctx.stroke();
-  lines.forEach((l,i)=>{ const y=by+20+i*26; let x=bx+14; ctx.textAlign='left';
-    if(typeof l==='string'){ ctx.font=FONT; ctx.fillStyle='#f3ead0'; ctx.fillText(l,x,y); return; }
+  const bw=Math.max(...widths)+40, bh=lines.length*26+26;
+  const bx=Math.max(EDGE+6,Math.min(W-EDGE-6-bw,cx-bw/2)), by=Math.max(EDGE+34,Math.min(H-EDGE-6-bh,cy-bh/2));
+  const pulse=0.5+0.5*Math.sin(performance.now()/420);
+  // 枠：赤紫の黒（上ほど少し明るい）、影、くすんだ金の二重のふち、すみのいばら、上のまん中に薔薇
+  ctx.save(); ctx.shadowColor='rgba(8,2,6,0.7)'; ctx.shadowBlur=14; ctx.shadowOffsetY=4;
+  roundRect(bx,by,bw,bh,6); const bg=ctx.createLinearGradient(0,by,0,by+bh); bg.addColorStop(0,'rgba(48,18,34,0.94)'); bg.addColorStop(1,'rgba(22,7,16,0.94)');
+  ctx.fillStyle=bg; ctx.fill(); ctx.restore();
+  roundRect(bx,by,bw,bh,6); ctx.strokeStyle=`rgba(214,176,118,${0.7+0.25*pulse})`; ctx.lineWidth=1.4; ctx.stroke();
+  roundRect(bx+4,by+4,bw-8,bh-8,3); ctx.strokeStyle='rgba(214,176,118,0.35)'; ctx.lineWidth=1; ctx.stroke();
+  hintCorner(bx+3,by+3,1,1); hintCorner(bx+bw-3,by+3,-1,1); hintCorner(bx+3,by+bh-3,1,-1); hintCorner(bx+bw-3,by+bh-3,-1,-1);
+  { const rx=bx+bw/2, ry=by;                                                               // 薔薇と葉
+    ctx.fillStyle='#2a3624'; ctx.beginPath(); ctx.ellipse(rx-9,ry+1,6,2.6,-0.3,0,Math.PI*2); ctx.ellipse(rx+9,ry+1,6,2.6,0.3,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(rx,ry,5.5,0,Math.PI*2); ctx.fillStyle='#6e1024'; ctx.fill();
+    ctx.beginPath(); ctx.arc(rx-1,ry-1,3.4,0,Math.PI*2); ctx.fillStyle='#b3263f'; ctx.fill();
+    ctx.beginPath(); ctx.arc(rx-0.6,ry-0.6,1.8,0.5,5.6); ctx.strokeStyle='#4a0816'; ctx.lineWidth=0.8; ctx.stroke(); }
+  lines.forEach((l,i)=>{ const y=by+24+i*26; let x=bx+20; ctx.textAlign='left';
+    if(typeof l==='string'){ ctx.font=FONT; ctx.fillStyle='#f1e3e6'; ctx.fillText(l,x,y); return; }
     const ks=touchKeys(l[0]);
     ks.forEach((k,j)=>{ x+=drawKeycap(x,y,k)+4;
-      if(j<ks.length-1){ ctx.fillStyle='#cbb98f'; ctx.font="700 12px serif"; ctx.textAlign='left'; ctx.fillText('/',x,y); x+=10; } });
-    ctx.font=FONT; ctx.textAlign='left'; ctx.fillStyle='#e8c35a'; ctx.fillText(l[1],x+4,y); });
+      if(j<ks.length-1){ ctx.fillStyle='#b98a92'; ctx.font="700 12px serif"; ctx.textAlign='left'; ctx.fillText('/',x,y); x+=10; } });
+    ctx.font=FONT; ctx.textAlign='left'; ctx.fillStyle='#e8c88a'; ctx.fillText(l[1],x+4,y); });
   ctx.restore();
 };
 
