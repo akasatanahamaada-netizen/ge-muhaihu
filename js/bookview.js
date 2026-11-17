@@ -236,6 +236,9 @@ let spread=0, turning=false, wasPaused=false;
 const spreads=()=>Math.ceil(entries().length/2);             // とびら + 章のとびら + ページ
 function show(){
   fill(pageL, spread*2); fill(pageR, spread*2+1);
+  updateNav();
+}
+function updateNav(){                                         // 前へ・次へのボタンと「n / m」
   const last=spreads()-1;
   btnPrev.disabled=hitL.disabled=spread<=0; btnNext.disabled=hitR.disabled=spread>=last;
   count.textContent=`${spread+1} / ${last+1}`;
@@ -244,7 +247,9 @@ function show(){
    めくれる紙は、ページとまったく同じ大きさで、表にはいまのページ、裏には次の見開きのページが描いてある
    （白紙ではなく、文字や挿絵が入ったまま めくれる）。
    紙は背表紙を軸に横へ縮みながら反対側へ倒れ、上下のふちが少し反る。めくっているあいだは見開きが少し暗くなり、
-   紙の背表紙側に影、めくれていくふちに光の線が入る。紙が背表紙を越えたところで、見開きが次のページに入れかわる。 */
+   紙の背表紙側に影、めくれていくふちに光の線が入る。
+   紙が倒れていく先のページ（進むときは左、もどるときは右）は、紙がおりきるまで いまのページのまま。
+   （先に入れかえると、細くなった紙のうしろから、次のページが先に見えてしまう） */
 function turn(dir){
   const to=spread+dir; if(turning || lidAnim || to<0 || to>=spreads()) return;
   turning=true; GT.sfx&&GT.sfx('page');
@@ -273,7 +278,7 @@ function turn(dir){
   const t0=performance.now(); let swapped=false;
   function frame(now){
     const p=Math.min(1,(now-t0)/TURN_MS), c=Math.cos(p*Math.PI), k=Math.max(0.001,Math.abs(c)), dim=Math.sin(p*Math.PI);
-    if(!swapped && p>=0.5){ swapped=true; spread=to; show(); }      // 背表紙を越えたら、次の見開きに入れかわる
+    if(!swapped && p>=0.5){ swapped=true; spread=to; updateNav(); } // 背表紙を越えたら、ページ番号だけ先に進める（ページの中身は、おりきってから）
     const cur = c>=0 ? front : back, other = c>=0 ? back : front;
     other.leaf.style.display='none'; cur.leaf.style.display='';
     // 上下のふちの反り（紙の外がわほど、内がわへ反る）。紙はページと同じ大きさ（SP×BH）
@@ -294,7 +299,7 @@ function turn(dir){
     g.font=`600 ${fs}px 'Zen Old Mincho', serif`; g.textAlign='center'; g.textBaseline='middle';
     g.fillText('ページをめくる…', BW/2, BH-BH*(38/480)); g.restore();
     if(p<1) requestAnimationFrame(frame);
-    else { front.leaf.remove(); back.leaf.remove(); dimEl.remove(); cv.remove(); turning=false; }
+    else { show(); front.leaf.remove(); back.leaf.remove(); dimEl.remove(); cv.remove(); turning=false; }   // 紙がおりきったら、倒れた先のページも次の見開きに
   }
   requestAnimationFrame(frame);
 }
