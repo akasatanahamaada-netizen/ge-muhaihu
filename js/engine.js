@@ -241,9 +241,9 @@ function bgVignette(spec,img){
   p.globalCompositeOperation='destination-in'; p.drawImage(brushMask(spec.w,spec.h,seed||7),0,0);
   return (bgVignettes[key]=c);
 }
-/* page:'spread' … 見開き全体に敷く（ふちの切りぬきなし） */
+/* page:'spread' … 見開き全体に敷く（ふちの切りぬきなし）。spec.wash で、かぶせる紙の色の濃さを背景ごとに変えられる（暗い森は薄く） */
 function bgSpread(spec,img){
-  const key=spec.src+'|spread';
+  const key=spec.src+'|spread|'+(spec.wash||'');
   if(bgVignettes[key]) return bgVignettes[key];
   const c=document.createElement('canvas'); c.width=W; c.height=H;
   const p=c.getContext('2d');
@@ -252,7 +252,7 @@ function bgSpread(spec,img){
   p.filter=BG_FILTER;
   p.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
   p.filter='none';
-  p.fillStyle=BG_WASH; p.fillRect(0,0,W,H);
+  p.fillStyle=spec.wash||BG_WASH; p.fillRect(0,0,W,H);
   return (bgVignettes[key]=c);
 }
 function drawStageBackground(){
