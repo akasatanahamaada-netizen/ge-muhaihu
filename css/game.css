@@ -335,3 +335,11 @@ canvas#game{ border-radius:0; }
 .gt-flags{ gap:2cqw; }
 .gt-flag:hover, .gt-flag:focus-visible, .gt-flag.gt-guide, .gt-flag.reset.armed{ transform:translateX(-2.4cqw) rotate(0); }
 .gt-spare{ left:calc(100% + 8cqw); }
+/* 栞は縦にまっすぐ。ゲーム画面をもう少し大きく（しおりを少し小さく、旗を本に寄せ、まわりの余白を詰める） */
+.gt-spare, .gt-spare:hover, .gt-spare:focus-visible{ transform:none; }
+.gt-spare:hover, .gt-spare:focus-visible{ transform:translateY(-1cqw); }
+.gt-tabs{ top:calc(-1 * (14cqw * 0.66 + 1.4cqw)); }
+.gt-tab{ --h:14cqw; width:4cqw; }
+.gt-flags{ right:100%; }
+.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin:calc(var(--gw,900px) * 0.12) calc(var(--gw,900px) * 0.145) calc(var(--gw,900px) * 0.05) calc(var(--gw,900px) * 0.145) !important; }
+.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.13) !important; }

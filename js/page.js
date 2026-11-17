@@ -23,7 +23,7 @@
     if(!full){                                   // 全画面でないとき：本（表紙・旗・しおりの余白もふくめて）が窓に入るだけの大きさ
       frame.style.removeProperty('--gs');
       // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.42（左右 0.21 ずつ）、たて gw×(480/900 + 0.14 + 0.06)
-      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.36, (window.innerHeight-40)/(480/900+0.24), 1100));   // しおりのひも・引き出した旗のぶんも入れる
+      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.31, (window.innerHeight-40)/(480/900+0.2), 1100));   // しおりのひも・引き出した旗のぶんも入れる
       frame.style.setProperty('--gw', Math.floor(gw)+'px'); return; }
     const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.gt-tabs','.gt-spare','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
