@@ -300,8 +300,8 @@ GT.loadStageDef = function(def, opt){
   GT.items = (def.items||[]).map((it,i)=>{ const pid=def.id+':'+i, had=!!(bp && bp.found.includes(pid));
     return {...it,pid,got:had,gotT:had?99:0}; });
   bookShown=def.bookPage ? GT.pagePieces(def.bookPage).found : GT.items.filter(i=>i.got).length; updateBookFill();         // 「本を開く」ボタンの本の絵（集めたぶんだけ埋まる）は、ステージごとに空から
-  itemLook  = def.itemLook||'page';      // 'page'（光るお話のかけら。ふつうはこれ）／'star'（前の★）
-  itemLabel = def.itemLabel||(itemLook==='page'?'お話のかけら':'★');   // 画面上のミッション表示での呼び名
+  itemLook  = def.itemLook||'page';      // 'page'（光るお話のかけら。ふつうはこれ）／'flower'（お花。摘むと消える）／'star'（前の★）
+  itemLabel = def.itemLabel||(itemLook==='page'?'お話のかけら':itemLook==='flower'?'お花':'★');   // 画面上のミッション表示での呼び名
   hudPulse=0;
   const m=def.mission||[];
   missionReq = m.length ? {items:m.includes('items'), enemies:m.includes('enemies')} : null;
@@ -1381,6 +1381,7 @@ function drawItem(it){
     drawPageScrap(cx,it.y+it.h/2+bob,sw,sh,rot,seed,0); ctx.restore();
     return;
   }
+  if(itemLook==='flower'){ drawFlowerItem(it,cx,r); return; }
   if(it.got){ if(it.gotT>0.5) return; const t=it.gotT/0.5;
     ctx.save(); ctx.globalAlpha=1-t; ctx.strokeStyle='#e8c35a'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(cx,it.y+it.h/2,r*(1+t*1.6),0,Math.PI*2); ctx.stroke(); ctx.restore(); return; }
@@ -1389,6 +1390,36 @@ function drawItem(it){
   ctx.shadowColor='rgba(232,195,90,0.8)'; ctx.shadowBlur=10;
   drawStar(cx,cy,r); ctx.fillStyle='#e8c35a'; ctx.fill();
   ctx.shadowBlur=0; ctx.strokeStyle='#8a6a2a'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.restore();
+}
+/* お花（itemLook:'flower'）：茎と葉のある、5枚花びらの花。天井に近いものは、さかさまに（天井から）咲いている。
+   摘むと、花びらが舞って「お花 ＋1」 */
+const FLOWER_COLS=[['#e2738a','#f6c1cc'],['#e8c35a','#f8e7a8'],['#8f8be0','#d4d0f6'],['#f3ead0','#ffffff'],['#e88a5a','#f8c9a8']];
+function drawFlowerItem(it,cx,r){
+  const up = it.y < H/2;                                    // 天井がわの花は、さかさま
+  const base = up ? it.y : it.y+it.h, d = up ? 1 : -1;      // 根もと（床か天井）と、のびる向き
+  const [c1,c2]=FLOWER_COLS[Math.abs(Math.round(it.x/7+it.y/11))%FLOWER_COLS.length];
+  const sway=Math.sin(goalPulse*2+it.x*0.05)*2.2;
+  if(it.got){
+    if(it.gotT>1.2) return;
+    const k=it.gotT;
+    ctx.save(); ctx.globalAlpha=Math.max(0,1-k/1.2);
+    for(let i=0;i<6;i++){ const a=i*1.05+k*2, rr=8+k*40;          // 花びらが舞う
+      ctx.fillStyle=i%2?c1:c2; ctx.beginPath(); ctx.ellipse(cx+Math.cos(a)*rr, base+d*it.h*0.7+Math.sin(a)*rr*0.6-k*20, 4, 2.4, a, 0, Math.PI*2); ctx.fill(); }
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font="700 14px 'Zen Old Mincho',serif";
+    const ty=base+d*it.h-40*(up?-1:1)-k*20, txt=itemLabel+' ＋1';
+    ctx.lineWidth=4; ctx.strokeStyle='rgba(43,36,24,0.75)'; ctx.strokeText(txt,cx,ty); ctx.fillStyle='#ffe9a0'; ctx.fillText(txt,cx,ty);
+    ctx.restore(); return;
+  }
+  const top=base+d*it.h*0.95, fx=cx+sway;
+  ctx.save();
+  ctx.strokeStyle='#5e7d44'; ctx.lineWidth=2.2; ctx.beginPath(); ctx.moveTo(cx,base); ctx.quadraticCurveTo(cx+sway*0.4,base+d*it.h*0.5,fx,top); ctx.stroke();   // 茎
+  ctx.fillStyle='#6f9a4e'; ctx.beginPath(); ctx.ellipse(cx+5,base+d*it.h*0.35,6,2.6,-0.5*d,0,Math.PI*2); ctx.fill();              // 葉
+  ctx.shadowColor='rgba(255,236,170,0.8)'; ctx.shadowBlur=8;                                                                        // ほんのり光って、見つけやすく
+  for(let i=0;i<5;i++){ const a=i*Math.PI*2/5+goalPulse*0.3; ctx.fillStyle=c1;
+    ctx.beginPath(); ctx.ellipse(fx+Math.cos(a)*r*0.42, top+Math.sin(a)*r*0.42, r*0.34, r*0.22, a, 0, Math.PI*2); ctx.fill(); }
+  ctx.shadowBlur=0; ctx.fillStyle=c2; for(let i=0;i<5;i++){ const a=i*Math.PI*2/5+goalPulse*0.3; ctx.beginPath(); ctx.ellipse(fx+Math.cos(a)*r*0.36, top+Math.sin(a)*r*0.36, r*0.16, r*0.1, a, 0, Math.PI*2); ctx.fill(); }
+  ctx.fillStyle='#c98a2a'; ctx.beginPath(); ctx.arc(fx,top,r*0.17,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
 /* ミッション中は右端に「閉じた扉」を描いて、通れないことを見せる */
@@ -1430,11 +1461,11 @@ function drawGameOver(){
 }
 function drawMissionHud(){
   const c=missionCount(), parts=[];
-  const page=itemLook==='page';
-  if(missionReq.items) parts.push(page ? `${itemLabel}を集める ${c.items}/${c.itemsAll}` : `${itemLabel} ${c.items}/${c.itemsAll}`);
-  if(missionReq.enemies) parts.push(`敵 ${c.enemies}/${c.enemiesAll}`);
+  const page=itemLook==='page', verb = page?'を集める':itemLook==='flower'?'を摘む':null;   // 見出しの言いかた
+  if(missionReq.items) parts.push(verb ? `${itemLabel}${verb} ${c.items}/${c.itemsAll}` : `${itemLabel} ${c.items}/${c.itemsAll}`);
+  if(missionReq.enemies) parts.push(`狼の手下を倒す ${c.enemies}/${c.enemiesAll}`);
   const done=missionDone();
-  const txt = done ? (page&&!missionReq.enemies ? `${itemLabel}が そろった！` : 'ミッション達成！') : (page ? '' : 'ミッション　')+parts.join('　');
+  const txt = done ? (verb&&!missionReq.enemies ? `${itemLabel}が そろった！` : missionReq.items ? 'ミッション達成！' : 'みんな倒した！') : ((verb||!missionReq.items) ? '' : 'ミッション　')+parts.join('　');
   ctx.save(); ctx.font="700 14px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
   const icon=page?26:0, w=ctx.measureText(txt).width+28+icon, y=48;
   ctx.globalAlpha = done ? Math.min(1,0.35+missionFlash) : 1;

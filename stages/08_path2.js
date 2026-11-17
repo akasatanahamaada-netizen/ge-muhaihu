@@ -18,6 +18,7 @@ GT.defineStage('path2', {
   boxes:[
     {x:750, y:160, w:32, h:32},
     {x:645, y:80, w:45, h:43},
+    {x:558, y:93, w:32, h:32},       // 3つ目（敵3体に、木箱3つ）
   ],
   enemies:[
     {page:'right', x:680, y:430, w:36, h:32, dir:-1},
@@ -40,13 +41,17 @@ GT.defineStage('path2', {
     {layer:'front', kind:'fern', x:790, y:400, w:75, h:70},
     {layer:'front', kind:'grass', x:745, y:385, w:60, h:79},
   ],
+  mission:['enemies'],   // 狼の手下を全部倒すまで、右の端は閉じている（木箱を上から落として倒す）
 });
 
 GT.registerScene({
   id:'path2', type:'play', stage:'path2', clear:'exit',
   label:'第一章 ── 近道',
   dynamic:'shortcutOnly',   // 近道のときだけ遊ぶ（07_crossroads.js）
-  intro:{s:'',c:'narr',t:'右へ進もう。'},
+  intro:[
+    {s:'',c:'narr',t:'いばらの道に、狼の手下たちがうろついている。'},
+    {s:'',c:'narr',t:'……ぜんぶ やっつけないと、この先へは進めそうにない。'},
+  ],
 });
 
 /* ============================================================================
