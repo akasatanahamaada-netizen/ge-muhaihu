@@ -23,6 +23,8 @@ const SRC={
   hoodR: {src:'assets/character/マリミニ (5).webp', box:[11,4,277,391], flip:true},
   hoodL: {src:'assets/character/マリミニ (5).webp', box:[11,4,277,391]},
   hoodWalkR:{src:'assets/character/マリミニ (4).webp', box:[25,1,295,387], flip:true},
+  wolf:   {src:'assets/character/狼ミニ.webp',     box:[11,1,266,392]},     // 狼（左向き。ゲームと同じ 2頭身）
+  wolfRun:{src:'assets/character/狼ミニ走る.webp', box:[0,6,280,392]},      // 走る狼（左向き）
 };
 const IMG={}, cache={};
 let onReady=null;
@@ -76,8 +78,14 @@ function mari(c,x,y,s){
   ell(c,-5,-25,2.6,2.6,'#e8dcc0'); ell(c,5,-25,2.6,2.6,'#e8dcc0');
   c.restore();
 }
-// 狼のかげ（横向き）。face=1 で右向き
-function wolf(c,x,y,s,face){
+// 狼（ゲームと同じ 2頭身の絵）。(x, 足もと y)、s=大きさ、face=1 で右向き、run で走る絵
+const WOLF_ART_H=170;
+function wolf(c,x,y,s,face,run){
+  const im=run?IMG.wolfRun:IMG.wolf;
+  if(ok(im)){ figure(c,im,x,y,WOLF_ART_H*s,{flip:(face||-1)>0}); return; }
+  wolfShadow(c,x,y-40*s,s,face);                       // 絵がまだ読みこめていないときだけ、かげ絵
+}
+function wolfShadow(c,x,y,s,face){
   c.save(); c.translate(x,y); c.scale(s*(face||1),s);
   c.beginPath();
   c.moveTo(-70,-8); c.quadraticCurveTo(-100,-30,-118,-14); c.quadraticCurveTo(-98,-22,-78,-2);        // しっぽ
@@ -208,8 +216,37 @@ function outside(c,dusk){
   c.fillStyle='rgba(70,64,60,0.55)'; c.beginPath(); c.moveTo(0,AH); c.quadraticCurveTo(200,190,380,236); c.quadraticCurveTo(500,262,AW,210); c.lineTo(AW,AH); c.closePath(); c.fill();
   c.fillStyle='rgba(60,52,44,0.9)'; c.fillRect(70,214,64,40); c.beginPath(); c.moveTo(62,216); c.lineTo(102,186); c.lineTo(142,216); c.closePath(); c.fill();
   c.fillStyle='rgba(255,200,110,0.85)'; c.fillRect(90,226,10,10);
-  for(const [x,y,r] of [[30,170,40],[250,190,34],[560,160,46]]){ c.fillStyle='rgba(50,56,44,0.7)'; c.fillRect(x-3,y,6,AH-y); ell(c,x,y,r*0.7,r,'rgba(50,56,44,0.7)'); }
+  c.save(); c.filter=dusk?'brightness(0.5) saturate(0.6) sepia(0.3)':'brightness(0.55) saturate(0.5)'; c.globalAlpha=0.85;   // 夕暮れ・夜明けの逆光の木
+  for(const [x,y,w,h] of [[-10,120,90,190],[214,150,76,150],[520,104,100,210]]) if(window.GTDecor) GTDecor.draw(c,'tree',x,y,w,h);
+  c.restore();
   c.fillStyle='rgba(60,50,40,0.35)'; c.fillRect(0,AH-24,AW,24);
+}
+/* 木（ゲームの木と同じ描き方：stages/_decor.js の GTDecor.paint）。x=幹の左、top〜bot=幹、w=幹の太さ、
+   crown=[[中心x,中心y,横の半径,たての半径],...] 葉の茂み。読みこまれていなければ、だ円だけ */
+function tree(c,x,top,bot,w,crown,seed){
+  const P=window.GTDecor && GTDecor.paint;
+  if(P){ P.trunk(c,x,top,bot,w,seed); P.canopy(c,crown.map(([cx,cy,rx,ry])=>({x:cx,y:cy,rx,ry})),seed); return; }
+  c.beginPath(); c.rect(x,top,w,bot-top); inked(c,'#5a4632',2.4);
+  for(const [cx,cy,rx,ry] of crown) ell(c,cx,cy,rx,ry,'#5b7a4e');
+}
+/* 丸太（木の皮・切り口の年輪・上に苔）。ゲームの丸太の足場に合わせた色 */
+function log(c,x,y,w,h){
+  rr(c,x,y,w,h,h/2); const g=c.createLinearGradient(0,y,0,y+h); g.addColorStop(0,'#8a6c48'); g.addColorStop(0.5,'#6e5236'); g.addColorStop(1,'#4e3a26');
+  c.fillStyle=g; c.fill(); c.strokeStyle=INK; c.lineWidth=1.8; c.stroke();
+  c.strokeStyle='rgba(40,26,14,0.45)'; c.lineWidth=1.2;
+  for(let i=0;i<6;i++){ const lx=x+20+i*28; c.beginPath(); c.moveTo(lx,y+4); c.quadraticCurveTo(lx+8,y+h/2,lx+2,y+h-4); c.stroke(); }   // 木の皮のすじ
+  ell(c,x+w-h/2,y+h/2,h/2-2,h/2-2,'#c9a66e'); c.strokeStyle='rgba(90,60,30,0.6)'; c.lineWidth=1;                                      // 切り口と年輪
+  for(const r of [3,6]){ c.beginPath(); c.arc(x+w-h/2,y+h/2,r,0,Math.PI*2); c.stroke(); }
+  c.fillStyle='rgba(110,140,80,0.85)'; for(let i=0;i<8;i++) ell(c,x+14+i*22,y+h-1,9,3.5,'rgba(110,140,80,0.8)');                      // 下がわ（天井では下）に苔
+}
+/* 木箱（板を打ちつけた箱。ゲームの木箱に合わせる） */
+function crate(c,x,y,w,h){
+  rr(c,x,y,w,h,3); c.fillStyle='#a07a4c'; c.fill();
+  c.strokeStyle='rgba(70,46,24,0.5)'; c.lineWidth=1; for(let i=1;i<4;i++){ c.beginPath(); c.moveTo(x+3,y+h*i/4); c.lineTo(x+w-3,y+h*i/4); c.stroke(); }   // 板のつなぎ目
+  c.lineWidth=5; c.strokeStyle='#7a5530'; c.strokeRect(x+3,y+3,w-6,h-6);                                                                      // 枠
+  c.beginPath(); c.moveTo(x+6,y+h-6); c.lineTo(x+w-6,y+6); c.stroke();                                                                          // すじかい
+  rr(c,x,y,w,h,3); c.strokeStyle=INK; c.lineWidth=1.8; c.stroke();
+  c.fillStyle='#4a3420'; for(const [px,py] of [[x+6,y+6],[x+w-6,y+6],[x+6,y+h-6],[x+w-6,y+h-6]]){ c.beginPath(); c.arc(px,py,1.6,0,Math.PI*2); c.fill(); }   // くぎ
 }
 function pages(c,list){ for(const [x,y,r] of list){ c.save(); c.translate(x,y); c.rotate(r); c.fillStyle='#f6eed8'; c.fillRect(-14,-5,28,9);
   c.strokeStyle='rgba(90,74,51,0.6)'; c.lineWidth=1; c.strokeRect(-14,-5,28,9); c.restore(); } }
@@ -232,21 +269,17 @@ const SCENES={
     // マリ（木の幹のうしろに立っていて、体の半分が幹にかくれている＝木のかげからのぞいている）
     if(ok(IMG.mari)) figure(c,IMG.mari,482,306,150); else mari(c,482,300,1.5);
     // 木の幹（マリより手前）
-    c.beginPath(); c.moveTo(470,AH); c.lineTo(486,60); c.lineTo(548,60); c.lineTo(566,AH); c.closePath(); inked(c,'#5a4632',2.4);
-    c.strokeStyle='rgba(30,20,10,0.35)'; c.lineWidth=1.4; for(let i=0;i<4;i++){ c.beginPath(); c.moveTo(498+i*12,90); c.lineTo(494+i*13,AH); c.stroke(); }
-    for(const [x,y,r,col] of [[515,40,80,'#4d6843'],[440,70,56,'#5b7a4e'],[590,60,56,'#5b7a4e']]) ell(c,x,y,r,r*0.8,col);
+    tree(c,486,30,AH-14,64,[[515,40,80,64],[440,74,56,44],[592,62,56,44]],7);                             // ゲームと同じ描き方の木
   },
   // 森の小道：本を裏返して、天井を歩く少年（ひとりだけ）。道をふさぐ大木と、押して動かす木箱
   komichi(c){
     bg(c,IMG.day,0.45,0.7,1.1); wash(c,'rgba(244,236,214,0.15)');
     rays(c,[[220,50],[430,40]],'rgba(255,236,170,0.2)');
     c.fillStyle='rgba(150,120,80,0.32)'; c.beginPath(); c.moveTo(0,AH); c.quadraticCurveTo(300,282,AW,300); c.lineTo(AW,AH); c.closePath(); c.fill();   // 小道
-    c.beginPath(); c.moveTo(212,AH); c.lineTo(222,40); c.lineTo(262,40); c.lineTo(274,AH); c.closePath(); inked(c,'#5a4632',2.4);                  // 道をふさぐ大木
-    for(const [x,y,r,col] of [[242,96,66,'#4d6843'],[192,128,44,'#5b7a4e'],[294,122,46,'#5b7a4e']]) ell(c,x,y,r,r*0.75,col);
-    rr(c,350,74,190,22,9); inked(c,'#6f8a5a',2);                                                                    // 天井からさがる足場（本を裏返すと、ここが床になる）
+    tree(c,218,90,AH-12,48,[[242,96,66,50],[192,128,44,33],[294,122,46,34]],3);                           // 道をふさぐ大木
+    log(c,350,74,190,22);                                                                                           // 天井からさがる丸太の足場（本を裏返すと、ここが床になる）
     c.save(); c.translate(0,2*96); c.scale(1,-1); boy(c,440,96,1.3,{face:1}); c.restore();                        // 天井を歩く少年（さかさま）
-    rr(c,470,262,48,46,4); inked(c,'#9a7448',2);                                                                    // 木箱
-    c.strokeStyle='rgba(60,40,20,0.6)'; c.lineWidth=2; c.beginPath(); c.moveTo(470,262); c.lineTo(518,308); c.moveTo(518,262); c.lineTo(470,308); c.stroke();
+    crate(c,470,262,48,46);                                                                                         // 木箱
     flowers(c,[[40,318,0],[86,324,1],[560,320,2],[590,316,3]]);
   },
   // 窓の向こう：お母さんが、赤ずきんにお使いを頼む
@@ -281,12 +314,12 @@ const SCENES={
     bg(c,IMG.day,0.35,0.6,1.1); wash(c,'rgba(40,24,30,0.08)');   // 昼の森
     ell(c,300,330,320,40,'rgba(20,12,10,0.35)');
     if(f.warnedHood){
-      wolf(c,470,262,1.25,-1);
+      wolf(c,470,314,1.25,-1);                                                                           // 少年たちのほうを向く狼
       figure(c,IMG.hoodR,150,318,190,{filter:'brightness(0.92)'});
       boy(c,300,300,1.7,{face:1});
       c.font="700 40px 'Zen Old Mincho',serif"; c.fillStyle='#f3ead0'; c.textAlign='center'; c.fillText('！',300,200);
     } else {
-      wolf(c,500,262,1.1,1);                                                                             // 脇道へ去っていく
+      wolf(c,505,312,1.1,1,true);                                                                        // 脇道へ走り去っていく
       figure(c,IMG.hoodR,200,318,190,{filter:'brightness(0.92)'});
       boy(c,340,300,1.7,{face:1});
     }
