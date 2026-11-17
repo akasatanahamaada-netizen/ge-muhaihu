@@ -16,7 +16,8 @@
 "use strict";
 const SAVE_KEY='gravityTale.ep1.save';
 const BOOKMARK_MAX=5;                 // しおりは5枚まで（下の「しおり」）
-const TITLE_BG='assets/background/タイトルロゴ.webp';   // タイトル画面の絵（まん中に「Gravity Tales」のロゴが描いてある）
+const TITLE_BG='assets/background/タイトル背景.webp';   // タイトル画面の背景（霧の薔薇の森。もとは『ゴシックの森とタイトル背景png.png』）
+const TITLE_LOGO='assets/background/タイトルロゴ.webp'; // タイトルのロゴ（ふちが透明。もとは『タイトルロゴ.png』）
 const NAMES={ arrive:'おばあさんの家', ending:'結末' };      // label の無いシーンの名前
 
 /* ---- セーブ（ブラウザの localStorage。使えないときはセーブなしで動く） ---- */
@@ -106,13 +107,15 @@ const css=`
 .gtm-btn small{ font-family:'Zen Old Mincho',serif; letter-spacing:0.04em; }
 .gtm-howto b{ font-family:'Caveat',cursive; font-size:1.3em; font-weight:700; letter-spacing:0.02em; }
 
-/* ==== タイトル画面：ロゴの絵（霧の薔薇の森と「Gravity Tales」）に合わせる ====
-   ・ロゴは絵に描いてあるので、文字のタイトルは出さない。ロゴの下に章の名前、その下に横に並んだ筆記体のメニュー
+/* ==== タイトル画面：背景（霧の薔薇の森）の上に、ロゴの絵（.gtm-logo）を重ねる ====
+   ・ロゴは絵なので、文字のタイトルは出さない。ロゴの下に章の名前、その下に横に並んだ筆記体のメニュー
    ・「Tap or press any key to start」のあいだは、ロゴと案内だけ（メニューは出さない）
    ・Settings・How to Play は、まん中に暗い半透明の枠で出す（薔薇の色と、くすんだ金のふち） */
 .gtm{ background:#1a0d14 url("${encodeURI(TITLE_BG)}") 50% 50%/cover no-repeat; color:#f0e2e6; }
 .gtm::before{ background:radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(10,3,8,0.55) 100%); }
-.gtm-title{ left:0; right:0; top:61.5%; text-shadow:0 1px 6px rgba(10,2,8,0.95), 0 0 14px rgba(10,2,8,0.8); }
+.gtm-logo{ position:absolute; left:50%; top:5%; width:64%; transform:translateX(-50%); pointer-events:none; user-select:none;
+  filter:drop-shadow(0 6px 14px rgba(10,2,8,0.75)); }
+.gtm-title{ left:0; right:0; top:50%; text-shadow:0 1px 6px rgba(10,2,8,0.95), 0 0 14px rgba(10,2,8,0.8); }
 .gtm-title h2{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }   /* ロゴの絵があるので、文字は見せない（読み上げ用に残す） */
 .gtm-title p{ margin:0; font-size:clamp(11px,1.7cqw,40px); letter-spacing:0.3em; color:#e8cfd6; }
 .gtm-title p::before, .gtm-title p::after{ content:'❧'; color:#b98a92; margin:0 0.8em; letter-spacing:0; font-size:0.9em; }
@@ -120,10 +123,11 @@ const css=`
 .gtm-foot{ left:0; right:0; bottom:3.2%; text-align:center; color:rgba(232,207,214,0.6); text-shadow:0 1px 4px rgba(0,0,0,0.9); letter-spacing:0.22em; font-size:clamp(9px,1.25cqw,28px); }
 /* 案内（はじめる前） */
 .gtm-start{ background:none; }
-.gtm-start span{ left:50%; top:79%; border:none; background:none; padding:0.2em 0.6em; color:#f6e6ea; font-size:clamp(18px,3cqw,70px);
+.gtm-start span{ left:50%; top:75%; border:none; background:none; padding:0.2em 0.6em; color:#f6e6ea; font-size:clamp(18px,3cqw,70px);
   text-shadow:0 0 10px rgba(225,80,110,0.55), 0 1px 4px rgba(0,0,0,0.9); }
 .gtm:has(.gtm-start.show) .gtm-card{ visibility:hidden; }
-.gtm:has(.gtm-start.show) .gtm-title{ top:63%; }
+.gtm:has(.gtm-start.show) .gtm-title{ top:52%; }
+.gtm:has(.gtm-start.show) .gtm-logo{ top:8%; }
 /* メインのメニュー：枠なしで、ロゴの下に横一列（入りきらなければ折りかえす） */
 .gtm[data-view="main"] .gtm-card{ left:4%; right:4%; width:auto; top:auto; bottom:11%; height:auto; padding:0; background:none; box-shadow:none; overflow:visible; }
 .gtm[data-view="main"] .gtm-card h3{ display:none; }
@@ -138,7 +142,7 @@ const css=`
 /* Settings・How to Play：まん中に、暗い半透明の枠 */
 .gtm:not([data-view="main"]) .gtm-card{ left:14%; width:72%; top:5%; height:90%; padding:clamp(8px,2cqw,50px) clamp(10px,3cqw,75px); background:rgba(24,10,18,0.86);
   box-shadow:0 10px 30px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(201,160,112,0.55), inset 0 0 0 4px rgba(24,10,18,0.86), inset 0 0 0 5px rgba(201,160,112,0.25); }
-.gtm:not([data-view="main"]) .gtm-title, .gtm:not([data-view="main"]) .gtm-foot{ display:none; }
+.gtm:not([data-view="main"]) .gtm-title, .gtm:not([data-view="main"]) .gtm-foot, .gtm:not([data-view="main"]) .gtm-logo{ display:none; }
 .gtm:not([data-view="main"]) .gtm-card h3{ color:#e3b9c3; border-bottom-color:rgba(201,160,112,0.4); text-align:center; }
 .gtm:not([data-view="main"]) .gtm-btn{ color:#f0e2e6; }
 .gtm:not([data-view="main"]) .gtm-btn:hover, .gtm:not([data-view="main"]) .gtm-btn:focus{ background:rgba(196,52,77,0.18); color:#ffe3ea; }
@@ -156,6 +160,7 @@ const style=document.createElement('style'); style.textContent=css; document.hea
 const wrap=document.querySelector('.canvas-wrap');
 const menu=document.createElement('div'); menu.className='gtm'; menu.dataset.view='main'; menu.setAttribute('role','dialog'); menu.setAttribute('aria-label','メニュー');
 menu.innerHTML=`
+  <img class="gtm-logo" src="${encodeURI(TITLE_LOGO)}" alt="" draggable="false">
   <div class="gtm-title"><h2>Gravity Tales</h2><p>第一章「赤い頭巾」</p></div>
   <div class="gtm-card">
     <div class="gtm-view" data-view="main">
