@@ -767,15 +767,30 @@ Object.assign(portrait.style,{ position:'absolute', right:'2%', bottom:'0', heig
   objectFit:'contain', objectPosition:'bottom right', pointerEvents:'none', opacity:'0',
   transition:'opacity .18s ease', filter:'drop-shadow(0 4px 10px rgba(0,0,0,0.35))' });
 dlg.parentNode.insertBefore(portrait, dlg);   // 会話の枠より奥（枠が手前に重なる）
-let portraitKey=null;
+let portraitKey=null, portraitToken=0;
+/* 立ち絵の読みこみ：GT.preloadPortraits([...]) で、ゲームの起動時に全部読みこんでおく（playlist.js の GT.portraitFiles）。
+   img の src を差しかえると、ブラウザは新しい絵の用意ができるまで前の絵を出したままにする。
+   そのままだと、別の人に切りかわる一瞬だけ、前の人の絵が見えてしまう。
+   なので、絵が変わるときは いったん消して、新しい絵の用意（decode）ができてから出す */
+const portraitCache={};
+function portraitImage(src){ let im=portraitCache[src];
+  if(!im){ im=new Image(); im.src=encodeURI(src); portraitCache[src]=im; if(im.decode) im.decode().catch(()=>{}); }
+  return im; }
+GT.preloadPortraits=list=>{ for(const s of list||[]) portraitImage(s); };
 function showPortrait(c, line){
   let src = c ? GT.portraits[c] : null;
   if(typeof src==='function') src=src(line||{});  // 向きやセリフの中身で絵を変えるとき（playlist.js の mari・narr など）
-  if(!src || !dlg.classList.contains('show')){ portrait.style.opacity='0'; portraitKey=null; return; }
-  if(portraitKey!==src){ portrait.src=encodeURI(src); portraitKey=src; }
+  if(!src || !dlg.classList.contains('show')){ portrait.style.opacity='0'; portraitKey=null; portraitToken++; return; }
   // 右向きに描かれた絵は、左右反転して左向きにする（GT.portraitMirror に入っている絵。playlist.js）
-  portrait.style.transform = (GT.portraitMirror||[]).includes(src) ? 'scaleX(-1)' : '';
-  portrait.style.opacity='1';
+  const flip = (GT.portraitMirror||[]).includes(src) ? 'scaleX(-1)' : '';
+  if(portraitKey===src){ portrait.style.transform=flip; portrait.style.opacity='1'; return; }
+  portraitKey=src; const tok=++portraitToken;
+  portrait.style.transition='none'; portrait.style.opacity='0';          // 前の絵は、すぐに消す
+  portraitImage(src);
+  portrait.src=encodeURI(src); portrait.style.transform=flip;
+  const show=()=>{ if(tok!==portraitToken) return;                        // そのあいだに別の絵になっていたら出さない
+    portrait.style.transition='opacity .18s ease'; portrait.style.opacity='1'; };
+  (portrait.decode ? portrait.decode() : Promise.resolve()).then(show,show);
 }
 // 会話の枠が閉じたら、立ち絵も消す
 new MutationObserver(()=>{ if(!dlg.classList.contains('show')) showPortrait(null); })

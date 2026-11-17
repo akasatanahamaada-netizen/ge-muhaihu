@@ -125,6 +125,11 @@ const BOY_PORTRAIT=()=> 'assets/character/物憂げな琥珀眼の少年.webp';
    表情：セリフに f:'smile'（笑顔）/ f:'surprise'（驚き）/ f:'scared'（怯え）/ f:'granny'（おばあさんに化けた狼）と書くと、その表情の絵になる */
 const P='assets/character/';
 GT.portraitMirror = [];   // いまの絵は、どれも もとから左向き（反転するものはない）
+// 会話の立ち絵のファイル（ゲームの起動時に先に読みこんでおき、会話で切りかえるとき、前の人の絵が一瞬見えないようにする）
+GT.portraitFiles = [ '物憂げな琥珀眼の少年.webp', '水彩タッチの赤ずきん少女.webp', '笑顔の赤ずきんと basket.webp', '赤ずきんの驚き顔バスケット少女.webp',
+  '水彩風の優しいお母さん.webp', '優しい笑顔の祖母キャラクター.webp', '杖を握る不安げなおばあさん.webp',
+  'mari honnmono (hidari).webp', 'マリ口開いている.webp', '狡猾な人狼の立ち姿.webp', 'おばあちゃん狼の不敵な微笑み.webp' ].map(f=>'assets/character/'+f);
+if(GT.preloadPortraits) GT.preloadPortraits(GT.portraitFiles);
 /* 表情の差分（笑顔・驚き・怯え・口を開いたマリ・化けた狼）の webp は、元の PNG から作るときに
    ふだんの絵にぴったり重なる位置・大きさに合わせてある。表情を変えても、人物がずれない */
 GT.portraits = {
