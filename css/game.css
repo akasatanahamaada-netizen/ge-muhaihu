@@ -401,3 +401,7 @@ canvas#game{ border-radius:0; }
 .gt-marks{ top:calc(-1 * (20.9cqw * 0.6 + 3.6cqw)); }
 .gt-mark .word{ top:38%; font-size:clamp(12px,2.1cqw,40px); }
 .gt-mark.gt-guide::after{ left:calc(200% + 2.6cqw); top:22%; }   /* 案内の吹き出しは、となりの menu の栞よりも右に */
+/* 栞を幅広く（ページから出る高さは、前とほぼ同じ） */
+.gt-mark{ width:7.6cqw; height:26.5cqw; }
+.gt-marks{ top:calc(-1 * (26.5cqw * 0.47 + 3.6cqw)); gap:1.8cqw; }
+.gt-mark .word{ top:30%; font-size:clamp(14px,2.7cqw,50px); }
