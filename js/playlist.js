@@ -99,24 +99,29 @@ GT.stageBackgrounds = {
 
 // 音楽（BGM）：シーンの id ごとに流す曲（assets/music/ フォルダの mp3）。ループ再生する。
 // 書いていないシーンは無音（前の曲はフェードアウトする）。
-const BGM_ADVENTURE='assets/music/小さな勇者の探検.mp3';   // 冒険（アクションのステージ）。前は『不思議な森(Mysterious_forest).mp3』
-const BGM_FOREST='assets/music/時を刻む森.mp3';
+// 曲を入れかえたいときは、下の M.xxx の割り当てを書きかえる（曲の名前で選んでいる。聞いて合わなければ、ここで差しかえる）
+const M=n=>'assets/music/'+n+'.mp3';
+const BGM_ADVENTURE=M('小さな勇者の探検');   // 冒険（アクションのステージ）
+const BGM_THORN=M('荊の庭');                 // 近道（いばらの道）
+const BGM_FALSE=M('虚像 (1)');               // おばあさんの家の前〜家の中（狼が、おばあさんのふりをしている）
 GT.sceneMusic = {
-  opening:  'assets/music/異世界へようこそ.mp3',        // 最初の物語ステージ（序章 ── 森）
+  opening:  M('ふしぎな絵本'),                // 最初の物語ステージ（本の中で目を覚ます）。前は『異世界へようこそ』
   komichi1: BGM_ADVENTURE, komichi2: BGM_ADVENTURE, path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
-  wolf_talk:'assets/music/お騒がせなオバケたち.mp3',   // 狼の初登場
-  crossroads:'assets/music/かくれんぼの庭。.mp3',       // 分かれ道（近道か遠回りかを選ぶ）
-  path2:    'assets/music/悪魔の悪戯.mp3', path2b: 'assets/music/悪魔の悪戯.mp3', path3: 'assets/music/悪魔の悪戯.mp3', path4: 'assets/music/悪魔の悪戯.mp3',
-  flowers:  'assets/music/魔法使いの箱庭.mp3',          // お花畑（のんびりした曲）   // 近道・遠回りの道（続けて流れる）
-  // 曲の入っていなかったステージ
-  house_peek: 'assets/music/魔法使いの箱庭.mp3',                          // 赤ずきんの家（窓のぞき）
-  meet_hood: 'assets/music/魔法使いの箱庭.mp3',                          // 赤ずきんと出会う・水たまりを越える
-  house_front:BGM_FOREST, arrive: BGM_FOREST, ending: BGM_FOREST, // おばあさんの家の前・家に到着・戦いのあと
-  epilogue: 'assets/music/世界の最果てで、自由を謳う.mp3',   // 外に出た場面（夕暮れ／夜明け）〜エンディングの画面
+  house_peek: M('魔法使いの箱庭'),             // 赤ずきんの家（窓のぞき）
+  meet_hood:  M('魔法使いの箱庭'),             // 赤ずきんと出会う・水たまりを越える
+  wolf_talk:M('お騒がせなオバケたち'),         // 狼の初登場
+  crossroads:M('かくれんぼの庭。'),            // 分かれ道（近道か遠回りかを選ぶ）
+  path2: BGM_THORN, path2b: BGM_THORN,          // 近道（いばらの道）。前は『悪魔の悪戯』
+  flowers:  M('魔法使いの箱庭'),               // お花畑（のんびりした曲）
+  path3: M('悪魔の悪戯'), path4: M('悪魔の悪戯'),   // 遠回りの道（続けて流れる）
+  house_front:BGM_FALSE, arrive:BGM_FALSE,      // おばあさんの家の前・家に到着。前は『時を刻む森』
+  ending:   M('抒情歌「二つの草」'),           // 戦いのあと（部屋の中）。前は『時を刻む森』
+  epilogue: M('世界の最果てで、自由を謳う'),   // 外に出た場面（夕暮れ／夜明け）〜エンディングの画面
 };
-// 最終戦闘（おばあさんの家で差しこまれるボス戦・QTE。id が無いので、シーンの種類で決める）
-GT.sceneTypeMusic = { boss:'assets/music/Foehn_Wind.mp3', qte:'assets/music/Foehn_Wind.mp3' };
-GT.titleMusic = 'assets/music/世界の最果てで、自由を謳う.mp3';   // タイトル（メニュー）画面
+// 最終戦闘（おばあさんの家で差しこまれるボス戦・QTE。id が無いので、シーンの種類で決める）。前は『Foehn_Wind』
+GT.sceneTypeMusic = { boss:M('堕ちる'), qte:M('堕ちる') };
+GT.titleMusic = M('魔法の扉は夜開く (1)');    // タイトル（メニュー）画面。前は『世界の最果てで、自由を謳う』
+GT.bookMusic  = M('時計図書館 (1)');          // 本を読み返す画面（Reread）
 
 // 走るときの足音（シーンの id ごとの地面）。'grass'=芝生 / 'leaves'=落ち葉 / 'dirt'=土。書いていないシーン（家の中など）は足音なし。
 GT.sceneFootsteps = {

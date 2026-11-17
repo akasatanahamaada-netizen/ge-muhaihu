@@ -6,7 +6,7 @@
    ・シーンが変わると、前の曲はフェードアウトし、新しい曲がフェードインする
    ・同じ曲のシーンが続く／「やり直す」では、曲は止めずに流しつづける
    ・メニュー画面を開いているあいだは、タイトルの曲に切りかわる。閉じると、もとの曲が続きから流れる
-   ・本を読みかえす画面では、いまの曲を流したまま
+   ・本を読みかえす画面では、GT.bookMusic があればその曲（無ければ、いまの曲を流したまま）。閉じると、もとの曲が続きから流れる
    ・ブラウザは、最初にクリックやキー入力があるまで音を出せないので、そのときに鳴らしはじめる
    ========================================================================== */
 (function(){
@@ -14,9 +14,10 @@ const VOLUME=0.5, FADE=1.2;            // 音量（0〜1）と、フェードに
 const players={};                      // src → {src, el, vol}（一度読みこんだ曲は取っておき、続きから流せるようにする）
 let sceneWant=null;                    // いまのシーンで流したい曲の src
 const menuOpen=()=>!!document.querySelector('.gtm.show');
+const bookOpen=()=>!!document.querySelector('#bookModal.show');
 let hushUntil=0;                       // この時刻（performance.now）までは、シーンの曲を消しておく（GT.musicHush）
 let muted=false;                       // GT.musicMute(true) のあいだは、シーンの曲を消しておく（狼がおばあさんのふりをしている場面など）
-const wantNow=()=> menuOpen() ? (GT.titleMusic||null) : (performance.now()<hushUntil || muted ? null : sceneWant);
+const wantNow=()=> (bookOpen() && GT.bookMusic) ? GT.bookMusic : menuOpen() ? (GT.titleMusic||null) : (performance.now()<hushUntil || muted ? null : sceneWant);
 const bgmVol=()=>VOLUME*(GT.volume?GT.volume.bgm:1);   // メニューの「せってい」で決めた大きさをかける
 
 function player(src){

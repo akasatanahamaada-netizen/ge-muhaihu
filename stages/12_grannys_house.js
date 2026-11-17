@@ -29,6 +29,8 @@ function drawRoom(){
   if(!isRoom()) return;
   const t=performance.now()/1000, cast=castNow(), dim=!!cast.dim, noon=GT.flags.route==='shortcut';
   GT.grannyRoom.draw(t,noon,dim);                     // 部屋の絵（12a_room_art.js）
+  const sc=GT.scene;                                   // 狼との戦い（QTE・ボス戦）は、灯りを消した夜の部屋
+  if(sc&&(sc.type==='boss'||sc.type==='qte')){ const b=GT.getBoss&&GT.getBoss(); GT.grannyRoom.drawNightFight(t, b&&b.enraged&&b.alive?1:0); }
   ctx.save(); drawCast(t,cast); ctx.restore();
 }
 /* 部屋にいる人（分岐・場面で変わる）
