@@ -466,3 +466,5 @@ canvas#game{ border-radius:0; }
 .qte .flipnow{ font-size:clamp(19px,2.7cqw,66px); }
 .btn.flip{ font-size:20px; }
 
+/* メニュー（タイトル画面）を開いているあいだは、ゲーム画面の「↺ Reset」を隠す（ゲームの上のボタンなので、メニューでは使わない） */
+.canvas-wrap:has(.gtm.show) #resetBtn{ visibility:hidden; }
