@@ -1438,6 +1438,27 @@ function drawFlowerItem(it,cx,r){
   ctx.fillStyle='#c98a2a'; ctx.beginPath(); ctx.arc(fx,top,r*0.17,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
+/* ページのめくれ（右下の角）：出口が開いていることを見せる。紙の裏（めくれた部分）と、焦げ茶の線。ゆっくり ふわっと動く */
+function drawPageCurl(){
+  const t=performance.now()/1000, k=1+0.06*Math.sin(t*2.2);
+  const R=W-EDGE, B=H-EDGE, s=96*k;                     // めくれの大きさ
+  ctx.save(); ctx.lineJoin='round'; ctx.lineCap='round';
+  // めくれたあとに見える、下のページ（少し暗い紙）
+  ctx.beginPath(); ctx.moveTo(R,B-s); ctx.lineTo(R,B); ctx.lineTo(R-s*1.05,B); ctx.closePath();
+  ctx.fillStyle='rgba(69,55,47,0.82)'; ctx.fill();
+  // めくれた紙（裏がわ）：折れ線 A（右のふち）〜 C（下のふち）をはさんで、角が内がわ（左上）へめくれ上がる。先は少し丸まる
+  const Ax=R, Ay=B-s, Cx=R-s, Cy=B, Px=R-s*0.86, Py=B-s*0.86;   // P … めくれた角の先
+  ctx.beginPath();
+  ctx.moveTo(Ax,Ay);
+  ctx.bezierCurveTo(Ax-s*0.25,Ay+s*0.02, Px+s*0.18,Py-s*0.02, Px,Py);          // 上のふち（ふくらむ）
+  ctx.bezierCurveTo(Px-s*0.06,Py+s*0.1, Px+s*0.02,Py+s*0.2, Px+s*0.1,Py+s*0.16); // 先の丸まり
+  ctx.bezierCurveTo(Px+s*0.02,Py+s*0.4, Cx+s*0.02,Cy-s*0.22, Cx,Cy);            // 下のふち
+  ctx.closePath();
+  const g=ctx.createLinearGradient(Px,Py,R-s*0.3,B-s*0.3); g.addColorStop(0,'#f8f2e8'); g.addColorStop(1,'#d8cbb2');
+  ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle='#45372f'; ctx.lineWidth=3; ctx.stroke();
+  ctx.restore();
+}
 /* ミッション中は右端に「閉じた扉」を描いて、通れないことを見せる */
 function drawExitGate(){
   ctx.save(); ctx.fillStyle='rgba(107,91,70,0.55)'; ctx.fillRect(W-EDGE,EDGE,EDGE,H-EDGE*2);
@@ -1638,18 +1659,14 @@ function render(){
   if(storyStage) for(const n of npcs) drawNpc(n);
   for(const it of GT.items) drawItem(it);
   if(missionReq && exitWanted && !stageExit) drawExitGate();
-  if((storyStage||missionReq) && stageExit && !flipping && !storyTalking){
-    const p=0.5+0.5*Math.sin(goalPulse*4);
-    ctx.save(); ctx.textAlign='right'; ctx.globalAlpha=0.55+0.45*p;
-    ctx.fillStyle='#b08d57'; ctx.font="700 16px 'Zen Old Mincho',serif";
-    ctx.fillText('右の端へ →', W-26, H/2);
-    ctx.restore();
-  }
+  // 出口が開いているあいだは、右下のページがめくれて見える（そこへ行くと、ページがめくれて次へ進む）
+  const exitOpen = (storyStage||missionReq) ? stageExit : (GT.scene && GT.scene.type==='play');
   for(const fn of drawWorld) fn();          // ボスなど（プレイヤーより後ろ）
   drawPlayer();
   for(const sw of GT.swamps) drawSwamp(sw);   // 沼はプレイヤーの足元を隠すよう手前に描く
   ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.drawImage(GT.paperArt.agedPaper,0,0); ctx.restore();   // 古い紙の色むら・しみ（表示類より奥）
   ctx.drawImage(GT.paperArt.wornEdges,0,0);                                                                        // 見開きのふちの、劣化したよれ
+  if(exitOpen && !flipping && !storyTalking && GT.mode==='play') drawPageCurl();                                  // 出口の目印（紙の色むらより手前）
   if(missionReq) drawMissionHud();
   if(GT.hurtFlash>0){ ctx.fillStyle=`rgba(139,20,20,${GT.hurtFlash*0.35})`; ctx.fillRect(0,0,W,H); }
   drawHearts();

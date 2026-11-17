@@ -21,10 +21,12 @@
   // ゲーム画面の幅：本の枠からはみ出さない、いちばん大きな幅をさがす（ボタンの並びが変わっても使える）
   function fit(){
     if(!full){ frame.style.removeProperty('--gw'); frame.style.removeProperty('--gs'); return; }
-    const parts=['.hud','.canvas-wrap','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
+    const parts=['.hud','.canvas-wrap','.gt-tabs','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
       return parts.every(el=>{ if(!el || !el.offsetParent) return true; const r=el.getBoundingClientRect();
-        return r.left>=f.left+4 && r.right<=f.right-4 && r.top>=f.top+4 && r.bottom<=f.bottom-4; }); };
+        // ゲーム画面は、まわりに描く本の枠（.canvas-wrap::after。太さ＝margin）も入れて、はみ出さないかを見る
+        const m = el.classList.contains('canvas-wrap') ? (parseFloat(getComputedStyle(el).marginTop)||0) : 0;
+        return r.left-m>=f.left+4 && r.right+m<=f.right-4 && r.top-m>=f.top+4 && r.bottom+m<=f.bottom-4; }); };
     let lo=200, hi=Math.min(frame.clientWidth, window.innerHeight*900/480);
     if(fits(hi)) return;
     for(let i=0;i<14;i++){ const mid=(lo+hi)/2; if(fits(mid)) lo=mid; else hi=mid; }
@@ -55,4 +57,20 @@
   for(const id of ['hudLeft','hudRight']){ const el=document.getElementById(id);
     const upd=()=>el.classList.toggle('rev', el.textContent.indexOf('反転')>=0);
     new MutationObserver(upd).observe(el,{childList:true,characterData:true,subtree:true}); upd(); }
+})();
+
+/* しおりのタブ（参考画像のデザイン）：本の左上に「menu」のタブと「物語を振り返る」のタブを並べる。
+   中身のボタンはそのまま使う（menu.js の「≡ メニュー」ボタンと、index.html の #openBook）。全画面ボタンは机の右上へ */
+(function(){
+  const wrap=document.querySelector('.canvas-wrap'); if(!wrap) return;
+  const tabs=document.createElement('div'); tabs.className='gt-tabs'; wrap.appendChild(tabs);
+  const menuBtn=wrap.querySelector('.gtm-open');
+  if(menuBtn){ menuBtn.className='gt-tab menu'; menuBtn.innerHTML='<span class="orn"></span>menu'; menuBtn.setAttribute('aria-label','メニュー'); tabs.appendChild(menuBtn); }
+  const book=document.getElementById('openBook');
+  if(book){ const svg=book.querySelector('svg');
+    book.className='gt-tab book'; book.textContent=''; book.insertAdjacentHTML('afterbegin','<span class="orn"></span>');
+    if(svg) book.appendChild(svg);
+    book.title='物語を振り返る'; book.setAttribute('aria-label','物語を振り返る'); tabs.appendChild(book); }
+  const fs=document.getElementById('fsBtn'); if(fs) document.body.appendChild(fs);
+  const under=document.querySelector('.under'); if(under) under.style.display='none';
 })();
