@@ -352,3 +352,6 @@ canvas#game{ border-radius:0; }
 .gt-spare:hover, .gt-spare:focus-visible{ transform:rotate(90deg) translateX(-1cqw); }
 .canvas-wrap, .book-frame.is-full .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.155) !important; }
 .book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.165) !important; }
+/* 横に置いた栞の「Save」（筆記体。栞は90度まわしてあるので、文字は逆にまわして横書きに） */
+.gt-spare .word{ position:absolute; left:50%; top:81%; transform:translate(-50%,-50%) rotate(-90deg); white-space:nowrap; pointer-events:none;
+  font-family:'Caveat',cursive; font-weight:600; font-size:clamp(14px,3cqw,56px); line-height:1; color:#f3e3bd; }

@@ -139,6 +139,7 @@
   }
   // 机の上（本の右）に、まっさらな栞を置いておく。押すと、いまのページに挟む（メニューの「しおりを挟む」と同じ。5枚まで）
   const spare=document.createElement('button'); spare.type='button'; spare.className='gt-spare';
+  spare.innerHTML='<span class="word">Save</span>';
   spare.title='しおりを挟む（いまのステージ）'; spare.setAttribute('aria-label','しおりを挟む');
   spare.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); if(GT.paused) return;
     if(!GT.addBookmark()){ spare.classList.remove('nope'); void spare.offsetWidth; spare.classList.add('nope'); } });
