@@ -49,7 +49,7 @@ GT.registerScene({
 });
 
 /* ============================================================================
-   見た目（地形は上の defineStage のまま。絵を重ねるだけ）と、チュートリアルの案内
+   見た目（地形は上の defineStage のまま。絵を重ねるだけ）
    足場の形を変えたら、下の番号（platforms の何番目か）も合わせて直すこと。
    ========================================================================== */
 (function(){
@@ -60,37 +60,8 @@ const F=GTDecor.forest;   // 森の絵（stages/_decor.js）
 const FLOWERS=[[34,1],[200,2],[290,0],[318,3],[470,1],[520,2],[600,0],[640,3],[862,1]];
 const MUSHROOMS=[[260,1],[560,1.1],[850,0.9]];
 
-/* ---- 案内：解き方に沿って、順に出す（先にできてしまった案内は飛ばす。もどらない） ---- */
-const box=()=>GT.boxes[0];
+/* 案内（解き方の説明）は出さない。謎解きなので、自分で考えて解く */
 const SHELF=P(0), VINE=P(1), STUMP=P(2), CLIFF=P(3);
-const boxOnCeiling=()=>box() && box().y<GT.EDGE+20;                   // 天井にある（棚の上の木箱は、天井にはない）
-const boxOffShelf =()=>box() && box().x>=SHELF.x+SHELF.w;              // 棚より右
-const boxRight    =()=>box() && GT.pageOf(box())==='right';           // 右ページへ運んだ
-const tut={ step:0 };
-GT.registerSceneReset(()=>{ if(isHere()) tut.step=0; });
-const STEPS=[
-  { done:()=>boxOnCeiling() || boxOffShelf() || boxRight(),
-    at:[260,250], lines:['木箱は 高い棚の上',[['F','Space'],'本を裏返すと、木箱も 天井へ落ちる']] },
-  { done:()=>boxOffShelf() || boxRight(),
-    at:[300,250], lines:['木箱の左がわへ回りこんで','天井で 右へ押そう（つるの手前まで）'] },
-  { done:()=>(boxOffShelf() && !boxOnCeiling()) || boxRight(),
-    at:[300,250], lines:[[['F','Space'],'もどすと、木箱は 床へ落ちる']] },
-  { done:()=>boxRight(),
-    at:[220,250], lines:['切り株の手前まで 押したら','もう一度裏返して、天井から 右のページへ運ぼう'] },
-  { done:()=>boxRight() && GT.gravity.left===1,
-    at:[300,250], lines:['木箱が 右のページの床へ落ちた',[['F','Space'],'左のページを もとにもどして、床から押そう']] },
-  { done:()=>{ const pl=GT.player; return pl.onGround && pl.x+pl.w/2>CLIFF.x && pl.y+pl.h<=CLIFF.y+2; },
-    at:[600,250], lines:['木箱を 崖の前まで押して','踏み台にしよう'] },
-];
-GT.registerUpdate(()=>{
-  if(!isHere()) return;
-  while(tut.step<STEPS.length && STEPS[tut.step].done()) tut.step++;
-});
-function drawTutorial(){
-  if(GT.mode!=='play' || tut.step>=STEPS.length) return;
-  const s=STEPS[tut.step];
-  GT.drawHint(s.at[0], s.at[1], typeof s.lines==='function'?s.lines():s.lines);
-}
 
 GT.registerDraw(()=>{ if(!isHere()) return;
   F.ground({flowers:FLOWERS, mushrooms:MUSHROOMS, lights:[[160,0.4],[520,1.6],[760,2.8]]});
@@ -103,5 +74,5 @@ GT.registerDraw(()=>{ if(!isHere()) return;
   F.crown([P(4)],31);                // 天井から垂れた茂み
   for(const b of GT.boxes) F.crate(b);
 }, 'world');
-GT.registerDraw(()=>{ if(!isHere()) return; F.air(); drawTutorial(); }, 'overlay');
+GT.registerDraw(()=>{ if(!isHere()) return; F.air(); }, 'overlay');
 })();

@@ -365,9 +365,9 @@ function flipCurrentPage(){ const p=GT.currentPage(); GT.gravity[p]*=-1; flashPa
   GT.player.flipFall=true; GT.player.vx=0; }
 /* 本を裏返せるのは、床（反転中は天井）に立っているときだけ。
    空中で押したときは、すぐには裏返さず 0.35 秒だけ覚えておき、そのあいだに着地したら裏返す
-   （スマホでは、着地の少し前にボタンを押してしまいやすいため）。間に合わなければ「立っているときだけ」と知らせる */
+   （スマホでは、着地の少し前にボタンを押してしまいやすいため）。間に合わなければ、ボタンが小さく首をふる */
 const FLIP_BUFFER=0.35;
-let flipBuffered=0, flipDenyT=0;
+let flipBuffered=0;
 function canFlipNow(){ return !flipping && !dlg.classList.contains('show') && !storyTalking && GT.flipModes.has(GT.mode); }
 function onFlipKey(){
   if(flipping) return;
@@ -378,22 +378,13 @@ function onFlipKey(){
   else flipBuffered=FLIP_BUFFER;
 }
 function updateFlipBuffer(dt){
-  flipDenyT=Math.max(0,flipDenyT-dt);
   if(flipBuffered<=0) return;
   if(!canFlipNow()){ flipBuffered=0; return; }
   if(GT.player.onGround){ flipBuffered=0; flipCurrentPage(); return; }
   flipBuffered-=dt;
-  if(flipBuffered<=0){ flipDenyT=1.4; const b=document.getElementById('btnFlip'); b.classList.remove('deny'); void b.offsetWidth; b.classList.add('deny'); }
+  if(flipBuffered<=0){ const b=document.getElementById('btnFlip'); b.classList.remove('deny'); void b.offsetWidth; b.classList.add('deny'); }
 }
-GT.registerDraw(()=>{
-  if(flipDenyT<=0) return;
-  const pl=GT.player, g=GT.gravity[GT.currentPage()];
-  ctx.save(); ctx.globalAlpha=Math.min(1,flipDenyT/0.4); ctx.font="700 13px 'Zen Old Mincho',serif"; ctx.textAlign='center';
-  ctx.lineWidth=3; ctx.strokeStyle='rgba(255,248,230,0.85)'; ctx.fillStyle='#8b2f26';
-  const t='床か天井に立っているときだけ 裏返せる', hw=ctx.measureText(t).width/2+6;
-  const x=Math.max(EDGE+hw,Math.min(W-EDGE-hw,pl.x+pl.w/2)), y=Math.max(EDGE+40,Math.min(H-EDGE-10, g>0 ? pl.y-20 : pl.y+pl.h+28));
-  ctx.strokeText(t,x,y); ctx.fillText(t,x,y); ctx.restore();
-},'speech');
+// （裏返せなかったときは、ボタンが小さく首をふるだけ。文字の知らせは出さない）
 GT.onFlipKey = onFlipKey;
 
 function updateHud(){
