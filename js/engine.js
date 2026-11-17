@@ -433,6 +433,7 @@ function applyShake(dt){
   if(shakeT<=0) return;
   shakeT=Math.max(0,shakeT-dt); const k=shakeDur>0?shakeT/shakeDur:0, a=shakePow*k*k;
   canvas.style.transform = shakeT>0 ? `translate(${((Math.random()*2-1)*a).toFixed(1)}px,${((Math.random()*2-1)*a).toFixed(1)}px)` : '';
+  if(GT.gameView) GT.gameView.style.transform=canvas.style.transform;
 }
 GT.damagePlayer=function(fromX,cause){
   if(gameOver || flipping || GT.invincible>0) return false;
@@ -1029,7 +1030,26 @@ function typeLoop(now){ const dt=(now-ttLast)/1000; ttLast=now; if(holdWait) hol
 /* ========================================================================== */
 let lastTime=performance.now();
 GT.paused=false;                     // true のあいだ、ゲームは止まる（メニューを開いているときなど）
-function loop(now){ let dt=(now-lastTime)/1000; dt=Math.min(dt,1/30); lastTime=now; if(!GT.paused){ update(dt); updateFlipBuffer(dt); } applyShake(dt); render(); requestAnimationFrame(loop); }
+function loop(now){ let dt=(now-lastTime)/1000; dt=Math.min(dt,1/30); lastTime=now; if(!GT.paused){ update(dt); updateFlipBuffer(dt); } applyShake(dt); render(); drawCurvedView(); requestAnimationFrame(loop); }
+/* 見た目だけ、ゲーム画面を本のページのカーブに沿わせる（遊ぶときの位置・当たり判定は、もとのゲーム画面のまま）。
+   ゲーム画面（#game）は見えなくして、その絵を、縦の細い短冊に分けて上下にずらし、ページの曲がりに合わせて別の画面（gameView）に描く。
+   ・背表紙（まん中）のそばほど、紙が沈んで下へ下がる。その少し外がわは、紙がふくらんで少し上がる
+   ・ゲーム画面のクリック・タップは、見えない #game がそのまま受けとる */
+const VIEW_EXTRA=24;                                   // 下へずらしたぶん、はみ出さないように、表示の画面を少し高くする
+const gameView=document.createElement('canvas'); gameView.width=W; gameView.height=H+VIEW_EXTRA; gameView.className='gt-gameview';
+gameView.setAttribute('aria-hidden','true');
+Object.assign(gameView.style,{ position:'absolute', left:'0', top:'0', width:'100%', height:`calc(100% * ${(H+VIEW_EXTRA)/H})`, pointerEvents:'none' });
+canvas.insertAdjacentElement('afterend',gameView); canvas.style.opacity='0'; GT.gameView=gameView;
+const vctx=gameView.getContext('2d');
+const CURVE_STRIP=3;
+const curveDy=x=>{ const a=Math.min(1,Math.abs(x-SPINE)/SPINE);          // 0＝背表紙 … 1＝ページの外のふち
+  return 14*Math.pow(1-a,6) - 4.5*Math.pow(Math.sin(Math.PI*a),2); };   // 背表紙へ沈む ／ まん中あたりで少しふくらむ
+const curveTable=[]; for(let x=0;x<W;x+=CURVE_STRIP) curveTable.push(curveDy(x+CURVE_STRIP/2));
+function drawCurvedView(){
+  vctx.clearRect(0,0,gameView.width,gameView.height);
+  for(let i=0,x=0;x<W;i++,x+=CURVE_STRIP){ const w=Math.min(CURVE_STRIP,W-x);
+    vctx.drawImage(canvas, x,0,w,H, x,curveTable[i]+4.5,w+0.5,H); }       // +4.5 … いちばん上がるところでも、上が切れないように
+}
 
 function update(dt){
   const player=GT.player, gravity=GT.gravity, boxes=GT.boxes, enemies=GT.enemies;
