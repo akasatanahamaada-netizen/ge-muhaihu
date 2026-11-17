@@ -57,6 +57,7 @@ GT.playlist = [
   'house_peek',   // 赤ずきんの家・窓のぞき（story）
   'path1',        // 森の道①（play）
   'meet_hood',    // 赤ずきんと道連れに（story）
+  'cliff',        // 森の崖（play・木箱を天井と床へ運ぶ謎解き）
   'wolf_talk',    // 狼（story・分岐：危険を告げるか）
   'crossroads',   // 分かれ道（story・分岐：近道か遠回りか）
   'path2',        // 近道（play・近道のときだけ）
@@ -78,7 +79,7 @@ GT.playlist = [
 const BG_DAY='assets/background/ohiru no mori.webp', BG_EVENING='assets/background/yuugata no mori.webp';
 const S=src=>({src,page:'spread'});
 GT.stageBackgrounds = {
-  opening:S(BG_DAY), komichi1:S(BG_DAY), komichi2:S(BG_DAY), house_peek:S(BG_DAY), path1:S(BG_DAY), meet_hood:S(BG_DAY),
+  opening:S(BG_DAY), komichi1:S(BG_DAY), komichi2:S(BG_DAY), house_peek:S(BG_DAY), path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),
   wolf_talk:S(BG_DAY), crossroads:S(BG_DAY),
   path2:S(BG_DAY),                                   // 近道
   path3:S(BG_DAY), path4:S(BG_EVENING),              // 遠回り：歩くうちに日が傾く
@@ -91,7 +92,7 @@ const BGM_ADVENTURE='assets/music/小さな勇者の探検.mp3';   // 冒険（�
 const BGM_FOREST='assets/music/時を刻む森.mp3';
 GT.sceneMusic = {
   opening:  'assets/music/異世界へようこそ.mp3',        // 最初の物語ステージ（序章 ── 森）
-  komichi1: BGM_ADVENTURE, komichi2: BGM_ADVENTURE, path1: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
+  komichi1: BGM_ADVENTURE, komichi2: BGM_ADVENTURE, path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
   wolf_talk:'assets/music/お騒がせなオバケたち.mp3',   // 狼の初登場
   crossroads:'assets/music/かくれんぼの庭。.mp3',       // 分かれ道（近道か遠回りかを選ぶ）
   path2:    'assets/music/悪魔の悪戯.mp3', path3: 'assets/music/悪魔の悪戯.mp3', path4: 'assets/music/悪魔の悪戯.mp3',   // 近道・遠回りの道（続けて流れる）
@@ -107,7 +108,7 @@ GT.titleMusic = 'assets/music/世界の最果てで、自由を謳う.mp3';   //
 
 // 走るときの足音（シーンの id ごとの地面）。'grass'=芝生 / 'leaves'=落ち葉 / 'dirt'=土。書いていないシーン（家の中など）は足音なし。
 GT.sceneFootsteps = {
-  opening:'grass', komichi1:'grass', komichi2:'grass', house_peek:'grass', path1:'grass', meet_hood:'grass',
+  opening:'grass', komichi1:'grass', komichi2:'grass', house_peek:'grass', path1:'grass', meet_hood:'grass', cliff:'grass',
   wolf_talk:'leaves', path3:'leaves', path4:'leaves',          // 森の奥・遠回りの道（落ち葉）
   crossroads:'dirt', path2:'dirt', house_front:'dirt',          // 分かれ道・近道・家の前（土の道）
 };

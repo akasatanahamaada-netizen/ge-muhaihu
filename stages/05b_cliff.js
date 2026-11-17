@@ -1,0 +1,107 @@
+/* ============================================================================
+   ステージ：第一章 ── 森の崖  id = 'cliff'
+   種類：play（右へ進んで、右ページの右端まで行くとクリア）
+   場所：水たまりを越えたあと（05_meet_hood.js）と、狼と出会う前（06_wolf_talk.js）のあいだ
+   担当：
+   ----------------------------------------------------------------------------
+   ◆ ねらい：「左右のページで重力が別々」を使う謎解き。木箱を、天井と床を行き来させて運ぶ
+     右ページの崖（高さ 124）は、ジャンプ（約93px）では登れない。天井がわも、垂れた茂みでふさがっている。
+     木箱を崖の前に置いて踏み台にすれば、登れる。
+     その木箱は、左ページの高い棚の上にあって、そのままでは手が届かない。
+
+   ◆ 想定ルート（★＝左ページを裏返す）
+     1) ★ 木箱が天井へ落ちる。少年も天井へ。天井で木箱を右へ押す → 垂れたつるで止まる
+     2) ★ もどすと、木箱は床へ落ちる（棚より右まで押してあれば、棚には乗らない）
+        床で木箱を右へ押す → 切り株で止まる（少年は跳び越えられるが、木箱は越えられない）
+     3) ★ 木箱をもう一度天井へ。天井を右へ押していくと、背表紙を越えたところで
+        右ページ（重力はふつう）の床へ落ちる
+     4) ★ 左ページをもとにもどして床へ降り、右ページの木箱を崖の前まで押す
+        （木箱は背表紙のすぐ右に落ちるので、右ページの中からは、木箱の左がわへ回りこめない）
+        木箱に乗ってから崖の上へ跳ぶ → 崖を降りて右端へ
+     ※ 詰んだら「やり直す」（木箱を崖の下にくぐらせられないよう、崖は床までつながっている）
+
+   ◆ 座標メモ（engine.js 由来）
+     画面 900×480 / 背表紙 x=450 / 床の上面 y=464 / 天井 y=16 / ジャンプ到達 約93px
+     床からのジャンプで届く足もとの高さ … y≒371 / 木箱（高さ40）の上から … y≒331
+   ========================================================================== */
+
+GT.defineStage('cliff', {
+  platforms:[
+    {page:'left',  x:60,  y:150, w:110, h:24,  kind:'ledge'},   // 0 高い棚（丸太）。木箱がのっている
+    {page:'left',  x:225, y:16,  w:30,  h:110, kind:'ledge'},   // 1 天井から垂れたつる（天井で押す木箱を止める）
+    {page:'left',  x:360, y:404, w:40,  h:60,  kind:'ledge'},   // 2 切り株（床で押す木箱を止める。少年は跳び越えられる）
+    {page:'right', x:690, y:340, w:140, h:124, kind:'ledge'},   // 3 崖（床から登れない。床までつながっている）
+    {page:'right', x:690, y:16,  w:140, h:184, kind:'ledge'},   // 4 天井から垂れた茂み（天井がわから崖を越えさせない）
+  ],
+  boxes:[
+    {x:100, y:110, w:40, h:40},                                 // 棚の上の木箱
+  ],
+  enemies:[],
+});
+
+GT.registerScene({
+  id:'cliff', type:'play', stage:'cliff', clear:'exit', label:'第一章 ── 森の崖',
+  intro:[
+    {s:'',c:'narr',t:'赤ずきんと並んで、森の奥へ進む。道の先は、切り立った崖でふさがれていた。'},
+    {s:'赤ずきん',c:'hood',f:'surprise',t:'わあ、高い崖……。あなたの魔法で、なんとかならない？'},
+    {s:'',c:'narr',t:'見回すと、左の高い棚の上に、木箱がひとつ置いてある。'},
+  ],
+});
+
+/* ============================================================================
+   見た目（地形は上の defineStage のまま。絵を重ねるだけ）と、チュートリアルの案内
+   足場の形を変えたら、下の番号（platforms の何番目か）も合わせて直すこと。
+   ========================================================================== */
+(function(){
+const isHere=()=>GT.scene&&GT.scene.id==='cliff';
+const D=()=>GT.STAGE_DEFS.cliff;
+const P=i=>D().platforms[i];
+const F=GTDecor.forest;   // 森の絵（stages/_decor.js）
+const FLOWERS=[[34,1],[200,2],[290,0],[318,3],[470,1],[520,2],[600,0],[640,3],[862,1]];
+const MUSHROOMS=[[260,1],[560,1.1],[850,0.9]];
+
+/* ---- 案内：解き方に沿って、順に出す（先にできてしまった案内は飛ばす。もどらない） ---- */
+const box=()=>GT.boxes[0];
+const SHELF=P(0), VINE=P(1), STUMP=P(2), CLIFF=P(3);
+const boxOnCeiling=()=>box() && box().y<GT.EDGE+20;                   // 天井にある（棚の上の木箱は、天井にはない）
+const boxOffShelf =()=>box() && box().x>=SHELF.x+SHELF.w;              // 棚より右
+const boxRight    =()=>box() && GT.pageOf(box())==='right';           // 右ページへ運んだ
+const tut={ step:0 };
+GT.registerSceneReset(()=>{ if(isHere()) tut.step=0; });
+const STEPS=[
+  { done:()=>boxOnCeiling() || boxOffShelf() || boxRight(),
+    at:[260,250], lines:['木箱は 高い棚の上',[['F','Space'],'本を裏返すと、木箱も 天井へ落ちる']] },
+  { done:()=>boxOffShelf() || boxRight(),
+    at:[300,250], lines:['木箱の左がわへ回りこんで','天井で 右へ押そう（つるの手前まで）'] },
+  { done:()=>(boxOffShelf() && !boxOnCeiling()) || boxRight(),
+    at:[300,250], lines:[[['F','Space'],'もどすと、木箱は 床へ落ちる']] },
+  { done:()=>boxRight(),
+    at:[220,250], lines:['切り株の手前まで 押したら','もう一度裏返して、天井から 右のページへ運ぼう'] },
+  { done:()=>boxRight() && GT.gravity.left===1,
+    at:[300,250], lines:['木箱が 右のページの床へ落ちた',[['F','Space'],'左のページを もとにもどして、床から押そう']] },
+  { done:()=>{ const pl=GT.player; return pl.onGround && pl.x+pl.w/2>CLIFF.x && pl.y+pl.h<=CLIFF.y+2; },
+    at:[600,250], lines:['木箱を 崖の前まで押して','踏み台にしよう'] },
+];
+GT.registerUpdate(()=>{
+  if(!isHere()) return;
+  while(tut.step<STEPS.length && STEPS[tut.step].done()) tut.step++;
+});
+function drawTutorial(){
+  if(GT.mode!=='play' || tut.step>=STEPS.length) return;
+  const s=STEPS[tut.step];
+  GT.drawHint(s.at[0], s.at[1], typeof s.lines==='function'?s.lines():s.lines);
+}
+
+GT.registerDraw(()=>{ if(!isHere()) return;
+  F.ground({flowers:FLOWERS, mushrooms:MUSHROOMS, lights:[[160,0.4],[520,1.6],[760,2.8]]});
+}, 'back');
+GT.registerDraw(()=>{ if(!isHere()) return;
+  F.log(SHELF,5);                    // 高い棚（丸太）
+  F.vine(VINE);                      // 天井から垂れたつる
+  F.rock([STUMP],9);                 // 切り株がわりの岩
+  F.rock([CLIFF],17);                // 崖
+  F.crown([P(4)],31);                // 天井から垂れた茂み
+  for(const b of GT.boxes) F.crate(b);
+}, 'world');
+GT.registerDraw(()=>{ if(!isHere()) return; F.air(); drawTutorial(); }, 'overlay');
+})();

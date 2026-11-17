@@ -471,7 +471,7 @@ function startScene(idx){
   } else if(scene.type==='play'){
     GT.loadStageDef(GT.STAGE_DEFS[scene.stage], {exit: scene.clear==='exit'});
     setHudStage((scene.label||'')+'　·　p.'+pageNo);
-    if(scene.intro){ GT.mode='idle'; beginDialogue([scene.intro],null,()=>{ hideDialogue(); GT.mode='play'; }); }
+    if(scene.intro){ GT.mode='idle'; beginDialogue(Array.isArray(scene.intro)?scene.intro:[scene.intro],null,()=>{ hideDialogue(); GT.mode='play'; }); }   // 何行でも書ける
     else { GT.mode='play'; }
   } else if(scene.type==='story'){
     GT.loadStageDef(GT.STAGE_DEFS[scene.stage], {exit:false});
