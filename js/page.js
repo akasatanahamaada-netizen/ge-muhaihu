@@ -115,10 +115,7 @@
   if(book){ book.className='gt-flag reread'; book.textContent='Reread'; book.title='本を読み返す'; book.setAttribute('aria-label','本を読み返す'); flags.appendChild(book); }
   const menuBtn=wrap.querySelector('.gtm-open');
   if(menuBtn){ menuBtn.className='gt-flag menu'; menuBtn.textContent='menu'; menuBtn.setAttribute('aria-label','メニュー'); flags.appendChild(menuBtn); }
-  // 「Reset」（このステージをやり直す。engine.js の「↺ やり直す」ボタン）。1回押すと「Again?」、もう一度で やり直す
-  const reset=document.getElementById('resetBtn');
-  if(reset){ reset.removeAttribute('style'); reset.className='gt-flag reset'; reset.dataset.label='Reset'; reset.dataset.arm='Again?';
-    reset.textContent='Reset'; reset.title='このステージを最初からやり直す（R キー）。2回押す'; reset.setAttribute('aria-label','このステージをやり直す'); flags.appendChild(reset); }
+  // やり直すボタンは、ゲーム画面の右上のまま（engine.js の「↺ やり直す」。旗にすると分かりにくいため）
   // 上のしおり（挟んだしおり）。1回押すと「もう一度押すと、このページへもどる」、2.5秒以内にもう一度押すと、もどる。右クリックで外す
   const tabs=document.createElement('div'); tabs.className='gt-tabs'; wrap.appendChild(tabs);
   const ROMAN=['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ','Ⅹ'];
