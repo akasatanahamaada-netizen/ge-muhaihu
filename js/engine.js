@@ -614,6 +614,26 @@ function tryTalk(){
    めくっているあいだ、会話の枠・立ち絵は隠しておき、めくり終わってから出す。 */
 const flipOld=document.createElement('canvas'); flipOld.width=W; flipOld.height=H;
 const flipLive=document.createElement('canvas'); flipLive.width=W; flipLive.height=H;
+/* めくる紙は、ゲーム画面のまわりのページのふくらみ（js/page.js の .gt-pages）までふくめた大きさで描く。
+   ・ページの大きさ：ゲーム画面の左右に PAGE_PAD_X、上に PAGE_PAD_TOP、下に PAGE_PAD_BOT ずつ広い（EW×EH）
+   ・めくりは、ゲーム画面より一回り大きい専用の層（flipCv。.gt-pages と同じ位置・大きさ。座標も同じ）に描く */
+const PAGE_PAD_X=30, PAGE_PAD_TOP=16, PAGE_PAD_BOT=26, PAGE_COLOR='#efe7da';
+const EW=W+PAGE_PAD_X*2, EH=H+PAGE_PAD_TOP+PAGE_PAD_BOT, ESP=EW/2;
+const extOld=document.createElement('canvas'); extOld.width=EW; extOld.height=EH;
+const extLive=document.createElement('canvas'); extLive.width=EW; extLive.height=EH;
+// ページの形（js/page.js の .gt-pages と同じ線。上下のふちがゆるく曲がっている）。座標は、ページの紙（EW×EH）の中
+function pagePath(g){ const X=x=>x+PAGE_PAD_X, Y=y=>y+PAGE_PAD_TOP;
+  g.beginPath(); g.moveTo(X(-30),Y(-10)); g.quadraticCurveTo(X(210),Y(-22),X(446),Y(-2)); g.lineTo(X(454),Y(-2));
+  g.quadraticCurveTo(X(690),Y(-22),X(930),Y(-10)); g.lineTo(X(932),Y(500)); g.quadraticCurveTo(X(690),Y(486),X(454),Y(506));
+  g.lineTo(X(446),Y(506)); g.quadraticCurveTo(X(210),Y(486),X(-30),Y(500)); g.closePath(); }
+function toPage(dst){ const g=dst.getContext('2d'); g.clearRect(0,0,EW,EH); g.save(); pagePath(g); g.clip();   // ゲーム画面を、ページの形の紙に写す（形の外は透明）
+  g.fillStyle=PAGE_COLOR; g.fillRect(0,0,EW,EH); g.drawImage(canvas,PAGE_PAD_X,PAGE_PAD_TOP); g.restore(); }
+const flipCv=document.createElement('canvas'); flipCv.width=1020; flipCv.height=560;   // viewBox「-60 -40 1020 560」と同じ
+flipCv.className='gt-flipcv'; flipCv.setAttribute('aria-hidden','true');
+Object.assign(flipCv.style,{ position:'absolute', left:'-6.667%', top:'-8.333%', width:'113.333%', height:'116.667%', pointerEvents:'none', zIndex:'3' });
+canvas.parentNode.appendChild(flipCv);
+const fctx=flipCv.getContext('2d');
+let flipCvDirty=false;
 function setFlipHide(on){ document.body.classList.toggle('gt-flipping',on); }
 (function(){ const st=document.createElement('style');
   st.textContent='.gt-flipping #dlg, .gt-flipping .dialogue, .gt-flipping #qte{ visibility:hidden !important; } .gt-flipping img[alt=""]{ visibility:hidden; }';
@@ -622,6 +642,7 @@ let flipDir=1;                                          // 1=次のページへ 
 function startPageFlip(dir){
   if(flipping) return;
   flipOld.getContext('2d').drawImage(canvas,0,0);       // いまの見開きを写しとる
+  toPage(extOld);                                         // ページの大きさの紙にも写しておく（めくる紙の絵）
   flipDir = dir===-1 ? -1 : 1;
   flipping=true; flipT=0; flipSwapped=true; GT.sfx&&GT.sfx('page');
   GT.player.vx=0; GT.player.vy=0;
@@ -1209,11 +1230,10 @@ function drawGravityIcon(cx,cy,dir,glow){
 function drawPageEdges(){
   ctx.save(); const T=22;
   function eb(x,y,w,h,gx0,gy0,gx1,gy1,color){ const g=ctx.createLinearGradient(gx0,gy0,gx1,gy1); g.addColorStop(0,color); g.addColorStop(1,'rgba(58,50,38,0)'); ctx.fillStyle=g; ctx.fillRect(x,y,w,h); }
-  eb(0,H-T,W,T,0,H,0,H-T,'rgba(87,100,74,0.5)');
-  eb(0,0,W,T,0,0,0,T,'rgba(43,46,74,0.4)');
-  eb(0,0,T,H,0,0,T,0,'rgba(176,141,87,0.35)');
-  eb(W-T,0,T,H,W,0,W-T,0,'rgba(176,141,87,0.35)');
-  ctx.strokeStyle='rgba(58,50,38,0.6)'; ctx.lineWidth=3; ctx.lineCap='round';
+  // ふちの色づけと、遊べる範囲のふちの線は、ごく薄く（まわりのページとのさかいを目立たせない。床・天井の目安だけ）
+  eb(0,H-T,W,T,0,H,0,H-T,'rgba(87,100,74,0.12)');
+  eb(0,0,W,T,0,0,0,T,'rgba(43,46,74,0.08)');
+  ctx.strokeStyle='rgba(58,50,38,0.14)'; ctx.lineWidth=1.5; ctx.lineCap='round';
   ctx.beginPath(); ctx.moveTo(EDGE,EDGE); ctx.lineTo(SPINE,EDGE); ctx.moveTo(EDGE,H-EDGE); ctx.lineTo(SPINE,H-EDGE); ctx.moveTo(EDGE,EDGE); ctx.lineTo(EDGE,H-EDGE); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(SPINE,EDGE); ctx.lineTo(W-EDGE,EDGE); ctx.moveTo(SPINE,H-EDGE); ctx.lineTo(W-EDGE,H-EDGE); ctx.moveTo(W-EDGE,EDGE); ctx.lineTo(W-EDGE,H-EDGE); ctx.stroke();
   ctx.restore();
@@ -1649,7 +1669,7 @@ function render(){
   drawPlayer();
   for(const sw of GT.swamps) drawSwamp(sw);   // 沼はプレイヤーの足元を隠すよう手前に描く
   ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.drawImage(GT.paperArt.agedPaper,0,0); ctx.restore();   // 古い紙の色むら・しみ（表示類より奥）
-  ctx.drawImage(GT.paperArt.wornEdges,0,0);                                                                        // 見開きのふちの、劣化したよれ
+  drawEdgeFade();                                                                                                   // ふちを、まわりのページの色へ ぼかす（ページのふくらみとのさかいを目立たせない）
   if(missionReq) drawMissionHud();
   if(GT.hurtFlash>0){ ctx.fillStyle=`rgba(139,20,20,${GT.hurtFlash*0.35})`; ctx.fillRect(0,0,W,H); }
   drawHearts();
@@ -1657,9 +1677,24 @@ function render(){
   for(const fn of drawOverlay) fn();         // 窓のぞきなど
   for(const fn of drawSpeechFns) fn();       // ステージ独自の吹き出し（最前面）
   for(const a of speechQueue.splice(0)) paintSpeech(...a);   // 人物の吹き出し（最前面）
-  if(flipping) drawFlip();                   // ページめくり（いちばん手前）
+  if(flipping) drawFlip();                   // ページめくり（いちばん手前。ページの大きさの層 flipCv に描く）
+  else if(flipCvDirty){ fctx.setTransform(1,0,0,1,0,0); fctx.clearRect(0,0,flipCv.width,flipCv.height); flipCvDirty=false; }
 }
 
+/* ゲーム画面のふちを、まわりのページ（js/page.js の .gt-pages。色は PAGE_COLOR）へ だんだん溶けこませる */
+const EDGE_FADE=22;
+function drawEdgeFade(){
+  ctx.save();
+  for(const e of ['left','right','top','bottom']){
+    const g = e==='left'?ctx.createLinearGradient(0,0,EDGE_FADE,0) : e==='right'?ctx.createLinearGradient(W,0,W-EDGE_FADE,0)
+            : e==='top'?ctx.createLinearGradient(0,0,0,EDGE_FADE) : ctx.createLinearGradient(0,H,0,H-EDGE_FADE);
+    g.addColorStop(0,'rgba(239,231,218,0.95)'); g.addColorStop(0.5,'rgba(239,231,218,0.45)'); g.addColorStop(1,'rgba(239,231,218,0)');
+    ctx.fillStyle=g;
+    if(e==='left') ctx.fillRect(0,0,EDGE_FADE,H); else if(e==='right') ctx.fillRect(W-EDGE_FADE,0,EDGE_FADE,H);
+    else if(e==='top') ctx.fillRect(0,0,W,EDGE_FADE); else ctx.fillRect(0,H-EDGE_FADE,W,EDGE_FADE);
+  }
+  ctx.restore();
+}
 /* ページめくり演出 */
 /* ページめくり：紙がしなるように、やわらかくめくれる。
    紙を背表紙から外へ細い短冊に分けて、外がわ（つまんだふち）ほど先に持ち上がって倒れる（紙がまるくたわむ）。
@@ -1668,7 +1703,10 @@ function render(){
 const FLIP_STRIPS=48;
 function drawFlip(){
   const p=Math.min(1,flipT/FLIP_DUR);
-  const lg=flipLive.getContext('2d'); lg.clearRect(0,0,W,H); lg.drawImage(canvas,0,0);   // 次のシーン（いま描いたもの）を写しとる
+  toPage(extLive);                                                    // 次のシーン（いま描いたもの）を、ページの大きさの紙に写しとる
+  const W=EW, H=EH, SPINE=ESP, flipOld=extOld, flipLive=extLive;      // ここでは、ページのふくらみまでふくめた大きさで描く
+  const ctx=fctx; ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,flipCv.width,flipCv.height);
+  ctx.setTransform(1,0,0,1,60-PAGE_PAD_X,40-PAGE_PAD_TOP); flipCvDirty=true;   // ページの左上が、ゲーム画面の (-PAGE_PAD_X, -PAGE_PAD_TOP)
   const ease = p<0.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2;            // ゆっくり始まって、ゆっくり着地
   const lift=Math.sin(p*Math.PI);                                     // 紙が いちばん持ち上がるのは まん中
   const base=ease*Math.PI, lead=1.35*lift;                            // 背表紙側の角度と、外がわが先に進む量
@@ -1682,6 +1720,7 @@ function drawFlip(){
     if(i<N){ x+=d*Math.cos(a)*SPINE/N; z+=Math.sin(a)*SPINE/N; }
   }
   ctx.save();
+  ctx.save(); pagePath(ctx); ctx.clip();                              // 下のページ・暗さ・影は、ページの形の中だけ
   if(d>0) ctx.drawImage(flipOld,0,0,SPINE,H,0,0,SPINE,H);            // 紙が倒れてくる側のページは、倒れてくるまで前のまま
   else    ctx.drawImage(flipOld,SPINE,0,SPINE,H,SPINE,0,SPINE,H);
   ctx.fillStyle=`rgba(28,22,14,${0.22*lift})`; ctx.fillRect(0,0,W,H);  // 見開きが少し暗くなる
@@ -1690,6 +1729,7 @@ function drawFlip(){
   const shW=40+70*lift, sg=ctx.createLinearGradient(tipX,0, tipX+(tipX>=SPINE?shW:-shW),0);   // 紙の外がわへ落ちる影
   sg.addColorStop(0,`rgba(30,22,12,${0.35*lift})`); sg.addColorStop(1,'rgba(30,22,12,0)');
   ctx.fillStyle=sg; ctx.fillRect(Math.min(tipX,tipX+(tipX>=SPINE?shW:-shW)),0,shW,H);
+  ctx.restore();                                                      // （ページの形の切り抜き、ここまで）
   // 紙（短冊を背表紙から順に。奥の短冊が先、手前の短冊があと）
   const order=[...Array(N).keys()];
   for(const i of order){

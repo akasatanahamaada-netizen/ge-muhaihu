@@ -77,15 +77,19 @@
   const cover=layer('gt-cover'), pages=layer('gt-pages');
   const L='#c4a574';
   cover.innerHTML=`<rect x="-52" y="-30" width="1004" height="546" rx="4" fill="#45372f" filter="url(#gt-rough)"/>`;
+  // ページ：手描きのように、線はゆらいで（#gt-sketch）、ところどころ二重。重なった紙の線は、長さ・太さ・こさがふぞろい
+  const sk=(d,w,o)=>`<path d="${d}" stroke-width="${w}" opacity="${o}"/>`;
   pages.innerHTML=`
-    <g fill="#efe7da" stroke="${L}" stroke-width="2.2" stroke-linejoin="round">
+    <g fill="#efe7da" stroke="${L}" stroke-width="2.4" stroke-linejoin="round" filter="url(#gt-sketch)">
       <path d="M -30 -10 Q 210 -22 446 -2 L 454 -2 Q 690 -22 930 -10 L 932 500 Q 690 486 454 506 L 446 506 Q 210 486 -30 500 Z"/>
     </g>
-    <g fill="none" stroke="${L}" stroke-width="1.6" stroke-linecap="round" opacity="0.9">
-      <path d="M -22 -4 L -22 494"/><path d="M -14 0 L -14 490"/><path d="M -7 2 L -7 488"/>
-      <path d="M 922 -4 L 922 494"/><path d="M 914 0 L 914 490"/><path d="M 907 2 L 907 488"/>
-      <path d="M -20 496 Q 210 482 440 500"/><path d="M 460 500 Q 690 482 920 496"/>
-      <path d="M 40 492 Q 200 484 330 490" opacity="0.6"/><path d="M 600 490 Q 760 482 870 490" opacity="0.6"/>
+    <g fill="none" stroke="${L}" stroke-linecap="round" filter="url(#gt-sketch)">
+      ${sk('M -28 -6 Q 210 -18 444 0',1.2,0.55)}${sk('M 456 0 Q 690 -18 928 -6',1.2,0.55)}
+      ${sk('M -22 -2 Q -24 240 -21 494',1.9,0.95)}${sk('M -15 4 Q -13 250 -15 488',1.3,0.8)}${sk('M -8 6 Q -9 230 -7 484',2.1,0.7)}${sk('M -19 30 L -18 460',0.9,0.5)}
+      ${sk('M 922 -2 Q 924 240 921 494',1.9,0.95)}${sk('M 915 4 Q 913 250 915 488',1.3,0.8)}${sk('M 908 6 Q 909 230 907 484',2.1,0.7)}${sk('M 919 30 L 918 460',0.9,0.5)}
+      ${sk('M -20 496 Q 210 480 440 500',1.8,0.9)}${sk('M -12 491 Q 220 478 438 495',1.1,0.6)}
+      ${sk('M 460 500 Q 690 480 920 496',1.8,0.9)}${sk('M 462 495 Q 680 478 912 491',1.1,0.6)}
+      ${sk('M 40 488 Q 200 480 330 486',1.3,0.55)}${sk('M 600 486 Q 760 478 870 488',1.3,0.55)}
     </g>`;
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 左がわの旗
