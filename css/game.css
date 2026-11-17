@@ -297,3 +297,5 @@ canvas#game{ border-radius:0; }
 @media (hover:none) and (orientation:landscape), (pointer:coarse) and (orientation:landscape){
   .book-frame.is-full{ grid-template-columns:auto calc(var(--gw,60vw) * 1.42) auto !important; padding:6px 8px !important; }
 }
+/* 全画面でないとき：本の上に、しおり（ひも・引き出したぶん）が切れずに入る余白 */
+.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.21) !important; }

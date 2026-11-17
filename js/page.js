@@ -23,12 +23,16 @@
     if(!full){                                   // 全画面でないとき：本（表紙・旗・しおりの余白もふくめて）が窓に入るだけの大きさ
       frame.style.removeProperty('--gs');
       // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.42（左右 0.21 ずつ）、たて gw×(480/900 + 0.14 + 0.06)
-      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.42, (window.innerHeight-40)/(480/900+0.2), 1100));
+      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.5, (window.innerHeight-40)/(480/900+0.4), 1100));   // しおりのひも・引き出した旗のぶんも入れる
       frame.style.setProperty('--gw', Math.floor(gw)+'px'); return; }
     const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.gt-tabs','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
       return parts.every(el=>{ if(!el) return true; const r=el.getBoundingClientRect(); if(!r.width && !r.height) return true;   // 見えていない部品は数えない（SVG は offsetParent を持たないので、大きさで見る）
-        return r.left>=f.left+4 && r.right<=f.right-4 && r.top>=f.top+4 && r.bottom<=f.bottom-4; }); };
+        // しおりは上にひも（V の字）が、旗はカーソルを乗せると左へ出るぶんがあるので、そのぶんも画面に入れる（切れないように）
+        const cq=(wrap.getBoundingClientRect().width||900)/100;
+        const top = el.classList.contains('gt-tabs') ? r.top-9.5*cq : r.top;   // ひも＋引き出したぶん
+        const left= el.classList.contains('gt-flags') ? r.left-4*cq : r.left;
+        return left>=f.left+4 && r.right<=f.right-4 && top>=f.top+4 && r.bottom<=f.bottom-4; }); };
     let lo=200, hi=Math.min(frame.clientWidth, window.innerHeight*900/480);
     if(fits(hi)) return;
     for(let i=0;i<14;i++){ const mid=(lo+hi)/2; if(fits(mid)) lo=mid; else hi=mid; }
