@@ -149,8 +149,9 @@ GT.registerUpdate(()=>{
 function moveHood(){
   const h=hoodNpc(); if(!h) return;
   const now=performance.now(), dt=Math.min(0.05,(now-st.last)/1000); st.last=now;
-  // 近道を選んだら、赤ずきんは別れて下の道（遠回り）を歩いていく。少年がページを裏返しても、床を歩きつづける
-  h.noGravity = GT.flags.route==='shortcut';
+  // 近道を選んだら、赤ずきんは別れて下の道（遠回り）を歩いていく。
+  // ほかの人と同じく、ページの重力にしたがう（少年がページを裏返すと、赤ずきんも天井へ落ちて、さかさまのまま歩いていく）
+  h.noGravity = false;
   if(st.bubble){ st.bubble.t-=dt; if(st.bubble.t<=0) st.bubble=null; }
   if(!st.talked) return;
   const pcx=GT.player.x+GT.player.w/2;
@@ -159,7 +160,9 @@ function moveHood(){
   else if(GT.flags.route==='shortcut'){ target=W+60; speed=60; }
   else target=SIGN_X-44;
   if(GT.mode!=='play' && GT.flags.route!=='shortcut') return;
-  if(GT.flags.route==='shortcut'){ const dx=target-h.x; if(Math.abs(dx)>6) h.x+=Math.sign(dx)*Math.min(speed*dt,Math.abs(dx)); }   // 画面の外へ歩いていく
+  if(GT.flags.route==='shortcut'){                         // 画面の外へ歩いていく（足場は、すり抜けずに跳び乗る）
+    const edge=W-EDGE-h.w;
+    if(h.x<edge-2) GT.npcStep(h,edge,speed,dt); else if(h.x<target) h.x=Math.min(target,h.x+speed*dt); }
   else GT.npcStep(h,target,speed,dt);                       // 足場は、すり抜けずに跳び乗る
 }
 
