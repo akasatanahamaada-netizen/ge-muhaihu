@@ -919,6 +919,23 @@ GT.drawHint=function(cx,cy,lines){
 };
 
 GT.beginDialogue=beginDialogue; GT.hideDialogue=hideDialogue;
+/* 吹き出しマーク（話しかけられる人の頭の上）。(cx,cy)＝マークの中心、g＝重力（-1 なら しっぽが上を向く）、
+   near＝話しかけられる近さにいる（金色にして、少し大きく） */
+function drawTalkMark(cx,cy,g,near){
+  const t=performance.now()/1000, bob=Math.sin(t*3)*2.5, k=near?1.15+0.06*Math.sin(t*6):1;
+  ctx.save(); ctx.translate(cx,cy+bob*g); ctx.scale(k,k);
+  const w=30, h=20;
+  const fill = near ? '#f6e2b0' : '#fffaf0', line = near ? '#b08d57' : '#8a7a5a';
+  ctx.beginPath(); roundRectPath(-w/2,-h/2,w,h,9);
+  ctx.fillStyle=fill; ctx.fill(); ctx.lineWidth=1.6; ctx.strokeStyle=line; ctx.stroke();
+  // しっぽ（人のほうへ向ける）。枠の線をまたいで塗り、つなぎ目を消す
+  const ty=g>0 ? h/2 : -h/2, tip=g>0 ? h/2+8 : -h/2-8, d=g>0?-2:2;
+  ctx.beginPath(); ctx.moveTo(-5,ty+d); ctx.lineTo(-1,tip); ctx.lineTo(4,ty+d); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-5,ty); ctx.lineTo(-1,tip); ctx.lineTo(4,ty); ctx.stroke();
+  ctx.fillStyle='#5a4630';
+  for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.arc(i*7, 0, 2.2, 0, Math.PI*2); ctx.fill(); }   // 「…」
+  ctx.restore();
+}
 
 canvas.addEventListener('pointerdown',e=>{
   if(dlg.classList.contains('show')){ e.preventDefault(); tryAdvanceDialogue(); return; }
@@ -1507,11 +1524,14 @@ function drawNpc(n){
   ctx.restore();
   if(n.name){ ctx.save(); ctx.font="600 11px 'Zen Old Mincho',serif"; ctx.textAlign='center';
     ctx.fillStyle='rgba(74,70,60,0.85)'; ctx.fillText(n.name, cx, g>0 ? headY-12 : headY+20); ctx.restore(); }
+  // 話しかけられる人：頭の上に吹き出しマーク（まだ話していない人だけ。会話中は出さない）
+  const canTalk = n.talkable && !n.talked && n.lines && !storyTalking && !dlg.classList.contains('show') && GT.mode==='play';
+  if(canTalk) drawTalkMark(cx, g>0 ? headY-38 : headY+44, g, n===activeNpc);
   if(n===activeNpc && !storyTalking){
     const p=0.5+0.5*Math.sin(goalPulse*5);
     ctx.save(); ctx.textAlign='center'; ctx.globalAlpha=0.65+0.35*p;
     ctx.fillStyle='#b08d57'; ctx.font="700 13px 'Zen Old Mincho',serif";
-    ctx.fillText(GT.ctl('タップ / Enter で はなす','タップで はなす'), cx, g>0 ? headY-28 : headY+36);
+    ctx.fillText(GT.ctl('タップ / Enter で はなす','タップで はなす'), cx, g>0 ? headY-66 : headY+74);
     ctx.restore();
   }
   if(n.speech) GT.drawSpeech(cx, g>0 ? headY-14 : headY+14, n.speech.text, n.speech.t/0.4, g<0, n.speech.angry);
