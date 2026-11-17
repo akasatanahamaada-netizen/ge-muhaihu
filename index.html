@@ -6,7 +6,7 @@
 <title>Gravity Tale — 第一章「赤い頭巾」</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Zen+Old+Mincho:wght@500;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/game.css?v=202611180012">
+<link rel="stylesheet" href="css/game.css?v=202611180024">
 </head>
 <body>
 <div class="ambient" aria-hidden="true"></div>
@@ -18,6 +18,45 @@
   <div class="db" style="--c:#4a382d; --w:25vw; left:-8vw; bottom:-22vh; --r:31deg"><b></b></div>
   <div class="db" style="--c:#6b3428; --w:23vw; right:-7vw; bottom:-16vh; --r:-22deg"><b></b></div>
   <div class="db" style="--c:#2f3a52; --w:13vw; right:9vw; bottom:-4vh; --r:-6deg"><b></b></div>
+  <!-- インクのしみ（インク瓶のそば） -->
+  <svg class="dk dk-stain" viewBox="0 0 100 60"><path d="M18 30 Q14 14 34 15 Q44 6 58 14 Q78 10 80 28 Q92 38 74 46 Q60 56 42 48 Q22 54 20 42 Q8 38 18 30Z" fill="#1d2238" opacity=".55"/><circle cx="90" cy="18" r="3.2" fill="#1d2238" opacity=".5"/><circle cx="8" cy="50" r="2.2" fill="#1d2238" opacity=".45"/></svg>
+  <!-- インク瓶（四角いガラス瓶・黒いふた・紙のラベル） -->
+  <svg class="dk dk-ink" viewBox="0 0 120 150">
+    <defs><linearGradient id="dkGlass" x1="0" x2="1"><stop offset="0" stop-color="#2a3150"/><stop offset=".45" stop-color="#151a30"/><stop offset="1" stop-color="#0d1020"/></linearGradient>
+      <linearGradient id="dkCap" x1="0" x2="1"><stop offset="0" stop-color="#3a3430"/><stop offset=".4" stop-color="#1c1815"/><stop offset="1" stop-color="#0e0c0a"/></linearGradient></defs>
+    <path d="M14 56 Q14 44 26 44 H94 Q106 44 106 56 V132 Q106 144 94 144 H26 Q14 144 14 132Z" fill="url(#dkGlass)" stroke="#2b2018" stroke-width="2.5"/>
+    <path d="M22 54 Q22 50 27 50 H36 V136 H27 Q22 136 22 132Z" fill="#fff" opacity=".13"/>
+    <rect x="30" y="80" width="60" height="40" rx="2" fill="#e9dfc8" stroke="#6b5640" stroke-width="1.5"/>
+    <rect x="34" y="84" width="52" height="32" rx="1" fill="none" stroke="#a8925f" stroke-width="1"/>
+    <path d="M44 97 H76 M48 104 H72" stroke="#5a4632" stroke-width="2" stroke-linecap="round"/>
+    <rect x="38" y="14" width="44" height="32" rx="4" fill="url(#dkCap)" stroke="#2b2018" stroke-width="2.5"/>
+    <path d="M38 22 H82 M38 38 H82" stroke="#cdb06a" stroke-width="1.6" opacity=".8"/>
+    <rect x="42" y="16" width="6" height="28" rx="2" fill="#fff" opacity=".12"/>
+  </svg>
+  <!-- 万年筆（紺の軸・金のクリップと輪・金のペン先） -->
+  <svg class="dk dk-fpen" viewBox="0 0 400 44">
+    <defs><linearGradient id="dkBarrel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a5590"/><stop offset=".35" stop-color="#262e5c"/><stop offset="1" stop-color="#131733"/></linearGradient>
+      <linearGradient id="dkGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dc9a"/><stop offset=".5" stop-color="#c9a456"/><stop offset="1" stop-color="#8a6a2e"/></linearGradient></defs>
+    <path d="M318 16 L392 22 L318 28 Q312 22 318 16Z" fill="url(#dkGold)" stroke="#5a4320" stroke-width="1.2"/>
+    <path d="M336 22 L390 22" stroke="#5a4320" stroke-width="1"/><circle cx="336" cy="22" r="2.2" fill="#5a4320"/>
+    <path d="M276 12 L322 15 Q326 22 322 29 L276 32Z" fill="#14151c" stroke="#2b2018" stroke-width="1.5"/>
+    <path d="M14 22 Q14 9 30 9 H274 Q280 9 280 22 Q280 35 274 35 H30 Q14 35 14 22Z" fill="url(#dkBarrel)" stroke="#1a1410" stroke-width="2"/>
+    <rect x="160" y="9" width="6" height="26" fill="url(#dkGold)"/><rect x="170" y="9" width="2.5" height="26" fill="url(#dkGold)"/>
+    <rect x="262" y="9" width="5" height="26" fill="url(#dkGold)"/>
+    <path d="M40 4 H140 Q148 4 148 9 V13 H50 Q40 13 40 8Z" fill="url(#dkGold)" stroke="#5a4320" stroke-width="1"/>
+    <path d="M30 13 H270" stroke="#fff" stroke-width="2" opacity=".18" stroke-linecap="round"/>
+  </svg>
+  <!-- つけペン（木の軸・銀のペン先） -->
+  <svg class="dk dk-dpen" viewBox="0 0 400 24">
+    <defs><linearGradient id="dkWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b07a48"/><stop offset=".45" stop-color="#7a4a26"/><stop offset="1" stop-color="#4a2b14"/></linearGradient>
+      <linearGradient id="dkSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef0f2"/><stop offset=".5" stop-color="#a5abb2"/><stop offset="1" stop-color="#5d636b"/></linearGradient></defs>
+    <path d="M8 12 Q8 7 16 7 L292 8 L292 16 L16 17 Q8 17 8 12Z" fill="url(#dkWood)" stroke="#2b1a0c" stroke-width="1.5"/>
+    <rect x="292" y="6" width="26" height="12" rx="1.5" fill="url(#dkSteel)" stroke="#3c4046" stroke-width="1.2"/>
+    <path d="M300 6 V18 M306 6 V18" stroke="#6e747b" stroke-width="1"/>
+    <path d="M318 8 L392 12 L318 16Z" fill="url(#dkSteel)" stroke="#3c4046" stroke-width="1.1"/>
+    <path d="M350 12 L390 12" stroke="#3c4046" stroke-width=".9"/><path d="M372 11 L392 12 L372 13Z" fill="#1d2238"/>
+    <path d="M20 10 H286" stroke="#fff" stroke-width="1.4" opacity=".2" stroke-linecap="round"/>
+  </svg>
 </div>
 <!-- 本の枠・背表紙の線を、手描きのように少しゆらがせるフィルター（css/game.css の filter:url(#gt-rough)） -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="gt-rough"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter><filter id="gt-soft" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="1" seed="9"/><feDisplacementMap in="SourceGraphic" scale="2"/></filter></svg>
@@ -102,37 +141,37 @@
 <!--   4) js/menu.js   … メニュー画面・セーブ（js/page.js の前）              -->
 <!-- ステージを足したら、stages/ の行をここに1行コピーして増やすだけ。        -->
 <!-- ====================================================================== -->
-<script src="js/engine.js?v=202611180012"></script>
-<script src="js/paper.js?v=202611180012"></script>     <!-- 本の紙（engine.js のすぐあと） -->
-<script src="js/sprites.js?v=202611180012"></script>   <!-- キャラクターの絵 -->
-<script src="stages/_decor.js?v=202611180012"></script>
+<script src="js/engine.js?v=202611180024"></script>
+<script src="js/paper.js?v=202611180024"></script>     <!-- 本の紙（engine.js のすぐあと） -->
+<script src="js/sprites.js?v=202611180024"></script>   <!-- キャラクターの絵 -->
+<script src="stages/_decor.js?v=202611180024"></script>
 
-<script src="stages/00_opening.js?v=202611180012"></script>
-<script src="stages/01_komichi1.js?v=202611180012"></script>
-<script src="stages/02_komichi2.js?v=202611180012"></script>
-<script src="stages/03_house_peek.js?v=202611180012"></script>
-<script src="stages/04_path1.js?v=202611180012"></script>
-<script src="stages/05_meet_hood.js?v=202611180012"></script>
-<script src="stages/05b_cliff.js?v=202611180012"></script>   <!-- 森の崖（木箱を運ぶ謎解き） -->
-<script src="stages/06_wolf_talk.js?v=202611180012"></script>
-<script src="stages/07_crossroads.js?v=202611180012"></script>
-<script src="stages/08_path2.js?v=202611180012"></script>
-<script src="stages/08b_path2b.js?v=202611180012"></script>   <!-- 近道②（いばらのトンネル） -->
-<script src="stages/08c_flowers.js?v=202611180012"></script>  <!-- お花畑（遠回り） -->
-<script src="stages/09_path3.js?v=202611180012"></script>
-<script src="stages/10_path4.js?v=202611180012"></script>
-<script src="stages/11_house_front.js?v=202611180012"></script>
-<script src="stages/12a_room_art.js?v=202611180012"></script>   <!-- おばあさんの家：部屋の絵 -->
-<script src="stages/12b_wolf_boss.js?v=202611180012"></script>   <!-- おばあさんの家：狼とのボス戦 -->
-<script src="stages/12_grannys_house.js?v=202611180012"></script>   <!-- おばあさんの家：お話（到着・QTE・結末） -->
+<script src="stages/00_opening.js?v=202611180024"></script>
+<script src="stages/01_komichi1.js?v=202611180024"></script>
+<script src="stages/02_komichi2.js?v=202611180024"></script>
+<script src="stages/03_house_peek.js?v=202611180024"></script>
+<script src="stages/04_path1.js?v=202611180024"></script>
+<script src="stages/05_meet_hood.js?v=202611180024"></script>
+<script src="stages/05b_cliff.js?v=202611180024"></script>   <!-- 森の崖（木箱を運ぶ謎解き） -->
+<script src="stages/06_wolf_talk.js?v=202611180024"></script>
+<script src="stages/07_crossroads.js?v=202611180024"></script>
+<script src="stages/08_path2.js?v=202611180024"></script>
+<script src="stages/08b_path2b.js?v=202611180024"></script>   <!-- 近道②（いばらのトンネル） -->
+<script src="stages/08c_flowers.js?v=202611180024"></script>  <!-- お花畑（遠回り） -->
+<script src="stages/09_path3.js?v=202611180024"></script>
+<script src="stages/10_path4.js?v=202611180024"></script>
+<script src="stages/11_house_front.js?v=202611180024"></script>
+<script src="stages/12a_room_art.js?v=202611180024"></script>   <!-- おばあさんの家：部屋の絵 -->
+<script src="stages/12b_wolf_boss.js?v=202611180024"></script>   <!-- おばあさんの家：狼とのボス戦 -->
+<script src="stages/12_grannys_house.js?v=202611180024"></script>   <!-- おばあさんの家：お話（到着・QTE・結末） -->
 
-<script src="js/playlist.js?v=202611180012"></script>
-<script src="js/sfx_data.js?v=202611180012"></script>   <!-- 大きく鳴らす効果音の中身 -->
-<script src="js/sfx.js?v=202611180012"></script>       <!-- 効果音 -->
-<script src="js/music.js?v=202611180012"></script>     <!-- 音楽（BGM。playlist.js のあとに読む） -->
-<script src="js/bookart.js?v=202611180012"></script>   <!-- 本の挿絵 -->
-<script src="js/bookview.js?v=202611180012"></script>  <!-- 本を読みかえす画面（ページをめくる） -->
-<script src="js/menu.js?v=202611180012"></script>      <!-- メニュー画面（playlist.js のあとに読む） -->
-<script src="js/page.js?v=202611180012"></script>     <!-- 画面外の飾り・全画面・見出しの色 -->
+<script src="js/playlist.js?v=202611180024"></script>
+<script src="js/sfx_data.js?v=202611180024"></script>   <!-- 大きく鳴らす効果音の中身 -->
+<script src="js/sfx.js?v=202611180024"></script>       <!-- 効果音 -->
+<script src="js/music.js?v=202611180024"></script>     <!-- 音楽（BGM。playlist.js のあとに読む） -->
+<script src="js/bookart.js?v=202611180024"></script>   <!-- 本の挿絵 -->
+<script src="js/bookview.js?v=202611180024"></script>  <!-- 本を読みかえす画面（ページをめくる） -->
+<script src="js/menu.js?v=202611180024"></script>      <!-- メニュー画面（playlist.js のあとに読む） -->
+<script src="js/page.js?v=202611180024"></script>     <!-- 画面外の飾り・全画面・見出しの色 -->
 </body>
 </html>

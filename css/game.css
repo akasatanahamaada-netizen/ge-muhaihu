@@ -447,4 +447,10 @@ canvas#game{ border-radius:0; }
 .db b{ position:absolute; left:28%; top:20%; width:48%; height:15%; border:1.5px solid rgba(205,176,106,0.75); border-radius:2px;   /* 題名の枠 */
   box-shadow:inset 0 0 0 3px rgba(0,0,0,0), inset 0 0 0 4px rgba(205,176,106,0.35); }
 .db b::after{ content:''; position:absolute; left:18%; right:18%; top:46%; height:2px; background:rgba(205,176,106,0.55); }          /* 題名（読めない金の線） */
+/* 机の上の小物（万年筆・インク瓶・インクのしみ・つけペン）。ゲームの本のうしろ。場所と大きさ・かたむきはここで決める */
+.dk{ position:absolute; height:auto; overflow:visible; }
+.dk-fpen{ width:clamp(200px,23vw,420px); left:37vw; top:clamp(14px,3.2vh,34px); transform:rotate(-7deg); filter:drop-shadow(4px 7px 4px rgba(0,0,0,0.35)); }
+.dk-ink{ width:clamp(56px,6.2vw,118px); right:19vw; top:clamp(-4px,0.6vh,10px); transform:rotate(6deg); filter:drop-shadow(5px 8px 6px rgba(0,0,0,0.4)); }
+.dk-stain{ width:clamp(60px,6vw,110px); right:15.5vw; top:clamp(30px,7vh,70px); transform:rotate(-14deg); }
+.dk-dpen{ width:clamp(220px,27vw,480px); left:24vw; bottom:clamp(2px,1.2vh,14px); transform:rotate(2.5deg); filter:drop-shadow(3px 5px 3px rgba(0,0,0,0.35)); }
 
