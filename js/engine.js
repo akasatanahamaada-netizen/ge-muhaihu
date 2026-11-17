@@ -666,9 +666,12 @@ function nextLine(){
 /* 主人公の名前（序で入力する。GT.flags.playerName にしまうので、セーブにも入る）。
    セリフの t に {name} と書くと、その名前に置きかわる。主人公のセリフ（c:'boy'）の名前の欄にも出る */
 GT.playerName=()=>(GT.flags && GT.flags.playerName) || '少年';
+/* 名前を名乗るまでは「？？？」と出す人（マリ）。flags.mariNamed が false のあいだ（序章で「わたしは、マリ」と名乗るまで）。
+   古いセーブで mariNamed が無いときは、名乗ったあととみなす */
+GT.speakerName=(c,name)=> (c==='mari' && GT.flags && GT.flags.mariNamed===false) ? '？？？' : name;
 const withName=t=>String(t||'').replace(/\{name\}/g, GT.playerName());
 function showLine(line){
-  dlgSpeaker.className='speaker '+(line.c||''); dlgSpeaker.textContent = line.c==='boy' ? GT.playerName() : (line.s||'');
+  dlgSpeaker.className='speaker '+(line.c||''); dlgSpeaker.textContent = line.c==='boy' ? GT.playerName() : GT.speakerName(line.c, line.s||'');
   showPortrait(line.c, line);
   typing=true; typeTarget=withName(line.t); typeI=0; typeAcc=0; dlgLine.textContent=''; dlgHint.style.display='block';
   if(line.ask==='name') showNameAsk();
@@ -1529,7 +1532,7 @@ function drawNpc(n){
   }
   ctx.restore();
   if(n.name){ ctx.save(); ctx.font="600 11px 'Zen Old Mincho',serif"; ctx.textAlign='center';
-    ctx.fillStyle='rgba(74,70,60,0.85)'; ctx.fillText(n.name, cx, g>0 ? headY-12 : headY+20); ctx.restore(); }
+    ctx.fillStyle='rgba(74,70,60,0.85)'; ctx.fillText(GT.speakerName(n.who, n.name), cx, g>0 ? headY-12 : headY+20); ctx.restore(); }
   // 話しかけられる人：頭の上に吹き出しマーク（まだ話していない人だけ。会話中は出さない）
   const canTalk = n.talkable && !n.talked && n.lines && !storyTalking && !dlg.classList.contains('show') && GT.mode==='play';
   // 話しかけないと先へ進めない人は「！」、話さなくても進める人（ヒント・寄り道の会話）は「…」

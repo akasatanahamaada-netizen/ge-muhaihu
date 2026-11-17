@@ -15,7 +15,8 @@ const players={};                      // src → {src, el, vol}（一度読み�
 let sceneWant=null;                    // いまのシーンで流したい曲の src
 const menuOpen=()=>!!document.querySelector('.gtm.show');
 let hushUntil=0;                       // この時刻（performance.now）までは、シーンの曲を消しておく（GT.musicHush）
-const wantNow=()=> menuOpen() ? (GT.titleMusic||null) : (performance.now()<hushUntil ? null : sceneWant);
+let muted=false;                       // GT.musicMute(true) のあいだは、シーンの曲を消しておく（狼がおばあさんのふりをしている場面など）
+const wantNow=()=> menuOpen() ? (GT.titleMusic||null) : (performance.now()<hushUntil || muted ? null : sceneWant);
 const bgmVol=()=>VOLUME*(GT.volume?GT.volume.bgm:1);   // メニューの「せってい」で決めた大きさをかける
 
 function player(src){
@@ -30,10 +31,13 @@ addEventListener('pointerdown',unlock); addEventListener('keydown',unlock);
 GT.musicUnlock=unlock;
 // GT.musicHush(秒) … しばらく BGM をフェードアウトして消す（グロテスクな音を聞かせる場面など）。時間がたつと、続きからフェードインする
 GT.musicHush=sec=>{ hushUntil=Math.max(hushUntil, performance.now()+sec*1000); };
+// GT.musicMute(true/false) … BGM をフェードアウトして止める／もどす。シーンが変わると、自動でもどる
+GT.musicMute=on=>{ muted=!!on; };
 // 操作する前でも鳴らせるブラウザなら、すぐに鳴らす（たいていは、最初のクリックやキーまで待たされる）
 setTimeout(()=>{ const w=wantNow(); if(w){ const p=player(w); p.el.play().then(()=>{ unlocked=true; }).catch(()=>{}); } },0);
 
 GT.onSceneStart(scene=>{
+  muted=false;
   // id で決める（GT.sceneMusic）。id の無い差しこみシーン（ボス戦・QTE）は、種類で決める（GT.sceneTypeMusic）
   const next=(GT.sceneMusic||{})[scene && scene.id]||(GT.sceneTypeMusic||{})[scene && scene.type]||null;
   if(next!==sceneWant){                                        // 別の曲になったら、新しい曲は頭から（止まっていれば）

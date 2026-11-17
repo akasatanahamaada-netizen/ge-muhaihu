@@ -126,10 +126,13 @@ GT.boxSkinned=isRoom;   // 家の中では、engine のふつうの箱は描か�
 /* ============================ QTE ====================================== */
 let qteActive=false, qteTimer=0, qteWindow=0;
 
+GT.registerAct('bgm-off',()=>{ GT.musicMute && GT.musicMute(true); });
+GT.registerAct('bgm-on', ()=>{ GT.musicMute && GT.musicMute(false); });
 GT.registerSceneType('qte', ()=>{
   GT.loadStageDef(GT.STAGE_DEFS['wolf_boss']); GT.mode='idle'; qteActive=false;
   { const pl=GT.player; pl.x=262; pl.y=H-EDGE-pl.h; pl.facing=-1; }   // 少年は戸口のそば（ベッドのほうを向く）
   GT.setHudStage('第一章 ── ！');
+  GT.musicMute && GT.musicMute(true);     // 狼がおばあさんのふりをしているあいだは、BGM を止める（跳ね起きたら流す）
   const lines=[
     {s:'狼',c:'wolf',f:'granny',t:'おやおや、よく来たね。カスタードとバターの小瓶は、そこの椅子に置いておくれ。'},
     {s:'狼',c:'wolf',f:'granny',t:'さあ、もっと近くへおいで。'},
@@ -144,7 +147,7 @@ GT.registerSceneType('qte', ()=>{
     {s:'狼',c:'wolf',f:'granny',t:'おまえを、よく見るためだよ。'},
     {s:'赤ずきん',c:'hood',f:'surprise',t:'……なんて大きな歯なの。'},
     {s:'狼',c:'wolf',f:'granny',t:'それは、おまえを食べるためだよ。'},
-    {s:'',c:'narr',t:'狼が、勢いよくベッドから跳ね起きた。'},
+    {s:'',c:'narr',t:'狼が、勢いよくベッドから跳ね起きた。',act:'bgm-on'},
   ];
   GT.beginDialogue(lines,null,()=>{
     GT.hideDialogue(); qteActive=true;

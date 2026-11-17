@@ -82,13 +82,13 @@ const KNOCK=[
   {s:'赤ずきん',c:'hood',t:'じゃあ、戸を叩くね。'},
   {s:'',c:'narr',t:'赤ずきんが、戸を叩く。',act:'front-knock'},
   {s:'赤ずきん',c:'hood',t:'おばあちゃん、わたしよ。カスタードとバターを持ってきたの。'},
-  {s:'狼',c:'wolf',f:'granny',t:'（おばあさんの声を真似て）糸巻きを引いてごらん。掛け金が外れるよ。'},
+  {s:'狼',c:'wolf',f:'granny',t:'（おばあさんの声を真似て）糸巻きを引いてごらん。掛け金が外れるよ。',act:'bgm-off'},   // ふりをしているあいだは BGM を止める
   {s:'',c:'narr',t:'……おばあさんの声にしては、少しおかしい。'},
   {s:'',c:'narr',t:'赤ずきんが、戸に手を伸ばす。'},
 ];
 const canStop=()=> GT.flags.warnedHood || clueCount()>=2;
 const KNOCK_CHOICES=[
-  { label:'赤ずきんを止める', set:()=>{ GT.flags.stoppedAtDoor = canStop(); }, after:()=>{
+  { label:'赤ずきんを止める', set:()=>{ GT.flags.stoppedAtDoor = canStop(); GT.musicMute && GT.musicMute(false); }, after:()=>{
       if(GT.flags.warnedHood) return [
         {s:'',c:'narr',t:'少年は、赤ずきんのもとへ駆けだした。',act:'front-run'},
         {s:'',c:'narr',t:'少年が手を掴む。'},
@@ -109,7 +109,7 @@ const KNOCK_CHOICES=[
         {s:'',c:'narr',t:'止める間もなく、赤ずきんは先に中へ入っていく。',act:'front-hood-enter'},
       ];
     }},
-  { label:'何もしない', set:()=>{ GT.flags.stoppedAtDoor=false; }, after:[
+  { label:'何もしない', set:()=>{ GT.flags.stoppedAtDoor=false; GT.musicMute && GT.musicMute(false); }, after:[
       {s:'',c:'narr',t:'赤ずきんが掛け金を引き、中へ入っていく。少年もあとに続いた。',act:'front-hood-enter'},
     ]},
 ];

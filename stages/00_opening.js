@@ -112,7 +112,7 @@ function MARI_FIRST(c){
   ];
   const tail=[
     {s:'少年',c:'boy',t:'……きみは、だれ？'},
-    {s:'マリ',c:'mari',t:'わたし？　わたしは、マリ。この本のことを、少しだけ知ってるの。'},
+    {s:'マリ',c:'mari',t:'わたし？　わたしは、マリ。この本のことを、少しだけ知ってるの。',act:'mari-named'},   // ここで名乗る（ここから名前の欄が「マリ」になる）
   ];
   return head.concat(mid,tail);
 }
@@ -181,6 +181,7 @@ GT.registerAct('opening-lie',()=>{
   pl.squash=sq; pl.y=FLOOR-pl.h/2-(pl.h/2)*(2-sq);
 });
 GT.registerAct('opening-book-on', ()=>{ st.book.on=true; });
+GT.registerAct('mari-named', ()=>{ GT.flags.mariNamed=true; });
 GT.registerAct('opening-book-off',()=>{ st.book.on=false; });
 
 /* ---------- 毎フレームの処理（操作中だけ動く） ---------- */
