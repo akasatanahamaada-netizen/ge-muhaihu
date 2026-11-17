@@ -388,3 +388,16 @@ canvas#game{ border-radius:0; }
 .gt-mark .word{ top:60%; font-size:clamp(15px,2.9cqw,54px); }
 /* 案内の吹き出しは、栞の下に（栞は90度まわしてあるので、まわし返して横書きに） */
 .gt-mark.gt-guide::after{ left:calc(100% + 1.2cqw); top:50%; transform:translate(-50%,-50%) rotate(-90deg) translateY(50%); transform-origin:50% 50%; }
+
+/* ==== 最初の参考画像のように：栞を縦にして、本の上のふちに挟む（上の部分だけページから出ている）。
+        栞に「menu」「Reread」と書く。カーソルを乗せると、すーっと引き出される ==== */
+.gt-marks{ left:5cqw; top:calc(-1 * (20.9cqw * 0.55 + 3.6cqw)); gap:1.6cqw; z-index:-2; align-items:flex-start; }
+.gt-mark{ width:6cqw; height:20.9cqw; margin:0; transform:none; filter:none; transition:transform .45s cubic-bezier(.25,.8,.3,1); }
+.gt-mark:hover, .gt-mark:focus-visible, .gt-mark.gt-guide{ transform:translateY(-2cqw); }
+.gt-mark .word{ top:43%; transform:translate(-50%,-50%); font-size:clamp(13px,2.3cqw,44px); }
+.gt-mark.gt-guide::after{ left:calc(100% + 10px); top:18%; transform:none; }
+.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.175) !important; }
+.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.185) !important; }
+.gt-marks{ top:calc(-1 * (20.9cqw * 0.6 + 3.6cqw)); }
+.gt-mark .word{ top:38%; font-size:clamp(12px,2.1cqw,40px); }
+.gt-mark.gt-guide::after{ left:calc(200% + 2.6cqw); top:22%; }   /* 案内の吹き出しは、となりの menu の栞よりも右に */
