@@ -21,12 +21,10 @@
   // ゲーム画面の幅：本の枠からはみ出さない、いちばん大きな幅をさがす（ボタンの並びが変わっても使える）
   function fit(){
     if(!full){ frame.style.removeProperty('--gw'); frame.style.removeProperty('--gs'); return; }
-    const parts=['.hud','.canvas-wrap','.gt-tabs','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
+    const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
       return parts.every(el=>{ if(!el || !el.offsetParent) return true; const r=el.getBoundingClientRect();
-        // ゲーム画面は、まわりに描く本の枠（.canvas-wrap::after。太さ＝margin）も入れて、はみ出さないかを見る
-        const m = el.classList.contains('canvas-wrap') ? (parseFloat(getComputedStyle(el).marginTop)||0) : 0;
-        return r.left-m>=f.left+4 && r.right+m<=f.right-4 && r.top-m>=f.top+4 && r.bottom+m<=f.bottom-4; }); };
+        return r.left>=f.left+4 && r.right<=f.right-4 && r.top>=f.top+4 && r.bottom<=f.bottom-4; }); };
     let lo=200, hi=Math.min(frame.clientWidth, window.innerHeight*900/480);
     if(fits(hi)) return;
     for(let i=0;i<14;i++){ const mid=(lo+hi)/2; if(fits(mid)) lo=mid; else hi=mid; }
@@ -59,27 +57,46 @@
     new MutationObserver(upd).observe(el,{childList:true,characterData:true,subtree:true}); upd(); }
 })();
 
-/* しおりのタブ（参考画像のデザイン）：本の左上に「menu」のタブと「物語を振り返る」のタブを並べる。
-   中身のボタンはそのまま使う（menu.js の「≡ メニュー」ボタンと、index.html の #openBook）。全画面ボタンは机の右上へ */
+/* 本のまわり（参考画像２のデザイン）：
+     ・.gt-cover … 焦げ茶の表紙と、開いたページのふち（重なった紙の線）。ゲーム画面のうしろに SVG で描く
+     ・.gt-flags … 左がわの赤いリボンの旗。「Reread」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）
+     ・.gt-tabs  … 上の紺色のしおり（menu.js の「しおりを挟む」で挟んだもの。Ⅰ〜Ⅴ）
+   全画面ボタンは机の右上へ */
 (function(){
   const wrap=document.querySelector('.canvas-wrap'); if(!wrap) return;
-  const tabs=document.createElement('div'); tabs.className='gt-tabs'; wrap.appendChild(tabs);
-  const menuBtn=wrap.querySelector('.gtm-open');
-  if(menuBtn){ menuBtn.className='gt-tab menu'; menuBtn.innerHTML='<span class="orn"></span>menu'; menuBtn.setAttribute('aria-label','メニュー'); tabs.appendChild(menuBtn); }
+  // 表紙とページ（viewBox はゲーム画面と同じ座標。ゲーム画面は 0〜900 × 0〜480 で、そのまわりが見える）
+  const NS='http://www.w3.org/2000/svg';
+  const cover=document.createElementNS(NS,'svg'); cover.setAttribute('class','gt-cover'); cover.setAttribute('viewBox','-60 -40 1020 560');
+  cover.setAttribute('preserveAspectRatio','none'); cover.setAttribute('aria-hidden','true');
+  const L='#c4a574';
+  cover.innerHTML=`
+    <rect x="-52" y="-30" width="1004" height="546" rx="4" fill="#45372f" filter="url(#gt-rough)"/>
+    <g fill="#efe7da" stroke="${L}" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M -30 -10 Q 210 -22 446 -2 L 454 -2 Q 690 -22 930 -10 L 932 500 Q 690 486 454 506 L 446 506 Q 210 486 -30 500 Z"/>
+    </g>
+    <g fill="none" stroke="${L}" stroke-width="1.6" stroke-linecap="round" opacity="0.9">
+      <path d="M -22 -4 L -22 494"/><path d="M -14 0 L -14 490"/><path d="M -7 2 L -7 488"/>
+      <path d="M 922 -4 L 922 494"/><path d="M 914 0 L 914 490"/><path d="M 907 2 L 907 488"/>
+      <path d="M -20 496 Q 210 482 440 500"/><path d="M 460 500 Q 690 482 920 496"/>
+      <path d="M 40 492 Q 200 484 330 490" opacity="0.6"/><path d="M 600 490 Q 760 482 870 490" opacity="0.6"/>
+    </g>`;
+  wrap.insertBefore(cover, wrap.firstChild);
+  // 左がわの旗
+  const flags=document.createElement('div'); flags.className='gt-flags'; wrap.appendChild(flags);
   const book=document.getElementById('openBook');
-  if(book){ const svg=book.querySelector('svg');
-    book.className='gt-tab book'; book.textContent=''; book.insertAdjacentHTML('afterbegin','<span class="orn"></span>');
-    if(svg) book.appendChild(svg);
-    book.title='物語を振り返る'; book.setAttribute('aria-label','物語を振り返る'); tabs.appendChild(book); }
-  // 挟んだしおり（menu.js の「しおりを挟む」）：1回押すと「もう一度で、このページへもどる」、2.5秒以内にもう一度押すと、もどる。
-  // 右クリック（スマホは長押し）で、しおりを外す
+  if(book){ book.className='gt-flag reread'; book.textContent='Reread'; book.title='本を読み返す'; book.setAttribute('aria-label','本を読み返す'); flags.appendChild(book); }
+  const menuBtn=wrap.querySelector('.gtm-open');
+  if(menuBtn){ menuBtn.className='gt-flag menu'; menuBtn.textContent='menu'; menuBtn.setAttribute('aria-label','メニュー'); flags.appendChild(menuBtn); }
+  // 上のしおり（挟んだしおり）。1回押すと「もう一度押すと、このページへもどる」、2.5秒以内にもう一度押すと、もどる。右クリックで外す
+  const tabs=document.createElement('div'); tabs.className='gt-tabs'; wrap.appendChild(tabs);
+  const ROMAN=['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ','Ⅹ'];
   function drawMarks(){
-    tabs.querySelectorAll('.gt-tab.mark').forEach(e=>e.remove());
+    tabs.innerHTML='';
     (GT.getBookmarks?GT.getBookmarks():[]).forEach((m,i)=>{
-      const t=document.createElement('button'); t.type='button'; t.className='gt-tab mark c'+m.color;
-      const short=String(m.name).replace(/^.*──\s*/,'');
-      t.innerHTML='<span class="orn"></span><span class="label"></span><span class="ask">もう一度押すと、このページへもどる</span>';
-      t.querySelector('.label').textContent=short; t.title='しおり：'+m.name+'（右クリックで外す）'; t.setAttribute('aria-label','しおり：'+m.name);
+      const t=document.createElement('button'); t.type='button'; t.className='gt-tab';
+      t.innerHTML='<span class="orn"></span><span class="num"></span><span class="ask">もう一度押すと、このページへもどる</span>';
+      t.querySelector('.num').textContent=ROMAN[i]||String(i+1);
+      t.title='しおり '+(ROMAN[i]||i+1)+'：'+m.name+'（右クリックで外す）'; t.setAttribute('aria-label','しおり '+(i+1)+'：'+m.name);
       let armT=0;
       t.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation();
         if(performance.now()<armT){ armT=0; t.classList.remove('armed'); GT.jumpBookmark(i); return; }

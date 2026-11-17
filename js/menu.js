@@ -3,7 +3,7 @@
    ----------------------------------------------------------------------------
    ・ゲームを開くと、まずこの画面が出る（タイトルともくじ）
        （ゲーム中は つづける / しおりを挟む）はじめから / つづきから / ステージをえらぶ / 物語を振り返る / あそびかた
-   ・しおりを挟む … いまのステージに、色ちがいのしおりを挟む。本の上のしおりを押すと、そのステージのはじめにもどれる（3本まで）
+   ・しおりを挟む … いまのステージに、しおり（Ⅰ・Ⅱ…）を挟む。本の上のしおりを押すと、そのステージのはじめにもどれる（5枚まで）
    ・ゲーム中は、左上の「≡ メニュー」ボタンか Esc キーで開く（開いているあいだは止まる）
    ・進み具合は、ブラウザに自動でセーブされる（ステージが始まるたび）
        → 「つづきから」で最後のステージから、「ステージをえらぶ」で一度来たステージから遊べる
@@ -15,6 +15,7 @@
 (function(){
 "use strict";
 const SAVE_KEY='gravityTale.ep1.save';
+const BOOKMARK_MAX=5;                 // しおりは5枚まで（下の「しおり」）
 const TITLE_BG='assets/background/水彩で描く静かな森と遠い城.webp';
 const NAMES={ arrive:'おばあさんの家', ending:'結末' };      // label の無いシーンの名前
 
@@ -188,8 +189,10 @@ function setView(name){
 function refreshMain(){
   $('[data-act="resume"]').style.display = inGame ? '' : 'none';
   const bm=$('[data-act="bookmark"]'), here=GT.scene && GT.playlist.indexOf(GT.scene.id)>=0 && save.scenes[GT.scene.id];
+  const full=bookmarks().length>=BOOKMARK_MAX;
   bm.style.display = inGame && here ? '' : 'none';
-  bm.querySelector('small').textContent = here ? sceneName(GT.scene.id) : '';
+  bm.disabled = full;
+  bm.querySelector('small').textContent = full ? 'しおりは5枚まで（右クリックで外せる）' : here ? sceneName(GT.scene.id) : '';
   const c=$('[data-act="continue"]'), has=save.last && save.scenes[save.last];
   c.disabled=!has; c.querySelector('small').textContent = has ? sceneName(save.last) : '';
   $('[data-act="stages"]').disabled = !Object.keys(save.scenes).length;
@@ -284,8 +287,7 @@ GT.showMenu=showMenu; GT.hideMenu=hideMenu;
 
 /* ---- しおり：メニューの「しおりを挟む」で、いまのステージにしおりを挟む。本の上に色ちがいのしおりが増え、
    押すと、そのステージのはじめにもどれる（挟んだときの分岐・本のページも、いっしょにもどる）。
-   しおりは BOOKMARK_MAX 本まで。それより多く挟むと、いちばん古いしおりが外れる。セーブといっしょにブラウザに残る ---- */
-const BOOKMARK_MAX=3;
+   しおりは BOOKMARK_MAX 枚まで（いっぱいのときは挟めない。右クリックで外す）。セーブといっしょにブラウザに残る ---- */
 const bookmarkHooks=[];
 function bookmarks(){ return save.bookmarks||(save.bookmarks=[]); }
 function changed(){ writeSave(); for(const f of bookmarkHooks) f(); }
@@ -294,8 +296,8 @@ function addBookmark(){
   const list=bookmarks();
   const used=new Set(list.map(b=>b.color));
   const color=[0,1,2].find(c=>!used.has(c)) ?? (list[0] ? list[0].color : 0);
+  if(list.length>=BOOKMARK_MAX) return;                       // 5枚まで（いっぱいのときは挟めない。しおりを右クリックで外せる）
   list.push({ id, name:sceneName(id), state:clone(st), color });
-  while(list.length>BOOKMARK_MAX) list.shift();
   GT.sfx&&GT.sfx('page'); changed();
 }
 GT.getBookmarks=()=>bookmarks().map(b=>({id:b.id, name:b.name, color:b.color}));

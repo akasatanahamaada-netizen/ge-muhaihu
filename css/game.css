@@ -229,65 +229,67 @@ html{ touch-action:manipulation; }                       /* ダブルタップ�
 
 
 /* ==========================================================================
-   見た目：参考画像（参考画像.jpg）のデザイン
+   見た目：参考画像２（参考画像２.jpg）のデザイン
      ・机：灰色の木目（assets/ui/desk_wood.webp）
-     ・本：手描きふうの太い焦げ茶の枠（ゲーム画面の中は、前のまま）
-     ・左上に、紺色のしおり（「menu」のタブと、物語を振り返るタブ）
+     ・本：焦げ茶の表紙の上に、開いたクリーム色のページ。ページのふちに、重なった紙の線（js/page.js が SVG で描く .gt-cover）
+       ゲーム画面の中は前のまま
+     ・左がわに赤いリボンの旗：「Reread」（本を読み返す）と「menu」。ふだんは半分ほど本のうしろ。カーソルを乗せると、すっと出る
+     ・上に紺色のしおり（挟んだしおり。Ⅰ〜Ⅴ）。ふだんは本のうしろに隠れていて、カーソルを乗せると上へぴょこっと出る
    上の古いデザインのうえに、ここで上書きする（ここを消せば、前の見た目にもどる）
    ========================================================================== */
-:root{ --frame:#45372f; --tab:#25286b; --tab-dark:#181a4e; --tab-gold:#cdb06a; }
+:root{ --cover:#45372f; --page:#efe7da; --page-line:#c4a574; --tab:#25286b; --tab-dark:#181a4e; --tab-gold:#cdb06a; --flag:#a8322b; --flag-dark:#7c221d; }
 html,body{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024px 512px repeat; background-attachment:fixed; color:#3a2f2a; }
+body.gt-full{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024px 512px repeat; }
 .ambient, .masthead, .credit, .ribbon, .hud{ display:none !important; }
 .stage{ max-width:1100px; padding-top:96px; }
-/* 本の枠：ゲーム画面のまわりに、太い焦げ茶の線（手描きのように、ふちが少しゆらぐ：index.html の SVG フィルター #gt-rough） */
 .book-frame{ background:none; box-shadow:none; border-radius:0; padding:0; }
 .book-frame::before, .book-frame::after{ display:none; }
-.canvas-wrap{ --bw:max(8px,2cqw); box-shadow:none; border-radius:0; margin:var(--bw) auto; }
-.canvas-wrap::after{ content:''; position:absolute; inset:calc(-1 * var(--bw)); border:var(--bw) solid var(--frame); border-radius:5px;
-  pointer-events:none; z-index:6; filter:url(#gt-rough) drop-shadow(0 6px 8px rgba(0,0,0,0.3)); }
+/* ゲーム画面のまわりに、表紙とページのふちのぶんの余白（--gw … 全画面のときのゲーム画面の幅。js/page.js） */
+.canvas-wrap, .book-frame.is-full .canvas-wrap{ z-index:1; box-shadow:none; border-radius:0;
+  margin:calc(var(--gw,900px) * 0.12) calc(var(--gw,900px) * 0.07) calc(var(--gw,900px) * 0.05) calc(var(--gw,900px) * 0.18) !important; }
 canvas#game{ border-radius:0; }
-/* しおりのタブ（左上）：ふだんは本のうしろに隠れていて、ひもと上のふちだけがのぞく。カーソルを乗せると、上へぴょこっと出てくる
-   （本のうしろに回すため、.canvas-wrap を重なりの基準にして、タブは z-index:-1） */
-.canvas-wrap{ z-index:1; }
-.gt-tabs{ position:absolute; left:3cqw; bottom:100%; display:flex; align-items:flex-end; gap:0.9cqw; z-index:-1; }
-.gt-tab{ --h:6.6cqw; --peek:1.1cqw; position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
-  width:6.2cqw; min-width:46px; height:var(--h); background:var(--tab); border:2px solid var(--tab-dark); border-radius:2px 2px 0 0;
-  color:#f6f0e4; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600; font-size:clamp(14px,2.2cqw,40px); letter-spacing:0.02em;
-  padding:1.6cqw 0 0; box-shadow:0 -2px 5px rgba(0,0,0,0.25);
-  transform:translateY(calc(var(--h) - var(--bw) - var(--peek)));        /* ふだん：本の枠のうしろへ沈める（上のふちだけ見える） */
-  transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
-.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.gt-guide, .gt-tab.armed{ transform:translateY(calc(-1 * var(--bw))); }   /* ぴょこっと出る（本の枠より上まで） */
+/* 表紙と、開いたページ（ゲーム画面のうしろ。ゲーム画面のまわりだけが見える） */
+.gt-cover{ position:absolute; left:-6.667%; top:-8.333%; width:113.333%; height:116.667%; z-index:-1; pointer-events:none; overflow:visible; }
+/* 左がわの赤いリボンの旗（Reread・menu） */
+.gt-flags{ position:absolute; right:calc(100% + 4.2cqw); top:12%; display:flex; flex-direction:column; gap:2.2cqw; z-index:-2; }
+.gt-flag{ position:relative; width:12.5cqw; min-width:80px; height:5.2cqw; min-height:32px; border:none; padding:0 0 0 2.6cqw; cursor:pointer;
+  background:var(--flag); color:#fbf4ea; font-family:'Caveat',cursive; font-weight:500; font-size:clamp(15px,2.7cqw,52px); line-height:1; text-align:left;
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%,2.2cqw 50%);                      /* 左はしは、リボンの切りこみ */
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25)); transform:translateX(1.2cqw) rotate(-1.5deg);   /* ふだん：はしが少し本のうしろ */
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1); }
+.gt-flag:nth-child(2){ transform:translateX(1.2cqw) rotate(1deg); }
+.gt-flag:hover, .gt-flag:focus-visible, .gt-flag.gt-guide{ transform:translateX(-2.8cqw) rotate(0); }                  /* すっと出る */
+.gt-flag:focus-visible{ outline:2px solid #f3d7a0; outline-offset:2px; }
+.gt-flag svg, .gt-flag small{ display:none; }
+/* 「Reread」で本を開くように誘導しているとき：旗が出て光り、下に吹き出し */
+.gt-flag.gt-guide{ animation:gtFlagGlow 1.1s ease-in-out infinite alternate; clip-path:none; }
+@keyframes gtFlagGlow{ from{ filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25)); } to{ filter:drop-shadow(0 0 10px rgba(255,220,140,0.95)); } }
+.gt-flag.gt-guide::after{ content:attr(data-guide); position:absolute; left:0; top:calc(100% + 10px); white-space:nowrap; pointer-events:none;
+  padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
+/* 上の紺色のしおり（挟んだしおり Ⅰ〜Ⅴ）：ふだんは本のうしろに隠れていて、ひもと上のふちだけがのぞく。カーソルを乗せると、上へぴょこっと出る */
+.gt-tabs{ position:absolute; left:4cqw; bottom:calc(100% + 1.8cqw); display:flex; align-items:flex-end; gap:0.9cqw; z-index:-2; }
+.gt-tab{ --h:6cqw; --hide:3.4cqw; position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  width:5.6cqw; min-width:40px; height:var(--h); background:var(--tab); border:2px solid var(--tab-dark); border-radius:2px 2px 0 0;
+  color:#f6f0e4; font-family:'Cormorant Garamond',serif; font-weight:700; font-size:clamp(14px,2.4cqw,44px); padding:1.4cqw 0 0;
+  box-shadow:0 -2px 5px rgba(0,0,0,0.25); transform:translateY(var(--hide)); transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
+.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(0); }
 .gt-tab:focus-visible{ outline:2px solid var(--tab-gold); outline-offset:2px; }
-/* 上の二すみだけ、金の飾り（下は本のうしろに隠れるので、描かない） */
-.gt-tab .orn{ position:absolute; inset:3px; pointer-events:none; --g:var(--tab-gold);
+.gt-tab .orn{ position:absolute; inset:3px; pointer-events:none; --g:var(--tab-gold);       /* 上の二すみだけ、金の飾り */
   background:
     linear-gradient(var(--g),var(--g)) top left/22% 2px no-repeat, linear-gradient(var(--g),var(--g)) top left/2px 22% no-repeat,
     linear-gradient(var(--g),var(--g)) top right/22% 2px no-repeat, linear-gradient(var(--g),var(--g)) top right/2px 22% no-repeat; }
-/* しおりのひも（V の字）と、ひもを通す小さな四角い穴 */
-.gt-tab::before{ content:''; position:absolute; left:50%; bottom:calc(100% - 0.9cqw); width:3.6cqw; min-width:26px; height:5.4cqw; min-height:38px; transform:translateX(-50%);
+.gt-tab::before{ content:''; position:absolute; left:50%; bottom:calc(100% - 0.9cqw); width:3.4cqw; min-width:24px; height:5cqw; min-height:34px; transform:translateX(-50%);
   background:var(--tab); clip-path:polygon(0 0,28% 0,50% 78%,72% 0,100% 0,62% 100%,38% 100%); z-index:-1; }
-.gt-tab::after{ content:''; position:absolute; left:50%; top:4px; width:0.95cqw; min-width:7px; height:0.95cqw; min-height:7px; transform:translateX(-50%);
+.gt-tab::after{ content:''; position:absolute; left:50%; top:4px; width:0.9cqw; min-width:6px; height:0.9cqw; min-height:6px; transform:translateX(-50%);
   border:2px solid #f6f0e4; border-radius:2px; background:var(--tab); }
-.gt-tab.book{ --h:5.4cqw; }
-.gt-tab.book svg{ width:1.7cqw; min-width:12px; height:auto; color:var(--tab-gold); }
-/* しおり（メニューの「しおりを挟む」で増える）：色ちがい。出てくると、ステージの名前が見える */
-.gt-tab.mark{ --h:6cqw; font-family:'Zen Old Mincho',serif; font-style:normal; font-weight:700; font-size:clamp(9px,1.05cqw,22px); line-height:1.25; text-align:center; letter-spacing:0; }
-.gt-tab.mark .label{ display:block; padding:0 0.3cqw; }
-.gt-tab.mark.c0{ --tab:#9b2f2a; --tab-dark:#6e1f1b; } .gt-tab.mark.c1{ --tab:#2f6b46; --tab-dark:#1f4a30; } .gt-tab.mark.c2{ --tab:#9a6a1f; --tab-dark:#6c4a14; }
-.gt-tab.mark .ask{ display:none; position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); white-space:nowrap; z-index:2;
-  padding:5px 10px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-size:12px; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
-.gt-tab.mark.armed .ask{ display:block; }
-/* 「物語を振り返る」タブで本を開くように誘導しているとき：タブが出て光り、右に吹き出し */
-.gt-tab.gt-guide{ animation:gtTabGlow 1.1s ease-in-out infinite alternate; }
-@keyframes gtTabGlow{ from{ box-shadow:0 -2px 5px rgba(0,0,0,0.25); } to{ box-shadow:0 0 16px 5px rgba(240,207,134,0.8); } }
-.gt-tab.gt-guide::after{ content:attr(data-guide); left:calc(100% + 12px); top:50%; transform:translateY(-50%); width:auto; height:auto; min-width:0; min-height:0;
-  white-space:nowrap; padding:6px 12px; border:none; border-radius:6px; background:#f3ead0; color:#3a2a1a;
-  font-family:'Zen Old Mincho',serif; font-style:normal; font-weight:500; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
+.gt-tab .ask{ display:none; position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); white-space:nowrap; z-index:2;
+  padding:5px 10px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:12px; font-weight:500; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
+.gt-tab.armed .ask{ display:block; }
 /* 全画面ボタン：机の右上に小さく */
 #fsBtn{ position:fixed; top:12px; right:14px; z-index:45; background:rgba(69,55,47,0.85); color:#f1e8dc; border-color:rgba(205,176,106,0.6); }
 #fsBtn #fsLabel{ display:none; }
-.under .controls{ display:none; }
-.under:empty, .under:not(:has(:not(.controls))){ display:none; }
-.book-frame.is-full{ background:none; padding-top:calc(var(--gw,60vw) * 0.115 + 10px) !important;    /* 上に、しおりのタブが飛び出すぶんの余白 */
-  padding-bottom:calc(var(--gw,60vw) * 0.02 + 14px) !important; padding-left:calc(var(--gw,60vw) * 0.02 + 14px) !important; padding-right:calc(var(--gw,60vw) * 0.02 + 14px) !important; }   /* 本の枠の太さぶん */
-body.gt-full{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024px 512px repeat; }
+.book-frame.is-full{ background:none; padding:12px !important; }
+/* スマホを横にした全画面：まん中の列（ゲーム画面）に、表紙・旗のぶんの余白（左 0.18・右 0.07）もふくめる */
+@media (hover:none) and (orientation:landscape), (pointer:coarse) and (orientation:landscape){
+  .book-frame.is-full{ grid-template-columns:auto calc(var(--gw,60vw) * 1.25) auto !important; padding:6px 8px !important; }
+}
