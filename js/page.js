@@ -87,15 +87,15 @@
   const COVER='M -52 -36 L 952 -36 Q 958 -36 958 -30 L 958 524 Q 958 530 952 530 L -52 530 Q -58 530 -58 524 L -58 -30 Q -58 -36 -52 -36 Z';
   cover.innerHTML=`
     <defs>
-      <linearGradient id="gtCoverG" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#5a463b"/><stop offset="0.5" stop-color="#47372e"/><stop offset="1" stop-color="#3a2c24"/></linearGradient>
+      <linearGradient id="gtCoverG" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#4f2236"/><stop offset="0.5" stop-color="#3d1828"/><stop offset="1" stop-color="#2b0f1c"/></linearGradient>
       <linearGradient id="gtSpineG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1e1611" stop-opacity="0"/><stop offset="0.3" stop-color="#1e1611" stop-opacity="0.5"/>
-        <stop offset="0.5" stop-color="#6b5446" stop-opacity="0.55"/><stop offset="0.7" stop-color="#1e1611" stop-opacity="0.5"/><stop offset="1" stop-color="#1e1611" stop-opacity="0"/></linearGradient>
+        <stop offset="0.5" stop-color="#74405a" stop-opacity="0.55"/><stop offset="0.7" stop-color="#1e1611" stop-opacity="0.5"/><stop offset="1" stop-color="#1e1611" stop-opacity="0"/></linearGradient>
       <filter id="gtShadow" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="9"/></filter>
       <filter id="gtLeather" x="0" y="0" width="100%" height="100%">
         <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="g"/>
         <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0 0.03  0 0 0 -1.6 1.15" result="grain"/>
         <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="8" result="m"/>
-        <feColorMatrix in="m" type="matrix" values="0 0 0 0 0.75  0 0 0 0 0.62  0 0 0 0 0.5  0 0 0 0.9 -0.32" result="mottle"/>
+        <feColorMatrix in="m" type="matrix" values="0 0 0 0 0.62  0 0 0 0 0.36  0 0 0 0 0.48  0 0 0 0.9 -0.32" result="mottle"/>
         <feMerge><feMergeNode in="mottle"/><feMergeNode in="grain"/></feMerge>
       </filter>
       <clipPath id="gtCoverClip"><path d="${COVER}"/></clipPath>
@@ -112,12 +112,14 @@
     </g>
     <path d="${COVER}" fill="none" stroke="#1d150f" stroke-width="1.6"/>
     <path d="M 432 -36 Q 450 -43 468 -36 L 468 -27 Q 450 -33 432 -27 Z" fill="#7a2e28" stroke="#4a1a16" stroke-width="0.8"/>
-    <path d="M 435 -33 Q 450 -38 465 -33" stroke="#c9a46a" stroke-width="0.8" fill="none"/>
+    <path d="M 435 -33 Q 450 -38 465 -33" stroke="#c9a070" stroke-width="0.8" fill="none"/>
     <path d="M 432 530 Q 450 537 468 530 L 468 521 Q 450 527 432 521 Z" fill="#7a2e28" stroke="#4a1a16" stroke-width="0.8"/>`;
   // ページ：top=上のふちの高さ、bot=下のふちの高さ（ずらしで、紙の束を描く）
   // ページの上下のふちは、ゆるやかに曲げる（背表紙のそばで少し沈むだけ）
   const pagePathD=(dx,dy)=>`M ${-40-dx} ${-20+dy} C 140 ${-26+dy} 340 ${-24+dy} 446 ${-13+dy} L 454 ${-13+dy} C 560 ${-24+dy} 760 ${-26+dy} ${940+dx} ${-20+dy}
       L ${942+dx} ${504+dy} C 760 ${499+dy} 560 ${500+dy} 454 ${509+dy} L 446 ${509+dy} C 340 ${500+dy} 140 ${499+dy} ${-42-dx} ${504+dy} Z`;
+  // ページの紙の色に、ゲーム画面と同じ色合い（engine.js の GRADE_MUL）をかける（さかいが目立たないように）
+  const tintPage=svg=>GT.tintHex ? svg.replace(/#[0-9a-fA-F]{6}\b/g, GT.tintHex) : svg;
   let stack='';
   for(let k=12;k>=1;k--){ const d=k*1.05;                                  // 紙の束：奥の紙ほど少し外へ・下へ。ふちは、明るい線と暗い線がこまかく交互に
     stack+=`<path d="${pagePathD(d,d*0.9)}" fill="${k%2?'#e9e0cd':'#d8cbb1'}" stroke="${k%2?'#cdbd9c':'#efe6d4'}" stroke-width="0.7"/>`; }
@@ -142,11 +144,11 @@
       <rect x="-50" y="-40" width="1000" height="570" filter="url(#gtPaperGrain)" opacity="0.5"/>
       <path d="M 447 -10 L 447 520 M 453 -10 L 453 520" stroke="rgba(255,250,238,0.35)" stroke-width="1.2"/>
     </g>`;
-  pages.innerHTML=PAGE_DEFS+stack+PAGE_SHEET;
+  pages.innerHTML=tintPage(PAGE_DEFS+stack+PAGE_SHEET);
   // ページをめくるときの紙にも、同じ紙（いちばん上の一枚）の絵を使う（engine.js の toPage が使う GT.pageSheet）。
   //   紙の大きさは、ゲーム画面のまわりに GT.PAGE_PAD（engine.js）だけ広い
   if(GT.PAGE_PAD){ const p=GT.PAGE_PAD, ew=900+p.x*2, eh=480+p.top+p.bot;
-    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${ew}" height="${eh}" viewBox="${-p.x} ${-p.top} ${ew} ${eh}">${PAGE_DEFS}${PAGE_SHEET}</svg>`;
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${ew}" height="${eh}" viewBox="${-p.x} ${-p.top} ${ew} ${eh}">${tintPage(PAGE_DEFS+PAGE_SHEET)}</svg>`;
     const im=new Image(); im.onload=()=>{ GT.pageSheet=im; }; im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg); }
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 本の上に横にして置いた栞（作者の絵 assets/komono/栞.png）：「Reread」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）

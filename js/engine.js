@@ -243,15 +243,16 @@ function bgVignette(spec,img){
 }
 /* page:'spread' … 見開き全体に敷く（ふちの切りぬきなし）。spec.wash で、かぶせる紙の色の濃さを背景ごとに変えられる（暗い森は薄く） */
 function bgSpread(spec,img){
-  const key=spec.src+'|spread|'+(spec.wash||'');
+  const key=spec.src+'|spread|'+(spec.wash||'')+'|'+(spec.filter||'')+'|'+(spec.tint||'');
   if(bgVignettes[key]) return bgVignettes[key];
   const c=document.createElement('canvas'); c.width=W; c.height=H;
   const p=c.getContext('2d');
   const sc=Math.max(W/img.naturalWidth, H/img.naturalHeight);
   const dw=img.naturalWidth*sc, dh=img.naturalHeight*sc;
-  p.filter=BG_FILTER;
+  p.filter=spec.filter||BG_FILTER;                                    // spec.filter … 背景ごとの色の直し（明るい森を暗くする など）
   p.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
   p.filter='none';
+  if(spec.tint){ p.globalCompositeOperation='multiply'; p.fillStyle=spec.tint; p.fillRect(0,0,W,H); p.globalCompositeOperation='source-over'; }   // spec.tint … 乗算でかぶせる色
   p.fillStyle=spec.wash||BG_WASH; p.fillRect(0,0,W,H);
   return (bgVignettes[key]=c);
 }
@@ -617,7 +618,14 @@ const flipLive=document.createElement('canvas'); flipLive.width=W; flipLive.heig
 /* めくる紙は、ゲーム画面のまわりのページのふくらみ（js/page.js の .gt-pages）までふくめた大きさで描く。
    ・ページの大きさ：ゲーム画面の左右に PAGE_PAD_X、上に PAGE_PAD_TOP、下に PAGE_PAD_BOT ずつ広い（EW×EH）
    ・めくりは、ゲーム画面より一回り大きい専用の層（flipCv。.gt-pages と同じ位置・大きさ。座標も同じ）に描く */
-const PAGE_PAD_X=42, PAGE_PAD_TOP=20, PAGE_PAD_BOT=36, PAGE_COLOR='#efe7da';
+/* ゴシックの色合い（タイトル画面の、霧の薔薇の森に合わせる）
+   GRADE_MUL … ゲーム画面の最後に、全体へ「乗算」でかぶせる色。まわりのページの紙（js/page.js）にも同じ色をかけて、さかいを合わせる
+   GRADE_HUE … 世界（背景・地形・人物）を、赤紫の色みに寄せる強さ（0 で元の色）。GRADE_VIG … 四すみの暗さ */
+const GRADE_MUL=[214,188,190], GRADE_HUE=0.32, GRADE_VIG=0.5;
+GT.PAGE_TINT=GRADE_MUL;
+const tintHex=h=>{ const n=parseInt(h.slice(1),16); return '#'+[n>>16&255,n>>8&255,n&255].map((v,i)=>Math.round(v*GRADE_MUL[i]/255).toString(16).padStart(2,'0')).join(''); };
+GT.tintHex=tintHex;
+const PAGE_PAD_X=42, PAGE_PAD_TOP=20, PAGE_PAD_BOT=36, PAGE_COLOR=tintHex('#efe7da');
 const EW=W+PAGE_PAD_X*2, EH=H+PAGE_PAD_TOP+PAGE_PAD_BOT, ESP=EW/2;
 GT.PAGE_PAD={x:PAGE_PAD_X, top:PAGE_PAD_TOP, bot:PAGE_PAD_BOT};
 const extOld=document.createElement('canvas'); extOld.width=EW; extOld.height=EH;
@@ -776,7 +784,7 @@ const skipBtn=document.createElement('button');
 skipBtn.textContent='Skip ≫';
 skipBtn.title='会話を飛ばす（S キー）';
 Object.assign(skipBtn.style,{ position:'absolute', top:'1.1cqw', right:'1.33cqw', padding:'0.33em 1em',
-  background:'rgba(176,141,87,0.15)', border:'1px solid rgba(176,141,87,0.55)', borderRadius:'14px',
+  background:'rgba(120,40,70,0.25)', border:'1px solid rgba(201,160,112,0.55)', borderRadius:'14px',
   color:'#e8dcc0', fontFamily:"'Caveat',cursive", fontSize:'clamp(15px,1.85cqw,44px)', lineHeight:'1', letterSpacing:'0.02em', cursor:'pointer' });   // ボタンの文字は英語の筆記体
 skipBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); skipDialogue(); });
 dlg.appendChild(skipBtn);
@@ -837,14 +845,14 @@ const resetBtn=document.createElement('button');
 resetBtn.textContent='↺ Reset';
 resetBtn.title='このステージを最初からやり直す（R キー）';
 Object.assign(resetBtn.style,{ position:'absolute', top:'0.67cqw', right:'0.9cqw', padding:'0.25em 0.85em', zIndex:'2',
-  background:'rgba(43,36,24,0.72)', border:'1px solid rgba(176,141,87,0.6)', borderRadius:'12px',
+  background:'rgba(34,12,24,0.78)', border:'1px solid rgba(201,160,112,0.6)', borderRadius:'12px',
   color:'#e8dcc0', fontFamily:"'Caveat',cursive", fontSize:'clamp(15px,1.85cqw,44px)', lineHeight:'1', letterSpacing:'0.02em', cursor:'pointer' });
 // 1回目のタップでは「もう一度で やり直す」と出すだけ。2.5 秒以内にもう一度押したら、やり直す
 // （スマホで会話を進めようと画面の端をタップしたとき、うっかりやり直さないように）
 let resetArmT=0;
 // 表示の文字は dataset で変えられる（js/page.js が「Reset」の旗にする）。押した1回目は .armed が付く
 const resetLabel=()=>{ resetBtn.textContent=resetBtn.dataset.label||'↺ Reset'; resetBtn.classList.remove('armed');
-  if(!resetBtn.dataset.label) resetBtn.style.background='rgba(43,36,24,0.72)'; };
+  if(!resetBtn.dataset.label) resetBtn.style.background='rgba(34,12,24,0.78)'; };
 resetBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation();
   if(performance.now()<resetArmT){ resetArmT=0; resetLabel(); restartStage(); return; }
   resetArmT=performance.now()+2500; resetBtn.classList.add('armed');
@@ -1677,19 +1685,33 @@ function render(){
   for(const fn of drawWorld) fn();          // ボスなど（プレイヤーより後ろ）
   drawPlayer();
   for(const sw of GT.swamps) drawSwamp(sw);   // 沼はプレイヤーの足元を隠すよう手前に描く
+  for(const fn of drawOverlay) fn();         // 手前の木・窓のぞきなど（ゴシックの色合いをかけるため、色合いより先に描く）
+  drawGothicWorld();                                                                                                // 世界を赤紫の色みに寄せ、四すみを暗く
   ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.drawImage(GT.paperArt.agedPaper,0,0); ctx.restore();   // 古い紙の色むら・しみ（表示類より奥）
   drawEdgeFade();                                                                                                   // ふちを、まわりのページの色へ ぼかす（ページのふくらみとのさかいを目立たせない）
+  ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgb(${GRADE_MUL})`; ctx.fillRect(0,0,W,H); ctx.restore();   // 全体の色合い（まわりのページと同じ色）
   if(missionReq) drawMissionHud();
   if(GT.hurtFlash>0){ ctx.fillStyle=`rgba(139,20,20,${GT.hurtFlash*0.35})`; ctx.fillRect(0,0,W,H); }
   drawHearts();
   if(gameOver){ const st=gameOver.cause&&gameOverStyles[gameOver.cause]; if(st&&st.draw) st.draw(gameOver); else drawGameOver(); }
-  for(const fn of drawOverlay) fn();         // 窓のぞきなど
   for(const fn of drawSpeechFns) fn();       // ステージ独自の吹き出し（最前面）
   for(const a of speechQueue.splice(0)) paintSpeech(...a);   // 人物の吹き出し（最前面）
   if(flipping) drawFlip();                   // ページめくり（いちばん手前。ページの大きさの層 flipCv に描く）
   else if(flipCvDirty){ fctx.setTransform(1,0,0,1,0,0); fctx.clearRect(0,0,flipCv.width,flipCv.height); flipCvDirty=false; }
 }
 
+/* ゴシックの色合い：世界（背景・地形・人物）を赤紫の色みに寄せ、少し色を抜き、四すみを暗くする（表示類・ふちのぼかしより奥） */
+let gothVig=null;
+function drawGothicWorld(){
+  ctx.save();
+  ctx.globalCompositeOperation='saturation'; ctx.globalAlpha=0.3; ctx.fillStyle='#808080'; ctx.fillRect(0,0,W,H);   // 色を少し抜く（明るい緑の木などを、なじませる）
+  ctx.globalCompositeOperation='color'; ctx.globalAlpha=GRADE_HUE; ctx.fillStyle='#8a3d62'; ctx.fillRect(0,0,W,H);  // 赤紫の色みに寄せる（明るさはそのまま）
+  ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
+  if(!gothVig){ gothVig=ctx.createRadialGradient(W/2,H*0.5,H*0.35,W/2,H*0.5,W*0.62);
+    gothVig.addColorStop(0,'rgba(24,6,16,0)'); gothVig.addColorStop(1,`rgba(24,6,16,${GRADE_VIG})`); }
+  ctx.fillStyle=gothVig; ctx.fillRect(0,0,W,H);
+  ctx.restore();
+}
 /* ゲーム画面のふちを、まわりのページ（js/page.js の .gt-pages。色は PAGE_COLOR）へ だんだん溶けこませる */
 const EDGE_FADE=22;
 function drawEdgeFade(){

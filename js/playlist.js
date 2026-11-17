@@ -82,15 +82,19 @@ const BG_DAY='assets/background/ohiru no mori.webp', BG_EVENING='assets/backgrou
 const BG_DARK='assets/background/霧深き森のゴシック童話.webp';   // 霧の深い、暗い森（近道①：狼を追って、森の奥へ）
 const BG_ROSE='assets/background/薔薇咲く霧深きゴシックの森.webp';   // 霧の深い、薔薇の咲く森（近道②：いばらのトンネル）
 const S=src=>({src,page:'spread'});
+// ゴシック：明るい森の絵は、暗く・色を抜き・赤紫をかぶせて使う（タイトル画面の霧の薔薇の森に合わせる）
+const G=src=>({src,page:'spread',filter:'brightness(0.72) saturate(0.55) contrast(1.05) blur(0.8px)',tint:'rgb(196,150,176)',wash:'rgba(244,240,230,0.06)'});
+const BG_TITLE='assets/background/タイトル背景.webp';   // タイトル画面の背景（道のある、霧の薔薇の森）
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
-  opening:S(BG_DAY), komichi1:S(BG_DAY), komichi2:S(BG_DAY), house_peek:S(BG_DAY), path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),
-  wolf_talk:S(BG_DAY), crossroads:S(BG_DAY),
+  opening:G(BG_DAY), komichi1:G(BG_DAY), komichi2:G(BG_DAY), house_peek:G(BG_DAY), path1:G(BG_DAY), meet_hood:G(BG_DAY), cliff:G(BG_DAY),
+  wolf_talk:DARK,                                    // 狼（暗い森）
+  crossroads:{src:BG_TITLE,page:'spread',wash:'rgba(244,240,230,0.08)'},   // 分かれ道（道のある、霧の薔薇の森）
   path2:DARK, path2b:ROSE,                           // 近道（①暗い森 ②いばらと薔薇の森）
-  flowers:S(BG_DAY),                                 // お花畑（遠回りの はじめ）
-  path3:S(BG_DAY), path4:S(BG_EVENING),              // 遠回り：歩くうちに日が傾く
-  house_front:f=>S(f.route==='shortcut'?BG_DAY:BG_EVENING),
+  flowers:ROSE,                                      // お花畑（遠回りの はじめ。薔薇の森）
+  path3:G(BG_DAY), path4:G(BG_EVENING),              // 遠回り：歩くうちに日が傾く
+  house_front:f=>G(f.route==='shortcut'?BG_DAY:BG_EVENING),
 };
 
 // 音楽（BGM）：シーンの id ごとに流す曲（assets/music/ フォルダの mp3）。ループ再生する。
