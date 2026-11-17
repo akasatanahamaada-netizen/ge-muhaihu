@@ -22,8 +22,8 @@
   function fit(){
     if(!full){                                   // 全画面でないとき：本（表紙・旗・しおりの余白もふくめて）が窓に入るだけの大きさ
       frame.style.removeProperty('--gs');
-      // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.38（左右 0.19 ずつ）、たて gw×(480/900 + 0.12 + 0.05)
-      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.38, (window.innerHeight-40)/(480/900+0.17), 1100));
+      // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.42（左右 0.21 ずつ）、たて gw×(480/900 + 0.14 + 0.06)
+      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.42, (window.innerHeight-40)/(480/900+0.2), 1100));
       frame.style.setProperty('--gw', Math.floor(gw)+'px'); return; }
     const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.gt-tabs','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
@@ -76,20 +76,32 @@
     e.setAttribute('preserveAspectRatio','none'); e.setAttribute('aria-hidden','true'); return e; };
   const cover=layer('gt-cover'), pages=layer('gt-pages');
   const L='#c4a574';
-  cover.innerHTML=`<rect x="-52" y="-30" width="1004" height="546" rx="4" fill="#45372f" filter="url(#gt-rough)"/>`;
-  // ページ：手描きのように、線はゆらいで（#gt-sketch）、ところどころ二重。重なった紙の線は、長さ・太さ・こさがふぞろい
-  const sk=(d,w,o)=>`<path d="${d}" stroke-width="${w}" opacity="${o}"/>`;
+  // 表紙：焦げ茶の厚い板。机に落ちる影・下と右に見える板の厚み・上のふちのかすかな光・まん中の背表紙（ふくらみと、頭と尻の飾り布）
+  cover.innerHTML=`
+    <defs>
+      <linearGradient id="gtCoverG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55433a"/><stop offset="0.45" stop-color="#46372f"/><stop offset="1" stop-color="#382b24"/></linearGradient>
+      <linearGradient id="gtSpineG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2c221c" stop-opacity="0"/><stop offset="0.35" stop-color="#2c221c" stop-opacity="0.55"/>
+        <stop offset="0.5" stop-color="#5a473c" stop-opacity="0.6"/><stop offset="0.65" stop-color="#2c221c" stop-opacity="0.55"/><stop offset="1" stop-color="#2c221c" stop-opacity="0"/></linearGradient>
+      <filter id="gtShadow" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+    <rect x="-46" y="-20" width="1004" height="546" rx="6" fill="rgba(20,14,10,0.45)" filter="url(#gtShadow)"/>
+    <rect x="-49" y="-26" width="1004" height="546" rx="5" fill="#261c17"/>
+    <rect x="-52" y="-30" width="1004" height="546" rx="5" fill="url(#gtCoverG)" stroke="#2a201b" stroke-width="2"/>
+    <path d="M -46 -27 L 946 -27" stroke="rgba(255,228,196,0.16)" stroke-width="2" stroke-linecap="round"/>
+    <rect x="420" y="-30" width="60" height="546" fill="url(#gtSpineG)"/>
+    <path d="M 432 -30 Q 450 -36 468 -30 L 468 -22 Q 450 -27 432 -22 Z" fill="#7a2e28"/>
+    <path d="M 432 516 Q 450 522 468 516 L 468 508 Q 450 513 432 508 Z" fill="#7a2e28"/>`;
+  // ページ：クリーム色の紙。ふちの線はなめらかに、かすかにゆらぐだけ（#gt-soft）
+  const ln=(d,w,o)=>`<path d="${d}" stroke-width="${w}" opacity="${o}"/>`;
   pages.innerHTML=`
-    <g fill="#efe7da" stroke="${L}" stroke-width="2.4" stroke-linejoin="round" filter="url(#gt-sketch)">
-      <path d="M -30 -10 Q 210 -22 446 -2 L 454 -2 Q 690 -22 930 -10 L 932 500 Q 690 486 454 506 L 446 506 Q 210 486 -30 500 Z"/>
+    <g fill="#efe7da" stroke="${L}" stroke-width="2.4" stroke-linejoin="round" filter="url(#gt-soft)">
+      <path d="M -30 -10 Q 210 -20 446 -2 L 454 -2 Q 690 -20 930 -10 L 932 500 Q 690 488 454 506 L 446 506 Q 210 488 -30 500 Z"/>
     </g>
-    <g fill="none" stroke="${L}" stroke-linecap="round" filter="url(#gt-sketch)">
-      ${sk('M -28 -6 Q 210 -18 444 0',1.2,0.55)}${sk('M 456 0 Q 690 -18 928 -6',1.2,0.55)}
-      ${sk('M -22 -2 Q -24 240 -21 494',1.9,0.95)}${sk('M -15 4 Q -13 250 -15 488',1.3,0.8)}${sk('M -8 6 Q -9 230 -7 484',2.1,0.7)}${sk('M -19 30 L -18 460',0.9,0.5)}
-      ${sk('M 922 -2 Q 924 240 921 494',1.9,0.95)}${sk('M 915 4 Q 913 250 915 488',1.3,0.8)}${sk('M 908 6 Q 909 230 907 484',2.1,0.7)}${sk('M 919 30 L 918 460',0.9,0.5)}
-      ${sk('M -20 496 Q 210 480 440 500',1.8,0.9)}${sk('M -12 491 Q 220 478 438 495',1.1,0.6)}
-      ${sk('M 460 500 Q 690 480 920 496',1.8,0.9)}${sk('M 462 495 Q 680 478 912 491',1.1,0.6)}
-      ${sk('M 40 488 Q 200 480 330 486',1.3,0.55)}${sk('M 600 486 Q 760 478 870 488',1.3,0.55)}
+    <g fill="none" stroke="${L}" stroke-linecap="round" filter="url(#gt-soft)">
+      ${ln('M -21 -4 Q -23 245 -21 494',1.8,0.9)}${ln('M -12 0 Q -13 245 -12 490',1.5,0.75)}
+      ${ln('M 921 -4 Q 923 245 921 494',1.8,0.9)}${ln('M 912 0 Q 913 245 912 490',1.5,0.75)}${ln('M 904 3 Q 905 245 904 486',1.2,0.55)}
+      ${ln('M -20 495 Q 210 480 440 499',1.6,0.85)}${ln('M 460 499 Q 690 480 920 495',1.6,0.85)}
+      ${ln('M 600 489 Q 760 481 880 488',1.2,0.5)}
     </g>`;
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 左がわの旗
