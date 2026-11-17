@@ -17,7 +17,7 @@
           下の道（遠回り）… 床をそのまま行く。明るいが、ぬかるみで足が遅くなる。先に水車小屋。
      3) 道の終わり近くまで行くと「この道を行く／引き返す」をたずねられる。
         行くと決めると flags.route が決まり、右の端から次へ。
-        遠回りなら赤ずきんがついてくる。近道なら、赤ずきんとはここで別れる。
+        赤ずきんは、ずっと左のページで待っている。遠回りを選んだときだけついてくる。近道なら、左のページに残る（ここで別れる）。
 
    ◆ このファイルが持っている独自の仕掛け（engine.js は触らない）
      GT.registerUpdate … 赤ずきんの動き・話しかける前のセリフ作り・道の確認
@@ -27,7 +27,6 @@
 const ctx=GT.ctx, W=GT.W, H=GT.H, EDGE=GT.EDGE, FLOOR=H-GT.EDGE, SPINE=GT.SPINE;
 const HOOD_WAIT=392;                        // 赤ずきんが待っている場所
 const DECIDE_X=780;                         // ここまで来たら「この道を行く？」
-const SIGN_X=478;                           // 話したあと、赤ずきんが待つあたり（道しるべは置かない）
 const THORN1={page:'right', x:610, y:EDGE, w:30, h:46, kind:'ceilingLedge'};   // 天井から垂れさがるいばら
 const THORN2={page:'right', x:722, y:EDGE, w:30, h:56, kind:'ceilingLedge'};
 const MUD   ={page:'right', x:560, y:446, w:200, h:18, slow:0.35, jump:0.6};  // 遠回りのぬかるみ
@@ -143,25 +142,17 @@ GT.registerUpdate(()=>{
 });
 
 /* 赤ずきんの動き（会話中も動けるよう、描画のついでに進める）
-   話す前：待っている / 話したあと：道の分かれ目の前 / 遠回り：ついてくる / 近道：下の道を歩いていく */
+   赤ずきんは、分かれ道ではずっと左のページ（HOOD_WAIT）にいる。遠回りを選んだときだけ、少年についてくる。
+   近道を選んだときは、左のページから動かない（ページの重力にはしたがう。裏返されると天井に落ちる） */
 function moveHood(){
   const h=hoodNpc(); if(!h) return;
   const now=performance.now(), dt=Math.min(0.05,(now-st.last)/1000); st.last=now;
-  // 近道を選んだら、赤ずきんは別れて下の道（遠回り）を歩いていく。
-  // ほかの人と同じく、ページの重力にしたがう（少年がページを裏返すと、赤ずきんも天井へ落ちて、さかさまのまま歩いていく）
   h.noGravity = false;
   if(st.bubble){ st.bubble.t-=dt; if(st.bubble.t<=0) st.bubble=null; }
-  if(!st.talked) return;
+  if(GT.flags.route!=='detour') return;                     // 話す前・話したあと・近道：その場（左のページ）から動かない
+  if(GT.mode!=='play') return;
   const pcx=GT.player.x+GT.player.w/2;
-  let target, speed=200;
-  if(GT.flags.route==='detour') target=pcx+(pcx>h.x+16?-42:42)-16;
-  else if(GT.flags.route==='shortcut'){ target=W+60; speed=60; }
-  else target=SIGN_X-44;
-  if(GT.mode!=='play' && GT.flags.route!=='shortcut') return;
-  if(GT.flags.route==='shortcut'){                         // 画面の外へ歩いていく（足場は、すり抜けずに跳び乗る）
-    const edge=W-EDGE-h.w;
-    if(h.x<edge-2) GT.npcStep(h,edge,speed,dt); else if(h.x<target) h.x=Math.min(target,h.x+speed*dt); }
-  else GT.npcStep(h,target,speed,dt);                       // 足場は、すり抜けずに跳び乗る
+  GT.npcStep(h, pcx+(pcx>h.x+16?-42:42)-16, 200, dt);       // 遠回り：ついてくる（足場は、すり抜けずに跳び乗る）
 }
 
 /* ==========================================================================
