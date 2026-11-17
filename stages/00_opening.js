@@ -328,8 +328,8 @@ function drawMarks(){
 const BOOK_TEXT_L='――少年は、ところどころ欠けた本とともに森で目を覚ました。そして、木の陰にいた少女と出会った。';
 const BOOK_TEXT_R='少女は、マリと名乗った。森のむこうには、まだ白いままのページが、どこまでも続いている。';
 const bookArtCv=document.createElement('canvas');
-function bookText(x,y,maxW,text,seed,lack,lineH){   // 1文字ずつ書く。欠けた字は、にじみ（インクのしみ）か空白にする
-  ctx.save(); ctx.font="500 12px 'Zen Old Mincho',serif"; ctx.textBaseline='middle'; ctx.textAlign='left';
+function bookText(x,y,maxW,text,seed,lack,lineH){   // 1文字ずつ書く。欠けた字は、にじみ（インクのしみ）か空白にする。全体に ぼやけている
+  ctx.save(); ctx.font="500 12px 'Zen Old Mincho',serif"; ctx.textBaseline='middle'; ctx.textAlign='left'; ctx.filter='blur(1.1px)';
   let cx=x, cy=y, i=0;
   for(const ch of text){
     const w=ctx.measureText(ch).width;
@@ -337,7 +337,7 @@ function bookText(x,y,maxW,text,seed,lack,lineH){   // 1文字ずつ書く。欠
     const v=rnd(Math.floor(i/3)+seed*97)*0.65+rnd(i*1.7+seed*13)*0.35;   // となりどうしで、まとまって欠ける
     if(v<lack){
       if(rnd(i+seed*5)<0.35){ ctx.fillStyle='rgba(120,92,60,0.13)'; ctx.beginPath(); ctx.ellipse(cx+w/2,cy,w*0.5,4.5,rnd(i)*3,0,Math.PI*2); ctx.fill(); }   // うすいしみ（多くは、ただの空白）
-    } else { ctx.fillStyle='rgba(58,53,80,0.88)'; ctx.fillText(ch,cx,cy); }
+    } else { ctx.fillStyle='rgba(58,53,80,0.6)'; ctx.fillText(ch,cx,cy); }
     cx+=w; i++;
   }
   ctx.restore(); return cy;
@@ -368,7 +368,7 @@ function drawBookView(){
   // ---- 左ページ：見出しと本文 ----
   ctx.save(); ctx.textAlign='left'; ctx.textBaseline='alphabetic';
   ctx.fillStyle='#9a8462'; ctx.font="500 10px 'Zen Old Mincho',serif"; ctx.fillText('序　章', cx-pw+pad, top+30);
-  ctx.fillStyle=ink; ctx.font="700 17px 'Zen Old Mincho',serif"; ctx.fillText('森で目覚める', cx-pw+pad, top+52);
+  ctx.fillStyle=ink; ctx.font="700 17px 'Zen Old Mincho',serif"; ctx.filter='blur(0.6px)'; ctx.globalAlpha=k*0.8; ctx.fillText('森で目覚める', cx-pw+pad, top+52); ctx.filter='none'; ctx.globalAlpha=k;
   ctx.strokeStyle='rgba(120,92,52,0.4)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx-pw+pad,top+62); ctx.lineTo(cx-pad,top+62); ctx.stroke();
   ctx.restore();
   bookText(cx-pw+pad, top+84, pw-pad*2, BOOK_TEXT_L, 3, 0.3, 22);
@@ -379,7 +379,7 @@ function drawBookView(){
   // ---- 右ページ：挿絵（本物の挿絵を、うすく色あせさせて）と、その下の文章 ----
   const aw=pw-pad*2, ah=aw*330/600, ax=cx+pad, ay=top+24;
   if(GT.bookArt && GT.bookArt.has('prologue')){ GT.bookArt.mount(bookArtCv,'prologue');
-    ctx.save(); ctx.filter='sepia(0.35) saturate(0.75) contrast(0.9)'; ctx.globalAlpha=k*0.88; ctx.drawImage(bookArtCv,ax,ay,aw,ah); ctx.restore(); }
+    ctx.save(); ctx.filter='blur(2.2px) sepia(0.45) saturate(0.6) contrast(0.8)'; ctx.globalAlpha=k*0.7; ctx.drawImage(bookArtCv,ax,ay,aw,ah); ctx.restore(); }   // 色あせて、ぼやけた挿絵
   ctx.save(); ctx.strokeStyle='rgba(90,74,51,0.35)'; ctx.lineWidth=1; ctx.strokeRect(ax+0.5,ay+0.5,aw-1,ah-1); ctx.restore();
   [[ax+aw*0.36,ay+ah*0.62,0],[ax+aw*0.74,ay+ah*0.42,1]].forEach(([hx,hy,j])=>{               // かけらが抜け落ちた穴（下のページの紙が見える）
     const pts=GT.scrapPoints ? GT.scrapPoints(40,36,51+j*17) : [];

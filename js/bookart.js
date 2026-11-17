@@ -229,11 +229,11 @@ const SCENES={
     rays(c,[[150,60],[330,40]],'rgba(255,236,170,0.22)');
     pages(c,[[120,300,-0.3],[260,312,0.2],[340,296,0.5],[90,270,0.1]]);
     boy(c,210,272,1.25,{lying:true,book:true});
-    // 木の幹とマリ
+    // マリ（木の幹のうしろに立っていて、体の半分が幹にかくれている＝木のかげからのぞいている）
+    if(ok(IMG.mari)) figure(c,IMG.mari,482,306,150); else mari(c,482,300,1.5);
+    // 木の幹（マリより手前）
     c.beginPath(); c.moveTo(470,AH); c.lineTo(486,60); c.lineTo(548,60); c.lineTo(566,AH); c.closePath(); inked(c,'#5a4632',2.4);
     c.strokeStyle='rgba(30,20,10,0.35)'; c.lineWidth=1.4; for(let i=0;i<4;i++){ c.beginPath(); c.moveTo(498+i*12,90); c.lineTo(494+i*13,AH); c.stroke(); }
-    c.save(); c.beginPath(); c.rect(400,0,90,AH); c.clip();
-    if(ok(IMG.mari)) figure(c,IMG.mari,478,306,150); else mari(c,478,300,1.5); c.restore();   // 木のかげからのぞくマリ
     for(const [x,y,r,col] of [[515,40,80,'#4d6843'],[440,70,56,'#5b7a4e'],[590,60,56,'#5b7a4e']]) ell(c,x,y,r,r*0.8,col);
   },
   // 森の小道：本を裏返して、天井を歩く少年（ひとりだけ）。道をふさぐ大木と、押して動かす木箱
