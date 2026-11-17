@@ -254,10 +254,11 @@ canvas#game{ border-radius:0; }
 .gt-cover, .gt-pages{ position:absolute; left:-6.667%; top:-8.333%; width:113.333%; height:116.667%; pointer-events:none; overflow:visible; }
 .gt-cover{ z-index:-3; } .gt-pages{ z-index:-1; }   /* あいだ（z-index:-2）に、しおりと旗 */
 /* 左がわの赤いリボンの旗（Reread・menu）：右はしはページのあいだに挟まっている。カーソルを乗せると、すーっと引き出される */
-.gt-flags{ position:absolute; right:calc(100% + 1.2cqw); top:16%; display:flex; flex-direction:column; gap:2.6cqw; z-index:-2; }
+/* 旗・しおりは、ページより手前（切れて見えないように、形がぜんぶ見える）。ゲーム画面にはかからない、ページのふちの上で止まる */
+.gt-flags{ position:absolute; right:calc(100% + 0.6cqw); top:16%; display:flex; flex-direction:column; gap:2.6cqw; z-index:0; }
 .gt-flag{ position:relative; width:17cqw; min-width:100px; height:7.2cqw; min-height:40px; border:none; padding:0 0 0 3.4cqw; cursor:pointer;
   background:var(--flag); color:#fbf4ea; font-family:'Caveat',cursive; font-weight:500; font-size:clamp(17px,3.6cqw,66px); line-height:1; text-align:left;
-  clip-path:polygon(0 0,100% 0,100% 100%,0 100%,2.6cqw 50%);                      /* 左はしは、リボンの切りこみ */
+  clip-path:polygon(0 0,calc(100% - 0.6cqw) 0,100% 0.6cqw,100% calc(100% - 0.6cqw),calc(100% - 0.6cqw) 100%,0 100%,2.6cqw 50%);   /* 左はしは、リボンの切りこみ。右はしは角を落とす */
   filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25)); transform:translateX(0) rotate(-1.2deg);
   transition:transform .45s cubic-bezier(.25,.8,.3,1); }
 .gt-flag:nth-child(2){ transform:translateX(0) rotate(0.8deg); }
@@ -270,12 +271,12 @@ canvas#game{ border-radius:0; }
   padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
 /* 上の紺色のしおり（挟んだしおり Ⅰ〜Ⅴ）：ほぼ正方形。上のまん中に、ひもを通す白い四角。上の二すみに、金の飾り。
    下のはしはページのあいだに挟まっている。カーソルを乗せると、すーっと上へ引き出される */
-.gt-tabs{ position:absolute; left:4cqw; bottom:calc(100% - 0.6cqw); display:flex; align-items:flex-end; gap:1.2cqw; z-index:-2; }
-.gt-tab{ --h:8cqw; --hide:2.6cqw; position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
-  width:8.4cqw; min-width:52px; height:var(--h); background:var(--tab); border:none; border-radius:2px 2px 0 0;
+.gt-tabs{ position:absolute; left:4cqw; bottom:calc(100% + 1cqw); display:flex; align-items:flex-end; gap:1.2cqw; z-index:0; }
+.gt-tab{ --h:8cqw; --hide:0px; position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  width:8.4cqw; min-width:52px; height:var(--h); background:var(--tab); border:none; border-radius:2px;
   color:#f6f0e4; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(16px,3.2cqw,58px); padding:2cqw 0 0;
   box-shadow:0 -1px 4px rgba(0,0,0,0.25); transform:translateY(var(--hide)); transition:transform .45s cubic-bezier(.25,.8,.3,1); }
-.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(-0.6cqw); }                                  /* すーっと引き出す */
+.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(-1.4cqw); }                                  /* すーっと引き出す */
 .gt-tab:focus-visible{ outline:2px solid var(--tab-gold); outline-offset:2px; }
 .gt-tab .orn{ position:absolute; left:0.5cqw; right:0.5cqw; top:0.5cqw; height:2.4cqw; pointer-events:none;              /* 上の二すみの、金の曲がった飾り */
   background:
