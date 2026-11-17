@@ -436,7 +436,6 @@ GT.registerDraw(drawEpilogue,'back');
 function drawEndCard(){
   if(!isEpi() || !ending.card) return;
   const k=Math.min(1,(performance.now()-ending.cardT)/1200), e=ENDINGS[ending.kind];
-  const filled=GT.pageRecord.filter(p=>p.filled).length, all=GT.pageRecord.length;
   ctx.save(); ctx.globalAlpha=k;
   ctx.fillStyle='rgba(20,16,12,0.82)'; ctx.fillRect(0,0,W,H);
   ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -445,10 +444,8 @@ function drawEndCard(){
   ctx.strokeStyle='rgba(176,141,87,0.6)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-140,138); ctx.lineTo(W/2+140,138); ctx.stroke();
   ctx.fillStyle='#d9b877'; ctx.font="700 15px 'Zen Old Mincho',serif"; ctx.fillText('エンディング '+e.mark,W/2,166);
   ctx.fillStyle='#f3ead0'; ctx.font="700 30px 'Zen Old Mincho',serif"; ctx.fillText('「'+e.title+'」',W/2,204);
-  ctx.fillStyle='#cbb98f'; ctx.font="500 14px 'Zen Old Mincho',serif";
-  ctx.fillText(ending.summary||'',W/2,244);
-  ctx.fillText('埋まったページ　'+filled+' / '+all,W/2,268);
-  ctx.fillStyle='#8a8266'; ctx.font="500 13px 'Zen Old Mincho',serif"; ctx.fillText('〜 おわり 〜',W/2,300);
+  // （「赤ずきん：救えた」などのまとめと、埋まったページの数は出さない）
+  ctx.fillStyle='#8a8266'; ctx.font="500 13px 'Zen Old Mincho',serif"; ctx.fillText('〜 おわり 〜',W/2,256);
   ctx.restore();
 }
 GT.registerDraw(drawEndCard,'overlay');

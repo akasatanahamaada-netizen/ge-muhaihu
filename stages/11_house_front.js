@@ -612,7 +612,7 @@ function drawRoomView(c,t,sc,big){
     // おばあさん（ベッドの上で身をすくめる）
     const shv=Math.sin(t*30)*0.9;
     ell(68,166,20,9,'#f6eed8');                                                                         // 枕
-    if(!GT.drawCharSprite('granny',78+shv,184,84,1,1,null,true)){
+    if(!GT.drawCharSprite('grannyScared',78+shv,184,84,1,1,null,true)){   // 怯えたおばあさん（ミニ）
       ctx.fillStyle='#8a7fa0'; GT.roundRect(64+shv,140,28,44,10); ctx.fill(); ell(78+shv,132,13,13,'#ecd0a8'); ell(78+shv,124,15,8,'#f6eed8'); }
     quilt(70,172,176,26,'#8b5e63');
     // 壁に映る狼の大きな影（ランプの光で）
