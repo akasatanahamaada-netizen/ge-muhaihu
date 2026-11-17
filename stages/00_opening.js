@@ -323,57 +323,85 @@ function drawMarks(){
 }
 
 /* 本の絵（虫食いのページ） */
+/* 序章で少年が開く本：「物語を振り返る」画面の本と同じつくり（革の表紙・クリーム色の紙・本物の挿絵と文章）。
+   ただし、まだ何も埋まっていないので、文字はところどころ にじんだり 欠けたりして読めず、挿絵には かけらの形の穴があいている */
+const BOOK_TEXT_L='――少年は、ところどころ欠けた本とともに森で目を覚ました。そして、木の陰にいた少女と出会った。';
+const BOOK_TEXT_R='少女は、マリと名乗った。森のむこうには、まだ白いままのページが、どこまでも続いている。';
+const bookArtCv=document.createElement('canvas');
+function bookText(x,y,maxW,text,seed,lack,lineH){   // 1文字ずつ書く。欠けた字は、にじみ（インクのしみ）か空白にする
+  ctx.save(); ctx.font="500 12px 'Zen Old Mincho',serif"; ctx.textBaseline='middle'; ctx.textAlign='left';
+  let cx=x, cy=y, i=0;
+  for(const ch of text){
+    const w=ctx.measureText(ch).width;
+    if(cx+w>x+maxW){ cx=x; cy+=lineH; }
+    const v=rnd(Math.floor(i/3)+seed*97)*0.65+rnd(i*1.7+seed*13)*0.35;   // となりどうしで、まとまって欠ける
+    if(v<lack){
+      if(rnd(i+seed*5)<0.35){ ctx.fillStyle='rgba(120,92,60,0.13)'; ctx.beginPath(); ctx.ellipse(cx+w/2,cy,w*0.5,4.5,rnd(i)*3,0,Math.PI*2); ctx.fill(); }   // うすいしみ（多くは、ただの空白）
+    } else { ctx.fillStyle='rgba(58,53,80,0.88)'; ctx.fillText(ch,cx,cy); }
+    cx+=w; i++;
+  }
+  ctx.restore(); return cy;
+}
 function drawBookView(){
   const now=performance.now(), dt=Math.min(0.1,(now-st.last)/1000); st.last=now;
   st.book.a+=((st.book.on?1:0)-st.book.a)*Math.min(1,dt*6);
   if(st.book.a<0.01) return;
-  const cx=W/2, cy=180, pw=220, ph=250;
-  ctx.save(); ctx.globalAlpha=st.book.a;
+  const cx=W/2, cy=176, pw=236, ph=262, top=cy-ph/2, k=st.book.a;
+  ctx.save(); ctx.globalAlpha=k;
   ctx.fillStyle='rgba(24,20,14,0.82)'; ctx.fillRect(0,0,W,H);
-  // 表紙
-  GT.roundRect(cx-pw-14,cy-ph/2-10,pw*2+28,ph+20,8); ctx.fillStyle='#5a3f2e'; ctx.fill();
-  // ページ
+  ctx.translate(cx,cy); ctx.scale(0.94+0.06*k,0.94+0.06*k); ctx.translate(-cx,-cy);   // 開くとき、少し手前にせり出す
+  // 表紙（革。金の縁取り）
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,0.55)'; ctx.shadowBlur=24; ctx.shadowOffsetY=10;
+  GT.roundRect(cx-pw-16,top-12,pw*2+32,ph+24,10);
+  const cg=ctx.createLinearGradient(cx-pw,top,cx+pw,top+ph); cg.addColorStop(0,'#6a4a33'); cg.addColorStop(0.6,'#4a3222'); cg.addColorStop(1,'#3a2618');
+  ctx.fillStyle=cg; ctx.fill(); ctx.restore();
+  GT.roundRect(cx-pw-10,top-6,pw*2+20,ph+12,7); ctx.strokeStyle='rgba(214,178,110,0.55)'; ctx.lineWidth=1.4; ctx.stroke();
+  // 紙（下に重なるページの厚み → いちばん上のページ）
+  for(let d=3;d>=1;d--){ ctx.fillStyle=d%2?'#d9caa2':'#e6d8b4'; ctx.fillRect(cx-pw-d*1.2,top+d*1.6,pw*2+d*2.4,ph-d*0.6); }
   for(const side of [-1,1]){
-    const x0=side<0?cx-pw:cx;
-    const g=ctx.createLinearGradient(x0,0,x0+pw,0);
-    if(side<0){ g.addColorStop(0,'#efe4c8'); g.addColorStop(0.85,'#e6d8b4'); g.addColorStop(1,'#c9b88e'); }
-    else      { g.addColorStop(0,'#c9b88e'); g.addColorStop(0.15,'#e6d8b4'); g.addColorStop(1,'#efe4c8'); }
-    ctx.fillStyle=g; ctx.fillRect(x0,cy-ph/2,pw,ph);
+    const x0=side<0?cx-pw:cx, g=ctx.createLinearGradient(x0,0,x0+pw,0);
+    if(side<0){ g.addColorStop(0,'#efe5c9'); g.addColorStop(0.7,'#f3ead3'); g.addColorStop(0.96,'#ddcfa9'); g.addColorStop(1,'#cbbb92'); }
+    else      { g.addColorStop(0,'#cbbb92'); g.addColorStop(0.04,'#ddcfa9'); g.addColorStop(0.3,'#f3ead3'); g.addColorStop(1,'#efe5c9'); }
+    ctx.fillStyle=g; ctx.fillRect(x0,top,pw,ph);
   }
-  // 左ページ：かすれた絵（木と、赤い頭巾の小さな人影）と、文字の行
-  ctx.strokeStyle='rgba(90,74,51,0.55)'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(cx-150,cy+10); ctx.lineTo(cx-150,cy-40); ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx-150,cy-58,24,0,Math.PI*2); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx-190,cy+10); ctx.lineTo(cx-40,cy+10); ctx.stroke();
-  ctx.fillStyle='rgba(184,66,63,0.55)';
-  ctx.beginPath(); ctx.moveTo(cx-90,cy+10); ctx.lineTo(cx-80,cy-16); ctx.lineTo(cx-70,cy+10); ctx.closePath(); ctx.fill();
-  ell(cx-80,cy-20,6,6,'rgba(184,66,63,0.55)');
-  ctx.fillStyle='rgba(90,74,51,0.4)';
-  for(let i=0;i<5;i++) ctx.fillRect(cx-pw+24, cy+34+i*14, (i===4?90:170)-rnd(i)*40, 2);
-  // 右ページ：挿絵と文章はあるが、ところどころ欠けて読めない（挿絵には、かけらの形の穴）
-  const ax=cx+28, ay=cy-ph/2+26, aw=pw-56, ah=92;
-  ctx.fillStyle='rgba(120,150,110,0.35)'; ctx.fillRect(ax,ay,aw,ah);                       // 森の挿絵（うすい水彩）
-  ctx.fillStyle='rgba(176,141,87,0.35)'; ctx.fillRect(ax,ay+ah*0.7,aw,ah*0.3);
-  ctx.fillStyle='rgba(90,74,51,0.45)'; ctx.fillRect(ax+30,ay+18,8,ah*0.7-18); ctx.fillRect(ax+aw-50,ay+10,10,ah*0.7-10);
-  ell(ax+34,ay+20,20,16,'rgba(87,110,74,0.45)'); ell(ax+aw-45,ay+14,24,18,'rgba(87,110,74,0.45)');
-  [[ax+aw*0.42,ay+ah*0.42,0],[ax+aw*0.72,ay+ah*0.58,1]].forEach(([hx,hy,j])=>{               // かけらが抜け落ちた穴
-    const pts=GT.scrapPoints ? GT.scrapPoints(44,40,51+j*17) : [];
+  const ink='#3a2f2a', pad=24;
+  // ---- 左ページ：見出しと本文 ----
+  ctx.save(); ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillStyle='#9a8462'; ctx.font="500 10px 'Zen Old Mincho',serif"; ctx.fillText('序　章', cx-pw+pad, top+30);
+  ctx.fillStyle=ink; ctx.font="700 17px 'Zen Old Mincho',serif"; ctx.fillText('森で目覚める', cx-pw+pad, top+52);
+  ctx.strokeStyle='rgba(120,92,52,0.4)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx-pw+pad,top+62); ctx.lineTo(cx-pad,top+62); ctx.stroke();
+  ctx.restore();
+  bookText(cx-pw+pad, top+84, pw-pad*2, BOOK_TEXT_L, 3, 0.3, 22);
+  // 小さな飾り（つる草の文様）
+  ctx.save(); ctx.strokeStyle='rgba(176,141,87,0.55)'; ctx.lineWidth=1.2; const oy=top+ph-46, ox=cx-pw/2;
+  ctx.beginPath(); ctx.moveTo(ox-46,oy); ctx.bezierCurveTo(ox-24,oy-12,ox-10,oy+10,ox,oy); ctx.bezierCurveTo(ox+10,oy-10,ox+24,oy+12,ox+46,oy); ctx.stroke();
+  ctx.fillStyle='rgba(176,141,87,0.6)'; ctx.beginPath(); ctx.arc(ox,oy,2.4,0,Math.PI*2); ctx.fill(); ctx.restore();
+  // ---- 右ページ：挿絵（本物の挿絵を、うすく色あせさせて）と、その下の文章 ----
+  const aw=pw-pad*2, ah=aw*330/600, ax=cx+pad, ay=top+24;
+  if(GT.bookArt && GT.bookArt.has('prologue')){ GT.bookArt.mount(bookArtCv,'prologue');
+    ctx.save(); ctx.filter='sepia(0.35) saturate(0.75) contrast(0.9)'; ctx.globalAlpha=k*0.88; ctx.drawImage(bookArtCv,ax,ay,aw,ah); ctx.restore(); }
+  ctx.save(); ctx.strokeStyle='rgba(90,74,51,0.35)'; ctx.lineWidth=1; ctx.strokeRect(ax+0.5,ay+0.5,aw-1,ah-1); ctx.restore();
+  [[ax+aw*0.36,ay+ah*0.62,0],[ax+aw*0.74,ay+ah*0.42,1]].forEach(([hx,hy,j])=>{               // かけらが抜け落ちた穴（下のページの紙が見える）
+    const pts=GT.scrapPoints ? GT.scrapPoints(40,36,51+j*17) : [];
     ctx.beginPath(); pts.forEach(([x,y],i)=>i?ctx.lineTo(hx+x,hy+y):ctx.moveTo(hx+x,hy+y)); ctx.closePath();
-    ctx.fillStyle='#dccb9f'; ctx.fill(); ctx.strokeStyle='rgba(255,250,235,0.9)'; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.fillStyle='#e3d6b4'; ctx.fill(); ctx.strokeStyle='rgba(255,250,235,0.95)'; ctx.lineWidth=2.5; ctx.stroke();
     ctx.strokeStyle='rgba(90,74,51,0.45)'; ctx.lineWidth=1; ctx.stroke(); });
-  for(let i=0;i<6;i++){                                                                    // 文章の行（ところどころ、にじんだり欠けたりしている）
-    const y=ay+ah+18+i*14, len=(i===5?90:pw-56);
-    for(let x=0;x<len;x+=10){ const r=rnd(i*31+x*0.37);
-      if(r<0.4) continue;                                                                  // 読めないところは空白
-      ctx.fillStyle='rgba(90,74,51,0.45)'; ctx.fillRect(cx+28+x, y, 8, 2); } }
-  ctx.fillStyle='rgba(90,74,51,0.4)';
+  bookText(cx+pad, ay+ah+24, pw-pad*2, BOOK_TEXT_R, 7, 0.45, 22);
+  // ページ番号
+  ctx.save(); ctx.fillStyle='#9a8462'; ctx.font="500 10px 'Zen Old Mincho',serif"; ctx.textAlign='center';
+  ctx.fillText('― 1 ―',cx-pw/2,top+ph-14); ctx.fillText('― 2 ―',cx+pw/2,top+ph-14); ctx.restore();
   // 虫食い（左ページは少し、右ページはたくさん食べられている）
-  GT.wormEaten(ctx, cx-pw, cy-ph/2, pw, ph, 3, { edges:['left','top','bottom'], under:'#dccb9f', outside:'#5a3f2e', count:4 });
-  GT.wormEaten(ctx, cx,    cy-ph/2, pw, ph, 7, { edges:['right','top','bottom'], under:'#dccb9f', outside:'#5a3f2e', count:7 });
+  GT.wormEaten(ctx, cx-pw, top, pw, ph, 3, { edges:['left','top','bottom'], under:'#dccb9f', outside:'#4a3222', count:3, avoid:[{x:cx-pw+pad,y:top+20,w:140,h:46}] });
+  GT.wormEaten(ctx, cx,    top, pw, ph, 7, { edges:['right','top','bottom'], under:'#dccb9f', outside:'#4a3222', count:5, avoid:[{x:ax,y:ay,w:aw,h:ah}] });
   // のど（真ん中の影）
-  const sg=ctx.createLinearGradient(cx-14,0,cx+14,0);
-  sg.addColorStop(0,'rgba(58,50,38,0)'); sg.addColorStop(0.5,'rgba(58,50,38,0.45)'); sg.addColorStop(1,'rgba(58,50,38,0)');
-  ctx.fillStyle=sg; ctx.fillRect(cx-14,cy-ph/2,28,ph);
+  const sg=ctx.createLinearGradient(cx-16,0,cx+16,0);
+  sg.addColorStop(0,'rgba(58,50,38,0)'); sg.addColorStop(0.5,'rgba(58,50,38,0.4)'); sg.addColorStop(1,'rgba(58,50,38,0)');
+  ctx.fillStyle=sg; ctx.fillRect(cx-16,top,32,ph);
+  // しおりのひも（赤）：本の下から、少しだけたれている
+  ctx.save(); ctx.strokeStyle='#9a2f28'; ctx.lineWidth=4; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(cx+8,top+ph-6); ctx.quadraticCurveTo(cx+6,top+ph+12,cx+12,top+ph+26); ctx.stroke();
+  ctx.fillStyle='#9a2f28'; ctx.beginPath(); ctx.moveTo(cx+6,top+ph+22); ctx.lineTo(cx+18,top+ph+22); ctx.lineTo(cx+15,top+ph+34); ctx.lineTo(cx+12,top+ph+28); ctx.lineTo(cx+9,top+ph+34); ctx.closePath(); ctx.fill();
+  ctx.restore();
   ctx.restore();
 }
 
