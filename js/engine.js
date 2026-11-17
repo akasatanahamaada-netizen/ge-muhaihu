@@ -308,7 +308,7 @@ GT.loadStageDef = function(def, opt){
   missionFlash=0;
   updateExitGate();
   const pl=GT.player;
-  pl.x=player_start.x; pl.y=player_start.y; pl.vx=0; pl.vy=0; pl.squash=1;
+  pl.x=player_start.x; pl.y=player_start.y; pl.vx=0; pl.vy=0; pl.squash=1; pl.flipFall=false;
   flashPage.left=0; flashPage.right=0; updateHud();
 };
 
@@ -360,7 +360,9 @@ window.addEventListener('keydown',e=>{ keys[e.key]=true;
   if(e.key==='f'||e.key==='F'||e.code==='Space'){ onFlipKey(); e.preventDefault(); } });
 window.addEventListener('keyup',e=>keys[e.key]=false);
 
-function flipCurrentPage(){ const p=GT.currentPage(); GT.gravity[p]*=-1; flashPage[p]=1; updateHud(); GT.sfx&&GT.sfx('flip'); }
+function flipCurrentPage(){ const p=GT.currentPage(); GT.gravity[p]*=-1; flashPage[p]=1; updateHud(); GT.sfx&&GT.sfx('flip');
+  // 本を裏返して床⇔天井へ落ちていくあいだは、横には動けない（着地するまで、まっすぐ落ちる）
+  GT.player.flipFall=true; GT.player.vx=0; }
 /* 本を裏返せるのは、床（反転中は天井）に立っているときだけ。
    空中で押したときは、すぐには裏返さず 0.35 秒だけ覚えておき、そのあいだに着地したら裏返す
    （スマホでは、着地の少し前にボタンを押してしまいやすいため）。間に合わなければ「立っているときだけ」と知らせる */
@@ -1025,8 +1027,9 @@ function update(dt){
   GT.activeNpc=activeNpc;   // 動作確認用に公開
 
   const page=GT.currentPage(); const g=gravity[page];
-  const left=keys['ArrowLeft']||keys['a']||keys['A'];
-  const right=keys['ArrowRight']||keys['d']||keys['D'];
+  const canSteer=!player.flipFall;            // 本を裏返して落ちているあいだは、左右のボタンが効かない
+  const left=canSteer&&(keys['ArrowLeft']||keys['a']||keys['A']);
+  const right=canSteer&&(keys['ArrowRight']||keys['d']||keys['D']);
   if(left&&!right){ player.vx-=ACCEL*dt; player.facing=-1; }
   else if(right&&!left){ player.vx+=ACCEL*dt; player.facing=1; }
   else{ const d=FRICTION*dt; if(Math.abs(player.vx)<=d) player.vx=0; else player.vx-=Math.sign(player.vx)*d; }
@@ -1092,6 +1095,7 @@ function update(dt){
   player.onGround=false;
   const pSteps=Math.max(1,Math.ceil(Math.abs(player.vy*dt)/8)), pCols=boxes.concat(GT.pagePlatforms(page));
   for(let i=0;i<pSteps&&player.vy!==0;i++){ player.y+=player.vy*dt/pSteps; resolveBodyCollisions(player,'y',pCols); }
+  if(player.onGround) player.flipFall=false;   // 着地したら、また左右に動ける
 
   for(const it of GT.items){ if(!it.got&&!it.hidden&&GT.rectsOverlap(player,GT.itemHitbox(it))){ it.got=true; it.gotT=0;   // アイテムを取る（hidden のあいだは取れない）
     if(itemLook==='page'){ hudPulse=1; GT.sfx&&GT.sfx('page'); flyScrapToBook(it); }
