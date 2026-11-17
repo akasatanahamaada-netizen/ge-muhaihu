@@ -300,6 +300,9 @@ function addBookmark(){
   list.push({ id, name:sceneName(id), state:clone(st), color });
   GT.sfx&&GT.sfx('page'); changed();
 }
+// 机の上の まっさらな栞（js/page.js）を押しても挟める。挟めたら true
+GT.addBookmark=()=>{ const n=bookmarks().length; if(inGame) addBookmark(); return bookmarks().length>n; };
+GT.bookmarksFull=()=>bookmarks().length>=BOOKMARK_MAX;
 GT.getBookmarks=()=>bookmarks().map(b=>({id:b.id, name:b.name, color:b.color}));
 GT.onBookmarksChange=fn=>{ bookmarkHooks.push(fn); };
 GT.jumpBookmark=i=>{ const b=bookmarks()[i]; if(!b) return;

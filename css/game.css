@@ -248,7 +248,7 @@ body.gt-full{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024p
 .book-frame::before, .book-frame::after{ display:none; }
 /* ゲーム画面のまわりに、表紙とページのふちのぶんの余白（--gw … 全画面のときのゲーム画面の幅。js/page.js） */
 .canvas-wrap, .book-frame.is-full .canvas-wrap{ z-index:1; box-shadow:none; border-radius:0;
-  margin:calc(var(--gw,900px) * 0.14) calc(var(--gw,900px) * 0.21) calc(var(--gw,900px) * 0.06) calc(var(--gw,900px) * 0.21) !important; }   /* 左右おなじ：本は真ん中 */
+  margin:calc(var(--gw,900px) * 0.14) calc(var(--gw,900px) * 0.16) calc(var(--gw,900px) * 0.06) calc(var(--gw,900px) * 0.16) !important; }   /* 左右おなじ：本は真ん中 */
 canvas#game{ border-radius:0; }
 /* 表紙と、開いたページ（ゲーム画面のうしろ。ゲーム画面のまわりだけが見える） */
 .gt-cover, .gt-pages{ position:absolute; left:-6.667%; top:-8.333%; width:113.333%; height:116.667%; pointer-events:none; overflow:visible; }
@@ -296,10 +296,10 @@ canvas#game{ border-radius:0; }
 .book-frame.is-full{ background:none; padding:12px !important; }
 /* スマホを横にした全画面：まん中の列（ゲーム画面）に、表紙・旗のぶんの余白（左 0.18・右 0.07）もふくめる */
 @media (hover:none) and (orientation:landscape), (pointer:coarse) and (orientation:landscape){
-  .book-frame.is-full{ grid-template-columns:auto calc(var(--gw,60vw) * 1.42) auto !important; padding:6px 8px !important; }
+  .book-frame.is-full{ grid-template-columns:auto calc(var(--gw,60vw) * 1.32) auto !important; padding:6px 8px !important; }
 }
 /* 全画面でないとき：本の上に、しおり（ひも・引き出したぶん）が切れずに入る余白 */
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.21) !important; }
+.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.15) !important; }
 
 /* メニューの画面（タイトルの絵）のふちを、まわりのページへ ぼかしてなじませる */
 .gtm{ -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%),linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%);
@@ -320,3 +320,18 @@ canvas#game{ border-radius:0; }
 .gt-tab .num{ position:absolute; left:0; right:0; top:36%; height:20%; display:flex; align-items:center; justify-content:center;
   font-family:'Cormorant Garamond',serif; font-weight:700; font-size:clamp(14px,2.6cqw,50px); line-height:1; color:#f3e3bd; }
 .gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(-2.2cqw); }
+
+/* 机の上（本の右）の、まっさらな栞（数字なし）。押すと、いまのページに挟む */
+.gt-spare{ position:absolute; left:calc(100% + 9cqw); top:22%; width:4.6cqw; min-width:28px; height:16cqw; padding:0; border:none; cursor:pointer;
+  background:url('../assets/komono/shiori_blank.webp') center/100% 100% no-repeat; transform:rotate(9deg);
+  filter:drop-shadow(2px 4px 3px rgba(0,0,0,0.3)); transition:transform .45s cubic-bezier(.25,.8,.3,1), opacity .3s; z-index:0; }
+.gt-spare:hover, .gt-spare:focus-visible{ transform:rotate(4deg) translateY(-1cqw); }
+.gt-spare.full{ opacity:0.45; cursor:default; }
+.gt-spare.nope{ animation:gtDeny .4s ease; }
+.gtm.show ~ .gt-spare{ pointer-events:none; }
+
+/* ゲーム画面を大きくするため、旗を少し小さく（左の余白を詰める） */
+.gt-flag{ width:12cqw; min-width:76px; height:5.6cqw; min-height:32px; padding-left:2.8cqw; font-size:clamp(14px,2.8cqw,52px); clip-path:polygon(0 0,calc(100% - 0.6cqw) 0,100% 0.6cqw,100% calc(100% - 0.6cqw),calc(100% - 0.6cqw) 100%,0 100%,2.2cqw 50%); }
+.gt-flags{ gap:2cqw; }
+.gt-flag:hover, .gt-flag:focus-visible, .gt-flag.gt-guide, .gt-flag.reset.armed{ transform:translateX(-2.4cqw) rotate(0); }
+.gt-spare{ left:calc(100% + 8cqw); }
