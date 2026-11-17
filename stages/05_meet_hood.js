@@ -75,7 +75,7 @@ const AFTER_END=[
 ];
 const AFTER_CHOICES=[
   { label:'……ちがう、と思う。', after:[
-      {s:'少年',c:'boy',t:'……ちがう、と思う。'},
+      {s:'少年',c:'boy',f:'disgust',t:'……ちがう、と思う。'},
       {s:'赤ずきん',c:'hood',t:'そうなんだ……残念。'},
       ...AFTER_END ]},
   { label:'そうだよ。', after:[

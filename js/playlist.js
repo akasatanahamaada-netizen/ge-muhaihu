@@ -118,19 +118,19 @@ GT.sceneFootsteps = {
 };
 
 // 会話の立ち絵（キーはセリフの c）。しゃべっているあいだ、会話の枠の右に出る。
-// 主人公（少年）：『物憂げな琥珀眼の少年.png』（向きは1枚だけ）
-const BOY_PORTRAIT=()=> 'assets/character/物憂げな琥珀眼の少年.webp';
+// 主人公（少年）：ふだん『物憂げな琥珀眼の少年』／嫌そうな顔（f:'disgust'）『主人公嫌そうな顔』
+const BOY_PORTRAIT=l=> l.f==='disgust' ? 'assets/character/主人公嫌そうな顔.webp' : 'assets/character/物憂げな琥珀眼の少年.webp';
 /* 会話の立ち絵は、だれでも左向き（会話の枠の右はしに出るので、枠の文字のほうを向く）。
    右向きに描かれた絵は GT.portraitMirror に入れておくと、左右反転して左向きにする。
-   表情：セリフに f:'smile'（笑顔）/ f:'surprise'（驚き）/ f:'scared'（怯え）/ f:'granny'（おばあさんに化けた狼）と書くと、その表情の絵になる */
+   表情：セリフに f:'smile'（笑顔）/ f:'disgust'（嫌そう）/ f:'surprise'（驚き）/ f:'scared'（怯え）/ f:'granny'（おばあさんに化けた狼）と書くと、その表情の絵になる */
 const P='assets/character/';
 GT.portraitMirror = [];   // いまの絵は、どれも もとから左向き（反転するものはない）
 // 会話の立ち絵のファイル（ゲームの起動時に先に読みこんでおき、会話で切りかえるとき、前の人の絵が一瞬見えないようにする）
-GT.portraitFiles = [ '物憂げな琥珀眼の少年.webp', '水彩タッチの赤ずきん少女.webp', '笑顔の赤ずきんと basket.webp', '赤ずきんの驚き顔バスケット少女.webp',
+GT.portraitFiles = [ '物憂げな琥珀眼の少年.webp', '主人公嫌そうな顔.webp', '水彩タッチの赤ずきん少女.webp', '笑顔の赤ずきんと basket.webp', '赤ずきんの驚き顔バスケット少女.webp',
   '水彩風の優しいお母さん.webp', '優しい笑顔の祖母キャラクター.webp', '杖を握る不安げなおばあさん.webp',
   'mari honnmono (hidari).webp', 'マリ口開いている.webp', '狡猾な人狼の立ち姿.webp', 'おばあちゃん狼の不敵な微笑み.webp', 'おばあちゃん狼の不敵な微笑み_影.webp' ].map(f=>'assets/character/'+f);
 if(GT.preloadPortraits) GT.preloadPortraits(GT.portraitFiles);
-/* 表情の差分（笑顔・驚き・怯え・口を開いたマリ・化けた狼）の webp は、元の PNG から作るときに
+/* 表情の差分（嫌そうな少年・笑顔・驚き・怯え・口を開いたマリ・化けた狼）の webp は、元の PNG から作るときに
    ふだんの絵にぴったり重なる位置・大きさに合わせてある。表情を変えても、人物がずれない */
 GT.portraits = {
   boy:   BOY_PORTRAIT,                                           // 少年のセリフ（c:'boy'）

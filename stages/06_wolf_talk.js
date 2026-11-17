@@ -107,7 +107,7 @@ GT.registerScene({
         set:()=>{GT.flags.warnedHood=true;}, after:()=>{
         // ここに来るのは、違和感を 3つとも調べたときだけ
         return [
-          {s:'少年',c:'boy',t:'……あの狼、なんだか変だよ。'},
+          {s:'少年',c:'boy',f:'disgust',t:'……あの狼、なんだか変だよ。'},
           {s:'',c:'narr',t:'少年は、見てきたものを話した。'+[st.found.prints&&'大きな足あと',st.found.claws&&'木の爪あと',st.found.blood&&'それから――狼についた血'].filter(Boolean).join('、')+'。'},
           {s:'',c:'narr',t:'赤ずきんが、狼の消えた脇道をふり返る。かごを抱く手に、力がこもった。'},
           {s:'赤ずきん',c:'hood',t:'……分かった。急ぎましょう。おばあちゃんのところへ。'},
