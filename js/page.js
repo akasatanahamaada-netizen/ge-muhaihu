@@ -23,7 +23,7 @@
     if(!full){                                   // 全画面でないとき：本（表紙・旗・しおりの余白もふくめて）が窓に入るだけの大きさ
       frame.style.removeProperty('--gs');
       // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.42（左右 0.21 ずつ）、たて gw×(480/900 + 0.14 + 0.06)
-      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.31, (window.innerHeight-40)/(480/900+0.235), 1100));   // しおりのひも・引き出した旗のぶんも入れる
+      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.36, (window.innerHeight-40)/(480/900+0.275), 1100));   // しおりのひも・引き出した旗のぶんも入れる
       frame.style.setProperty('--gw', Math.floor(gw)+'px'); return; }
     const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.gt-tabs','.gt-spare','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
@@ -76,7 +76,7 @@
   // 表紙とページ（viewBox はゲーム画面と同じ座標。ゲーム画面は 0〜900 × 0〜480 で、そのまわりが見える）
   const NS='http://www.w3.org/2000/svg';
   // 重なり順：表紙（いちばん奥）→ しおり・旗 → ページ。しおりと旗は、ページのあいだに挟まっていて、ページのふちから出ているように見える
-  const layer=cls=>{ const e=document.createElementNS(NS,'svg'); e.setAttribute('class',cls); e.setAttribute('viewBox','-60 -40 1020 560');
+  const layer=cls=>{ const e=document.createElementNS(NS,'svg'); e.setAttribute('class',cls); e.setAttribute('viewBox','-100 -70 1100 620');   // ゲーム画面は 0〜900 × 0〜480。そのまわりに、表紙とページ
     e.setAttribute('preserveAspectRatio','none'); e.setAttribute('aria-hidden','true'); return e; };
   const cover=layer('gt-cover'), pages=layer('gt-pages');
   const L='#c4a574';
@@ -88,17 +88,17 @@
         <stop offset="0.5" stop-color="#5a473c" stop-opacity="0.6"/><stop offset="0.65" stop-color="#2c221c" stop-opacity="0.55"/><stop offset="1" stop-color="#2c221c" stop-opacity="0"/></linearGradient>
       <filter id="gtShadow" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="7"/></filter>
     </defs>
-    <rect x="-46" y="-20" width="1004" height="546" rx="6" fill="rgba(20,14,10,0.45)" filter="url(#gtShadow)"/>
-    <rect x="-49" y="-26" width="1004" height="546" rx="5" fill="#261c17"/>
-    <rect x="-52" y="-30" width="1004" height="546" rx="5" fill="url(#gtCoverG)" stroke="#2a201b" stroke-width="2"/>
-    <path d="M -46 -27 L 946 -27" stroke="rgba(255,228,196,0.16)" stroke-width="2" stroke-linecap="round"/>
-    <rect x="420" y="-30" width="60" height="546" fill="url(#gtSpineG)"/>
-    <path d="M 432 -30 Q 450 -36 468 -30 L 468 -22 Q 450 -27 432 -22 Z" fill="#7a2e28"/>
-    <path d="M 432 516 Q 450 522 468 516 L 468 508 Q 450 513 432 508 Z" fill="#7a2e28"/>`;
+    <rect x="-78" y="-48" width="1068" height="596" rx="6" fill="rgba(20,14,10,0.45)" filter="url(#gtShadow)"/>
+    <rect x="-81" y="-54" width="1068" height="604" rx="5" fill="#261c17"/>
+    <rect x="-84" y="-58" width="1068" height="604" rx="5" fill="url(#gtCoverG)" stroke="#2a201b" stroke-width="2"/>
+    <path d="M -78 -55 L 978 -55" stroke="rgba(255,228,196,0.16)" stroke-width="2" stroke-linecap="round"/>
+    <rect x="420" y="-58" width="60" height="604" fill="url(#gtSpineG)"/>
+    <path d="M 432 -58 Q 450 -64 468 -58 L 468 -50 Q 450 -55 432 -50 Z" fill="#7a2e28"/>
+    <path d="M 432 546 Q 450 552 468 546 L 468 538 Q 450 543 432 538 Z" fill="#7a2e28"/>`;
   // ページ：ちゃんとした開いた本の形。背表紙に向かって紙が沈み、外がわへ ふくらむ。
   //   外がわ（左右）と下には、重なった紙の層（少しずつずらした紙を、奥から順に重ねる）。まん中は、のどの陰
-  const pg=(dx,dy,fill,o)=>`<path d="M ${-30-dx} ${-12+dy} C 120 ${-30+dy} 330 ${-26+dy} 446 ${2+dy} L 454 ${2+dy} C 570 ${-26+dy} 780 ${-30+dy} ${930+dx} ${-12+dy}
-      L ${932+dx} ${498+dy} C 780 ${484+dy} 570 ${486+dy} 454 ${508+dy} L 446 ${508+dy} C 330 ${486+dy} 120 ${484+dy} ${-32-dx} ${498+dy} Z"
+  const pg=(dx,dy,fill,o)=>`<path d="M ${-60-dx} ${-34+dy} C 120 ${-54+dy} 330 ${-50+dy} 446 ${-20+dy} L 454 ${-20+dy} C 570 ${-50+dy} 780 ${-54+dy} ${960+dx} ${-34+dy}
+      L ${962+dx} ${524+dy} C 780 ${508+dy} 570 ${510+dy} 454 ${534+dy} L 446 ${534+dy} C 330 ${510+dy} 120 ${508+dy} ${-62-dx} ${524+dy} Z"
       fill="${fill}" stroke="${L}" stroke-width="1.3" stroke-opacity="${o}" stroke-linejoin="round"/>`;
   pages.innerHTML=`
     <defs>
@@ -107,7 +107,7 @@
     </defs>
     ${pg(10,10,'#ddd0b8',0.7)}${pg(8,8,'#e5d9c4',0.7)}${pg(6,6,'#ddd0b8',0.7)}${pg(4,4,'#e8ddca',0.75)}${pg(2,2,'#e2d6c1',0.8)}
     ${pg(0,0,'url(#gtPaperL)',1)}
-    <rect x="390" y="-30" width="120" height="545" fill="url(#gtGutter)"/>`;
+    <rect x="390" y="-58" width="120" height="604" fill="url(#gtGutter)"/>`;
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 左がわの旗
   const flags=document.createElement('div'); flags.className='gt-flags'; wrap.appendChild(flags);
