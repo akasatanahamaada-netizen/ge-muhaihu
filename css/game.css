@@ -231,9 +231,8 @@ html{ touch-action:manipulation; }                       /* ダブルタップ�
 /* ==========================================================================
    見た目：参考画像（参考画像.jpg）のデザイン
      ・机：灰色の木目（assets/ui/desk_wood.webp）
-     ・本：手描きふうの太い焦げ茶の枠。見開きのまん中に、背表紙の線
+     ・本：手描きふうの太い焦げ茶の枠（ゲーム画面の中は、前のまま）
      ・左上に、紺色のしおり（「menu」のタブと、物語を振り返るタブ）
-     ・右下：出口が開いているときに、ページのめくれ（engine.js の drawPageCurl）
    上の古いデザインのうえに、ここで上書きする（ここを消せば、前の見た目にもどる）
    ========================================================================== */
 :root{ --frame:#45372f; --tab:#25286b; --tab-dark:#181a4e; --tab-gold:#cdb06a; }
@@ -247,36 +246,40 @@ html,body{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024px 5
 .canvas-wrap::after{ content:''; position:absolute; inset:calc(-1 * var(--bw)); border:var(--bw) solid var(--frame); border-radius:5px;
   pointer-events:none; z-index:6; filter:url(#gt-rough) drop-shadow(0 6px 8px rgba(0,0,0,0.3)); }
 canvas#game{ border-radius:0; }
-/* 背表紙の線（見開きのまん中） */
-.canvas-wrap::before{ content:''; position:absolute; top:0; bottom:0; left:50%; width:max(4px,0.75cqw); transform:translateX(-50%);
-  background:var(--frame); pointer-events:none; z-index:1; filter:url(#gt-rough); }
-/* しおりのタブ（左上。本の上のふちから、上へ飛び出している） */
-.gt-tabs{ position:absolute; left:3cqw; bottom:100%; display:flex; align-items:flex-end; gap:0.9cqw; z-index:7; }
-.gt-tab{ position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
-  width:6.2cqw; min-width:46px; background:var(--tab); border:2px solid var(--tab-dark); border-radius:2px;
+/* しおりのタブ（左上）：ふだんは本のうしろに隠れていて、ひもと上のふちだけがのぞく。カーソルを乗せると、上へぴょこっと出てくる
+   （本のうしろに回すため、.canvas-wrap を重なりの基準にして、タブは z-index:-1） */
+.canvas-wrap{ z-index:1; }
+.gt-tabs{ position:absolute; left:3cqw; bottom:100%; display:flex; align-items:flex-end; gap:0.9cqw; z-index:-1; }
+.gt-tab{ --h:6.6cqw; --peek:1.1cqw; position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  width:6.2cqw; min-width:46px; height:var(--h); background:var(--tab); border:2px solid var(--tab-dark); border-radius:2px 2px 0 0;
   color:#f6f0e4; font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600; font-size:clamp(14px,2.2cqw,40px); letter-spacing:0.02em;
-  box-shadow:0 3px 6px rgba(0,0,0,0.3); padding:0; transition:transform .15s; }
-.gt-tab:hover{ transform:translateY(-3px); }
+  padding:1.6cqw 0 0; box-shadow:0 -2px 5px rgba(0,0,0,0.25);
+  transform:translateY(calc(var(--h) - var(--bw) - var(--peek)));        /* ふだん：本の枠のうしろへ沈める（上のふちだけ見える） */
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
+.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.gt-guide, .gt-tab.armed{ transform:translateY(calc(-1 * var(--bw))); }   /* ぴょこっと出る（本の枠より上まで） */
 .gt-tab:focus-visible{ outline:2px solid var(--tab-gold); outline-offset:2px; }
-/* 四すみの金の飾り */
+/* 上の二すみだけ、金の飾り（下は本のうしろに隠れるので、描かない） */
 .gt-tab .orn{ position:absolute; inset:3px; pointer-events:none; --g:var(--tab-gold);
   background:
     linear-gradient(var(--g),var(--g)) top left/22% 2px no-repeat, linear-gradient(var(--g),var(--g)) top left/2px 22% no-repeat,
-    linear-gradient(var(--g),var(--g)) top right/22% 2px no-repeat, linear-gradient(var(--g),var(--g)) top right/2px 22% no-repeat,
-    linear-gradient(var(--g),var(--g)) bottom left/22% 2px no-repeat, linear-gradient(var(--g),var(--g)) bottom left/2px 22% no-repeat,
-    linear-gradient(var(--g),var(--g)) bottom right/22% 2px no-repeat, linear-gradient(var(--g),var(--g)) bottom right/2px 22% no-repeat; }
+    linear-gradient(var(--g),var(--g)) top right/22% 2px no-repeat, linear-gradient(var(--g),var(--g)) top right/2px 22% no-repeat; }
 /* しおりのひも（V の字）と、ひもを通す小さな四角い穴 */
 .gt-tab::before{ content:''; position:absolute; left:50%; bottom:calc(100% - 0.9cqw); width:3.6cqw; min-width:26px; height:5.4cqw; min-height:38px; transform:translateX(-50%);
   background:var(--tab); clip-path:polygon(0 0,28% 0,50% 78%,72% 0,100% 0,62% 100%,38% 100%); z-index:-1; }
 .gt-tab::after{ content:''; position:absolute; left:50%; top:4px; width:0.95cqw; min-width:7px; height:0.95cqw; min-height:7px; transform:translateX(-50%);
   border:2px solid #f6f0e4; border-radius:2px; background:var(--tab); }
-.gt-tab.menu{ height:6.6cqw; min-height:48px; padding-top:1.2cqw; }
-.gt-tab.book{ height:2.8cqw; min-height:22px; }
-.gt-tab.book .label{ display:none; }
-.gt-tab.book svg{ width:1.5cqw; min-width:12px; height:auto; margin-top:0.5cqw; color:var(--tab-gold); }
-/* 「物語を振り返る」タブで本を開くように誘導しているとき：タブが光り、右に吹き出し */
+.gt-tab.book{ --h:5.4cqw; }
+.gt-tab.book svg{ width:1.7cqw; min-width:12px; height:auto; color:var(--tab-gold); }
+/* しおり（メニューの「しおりを挟む」で増える）：色ちがい。出てくると、ステージの名前が見える */
+.gt-tab.mark{ --h:6cqw; font-family:'Zen Old Mincho',serif; font-style:normal; font-weight:700; font-size:clamp(9px,1.05cqw,22px); line-height:1.25; text-align:center; letter-spacing:0; }
+.gt-tab.mark .label{ display:block; padding:0 0.3cqw; }
+.gt-tab.mark.c0{ --tab:#9b2f2a; --tab-dark:#6e1f1b; } .gt-tab.mark.c1{ --tab:#2f6b46; --tab-dark:#1f4a30; } .gt-tab.mark.c2{ --tab:#9a6a1f; --tab-dark:#6c4a14; }
+.gt-tab.mark .ask{ display:none; position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); white-space:nowrap; z-index:2;
+  padding:5px 10px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-size:12px; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
+.gt-tab.mark.armed .ask{ display:block; }
+/* 「物語を振り返る」タブで本を開くように誘導しているとき：タブが出て光り、右に吹き出し */
 .gt-tab.gt-guide{ animation:gtTabGlow 1.1s ease-in-out infinite alternate; }
-@keyframes gtTabGlow{ from{ box-shadow:0 3px 6px rgba(0,0,0,0.3); } to{ box-shadow:0 0 16px 5px rgba(240,207,134,0.8); } }
+@keyframes gtTabGlow{ from{ box-shadow:0 -2px 5px rgba(0,0,0,0.25); } to{ box-shadow:0 0 16px 5px rgba(240,207,134,0.8); } }
 .gt-tab.gt-guide::after{ content:attr(data-guide); left:calc(100% + 12px); top:50%; transform:translateY(-50%); width:auto; height:auto; min-width:0; min-height:0;
   white-space:nowrap; padding:6px 12px; border:none; border-radius:6px; background:#f3ead0; color:#3a2a1a;
   font-family:'Zen Old Mincho',serif; font-style:normal; font-weight:500; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); }

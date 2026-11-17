@@ -2,7 +2,8 @@
    Gravity Tale ── メニュー画面 (menu.js)
    ----------------------------------------------------------------------------
    ・ゲームを開くと、まずこの画面が出る（タイトルともくじ）
-       はじめから / つづきから / ステージをえらぶ / 物語を振り返る / あそびかた
+       （ゲーム中は つづける / しおりを挟む）はじめから / つづきから / ステージをえらぶ / 物語を振り返る / あそびかた
+   ・しおりを挟む … いまのステージに、色ちがいのしおりを挟む。本の上のしおりを押すと、そのステージのはじめにもどれる（3本まで）
    ・ゲーム中は、左上の「≡ メニュー」ボタンか Esc キーで開く（開いているあいだは止まる）
    ・進み具合は、ブラウザに自動でセーブされる（ステージが始まるたび）
        → 「つづきから」で最後のステージから、「ステージをえらぶ」で一度来たステージから遊べる
@@ -108,6 +109,7 @@ menu.innerHTML=`
     <div class="gtm-view" data-view="main">
       <h3>もくじ</h3>
       <button class="gtm-btn" data-act="resume">つづける</button>
+      <button class="gtm-btn" data-act="bookmark">しおりを挟む<small></small></button>
       <button class="gtm-btn" data-act="new">はじめから</button>
       <button class="gtm-btn" data-act="continue">つづきから<small></small></button>
       <button class="gtm-btn" data-act="stages">ステージをえらぶ</button>
@@ -185,6 +187,9 @@ function setView(name){
 }
 function refreshMain(){
   $('[data-act="resume"]').style.display = inGame ? '' : 'none';
+  const bm=$('[data-act="bookmark"]'), here=GT.scene && GT.playlist.indexOf(GT.scene.id)>=0 && save.scenes[GT.scene.id];
+  bm.style.display = inGame && here ? '' : 'none';
+  bm.querySelector('small').textContent = here ? sceneName(GT.scene.id) : '';
   const c=$('[data-act="continue"]'), has=save.last && save.scenes[save.last];
   c.disabled=!has; c.querySelector('small').textContent = has ? sceneName(save.last) : '';
   $('[data-act="stages"]').disabled = !Object.keys(save.scenes).length;
@@ -238,6 +243,7 @@ menu.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b || b.disabled) return;
   switch(b.dataset.act){
     case 'resume':   hideMenu(); break;
+    case 'bookmark': addBookmark(); hideMenu(); break;
     case 'new':      startNew(); break;
     case 'continue': startFrom(save.last); break;
     case 'stages':   setView('stages'); break;
@@ -275,4 +281,28 @@ window.addEventListener('keydown',e=>{
 }, true);
 
 GT.showMenu=showMenu; GT.hideMenu=hideMenu;
+
+/* ---- しおり：メニューの「しおりを挟む」で、いまのステージにしおりを挟む。本の上に色ちがいのしおりが増え、
+   押すと、そのステージのはじめにもどれる（挟んだときの分岐・本のページも、いっしょにもどる）。
+   しおりは BOOKMARK_MAX 本まで。それより多く挟むと、いちばん古いしおりが外れる。セーブといっしょにブラウザに残る ---- */
+const BOOKMARK_MAX=3;
+const bookmarkHooks=[];
+function bookmarks(){ return save.bookmarks||(save.bookmarks=[]); }
+function changed(){ writeSave(); for(const f of bookmarkHooks) f(); }
+function addBookmark(){
+  const id=GT.scene && GT.scene.id, st=id && save.scenes[id]; if(!st) return;
+  const list=bookmarks();
+  const used=new Set(list.map(b=>b.color));
+  const color=[0,1,2].find(c=>!used.has(c)) ?? (list[0] ? list[0].color : 0);
+  list.push({ id, name:sceneName(id), state:clone(st), color });
+  while(list.length>BOOKMARK_MAX) list.shift();
+  GT.sfx&&GT.sfx('page'); changed();
+}
+GT.getBookmarks=()=>bookmarks().map(b=>({id:b.id, name:b.name, color:b.color}));
+GT.onBookmarksChange=fn=>{ bookmarkHooks.push(fn); };
+GT.jumpBookmark=i=>{ const b=bookmarks()[i]; if(!b) return;
+  applyState(b.state); rebuildScenes();
+  const idx=GT.SCENES.findIndex(s=>s.id===b.id); if(idx<0) return;
+  inGame=true; hideMenu(); GT.flipToScene(idx, b.state.pageNo||1); };          // ページをめくって、しおりのページへ
+GT.removeBookmark=i=>{ bookmarks().splice(i,1); changed(); };
 })();

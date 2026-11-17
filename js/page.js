@@ -71,6 +71,24 @@
     book.className='gt-tab book'; book.textContent=''; book.insertAdjacentHTML('afterbegin','<span class="orn"></span>');
     if(svg) book.appendChild(svg);
     book.title='物語を振り返る'; book.setAttribute('aria-label','物語を振り返る'); tabs.appendChild(book); }
+  // 挟んだしおり（menu.js の「しおりを挟む」）：1回押すと「もう一度で、このページへもどる」、2.5秒以内にもう一度押すと、もどる。
+  // 右クリック（スマホは長押し）で、しおりを外す
+  function drawMarks(){
+    tabs.querySelectorAll('.gt-tab.mark').forEach(e=>e.remove());
+    (GT.getBookmarks?GT.getBookmarks():[]).forEach((m,i)=>{
+      const t=document.createElement('button'); t.type='button'; t.className='gt-tab mark c'+m.color;
+      const short=String(m.name).replace(/^.*──\s*/,'');
+      t.innerHTML='<span class="orn"></span><span class="label"></span><span class="ask">もう一度押すと、このページへもどる</span>';
+      t.querySelector('.label').textContent=short; t.title='しおり：'+m.name+'（右クリックで外す）'; t.setAttribute('aria-label','しおり：'+m.name);
+      let armT=0;
+      t.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation();
+        if(performance.now()<armT){ armT=0; t.classList.remove('armed'); GT.jumpBookmark(i); return; }
+        armT=performance.now()+2500; t.classList.add('armed'); setTimeout(()=>{ if(performance.now()>=armT) t.classList.remove('armed'); },2600); });
+      t.addEventListener('contextmenu',e=>{ e.preventDefault(); GT.removeBookmark(i); });
+      tabs.appendChild(t);
+    });
+  }
+  if(GT.onBookmarksChange){ GT.onBookmarksChange(drawMarks); drawMarks(); }
   const fs=document.getElementById('fsBtn'); if(fs) document.body.appendChild(fs);
   const under=document.querySelector('.under'); if(under) under.style.display='none';
 })();
