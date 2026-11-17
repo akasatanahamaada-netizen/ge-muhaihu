@@ -309,11 +309,3 @@ canvas#game{ border-radius:0; }
 
 .gt-flag:nth-child(3){ transform:translateX(0) rotate(-0.6deg); }
 .gt-flag.reset.armed{ transform:translateX(-3.4cqw) rotate(0); background:#c2453b; }   /* 1回押したとき：出たまま、明るい赤で「Again?」 */
-
-/* ---- 参考画像２の絵に合わせて：影・光・グラデーションをなくし、平らな色に ---- */
-.gt-flag, .gt-flag:nth-child(2), .gt-flag:nth-child(3){ filter:none; }
-.gt-flag{ font-weight:400; letter-spacing:0.01em; clip-path:polygon(0 0,calc(100% - 0.5cqw) 0,100% 0.5cqw,100% calc(100% - 0.5cqw),calc(100% - 0.5cqw) 100%,0 100%,2.6cqw 50%); }
-.gt-flag.gt-guide{ animation:none; outline:3px solid #f3d7a0; outline-offset:2px; clip-path:none; }
-.gt-tab{ box-shadow:none; font-family:'Caveat',cursive; font-weight:400; }
-.gt-tab.gt-guide{ animation:none; }
-#fsBtn{ background:#46382f; border:none; box-shadow:none; }

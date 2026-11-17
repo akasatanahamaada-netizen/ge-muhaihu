@@ -80,24 +80,34 @@
     e.setAttribute('preserveAspectRatio','none'); e.setAttribute('aria-hidden','true'); return e; };
   const cover=layer('gt-cover'), pages=layer('gt-pages');
   const L='#c4a574';
-  // 参考画像２（作者の絵）に合わせる：影やグラデーションは使わず、平らな色と、手で引いたような線だけで描く
-  //   表紙 … 平らな焦げ茶。右と下のふちに、こい線
-  //   ページ … 平らなクリーム色（ふちの線はなし）。内がわに、紙の厚みを表すベージュの線（ふちの近くに2〜3本。ところどころ はみ出したり重なったりする）
-  //   まん中 … 細い折り目の線
+  // 表紙：焦げ茶の厚い板。机に落ちる影・下と右に見える板の厚み・上のふちのかすかな光・まん中の背表紙（ふくらみと、頭と尻の飾り布）
   cover.innerHTML=`
-    <path d="M -52 -30 L 952 -32 L 954 516 L -51 518 Z" fill="#46382f" filter="url(#gt-rough)"/>
-    <path d="M 950 -26 L 952 514 L 300 517" fill="none" stroke="#211814" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#gt-rough)"/>`;
-  const st=(d,w,o)=>`<path d="${d}" stroke-width="${w||2.4}" opacity="${o||1}"/>`;
+    <defs>
+      <linearGradient id="gtCoverG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55433a"/><stop offset="0.45" stop-color="#46372f"/><stop offset="1" stop-color="#382b24"/></linearGradient>
+      <linearGradient id="gtSpineG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2c221c" stop-opacity="0"/><stop offset="0.35" stop-color="#2c221c" stop-opacity="0.55"/>
+        <stop offset="0.5" stop-color="#5a473c" stop-opacity="0.6"/><stop offset="0.65" stop-color="#2c221c" stop-opacity="0.55"/><stop offset="1" stop-color="#2c221c" stop-opacity="0"/></linearGradient>
+      <filter id="gtShadow" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="7"/></filter>
+    </defs>
+    <rect x="-46" y="-20" width="1004" height="546" rx="6" fill="rgba(20,14,10,0.45)" filter="url(#gtShadow)"/>
+    <rect x="-49" y="-26" width="1004" height="546" rx="5" fill="#261c17"/>
+    <rect x="-52" y="-30" width="1004" height="546" rx="5" fill="url(#gtCoverG)" stroke="#2a201b" stroke-width="2"/>
+    <path d="M -46 -27 L 946 -27" stroke="rgba(255,228,196,0.16)" stroke-width="2" stroke-linecap="round"/>
+    <rect x="420" y="-30" width="60" height="546" fill="url(#gtSpineG)"/>
+    <path d="M 432 -30 Q 450 -36 468 -30 L 468 -22 Q 450 -27 432 -22 Z" fill="#7a2e28"/>
+    <path d="M 432 516 Q 450 522 468 516 L 468 508 Q 450 513 432 508 Z" fill="#7a2e28"/>`;
+  // ページ：ちゃんとした開いた本の形。背表紙に向かって紙が沈み、外がわへ ふくらむ。
+  //   外がわ（左右）と下には、重なった紙の層（少しずつずらした紙を、奥から順に重ねる）。まん中は、のどの陰
+  const pg=(dx,dy,fill,o)=>`<path d="M ${-30-dx} ${-12+dy} C 120 ${-30+dy} 330 ${-26+dy} 446 ${2+dy} L 454 ${2+dy} C 570 ${-26+dy} 780 ${-30+dy} ${930+dx} ${-12+dy}
+      L ${932+dx} ${498+dy} C 780 ${484+dy} 570 ${486+dy} 454 ${508+dy} L 446 ${508+dy} C 330 ${486+dy} 120 ${484+dy} ${-32-dx} ${498+dy} Z"
+      fill="${fill}" stroke="${L}" stroke-width="1.3" stroke-opacity="${o}" stroke-linejoin="round"/>`;
   pages.innerHTML=`
-    <path d="M -34 -8 Q 200 -18 446 4 L 454 4 Q 700 -18 934 -10 L 936 498 Q 700 482 454 512 L 446 512 Q 200 482 -36 496 Z" fill="#eee6da"/>
-    <g fill="none" stroke="#c4a574" stroke-linecap="round" stroke-linejoin="round" filter="url(#gt-soft)">
-      ${st('M -30 -6 Q 200 -17 446 5')}${st('M 454 5 Q 700 -17 930 -8')}${st('M 420 -2 Q 440 2 452 8',1.6,0.8)}
-      ${st('M -22 -2 L -21 492',2.6)}${st('M -14 4 Q -12 250 -13 486',2.2)}${st('M -24 40 L -23 300',1.4,0.7)}
-      ${st('M 923 -6 L 922 492',2.6)}${st('M 915 0 Q 913 250 914 488',2.2)}${st('M 907 4 L 906 484',1.6,0.85)}${st('M 919 360 L 918 470',1.4,0.7)}
-      ${st('M -30 494 Q 200 478 440 506',2.6)}${st('M -10 488 Q 220 474 436 498',1.6,0.8)}${st('M 60 498 L 130 497',1.6,0.7)}
-      ${st('M 458 506 Q 700 478 928 494',2.6)}${st('M 600 486 Q 780 478 930 490',1.8,0.85)}${st('M 700 499 L 760 498',1.6,0.7)}
-    </g>
-    <path d="M 450 6 L 450 508" stroke="#b7aa98" stroke-width="1.2" fill="none"/>`;
+    <defs>
+      <linearGradient id="gtGutter" x1="0" y1="0" x2="1" y2="0"><stop offset="0.44" stop-color="#8a6c4a" stop-opacity="0"/><stop offset="0.5" stop-color="#8a6c4a" stop-opacity="0.28"/><stop offset="0.56" stop-color="#8a6c4a" stop-opacity="0"/></linearGradient>
+      <linearGradient id="gtPaperL" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e2d6c1"/><stop offset="0.12" stop-color="#efe7da"/><stop offset="0.9" stop-color="#efe7da"/><stop offset="1" stop-color="#e2d6c1"/></linearGradient>
+    </defs>
+    ${pg(10,10,'#ddd0b8',0.7)}${pg(8,8,'#e5d9c4',0.7)}${pg(6,6,'#ddd0b8',0.7)}${pg(4,4,'#e8ddca',0.75)}${pg(2,2,'#e2d6c1',0.8)}
+    ${pg(0,0,'url(#gtPaperL)',1)}
+    <rect x="390" y="-30" width="120" height="545" fill="url(#gtGutter)"/>`;
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 左がわの旗
   const flags=document.createElement('div'); flags.className='gt-flags'; wrap.appendChild(flags);
