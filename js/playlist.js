@@ -80,7 +80,7 @@ GT.playlist = [
 // （水彩の森と遠い城の絵 'assets/background/水彩で描く静かな森と遠い城.webp' も使える）
 const BG_DAY='assets/background/ohiru no mori.webp', BG_EVENING='assets/background/yuugata no mori.webp';
 const BG_DARK='assets/background/霧深き森のゴシック童話.webp';   // 霧の深い、暗い森（近道①：狼を追って、森の奥へ）
-const BG_ROSE='assets/background/霧深き薔薇の森１.webp';          // 霧の深い、いばらと薔薇の森（近道②：いばらのトンネル）
+const BG_ROSE='assets/background/薔薇咲く霧深きゴシックの森.webp';   // 霧の深い、薔薇の咲く森（近道②：いばらのトンネル）
 const S=src=>({src,page:'spread'});
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
