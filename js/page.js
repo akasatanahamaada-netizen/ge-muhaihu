@@ -80,34 +80,67 @@
     e.setAttribute('preserveAspectRatio','none'); e.setAttribute('aria-hidden','true'); return e; };
   const cover=layer('gt-cover'), pages=layer('gt-pages');
   const L='#c4a574';
-  // 表紙：焦げ茶の厚い板。机に落ちる影・下と右に見える板の厚み・上のふちのかすかな光・まん中の背表紙（ふくらみと、頭と尻の飾り布）
+  // 本のまわりを、できるだけ本物らしく（ゲーム画面の座標で、表紙は -58〜958 × -36〜530、ページは -40〜940 × -20〜516）
+  //   表紙 … 革の地（こまかい しぼ と、まだらの色むら）、ふちの面取りの光と影、すり切れた角、下と右に見える板の厚み、机に落ちる影
+  //   背表紙 … まん中の ふくらみ と、頭と尻の飾り布
+  //   ページ … 重なった紙の束（こまかい線がたくさん）、紙のこまかい地、のど（まん中）へ向かって紙が沈む陰、ふちのかすかな焼け
+  const COVER='M -52 -36 L 952 -36 Q 958 -36 958 -30 L 958 524 Q 958 530 952 530 L -52 530 Q -58 530 -58 524 L -58 -30 Q -58 -36 -52 -36 Z';
   cover.innerHTML=`
     <defs>
-      <linearGradient id="gtCoverG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55433a"/><stop offset="0.45" stop-color="#46372f"/><stop offset="1" stop-color="#382b24"/></linearGradient>
-      <linearGradient id="gtSpineG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2c221c" stop-opacity="0"/><stop offset="0.35" stop-color="#2c221c" stop-opacity="0.55"/>
-        <stop offset="0.5" stop-color="#5a473c" stop-opacity="0.6"/><stop offset="0.65" stop-color="#2c221c" stop-opacity="0.55"/><stop offset="1" stop-color="#2c221c" stop-opacity="0"/></linearGradient>
-      <filter id="gtShadow" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="7"/></filter>
+      <linearGradient id="gtCoverG" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#5a463b"/><stop offset="0.5" stop-color="#47372e"/><stop offset="1" stop-color="#3a2c24"/></linearGradient>
+      <linearGradient id="gtSpineG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1e1611" stop-opacity="0"/><stop offset="0.3" stop-color="#1e1611" stop-opacity="0.5"/>
+        <stop offset="0.5" stop-color="#6b5446" stop-opacity="0.55"/><stop offset="0.7" stop-color="#1e1611" stop-opacity="0.5"/><stop offset="1" stop-color="#1e1611" stop-opacity="0"/></linearGradient>
+      <filter id="gtShadow" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="9"/></filter>
+      <filter id="gtLeather" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0 0.03  0 0 0 -1.6 1.15" result="grain"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="8" result="m"/>
+        <feColorMatrix in="m" type="matrix" values="0 0 0 0 0.75  0 0 0 0 0.62  0 0 0 0 0.5  0 0 0 0.9 -0.32" result="mottle"/>
+        <feMerge><feMergeNode in="mottle"/><feMergeNode in="grain"/></feMerge>
+      </filter>
+      <clipPath id="gtCoverClip"><path d="${COVER}"/></clipPath>
     </defs>
-    <rect x="-52" y="-28" width="1016" height="560" rx="6" fill="rgba(20,14,10,0.45)" filter="url(#gtShadow)"/>
-    <rect x="-55" y="-32" width="1016" height="566" rx="5" fill="#261c17"/>
-    <rect x="-58" y="-36" width="1016" height="566" rx="5" fill="url(#gtCoverG)" stroke="#2a201b" stroke-width="2"/>
-    <path d="M -52 -33 L 952 -33" stroke="rgba(255,228,196,0.16)" stroke-width="2" stroke-linecap="round"/>
-    <rect x="420" y="-36" width="60" height="566" fill="url(#gtSpineG)"/>
-    <path d="M 432 -36 Q 450 -42 468 -36 L 468 -28 Q 450 -33 432 -28 Z" fill="#7a2e28"/>
-    <path d="M 432 530 Q 450 536 468 530 L 468 522 Q 450 527 432 522 Z" fill="#7a2e28"/>`;
-  // ページ：ちゃんとした開いた本の形。背表紙に向かって紙が沈み、外がわへ ふくらむ。
-  //   外がわ（左右）と下には、重なった紙の層（少しずつずらした紙を、奥から順に重ねる）。まん中は、のどの陰
-  const pg=(dx,dy,fill,o)=>`<path d="M ${-40-dx} ${-20+dy} C 120 ${-36+dy} 330 ${-32+dy} 446 ${-6+dy} L 454 ${-6+dy} C 570 ${-32+dy} 780 ${-36+dy} ${940+dx} ${-20+dy}
-      L ${942+dx} ${504+dy} C 780 ${492+dy} 570 ${494+dy} 454 ${516+dy} L 446 ${516+dy} C 330 ${494+dy} 120 ${492+dy} ${-42-dx} ${504+dy} Z"
-      fill="${fill}" stroke="${L}" stroke-width="1.3" stroke-opacity="${o}" stroke-linejoin="round"/>`;
+    <path d="${COVER}" transform="translate(8 14)" fill="rgba(18,12,8,0.5)" filter="url(#gtShadow)"/>
+    <path d="${COVER}" transform="translate(3 5)" fill="#22180f"/>
+    <path d="${COVER}" fill="url(#gtCoverG)"/>
+    <g clip-path="url(#gtCoverClip)">
+      <rect x="-60" y="-40" width="1020" height="575" filter="url(#gtLeather)" opacity="0.55"/>
+      <rect x="420" y="-36" width="60" height="566" fill="url(#gtSpineG)"/>
+      <path d="${COVER}" fill="none" stroke="rgba(255,226,190,0.18)" stroke-width="3" transform="translate(1.5 1.5)"/>
+      <path d="${COVER}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="3" transform="translate(-1.5 -1.5)"/>
+      <path d="M -58 -24 L -46 -36 M 946 -36 L 958 -24 M -58 518 L -46 530 M 946 530 L 958 518" stroke="rgba(170,140,110,0.35)" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <path d="${COVER}" fill="none" stroke="#1d150f" stroke-width="1.6"/>
+    <path d="M 432 -36 Q 450 -43 468 -36 L 468 -27 Q 450 -33 432 -27 Z" fill="#7a2e28" stroke="#4a1a16" stroke-width="0.8"/>
+    <path d="M 435 -33 Q 450 -38 465 -33" stroke="#c9a46a" stroke-width="0.8" fill="none"/>
+    <path d="M 432 530 Q 450 537 468 530 L 468 521 Q 450 527 432 521 Z" fill="#7a2e28" stroke="#4a1a16" stroke-width="0.8"/>`;
+  // ページ：top=上のふちの高さ、bot=下のふちの高さ（ずらしで、紙の束を描く）
+  const pagePathD=(dx,dy)=>`M ${-40-dx} ${-20+dy} C 120 ${-36+dy} 330 ${-32+dy} 446 ${-6+dy} L 454 ${-6+dy} C 570 ${-32+dy} 780 ${-36+dy} ${940+dx} ${-20+dy}
+      L ${942+dx} ${504+dy} C 780 ${492+dy} 570 ${494+dy} 454 ${516+dy} L 446 ${516+dy} C 330 ${494+dy} 120 ${492+dy} ${-42-dx} ${504+dy} Z`;
+  let stack='';
+  for(let k=12;k>=1;k--){ const d=k*1.05;                                  // 紙の束：奥の紙ほど少し外へ・下へ。ふちは、明るい線と暗い線がこまかく交互に
+    stack+=`<path d="${pagePathD(d,d*0.9)}" fill="${k%2?'#e9e0cd':'#d8cbb1'}" stroke="${k%2?'#cdbd9c':'#efe6d4'}" stroke-width="0.7"/>`; }
   pages.innerHTML=`
     <defs>
-      <linearGradient id="gtGutter" x1="0" y1="0" x2="1" y2="0"><stop offset="0.44" stop-color="#8a6c4a" stop-opacity="0"/><stop offset="0.5" stop-color="#8a6c4a" stop-opacity="0.28"/><stop offset="0.56" stop-color="#8a6c4a" stop-opacity="0"/></linearGradient>
-      <linearGradient id="gtPaperL" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e2d6c1"/><stop offset="0.12" stop-color="#efe7da"/><stop offset="0.9" stop-color="#efe7da"/><stop offset="1" stop-color="#e2d6c1"/></linearGradient>
+      <linearGradient id="gtPaperL" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="940" y2="0">
+        <stop offset="0" stop-color="#e3d7c0"/><stop offset="0.05" stop-color="#f0e8d9"/><stop offset="0.4" stop-color="#f1e9db"/>
+        <stop offset="0.47" stop-color="#e2d6bf"/><stop offset="0.495" stop-color="#c6b493"/><stop offset="0.505" stop-color="#c6b493"/>
+        <stop offset="0.53" stop-color="#e2d6bf"/><stop offset="0.6" stop-color="#f1e9db"/><stop offset="0.95" stop-color="#f0e8d9"/><stop offset="1" stop-color="#e3d7c0"/></linearGradient>
+      <linearGradient id="gtPaperV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b89a6a" stop-opacity="0.18"/><stop offset="0.05" stop-color="#b89a6a" stop-opacity="0"/>
+        <stop offset="0.95" stop-color="#b89a6a" stop-opacity="0"/><stop offset="1" stop-color="#b89a6a" stop-opacity="0.22"/></linearGradient>
+      <filter id="gtPaperGrain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="5"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.24  0 0 0 -1.2 0.75"/>
+      </filter>
+      <clipPath id="gtPageClip"><path d="${pagePathD(0,0)}"/></clipPath>
     </defs>
-    ${pg(10,10,'#ddd0b8',0.7)}${pg(8,8,'#e5d9c4',0.7)}${pg(6,6,'#ddd0b8',0.7)}${pg(4,4,'#e8ddca',0.75)}${pg(2,2,'#e2d6c1',0.8)}
-    ${pg(0,0,'url(#gtPaperL)',1)}
-    <rect x="390" y="-36" width="120" height="566" fill="url(#gtGutter)"/>`;
+    ${stack}
+    <path d="${pagePathD(0,0)}" fill="url(#gtPaperL)" stroke="#bfa985" stroke-width="0.9"/>
+    <g clip-path="url(#gtPageClip)">
+      <rect x="-50" y="-40" width="1000" height="570" fill="url(#gtPaperV)"/>
+      <rect x="-50" y="-40" width="1000" height="570" filter="url(#gtPaperGrain)" opacity="0.5"/>
+      <path d="M 447 -10 L 447 520 M 453 -10 L 453 520" stroke="rgba(255,250,238,0.35)" stroke-width="1.2"/>
+    </g>`;
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 本の上に横にして置いた栞（作者の絵 assets/komono/栞.png）：「Reread」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）
   //   カーソルを乗せると、すこし持ち上がる。やり直すボタンは、ゲーム画面の右上（engine.js の「↺ やり直す」）
