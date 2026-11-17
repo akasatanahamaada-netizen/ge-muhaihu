@@ -40,7 +40,8 @@ setTimeout(()=>{ const w=wantNow(); if(w){ const p=player(w); p.el.play().then((
 GT.onSceneStart(scene=>{
   muted=false;
   // id で決める（GT.sceneMusic）。id の無い差しこみシーン（ボス戦・QTE）は、種類で決める（GT.sceneTypeMusic）
-  const next=(GT.sceneMusic||{})[scene && scene.id]||(GT.sceneTypeMusic||{})[scene && scene.type]||null;
+  let next=(GT.sceneMusic||{})[scene && scene.id]||(GT.sceneTypeMusic||{})[scene && scene.type]||null;
+  if(typeof next==='function') next=next(GT.flags)||null;      // 分岐で曲を変えるとき（例：結末の種類）
   if(next!==sceneWant){                                        // 別の曲になったら、新しい曲は頭から（止まっていれば）
     if(sceneWant && players[sceneWant]) players[sceneWant].restart=true;
     if(next && players[next] && players[next].el.paused) players[next].restart=true; }

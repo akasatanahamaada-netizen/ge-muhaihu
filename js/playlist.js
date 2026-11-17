@@ -103,23 +103,25 @@ GT.stageBackgrounds = {
 const M=n=>'assets/music/'+n+'.mp3';
 const BGM_ADVENTURE=M('小さな勇者の探検');   // 冒険（アクションのステージ）
 const BGM_THORN=M('荊の庭');                 // 近道（いばらの道）
-const BGM_FALSE=M('虚像 (1)');               // おばあさんの家の前〜家の中（狼が、おばあさんのふりをしている）
+const BGM_SAD=M('堕ちる');                    // 悲しい曲（おばあさんを助けられなかった結末）
 GT.sceneMusic = {
   opening:  M('ふしぎな絵本'),                // 最初の物語ステージ（本の中で目を覚ます）。前は『異世界へようこそ』
   komichi1: BGM_ADVENTURE, komichi2: BGM_ADVENTURE, path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
   house_peek: M('魔法使いの箱庭'),             // 赤ずきんの家（窓のぞき）
   meet_hood:  M('魔法使いの箱庭'),             // 赤ずきんと出会う・水たまりを越える
-  wolf_talk:M('お騒がせなオバケたち'),         // 狼の初登場
+  wolf_talk:M('虚像 (1)'),                     // 狼の初登場（うそをつく狼）。前は『お騒がせなオバケたち』
   crossroads:M('かくれんぼの庭。'),            // 分かれ道（近道か遠回りかを選ぶ）
   path2: BGM_THORN, path2b: BGM_THORN,          // 近道（いばらの道）。前は『悪魔の悪戯』
   flowers:  M('魔法使いの箱庭'),               // お花畑（のんびりした曲）
   path3: M('悪魔の悪戯'), path4: M('悪魔の悪戯'),   // 遠回りの道（続けて流れる）
-  house_front:BGM_FALSE, arrive:BGM_FALSE,      // おばあさんの家の前・家に到着。前は『時を刻む森』
-  ending:   M('抒情歌「二つの草」'),           // 戦いのあと（部屋の中）。前は『時を刻む森』
+  house_front:M('時を刻む森'), arrive:M('時を刻む森'),   // おばあさんの家の前・家に到着
+  // 戦いのあと（部屋の中）：おばあさんも助かった結末は『抒情歌「二つの草」』、助けられなかった結末は悲しい『堕ちる』
+  //   （結末の決まり方は 12_grannys_house.js の 'result'：おばあさんが助かるのは、近道で、赤ずきんも助けたときだけ）
+  ending: f=> (f.route==='shortcut' && f.saved!==false) ? M('抒情歌「二つの草」') : BGM_SAD,
   epilogue: M('世界の最果てで、自由を謳う'),   // 外に出た場面（夕暮れ／夜明け）〜エンディングの画面
 };
-// 最終戦闘（おばあさんの家で差しこまれるボス戦・QTE。id が無いので、シーンの種類で決める）。前は『Foehn_Wind』
-GT.sceneTypeMusic = { boss:M('堕ちる'), qte:M('堕ちる') };
+// 最終戦闘（おばあさんの家で差しこまれるボス戦・QTE。id が無いので、シーンの種類で決める）
+GT.sceneTypeMusic = { boss:M('Foehn_Wind'), qte:M('Foehn_Wind') };
 GT.titleMusic = M('魔法の扉は夜開く (1)');    // タイトル（メニュー）画面。前は『世界の最果てで、自由を謳う』
 GT.bookMusic  = M('時計図書館 (1)');          // 本を読み返す画面（Reread）
 
