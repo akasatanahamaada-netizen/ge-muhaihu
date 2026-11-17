@@ -928,7 +928,8 @@ function drawTalkMark(cx,cy,g,near,must){
   const t=performance.now()/1000, bob=Math.sin(t*3)*2.5, k=near?1.15+0.06*Math.sin(t*6):1;
   ctx.save(); ctx.translate(cx,cy+bob*g); ctx.scale(k,k);
   const w=30, h=20;
-  const fill = near ? '#f6e2b0' : '#fffaf0', line = near ? '#b08d57' : '#8a7a5a';
+  const fill = near ? '#fff4d6' : '#fffaf0', line = near ? '#c0902a' : '#8a7a5a';
+  const GOLD='#c0902a';   // 「！」「…」の色（金色）
   ctx.beginPath(); roundRectPath(-w/2,-h/2,w,h,9);
   ctx.fillStyle=fill; ctx.fill(); ctx.lineWidth=1.6; ctx.strokeStyle=line; ctx.stroke();
   // しっぽ（人のほうへ向ける）。枠の線をまたいで塗り、つなぎ目を消す
@@ -936,11 +937,11 @@ function drawTalkMark(cx,cy,g,near,must){
   ctx.beginPath(); ctx.moveTo(-5,ty+d); ctx.lineTo(-1,tip); ctx.lineTo(4,ty+d); ctx.closePath(); ctx.fill();
   ctx.beginPath(); ctx.moveTo(-5,ty); ctx.lineTo(-1,tip); ctx.lineTo(4,ty); ctx.stroke();
   if(must){                                                                            // 「！」（話さないと進めない）
-    ctx.fillStyle='#b8423f';
+    ctx.fillStyle=GOLD;
     ctx.beginPath(); ctx.moveTo(-2.6,-6.5); ctx.lineTo(2.6,-6.5); ctx.lineTo(1.4,2.5); ctx.lineTo(-1.4,2.5); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.arc(0,5.6,1.9,0,Math.PI*2); ctx.fill();
   } else {
-    ctx.fillStyle='#5a4630';
+    ctx.fillStyle=GOLD;
     for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.arc(i*7, 0, 2.2, 0, Math.PI*2); ctx.fill(); }   // 「…」（話さなくても進める）
   }
   ctx.restore();
