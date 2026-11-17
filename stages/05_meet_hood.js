@@ -24,7 +24,7 @@ const ctx=GT.ctx, W=GT.W, H=GT.H, EDGE=GT.EDGE, FLOOR=H-GT.EDGE, SPINE=GT.SPINE;
 const POND={x:560, y:448, w:210};          // 水たまり（y は水面の高さ）
 const HW=32, HH=40;                        // 赤ずきんの大きさ（engine の NPC と同じ）
 const HOOD_START=300;                      // はじめにいる場所（ここから鼻歌を歌いながら、右へゆっくり歩いていく）
-const HOOD_STROLL_END=470;                 // 歩いていく先（水たまりの手前）。ここで立ち止まって待つ
+const HOOD_STROLL_END=SPINE-HW-14;         // 歩いていく先。左のページのうちに（背表紙の手前で）立ち止まって待つ
 const HOOD_STROLL_SPEED=26;                // 歩く速さ（px/秒）。少年よりずっと遅いので、すぐ追いつける
 
 // --- 地形 ------------------------------------------------------------------
