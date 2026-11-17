@@ -309,3 +309,14 @@ canvas#game{ border-radius:0; }
 
 .gt-flag:nth-child(3){ transform:translateX(0) rotate(-0.6deg); }
 .gt-flag.reset.armed{ transform:translateX(-3.4cqw) rotate(0); background:#c2453b; }   /* 1回押したとき：出たまま、明るい赤で「Again?」 */
+
+/* ---- しおり：作者の絵（assets/komono/栞.png。数字を消した shiori_blank.webp を使い、数字 Ⅰ〜Ⅴ はここで重ねる） ----
+   細長いしおり。上（ひも・飾り・数字・星）がページの上から出ていて、下はページのあいだに挟まっている。
+   カーソルを乗せると、すーっと引き出される（下のはしは、引き出してもページのうしろ） */
+.gt-tabs{ top:calc(-1 * (16cqw * 0.64 + 1.4cqw)); gap:1cqw; }
+.gt-tab{ --h:16cqw; width:4.6cqw; min-width:30px; flex:none; height:var(--h); padding:0; border:none; border-radius:0; box-shadow:none;
+  background:url('../assets/komono/shiori_blank.webp') center top/100% 100% no-repeat; }
+.gt-tab::before, .gt-tab::after, .gt-tab .orn{ display:none; }
+.gt-tab .num{ position:absolute; left:0; right:0; top:36%; height:20%; display:flex; align-items:center; justify-content:center;
+  font-family:'Cormorant Garamond',serif; font-weight:700; font-size:clamp(14px,2.6cqw,50px); line-height:1; color:#f3e3bd; }
+.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(-2.2cqw); }
