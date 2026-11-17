@@ -248,19 +248,20 @@ body.gt-full{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024p
 .book-frame::before, .book-frame::after{ display:none; }
 /* ゲーム画面のまわりに、表紙とページのふちのぶんの余白（--gw … 全画面のときのゲーム画面の幅。js/page.js） */
 .canvas-wrap, .book-frame.is-full .canvas-wrap{ z-index:1; box-shadow:none; border-radius:0;
-  margin:calc(var(--gw,900px) * 0.12) calc(var(--gw,900px) * 0.07) calc(var(--gw,900px) * 0.05) calc(var(--gw,900px) * 0.18) !important; }
+  margin:calc(var(--gw,900px) * 0.12) calc(var(--gw,900px) * 0.19) calc(var(--gw,900px) * 0.05) calc(var(--gw,900px) * 0.19) !important; }   /* 左右おなじ：本は真ん中 */
 canvas#game{ border-radius:0; }
 /* 表紙と、開いたページ（ゲーム画面のうしろ。ゲーム画面のまわりだけが見える） */
-.gt-cover{ position:absolute; left:-6.667%; top:-8.333%; width:113.333%; height:116.667%; z-index:-1; pointer-events:none; overflow:visible; }
+.gt-cover, .gt-pages{ position:absolute; left:-6.667%; top:-8.333%; width:113.333%; height:116.667%; pointer-events:none; overflow:visible; }
+.gt-cover{ z-index:-3; } .gt-pages{ z-index:-1; }   /* あいだ（z-index:-2）に、しおりと旗 */
 /* 左がわの赤いリボンの旗（Reread・menu） */
-.gt-flags{ position:absolute; right:calc(100% + 4.2cqw); top:12%; display:flex; flex-direction:column; gap:2.2cqw; z-index:-2; }
+.gt-flags{ position:absolute; right:calc(100% + 1.2cqw); top:12%; display:flex; flex-direction:column; gap:2.2cqw; z-index:-2; }
 .gt-flag{ position:relative; width:12.5cqw; min-width:80px; height:5.2cqw; min-height:32px; border:none; padding:0 0 0 2.6cqw; cursor:pointer;
   background:var(--flag); color:#fbf4ea; font-family:'Caveat',cursive; font-weight:500; font-size:clamp(15px,2.7cqw,52px); line-height:1; text-align:left;
   clip-path:polygon(0 0,100% 0,100% 100%,0 100%,2.2cqw 50%);                      /* 左はしは、リボンの切りこみ */
-  filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25)); transform:translateX(1.2cqw) rotate(-1.5deg);   /* ふだん：はしが少し本のうしろ */
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25)); transform:translateX(0) rotate(-1.5deg);   /* ふだん：右はしは、ページのあいだに挟まっている */
   transition:transform .25s cubic-bezier(.34,1.56,.64,1); }
-.gt-flag:nth-child(2){ transform:translateX(1.2cqw) rotate(1deg); }
-.gt-flag:hover, .gt-flag:focus-visible, .gt-flag.gt-guide{ transform:translateX(-2.8cqw) rotate(0); }                  /* すっと出る */
+.gt-flag:nth-child(2){ transform:translateX(0) rotate(1deg); }
+.gt-flag:hover, .gt-flag:focus-visible, .gt-flag.gt-guide{ transform:translateX(-3cqw) rotate(0); }                    /* 引き出す */
 .gt-flag:focus-visible{ outline:2px solid #f3d7a0; outline-offset:2px; }
 .gt-flag svg, .gt-flag small{ display:none; }
 /* 「Reread」で本を開くように誘導しているとき：旗が出て光り、下に吹き出し */
@@ -269,12 +270,12 @@ canvas#game{ border-radius:0; }
 .gt-flag.gt-guide::after{ content:attr(data-guide); position:absolute; left:0; top:calc(100% + 10px); white-space:nowrap; pointer-events:none;
   padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
 /* 上の紺色のしおり（挟んだしおり Ⅰ〜Ⅴ）：ふだんは本のうしろに隠れていて、ひもと上のふちだけがのぞく。カーソルを乗せると、上へぴょこっと出る */
-.gt-tabs{ position:absolute; left:4cqw; bottom:calc(100% + 1.8cqw); display:flex; align-items:flex-end; gap:0.9cqw; z-index:-2; }
-.gt-tab{ --h:6cqw; --hide:3.4cqw; position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
+.gt-tabs{ position:absolute; left:4cqw; bottom:calc(100% - 0.5cqw); display:flex; align-items:flex-end; gap:0.9cqw; z-index:-2; }
+.gt-tab{ --h:6.4cqw; --hide:2.2cqw; position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
   width:5.6cqw; min-width:40px; height:var(--h); background:var(--tab); border:2px solid var(--tab-dark); border-radius:2px 2px 0 0;
   color:#f6f0e4; font-family:'Cormorant Garamond',serif; font-weight:700; font-size:clamp(14px,2.4cqw,44px); padding:1.4cqw 0 0;
   box-shadow:0 -2px 5px rgba(0,0,0,0.25); transform:translateY(var(--hide)); transition:transform .28s cubic-bezier(.34,1.56,.64,1); }
-.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(0); }
+.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(-1cqw); }   /* 引き出す */
 .gt-tab:focus-visible{ outline:2px solid var(--tab-gold); outline-offset:2px; }
 .gt-tab .orn{ position:absolute; inset:3px; pointer-events:none; --g:var(--tab-gold);       /* 上の二すみだけ、金の飾り */
   background:
@@ -293,5 +294,5 @@ canvas#game{ border-radius:0; }
 .book-frame.is-full{ background:none; padding:12px !important; }
 /* スマホを横にした全画面：まん中の列（ゲーム画面）に、表紙・旗のぶんの余白（左 0.18・右 0.07）もふくめる */
 @media (hover:none) and (orientation:landscape), (pointer:coarse) and (orientation:landscape){
-  .book-frame.is-full{ grid-template-columns:auto calc(var(--gw,60vw) * 1.25) auto !important; padding:6px 8px !important; }
+  .book-frame.is-full{ grid-template-columns:auto calc(var(--gw,60vw) * 1.38) auto !important; padding:6px 8px !important; }
 }

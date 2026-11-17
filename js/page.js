@@ -22,10 +22,10 @@
   function fit(){
     if(!full){                                   // 全画面でないとき：本（表紙・旗・しおりの余白もふくめて）が窓に入るだけの大きさ
       frame.style.removeProperty('--gs');
-      // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.25（左0.18・右0.07）、たて gw×(480/900 + 0.12 + 0.05)
-      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.25, (window.innerHeight-40)/(480/900+0.17), 1100));
+      // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.38（左右 0.19 ずつ）、たて gw×(480/900 + 0.12 + 0.05)
+      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.38, (window.innerHeight-40)/(480/900+0.17), 1100));
       frame.style.setProperty('--gw', Math.floor(gw)+'px'); return; }
-    const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
+    const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.gt-tabs','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
       return parts.every(el=>{ if(!el) return true; const r=el.getBoundingClientRect(); if(!r.width && !r.height) return true;   // 見えていない部品は数えない（SVG は offsetParent を持たないので、大きさで見る）
         return r.left>=f.left+4 && r.right<=f.right-4 && r.top>=f.top+4 && r.bottom<=f.bottom-4; }); };
@@ -71,11 +71,13 @@
   const wrap=document.querySelector('.canvas-wrap'); if(!wrap) return;
   // 表紙とページ（viewBox はゲーム画面と同じ座標。ゲーム画面は 0〜900 × 0〜480 で、そのまわりが見える）
   const NS='http://www.w3.org/2000/svg';
-  const cover=document.createElementNS(NS,'svg'); cover.setAttribute('class','gt-cover'); cover.setAttribute('viewBox','-60 -40 1020 560');
-  cover.setAttribute('preserveAspectRatio','none'); cover.setAttribute('aria-hidden','true');
+  // 重なり順：表紙（いちばん奥）→ しおり・旗 → ページ。しおりと旗は、ページのあいだに挟まっていて、ページのふちから出ているように見える
+  const layer=cls=>{ const e=document.createElementNS(NS,'svg'); e.setAttribute('class',cls); e.setAttribute('viewBox','-60 -40 1020 560');
+    e.setAttribute('preserveAspectRatio','none'); e.setAttribute('aria-hidden','true'); return e; };
+  const cover=layer('gt-cover'), pages=layer('gt-pages');
   const L='#c4a574';
-  cover.innerHTML=`
-    <rect x="-52" y="-30" width="1004" height="546" rx="4" fill="#45372f" filter="url(#gt-rough)"/>
+  cover.innerHTML=`<rect x="-52" y="-30" width="1004" height="546" rx="4" fill="#45372f" filter="url(#gt-rough)"/>`;
+  pages.innerHTML=`
     <g fill="#efe7da" stroke="${L}" stroke-width="2.2" stroke-linejoin="round">
       <path d="M -30 -10 Q 210 -22 446 -2 L 454 -2 Q 690 -22 930 -10 L 932 500 Q 690 486 454 506 L 446 506 Q 210 486 -30 500 Z"/>
     </g>
@@ -85,7 +87,7 @@
       <path d="M -20 496 Q 210 482 440 500"/><path d="M 460 500 Q 690 482 920 496"/>
       <path d="M 40 492 Q 200 484 330 490" opacity="0.6"/><path d="M 600 490 Q 760 482 870 490" opacity="0.6"/>
     </g>`;
-  wrap.insertBefore(cover, wrap.firstChild);
+  wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 左がわの旗
   const flags=document.createElement('div'); flags.className='gt-flags'; wrap.appendChild(flags);
   const book=document.getElementById('openBook');
