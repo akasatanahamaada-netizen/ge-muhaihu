@@ -2,11 +2,11 @@
    Gravity Tale ── メニュー画面 (menu.js)
    ----------------------------------------------------------------------------
    ・ゲームを開くと、まずこの画面が出る（タイトルともくじ）
-       （ゲーム中は つづける / しおりを挟む）はじめから / つづきから / ステージをえらぶ / 物語を振り返る / あそびかた
+       （ゲーム中は つづける）はじめから / つづきから / 物語を振り返る / あそびかた / せってい
    ・しおりを挟む … いまのステージに、しおり（Ⅰ・Ⅱ…）を挟む。本の上のしおりを押すと、そのステージのはじめにもどれる（5枚まで）
    ・ゲーム中は、左上の「≡ メニュー」ボタンか Esc キーで開く（開いているあいだは止まる）
    ・進み具合は、ブラウザに自動でセーブされる（ステージが始まるたび）
-       → 「つづきから」で最後のステージから、「ステージをえらぶ」で一度来たステージから遊べる
+       → 「つづきから」で最後のステージから遊べる。一度来たステージへは、本を読み返す画面（bookview.js）の各ページから行ける
        → そのステージに来たときの分岐（フラグ）と本のページも、いっしょにもどる
 
    読み込む順番：playlist.js のあと（index.html のいちばん最後）。
@@ -81,10 +81,6 @@ const css=`
 .gtm-btn[disabled]{ cursor:default; color:#b3a587; } .gtm-btn[disabled]::before{ opacity:0; }
 .gtm-btn[disabled]:hover{ background:none; }
 .gtm-back{ margin-top:auto; font-size:clamp(11px,1.8cqw,38px); color:#8a7350; }
-.gtm-stages{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(2px,0.5cqw,15px); }
-.gtm-stages .gtm-btn{ font-size:clamp(10px,1.6cqw,35px); padding:clamp(3px,0.7cqw,20px); }
-.gtm-stages .gtm-btn::before{ content:none; }
-.gtm-stages .no{ color:#b08d57; font-size:0.85em; min-width:1.6em; }
 .gtm-howto{ font-size:clamp(10px,1.65cqw,35px); line-height:1.75; margin:0; padding:0; list-style:none; }
 .gtm-howto b{ display:inline-block; min-width:6.5em; color:#5a3f1c; }
 .gtm-howto li{ border-bottom:1px dashed rgba(120,92,52,0.25); padding:0.15em 0; }
@@ -107,8 +103,7 @@ const css=`
 .gtm-vol{ font-size:clamp(15px,2.6cqw,58px); }
 .gtm-vol output{ font-family:'Zen Old Mincho',serif; font-size:0.6em; }
 .gtm-start span{ font-size:clamp(17px,3cqw,68px); letter-spacing:0.05em; }
-.gtm-btn small, .gtm-stages .gtm-btn{ font-family:'Zen Old Mincho',serif; letter-spacing:0.04em; }
-.gtm-stages .gtm-btn{ font-weight:700; line-height:1.4; }
+.gtm-btn small{ font-family:'Zen Old Mincho',serif; letter-spacing:0.04em; }
 .gtm-howto b{ font-family:'Caveat',cursive; font-size:1.3em; font-weight:700; letter-spacing:0.02em; }
 `;
 const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
@@ -123,7 +118,6 @@ menu.innerHTML=`
       <button class="gtm-btn" data-act="resume">Resume</button>
       <button class="gtm-btn" data-act="new">New Game</button>
       <button class="gtm-btn" data-act="continue">Continue<small></small></button>
-      <button class="gtm-btn" data-act="stages">Select Stage</button>
       <button class="gtm-btn" data-act="book">Reread the Story</button>
       <button class="gtm-btn" data-act="howto">How to Play</button>
       <button class="gtm-btn" data-act="settings">Settings</button>
@@ -133,11 +127,6 @@ menu.innerHTML=`
       <label class="gtm-vol"><span>Music</span><input type="range" class="gtm-range" data-vol="bgm" min="0" max="100" step="5"><output></output></label>
       <label class="gtm-vol"><span>Sound</span><input type="range" class="gtm-range" data-vol="se" min="0" max="100" step="5"><output></output></label>
       <p class="gtm-howto gtm-pc" style="margin-top:0.4em">← → で大きさを変える（↑ ↓ で選ぶ）</p>
-      <button class="gtm-btn gtm-back" data-act="back">← Back</button>
-    </div>
-    <div class="gtm-view" data-view="stages">
-      <h3>Select Stage</h3>
-      <div class="gtm-stages"></div>
       <button class="gtm-btn gtm-back" data-act="back">← Back</button>
     </div>
     <div class="gtm-view" data-view="howto">
@@ -191,7 +180,6 @@ let inGame=false;        // 一度でもゲームを始めたか（「つづけ�
 
 function setView(name){
   menu.querySelectorAll('.gtm-view').forEach(v=>v.classList.toggle('show', v.dataset.view===name));
-  if(name==='stages') fillStages();
   if(name==='settings') fillVolume();
   const first=menu.querySelector(`.gtm-view[data-view="${name}"] :is(.gtm-range,.gtm-btn:not([disabled]))`);
   if(first) first.focus({preventScroll:true});
@@ -200,18 +188,6 @@ function refreshMain(){
   $('[data-act="resume"]').style.display = inGame ? '' : 'none';
   const c=$('[data-act="continue"]'), has=save.last && save.scenes[save.last];
   c.disabled=!has; c.querySelector('small').textContent = has ? sceneName(save.last) : '';
-  $('[data-act="stages"]').disabled = !Object.keys(save.scenes).length;
-}
-function fillStages(){
-  const box=$('.gtm-stages'); box.innerHTML='';
-  GT.playlist.forEach((id,i)=>{
-    const b=document.createElement('button'); b.className='gtm-btn';
-    const ok=!!save.scenes[id];
-    b.innerHTML=`<span class="no">${i+1}</span>${ok?escapeHtml(sceneName(id)):'？？？'}`;
-    b.disabled=!ok;
-    if(ok) b.addEventListener('click',()=>startFrom(id));
-    box.appendChild(b);
-  });
 }
 /* せってい：音量のバー（0〜100%。100% がふつうの大きさ） */
 function fillVolume(){
@@ -254,7 +230,6 @@ menu.addEventListener('click',e=>{
     case 'bookmark': addBookmark(); hideMenu(); break;
     case 'new':      startNew(); break;
     case 'continue': startFrom(save.last); break;
-    case 'stages':   setView('stages'); break;
     case 'howto':    setView('howto'); break;
     case 'settings': setView('settings'); break;
     case 'book':     GT.openBookModal(); break;
@@ -289,7 +264,7 @@ window.addEventListener('keydown',e=>{
 }, true);
 
 GT.showMenu=showMenu; GT.hideMenu=hideMenu;
-GT.startFrom=startFrom; GT.canStartFrom=id=>!!save.scenes[id];   // 本を読み返す画面の「このページへもどる」で使う
+GT.startFrom=startFrom; GT.canStartFrom=id=>!!save.scenes[id]; GT.sceneName=sceneName;   // 本を読み返す画面の、各ページのステージのボタンで使う
 
 /* ---- しおり：メニューの「しおりを挟む」で、いまのステージにしおりを挟む。本の上に色ちがいのしおりが増え、
    押すと、そのステージのはじめにもどれる（挟んだときの分岐・本のページも、いっしょにもどる）。

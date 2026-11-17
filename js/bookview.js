@@ -73,6 +73,11 @@ const css=`
 .bv-go{ position:absolute; z-index:6; right:7%; bottom:8%; font-family:'Caveat',cursive; font-size:clamp(14px,1.8cqw,42px); line-height:1.1; color:#f3ead0; cursor:pointer;
   background:#7a2e28; border:none; border-radius:2em; padding:0.45em 1.1em; letter-spacing:0.06em; box-shadow:0 2px 4px rgba(0,0,0,0.25); }
 .bv-go:hover{ background:#9a3a32; }
+/* ページの下：このページのステージへ行くボタンを並べる（多いときは折りかえす） */
+.bv-gos{ position:absolute; z-index:6; left:7%; right:7%; bottom:8%; display:flex; flex-wrap:wrap-reverse; justify-content:flex-end; align-items:center; gap:0.4em 0.45em; }
+.bv-gos-h{ font-family:'Caveat',cursive; font-size:clamp(14px,1.8cqw,42px); color:#7a5a3a; margin-right:auto; align-self:flex-end; }
+.bv-gos .bv-go{ position:static; font-family:'Zen Old Mincho',serif; font-size:clamp(10px,1.2cqw,28px); padding:0.45em 0.95em; letter-spacing:0.04em; }
+.bv-gos .bv-go.armed{ font-family:'Caveat',cursive; font-size:clamp(13px,1.55cqw,37px); padding:0.2em 0.95em; background:#9a3a32; }
 .bv-hit{ position:absolute; top:0; height:100%; width:50%; z-index:5; cursor:pointer; background:none; border:none; padding:0; }
 .bv-hit.l{ left:0; } .bv-hit.r{ left:50%; }
 .bv-hit[disabled]{ cursor:default; }
@@ -163,13 +168,25 @@ function slotInner(slot){
   const base=(GT.pageBases&&GT.pageBases[p.key]) || p.base || '';
   const text=(p.filled && p.text) ? p.text : base;
   const body=(p.filled ? art : '') + `<div class="bv-body">${damagedText(text, pc, slot, !p.filled)}</div>` + (worm>0 ? holes(slot,worm) : '');
-  // このページの場面へもどる（一度来たことのある場面だけ。menu.js の GT.canStartFrom / GT.startFrom）
-  const sid=PAGE_SCENE[p.key];
-  const go = (sid && GT.canStartFrom && GT.canStartFrom(sid)) ? `<button type="button" class="bv-go" data-scene="${esc(sid)}">Go back to this page</button>` : '';
+  // このページのステージへ行くボタン（このページにふくまれるステージのうち、一度来たことのあるものだけ。menu.js の GT.canStartFrom / GT.startFrom）
+  const ids=(PAGE_SCENES[p.key]||[]).filter(id=>GT.canStartFrom && GT.canStartFrom(id));
+  const go = ids.length ? `<div class="bv-gos"><span class="bv-gos-h">Play again</span>${ids.map(id=>
+    `<button type="button" class="bv-go" data-scene="${esc(id)}" data-name="${esc(stageName(id))}">${esc(stageName(id))}</button>`).join('')}</div>` : '';
   return head+body+go+`<div class="bv-no">— ${pno} —</div>`;
 }
-/* ページ（playlist.js の GT.definePages の key）と、そのページの場面（シーンの id） */
-const PAGE_SCENE={ prologue:'opening', komichi:'komichi1', window:'house_peek', meet:'meet_hood', wolf:'wolf_talk', front:'house_front', granny:'arrive' };
+/* ページ（playlist.js の GT.definePages の key）と、そのページにふくまれるステージ（シーンの id。物語の順）。
+   そのページのボタンから、どのステージへも行ける（一度来たステージだけ出る。近道・遠回りは、通ったほうだけ） */
+const PAGE_SCENES={
+  prologue:['opening'],
+  komichi: ['komichi1','komichi2'],
+  window:  ['house_peek','path1'],
+  meet:    ['meet_hood','cliff'],
+  wolf:    ['wolf_talk','crossroads','path2','path2b','flowers','path3','path4'],
+  front:   ['house_front'],
+  granny:  ['arrive'],
+};
+// ボタンに出す名前：ステージの label から「第一章 ── 」などの章の名前をはずしたもの
+const stageName=id=>String(GT.sceneName ? GT.sceneName(id) : id).replace(/^.*?──\s*/,'');
 /* そのページのお話のかけら（engine.js）。かけらのないページは、いつも完全 */
 function pieces(p){ return GT.pagePieces ? GT.pagePieces(p.key) : {found:0,total:0,ids:[],foundIds:[],extra:[]}; }
 /* 欠けた文章：かけらが足りないぶんだけ、ところどころの文字がにじんだり、なくなったりしている。
@@ -420,8 +437,8 @@ modal.querySelector('.bv-close').addEventListener('click',close);
 // 「このページへもどる」：本をすぐに閉じて、その場面のはじめから（来たときの分岐・本のページの状態にもどる）
 //   1回押すと「もう一度押すと、もどる」。2.5秒以内にもう一度押すと、もどる（うっかり押して、いまの進みがなくならないように）
 modal.addEventListener('click',e=>{ const g=e.target.closest('.bv-go'); if(!g) return; e.stopPropagation();
-  if(!(g._armT>performance.now())){ g._armT=performance.now()+2500; g.textContent='Tap again to go back';
-    setTimeout(()=>{ if(!(g._armT>performance.now())) g.textContent='Go back to this page'; },2600); return; }
+  if(!(g._armT>performance.now())){ g._armT=performance.now()+2500; g.textContent='Tap again'; g.classList.add('armed');
+    setTimeout(()=>{ if(!(g._armT>performance.now())){ g.textContent=g.dataset.name; g.classList.remove('armed'); } },2600); return; }
   const id=g.dataset.scene; modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=false;
   if(GT.startFrom) GT.startFrom(id); }, true);
 modal.addEventListener('click',e=>{ if(e.target===modal) close(); });
