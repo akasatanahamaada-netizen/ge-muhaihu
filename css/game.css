@@ -454,3 +454,8 @@ canvas#game{ border-radius:0; }
 .dk-stain{ width:clamp(60px,6vw,110px); right:15.5vw; top:clamp(30px,7vh,70px); transform:rotate(-14deg); }
 .dk-dpen{ width:clamp(220px,27vw,480px); left:24vw; bottom:clamp(2px,1.2vh,14px); transform:rotate(2.5deg); filter:drop-shadow(3px 5px 3px rgba(0,0,0,0.35)); }
 
+/* 栞（Reread・menu）が光るとき：栞とひもの形にそって、ふちだけ細く光る（四角くぼやけないように、ぼかしを小さく重ねる） */
+.gt-mark.gt-guide{ animation:gtMarkGlow 1s ease-in-out infinite alternate; }
+@keyframes gtMarkGlow{
+  from{ filter:drop-shadow(0 0 0 rgba(255,222,150,0)) drop-shadow(0 0 0 rgba(255,210,130,0)); }
+  to{ filter:drop-shadow(0 0 2px rgba(255,236,180,1)) drop-shadow(0 0 6px rgba(255,214,130,0.8)); } }
