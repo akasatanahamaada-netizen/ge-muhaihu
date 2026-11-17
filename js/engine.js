@@ -1649,13 +1649,10 @@ function render(){
   const gravity=GT.gravity;
   ctx.clearRect(0,0,W,H); ctx.drawImage(GT.paperArt.paper,0,0);
   drawStageBackground();
-  ctx.fillStyle='rgba(87,100,74,0.05)'; ctx.fillRect(0,0,SPINE,H);
-  ctx.fillStyle='rgba(139,94,99,0.05)'; ctx.fillRect(SPINE,0,SPINE,H);
+  // 見開きのまん中（ページの境目）は、ステージの上では目立たせない（左右のページの色分け・のどの影は描かない）。
+  // 重力を反転したページだけ、ほんのり暗くして分かるようにする
   if(gravity.left===-1){ ctx.fillStyle='rgba(43,46,74,0.06)'; ctx.fillRect(0,0,SPINE,H); }
   if(gravity.right===-1){ ctx.fillStyle='rgba(43,46,74,0.06)'; ctx.fillRect(SPINE,0,SPINE,H); }
-  const sg=ctx.createLinearGradient(SPINE-16,0,SPINE+16,0);
-  sg.addColorStop(0,'rgba(58,50,38,0)'); sg.addColorStop(0.5,'rgba(58,50,38,0.35)'); sg.addColorStop(1,'rgba(58,50,38,0)');
-  ctx.fillStyle=sg; ctx.fillRect(SPINE-16,0,32,H);
   for(const fn of drawBack) fn();           // 奥の飾り（地形より後ろ・判定なし）
   drawPageEdges();
   for(const plat of GT.platforms){
