@@ -23,9 +23,9 @@
     if(!full){                                   // 全画面でないとき：本（表紙・旗・しおりの余白もふくめて）が窓に入るだけの大きさ
       frame.style.removeProperty('--gs');
       // 本ぜんたいの大きさ（ゲーム画面の幅 gw に対して）：横 gw×1.42（左右 0.21 ずつ）、たて gw×(480/900 + 0.14 + 0.06)
-      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.36, (window.innerHeight-40)/(480/900+0.275), 1100));   // しおりのひも・引き出した旗のぶんも入れる
+      const gw=Math.max(240, Math.min((window.innerWidth-28)/1.25, (window.innerHeight-40)/(480/900+0.24), 1100));   // しおりのひも・引き出した旗のぶんも入れる
       frame.style.setProperty('--gw', Math.floor(gw)+'px'); return; }
-    const parts=['.hud','.canvas-wrap','.gt-cover','.gt-flags','.gt-tabs','.gt-spare','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
+    const parts=['.hud','.canvas-wrap','.gt-cover','.gt-marks','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
       return parts.every(el=>{ if(!el) return true; const r=el.getBoundingClientRect(); if(!r.width && !r.height) return true;   // 見えていない部品は数えない（SVG は offsetParent を持たないので、大きさで見る）
         // しおりは上にひも（V の字）が、旗はカーソルを乗せると左へ出るぶんがあるので、そのぶんも画面に入れる（切れないように）
@@ -109,40 +109,13 @@
     ${pg(0,0,'url(#gtPaperL)',1)}
     <rect x="390" y="-58" width="120" height="604" fill="url(#gtGutter)"/>`;
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
-  // 左がわの旗
-  const flags=document.createElement('div'); flags.className='gt-flags'; wrap.appendChild(flags);
-  const book=document.getElementById('openBook');
-  if(book){ book.className='gt-flag reread'; book.textContent='Book'; book.title='本を読み返す'; book.setAttribute('aria-label','本を読み返す'); flags.appendChild(book); }
-  const menuBtn=wrap.querySelector('.gtm-open');
-  if(menuBtn){ menuBtn.className='gt-flag menu'; menuBtn.textContent='menu'; menuBtn.setAttribute('aria-label','メニュー'); flags.appendChild(menuBtn); }
-  // やり直すボタンは、ゲーム画面の右上のまま（engine.js の「↺ やり直す」。旗にすると分かりにくいため）
-  // 上のしおり（挟んだしおり）。1回押すと「もう一度押すと、このページへもどる」、2.5秒以内にもう一度押すと、もどる。右クリックで外す
-  const tabs=document.createElement('div'); tabs.className='gt-tabs'; wrap.appendChild(tabs);
-  const ROMAN=['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ','Ⅹ'];
-  function drawMarks(){
-    tabs.innerHTML='';
-    (GT.getBookmarks?GT.getBookmarks():[]).forEach((m,i)=>{
-      const t=document.createElement('button'); t.type='button'; t.className='gt-tab';
-      t.innerHTML='<span class="orn"></span><span class="num"></span><span class="ask">もう一度押すと、このページへもどる</span>';
-      t.querySelector('.num').textContent=ROMAN[i]||String(i+1);
-      t.title='しおり '+(ROMAN[i]||i+1)+'：'+m.name+'（右クリックで外す）'; t.setAttribute('aria-label','しおり '+(i+1)+'：'+m.name);
-      let armT=0;
-      t.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation();
-        if(performance.now()<armT){ armT=0; t.classList.remove('armed'); GT.jumpBookmark(i); return; }
-        armT=performance.now()+2500; t.classList.add('armed'); setTimeout(()=>{ if(performance.now()>=armT) t.classList.remove('armed'); },2600); });
-      t.addEventListener('contextmenu',e=>{ e.preventDefault(); GT.removeBookmark(i); });
-      tabs.appendChild(t);
-    });
-  }
-  // 机の上（本の右）に、まっさらな栞を置いておく。押すと、いまのページに挟む（メニューの「しおりを挟む」と同じ。5枚まで）
-  const spare=document.createElement('button'); spare.type='button'; spare.className='gt-spare';
-  spare.innerHTML='<span class="word">Save</span>';
-  spare.title='しおりを挟む（いまのステージ）'; spare.setAttribute('aria-label','しおりを挟む');
-  spare.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); if(GT.paused) return;
-    if(!GT.addBookmark()){ spare.classList.remove('nope'); void spare.offsetWidth; spare.classList.add('nope'); } });
-  wrap.appendChild(spare);
-  const syncSpare=()=>spare.classList.toggle('full', !!(GT.bookmarksFull&&GT.bookmarksFull()));
-  if(GT.onBookmarksChange){ GT.onBookmarksChange(drawMarks); GT.onBookmarksChange(syncSpare); drawMarks(); syncSpare(); }
+  // 本の上に横にして置いた栞（作者の絵 assets/komono/栞.png）：「Reread」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）
+  //   カーソルを乗せると、すこし持ち上がる。やり直すボタンは、ゲーム画面の右上（engine.js の「↺ やり直す」）
+  const marks=document.createElement('div'); marks.className='gt-marks'; wrap.appendChild(marks);
+  const asMark=(el,word,label)=>{ if(!el) return; el.className='gt-mark'; el.innerHTML='<span class="word"></span>';
+    el.querySelector('.word').textContent=word; el.title=label; el.setAttribute('aria-label',label); el.removeAttribute('style'); marks.appendChild(el); };
+  asMark(document.getElementById('openBook'),'Reread','本を読み返す');
+  asMark(wrap.querySelector('.gtm-open'),'menu','メニュー');
   const fs=document.getElementById('fsBtn'); if(fs) document.body.appendChild(fs);
   const under=document.querySelector('.under'); if(under) under.style.display='none';
 })();

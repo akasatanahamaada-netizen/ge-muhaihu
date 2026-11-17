@@ -367,3 +367,24 @@ canvas#game{ border-radius:0; }
 .gt-tabs{ top:calc(-1 * (17.4cqw * 0.66 + 3.8cqw)); }
 .gt-spare{ top:-18.7cqw; }
 .gt-flags{ z-index:4; }   /* ページをめくっているあいだも、旗はめくる紙より手前 */
+
+/* ==== セーブ（しおり）をやめて、栞は「Reread」と「menu」のボタンに。付箋（赤い旗）はなし ==== */
+.gt-flags, .gt-tabs, .gt-spare{ display:none !important; }
+.gt-marks{ position:absolute; left:6cqw; top:-15.5cqw; display:flex; gap:3cqw; z-index:4; }
+.gt-mark{ position:relative; width:5cqw; min-width:28px; height:17.4cqw; padding:0; border:none; cursor:pointer; flex:none;
+  margin:0 6.2cqw;                                                                                  /* 90度まわすぶんの すきま */
+  background:url('../assets/komono/shiori_blank.webp') center/100% 100% no-repeat; transform:rotate(90deg);
+  filter:drop-shadow(2px 4px 3px rgba(0,0,0,0.3)); transition:transform .45s cubic-bezier(.25,.8,.3,1); }
+.gt-mark:hover, .gt-mark:focus-visible{ transform:rotate(90deg) translateX(-1cqw); }
+.gt-mark:focus-visible{ outline:2px solid #f3d7a0; outline-offset:2px; }
+.gt-mark .word{ position:absolute; left:50%; top:76%; transform:translate(-50%,-50%) rotate(-90deg); white-space:nowrap; pointer-events:none;
+  font-family:'Caveat',cursive; font-weight:500; font-size:clamp(14px,2.6cqw,50px); line-height:1; color:#f3e3bd; }
+.gt-mark.gt-guide{ animation:gtSpareGlow 1s ease-in-out infinite alternate; }
+.gt-mark.gt-guide::after{ content:attr(data-guide); position:absolute; left:50%; top:110%; transform:translateX(-50%) rotate(-90deg); transform-origin:center;
+  white-space:nowrap; padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); pointer-events:none; }
+.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin:calc(var(--gw,900px) * 0.155) calc(var(--gw,900px) * 0.12) calc(var(--gw,900px) * 0.085) calc(var(--gw,900px) * 0.12) !important; }
+.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.165) !important; }
+.gt-mark{ background-image:url('../assets/komono/shiori_plain.webp'); }   /* 星の飾りを消した栞（文字をまん中に） */
+.gt-mark .word{ top:60%; font-size:clamp(15px,2.9cqw,54px); }
+/* 案内の吹き出しは、栞の下に（栞は90度まわしてあるので、まわし返して横書きに） */
+.gt-mark.gt-guide::after{ left:calc(100% + 1.2cqw); top:50%; transform:translate(-50%,-50%) rotate(-90deg) translateY(50%); transform-origin:50% 50%; }

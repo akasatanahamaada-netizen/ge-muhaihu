@@ -110,7 +110,6 @@ menu.innerHTML=`
     <div class="gtm-view" data-view="main">
       <h3>もくじ</h3>
       <button class="gtm-btn" data-act="resume">つづける</button>
-      <button class="gtm-btn" data-act="bookmark">しおりを挟む<small></small></button>
       <button class="gtm-btn" data-act="new">はじめから</button>
       <button class="gtm-btn" data-act="continue">つづきから<small></small></button>
       <button class="gtm-btn" data-act="stages">ステージをえらぶ</button>
@@ -188,11 +187,6 @@ function setView(name){
 }
 function refreshMain(){
   $('[data-act="resume"]').style.display = inGame ? '' : 'none';
-  const bm=$('[data-act="bookmark"]'), here=GT.scene && GT.playlist.indexOf(GT.scene.id)>=0 && save.scenes[GT.scene.id];
-  const full=bookmarks().length>=BOOKMARK_MAX;
-  bm.style.display = inGame && here ? '' : 'none';
-  bm.disabled = full;
-  bm.querySelector('small').textContent = full ? 'しおりは5枚まで（右クリックで外せる）' : here ? sceneName(GT.scene.id) : '';
   const c=$('[data-act="continue"]'), has=save.last && save.scenes[save.last];
   c.disabled=!has; c.querySelector('small').textContent = has ? sceneName(save.last) : '';
   $('[data-act="stages"]').disabled = !Object.keys(save.scenes).length;
