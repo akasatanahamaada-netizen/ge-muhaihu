@@ -121,7 +121,7 @@
   let stack='';
   for(let k=12;k>=1;k--){ const d=k*1.05;                                  // 紙の束：奥の紙ほど少し外へ・下へ。ふちは、明るい線と暗い線がこまかく交互に
     stack+=`<path d="${pagePathD(d,d*0.9)}" fill="${k%2?'#e9e0cd':'#d8cbb1'}" stroke="${k%2?'#cdbd9c':'#efe6d4'}" stroke-width="0.7"/>`; }
-  pages.innerHTML=`
+  const PAGE_DEFS=`
     <defs>
       <linearGradient id="gtPaperL" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="940" y2="0">
         <stop offset="0" stop-color="#e3d7c0"/><stop offset="0.05" stop-color="#f0e8d9"/><stop offset="0.4" stop-color="#f1e9db"/>
@@ -134,14 +134,20 @@
         <feColorMatrix type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.24  0 0 0 -1.2 0.75"/>
       </filter>
       <clipPath id="gtPageClip"><path d="${pagePathD(0,0)}"/></clipPath>
-    </defs>
-    ${stack}
+    </defs>`;
+  const PAGE_SHEET=`
     <path d="${pagePathD(0,0)}" fill="url(#gtPaperL)" stroke="#bfa985" stroke-width="0.9"/>
     <g clip-path="url(#gtPageClip)">
       <rect x="-50" y="-40" width="1000" height="570" fill="url(#gtPaperV)"/>
       <rect x="-50" y="-40" width="1000" height="570" filter="url(#gtPaperGrain)" opacity="0.5"/>
       <path d="M 447 -10 L 447 520 M 453 -10 L 453 520" stroke="rgba(255,250,238,0.35)" stroke-width="1.2"/>
     </g>`;
+  pages.innerHTML=PAGE_DEFS+stack+PAGE_SHEET;
+  // ページをめくるときの紙にも、同じ紙（いちばん上の一枚）の絵を使う（engine.js の toPage が使う GT.pageSheet）。
+  //   紙の大きさは、ゲーム画面のまわりに GT.PAGE_PAD（engine.js）だけ広い
+  if(GT.PAGE_PAD){ const p=GT.PAGE_PAD, ew=900+p.x*2, eh=480+p.top+p.bot;
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${ew}" height="${eh}" viewBox="${-p.x} ${-p.top} ${ew} ${eh}">${PAGE_DEFS}${PAGE_SHEET}</svg>`;
+    const im=new Image(); im.onload=()=>{ GT.pageSheet=im; }; im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg); }
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 本の上に横にして置いた栞（作者の絵 assets/komono/栞.png）：「Reread」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）
   //   カーソルを乗せると、すこし持ち上がる。やり直すボタンは、ゲーム画面の右上（engine.js の「↺ やり直す」）

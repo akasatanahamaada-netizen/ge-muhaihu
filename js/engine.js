@@ -619,6 +619,7 @@ const flipLive=document.createElement('canvas'); flipLive.width=W; flipLive.heig
    ・めくりは、ゲーム画面より一回り大きい専用の層（flipCv。.gt-pages と同じ位置・大きさ。座標も同じ）に描く */
 const PAGE_PAD_X=42, PAGE_PAD_TOP=20, PAGE_PAD_BOT=36, PAGE_COLOR='#efe7da';
 const EW=W+PAGE_PAD_X*2, EH=H+PAGE_PAD_TOP+PAGE_PAD_BOT, ESP=EW/2;
+GT.PAGE_PAD={x:PAGE_PAD_X, top:PAGE_PAD_TOP, bot:PAGE_PAD_BOT};
 const extOld=document.createElement('canvas'); extOld.width=EW; extOld.height=EH;
 const extLive=document.createElement('canvas'); extLive.width=EW; extLive.height=EH;
 // ページの形（js/page.js の .gt-pages と同じ線。上下のふちがゆるく曲がっている）。座標は、ページの紙（EW×EH）の中
@@ -627,7 +628,9 @@ function pagePath(g){ const X=x=>x+PAGE_PAD_X, Y=y=>y+PAGE_PAD_TOP;
   g.bezierCurveTo(X(560),Y(-24),X(760),Y(-26),X(940),Y(-20)); g.lineTo(X(942),Y(504)); g.bezierCurveTo(X(760),Y(499),X(560),Y(500),X(454),Y(509));
   g.lineTo(X(446),Y(509)); g.bezierCurveTo(X(340),Y(500),X(140),Y(499),X(-42),Y(504)); g.closePath(); }
 function toPage(dst){ const g=dst.getContext('2d'); g.clearRect(0,0,EW,EH); g.save(); pagePath(g); g.clip();   // ゲーム画面を、ページの形の紙に写す（形の外は透明）
-  g.fillStyle=PAGE_COLOR; g.fillRect(0,0,EW,EH); g.drawImage(canvas,PAGE_PAD_X,PAGE_PAD_TOP); g.restore(); }
+  if(GT.pageSheet) g.drawImage(GT.pageSheet,0,0,EW,EH);           // まわりのページと同じ紙の絵（js/page.js）
+  else { g.fillStyle=PAGE_COLOR; g.fillRect(0,0,EW,EH); }
+  g.drawImage(canvas,PAGE_PAD_X,PAGE_PAD_TOP); g.restore(); }
 const flipCv=document.createElement('canvas'); flipCv.width=1100; flipCv.height=620;   // viewBox「-100 -70 1100 620」と同じ
 flipCv.className='gt-flipcv'; flipCv.setAttribute('aria-hidden','true');
 Object.assign(flipCv.style,{ position:'absolute', left:'-11.111%', top:'-14.583%', width:'122.222%', height:'129.167%', pointerEvents:'none', zIndex:'3' });
@@ -1742,7 +1745,7 @@ function drawFlip(){
     const p0=pts[i], p1=pts[i+1], am=(p0.a+p1.a)/2;
     const front = am<Math.PI/2;                                        // 表（前の右ページ）か、裏（次の左ページ）か
     const x0=p0.x, x1=p1.x, w=x1-x0; if(Math.abs(w)<0.05) continue;
-    const sc=1+0.035*Math.sin(am);                                    // 立ち上がったところだけ、ほんの少し大きく（寝ている紙はページと同じ大きさ）
+    const sc=1+0.012*Math.sin(am);                                    // 立ち上がったところだけ、ほんの少し大きく（寝ている紙はページと同じ大きさ）
     const hh=H*sc, top=(H-hh)/2;
     const srcX = d>0 ? (front ? SPINE+p0.u*SPINE : SPINE-p1.u*SPINE)          // 次へ：表=前の右ページ / 裏=次の左ページ
                      : (front ? SPINE-p1.u*SPINE : SPINE+p0.u*SPINE), srcW=SPINE/N;   // 前へ：表=前の左ページ / 裏=やり直す右ページ
@@ -1761,7 +1764,7 @@ function drawFlip(){
   spg.addColorStop(0,'rgba(58,45,30,0)'); spg.addColorStop(0.5,`rgba(58,45,30,${0.25*lift})`); spg.addColorStop(1,'rgba(58,45,30,0)');
   ctx.fillStyle=spg; ctx.fillRect(SPINE-18,0,36,H);
   // めくれていくふちの、紙の厚みの光
-  if(lift>0.02){ const sc=1+0.035*Math.sin(tip.a), hh=H*sc, top=(H-hh)/2;
+  if(lift>0.02){ const sc=1+0.012*Math.sin(tip.a), hh=H*sc, top=(H-hh)/2;
     ctx.strokeStyle=`rgba(255,250,235,${0.5*lift})`; ctx.lineWidth=1.6;
     ctx.beginPath(); ctx.moveTo(tipX,top+2); ctx.lineTo(tipX,top+hh-2); ctx.stroke(); }
   ctx.restore();
