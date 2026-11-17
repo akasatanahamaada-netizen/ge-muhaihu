@@ -16,7 +16,7 @@
 "use strict";
 const SAVE_KEY='gravityTale.ep1.save';
 const BOOKMARK_MAX=5;                 // しおりは5枚まで（下の「しおり」）
-const TITLE_BG='assets/background/水彩で描く静かな森と遠い城.webp';
+const TITLE_BG='assets/background/タイトルロゴ.webp';   // タイトル画面の絵（まん中に「Gravity Tales」のロゴが描いてある）
 const NAMES={ arrive:'おばあさんの家', ending:'結末' };      // label の無いシーンの名前
 
 /* ---- セーブ（ブラウザの localStorage。使えないときはセーブなしで動く） ---- */
@@ -105,13 +105,58 @@ const css=`
 .gtm-start span{ font-size:clamp(17px,3cqw,68px); letter-spacing:0.05em; }
 .gtm-btn small{ font-family:'Zen Old Mincho',serif; letter-spacing:0.04em; }
 .gtm-howto b{ font-family:'Caveat',cursive; font-size:1.3em; font-weight:700; letter-spacing:0.02em; }
+
+/* ==== タイトル画面：ロゴの絵（霧の薔薇の森と「Gravity Tales」）に合わせる ====
+   ・ロゴは絵に描いてあるので、文字のタイトルは出さない。ロゴの下に章の名前、その下に横に並んだ筆記体のメニュー
+   ・「Tap or press any key to start」のあいだは、ロゴと案内だけ（メニューは出さない）
+   ・Settings・How to Play は、まん中に暗い半透明の枠で出す（薔薇の色と、くすんだ金のふち） */
+.gtm{ background:#1a0d14 url("${encodeURI(TITLE_BG)}") 50% 50%/cover no-repeat; color:#f0e2e6; }
+.gtm::before{ background:radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(10,3,8,0.55) 100%); }
+.gtm-title{ left:0; right:0; top:61.5%; text-shadow:0 1px 6px rgba(10,2,8,0.95), 0 0 14px rgba(10,2,8,0.8); }
+.gtm-title h2{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }   /* ロゴの絵があるので、文字は見せない（読み上げ用に残す） */
+.gtm-title p{ margin:0; font-size:clamp(11px,1.7cqw,40px); letter-spacing:0.3em; color:#e8cfd6; }
+.gtm-title p::before, .gtm-title p::after{ content:'❧'; color:#b98a92; margin:0 0.8em; letter-spacing:0; font-size:0.9em; }
+.gtm-title p::before{ display:inline-block; transform:scaleX(-1); }
+.gtm-foot{ left:0; right:0; bottom:3.2%; text-align:center; color:rgba(232,207,214,0.6); text-shadow:0 1px 4px rgba(0,0,0,0.9); letter-spacing:0.22em; font-size:clamp(9px,1.25cqw,28px); }
+/* 案内（はじめる前） */
+.gtm-start{ background:none; }
+.gtm-start span{ left:50%; top:79%; border:none; background:none; padding:0.2em 0.6em; color:#f6e6ea; font-size:clamp(18px,3cqw,70px);
+  text-shadow:0 0 10px rgba(225,80,110,0.55), 0 1px 4px rgba(0,0,0,0.9); }
+.gtm:has(.gtm-start.show) .gtm-card{ visibility:hidden; }
+.gtm:has(.gtm-start.show) .gtm-title{ top:63%; }
+/* メインのメニュー：枠なしで、ロゴの下に横一列（入りきらなければ折りかえす） */
+.gtm[data-view="main"] .gtm-card{ left:4%; right:4%; width:auto; top:auto; bottom:11%; height:auto; padding:0; background:none; box-shadow:none; overflow:visible; }
+.gtm[data-view="main"] .gtm-card h3{ display:none; }
+.gtm[data-view="main"] .gtm-view{ flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:0.2em clamp(4px,1.4cqw,34px); }
+.gtm[data-view="main"] .gtm-btn{ padding:0.15em 0.35em; font-size:clamp(17px,2.85cqw,66px); color:#f3e4e8; font-weight:700;
+  text-shadow:0 1px 4px rgba(0,0,0,0.95), 0 0 10px rgba(20,4,12,0.8); background:none; }
+.gtm[data-view="main"] .gtm-btn::before{ content:'❦'; color:#c4344d; font-size:0.7em; margin-right:-0.25em; }
+.gtm[data-view="main"] .gtm-btn:hover, .gtm[data-view="main"] .gtm-btn:focus-visible, .gtm[data-view="main"] .gtm-btn:focus{ background:none; color:#ffe3ea;
+  text-shadow:0 1px 4px rgba(0,0,0,0.95), 0 0 12px rgba(225,70,105,0.85); }
+.gtm[data-view="main"] .gtm-btn small{ display:none; }   /* 「Continue」のステージの名前は、カーソルを乗せたときに出す（title） */
+.gtm[data-view="main"] .gtm-btn[disabled]{ color:rgba(243,228,232,0.32); text-shadow:0 1px 3px rgba(0,0,0,0.8); }
+/* Settings・How to Play：まん中に、暗い半透明の枠 */
+.gtm:not([data-view="main"]) .gtm-card{ left:14%; width:72%; top:5%; height:90%; padding:clamp(8px,2cqw,50px) clamp(10px,3cqw,75px); background:rgba(24,10,18,0.86);
+  box-shadow:0 10px 30px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(201,160,112,0.55), inset 0 0 0 4px rgba(24,10,18,0.86), inset 0 0 0 5px rgba(201,160,112,0.25); }
+.gtm:not([data-view="main"]) .gtm-title, .gtm:not([data-view="main"]) .gtm-foot{ display:none; }
+.gtm:not([data-view="main"]) .gtm-card h3{ color:#e3b9c3; border-bottom-color:rgba(201,160,112,0.4); text-align:center; }
+.gtm:not([data-view="main"]) .gtm-btn{ color:#f0e2e6; }
+.gtm:not([data-view="main"]) .gtm-btn:hover, .gtm:not([data-view="main"]) .gtm-btn:focus{ background:rgba(196,52,77,0.18); color:#ffe3ea; }
+.gtm:not([data-view="main"]) .gtm-btn::before{ color:#c4344d; }
+.gtm-back{ color:#c9a070 !important; align-self:center; }
+.gtm-howto{ color:#e8d8dc; } .gtm-howto b{ color:#e6a7b4; } .gtm-howto li{ border-bottom-color:rgba(201,160,112,0.22); }
+.gtm-vol{ color:#f0e2e6; } .gtm-vol:focus-within{ background:rgba(196,52,77,0.16); } .gtm-vol output{ color:#c9a070; }
+.gtm-range{ accent-color:#c4344d; }
+.gtm:not([data-view="main"]) .gtm-howto{ font-size:clamp(10px,1.5cqw,32px); line-height:1.45; }   /* How to Play が枠に入りきるように */
+.gtm:not([data-view="main"]) .gtm-card h3{ margin-bottom:0.35em; padding-bottom:0.3em; }
+@media (max-width:640px){ .gtm:not([data-view="main"]) .gtm-card{ left:6%; width:88%; top:5%; height:90%; } }
 `;
 const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
 
 const wrap=document.querySelector('.canvas-wrap');
-const menu=document.createElement('div'); menu.className='gtm'; menu.setAttribute('role','dialog'); menu.setAttribute('aria-label','メニュー');
+const menu=document.createElement('div'); menu.className='gtm'; menu.dataset.view='main'; menu.setAttribute('role','dialog'); menu.setAttribute('aria-label','メニュー');
 menu.innerHTML=`
-  <div class="gtm-title"><h2>GRAVITY<br>TALE</h2><p>第一章「赤い頭巾」</p></div>
+  <div class="gtm-title"><h2>Gravity Tales</h2><p>第一章「赤い頭巾」</p></div>
   <div class="gtm-card">
     <div class="gtm-view" data-view="main">
       <h3>Contents</h3>
@@ -179,6 +224,7 @@ const $=sel=>menu.querySelector(sel);
 let inGame=false;        // 一度でもゲームを始めたか（「つづける」を出すか）
 
 function setView(name){
+  menu.dataset.view=name;                                    // タイトル画面の見た目を、いま出しているもの（main / settings / howto）で変える
   menu.querySelectorAll('.gtm-view').forEach(v=>v.classList.toggle('show', v.dataset.view===name));
   if(name==='settings') fillVolume();
   const first=menu.querySelector(`.gtm-view[data-view="${name}"] :is(.gtm-range,.gtm-btn:not([disabled]))`);
@@ -188,6 +234,7 @@ function refreshMain(){
   $('[data-act="resume"]').style.display = inGame ? '' : 'none';
   const c=$('[data-act="continue"]'), has=save.last && save.scenes[save.last];
   c.disabled=!has; c.querySelector('small').textContent = has ? sceneName(save.last) : '';
+  c.title = has ? sceneName(save.last)+' から' : '';
 }
 /* せってい：音量のバー（0〜100%。100% がふつうの大きさ） */
 function fillVolume(){

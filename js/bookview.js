@@ -150,7 +150,7 @@ function slotInner(slot){
   }
   if(slot===0){
     const filled=rec.filter(p=>{ const pc=pieces(p); return p.filled && pc.found>=pc.total; }).length;   // 欠けのない、完全なページの数
-    return `<div class="bv-title"><div class="orn">❦</div><div class="t1">Gravity<br>Tale</div>
+    return `<div class="bv-title"><div class="orn">❦</div><div class="t1">Gravity<br>Tales</div>
       <div class="t2">${(GT.chapters||[]).map(c=>c.name==='序章'?'序章':`${esc(c.name)}「${esc(c.sub)}」`).join('　・　')}</div><div class="orn">· · ·</div>
       <div class="t3">埋まったページ　${filled} / ${rec.length}</div></div>`;
   }
@@ -340,7 +340,7 @@ function mkLid(backSlot){
   const r=book.getBoundingClientRect(), BW=r.width, BH=r.height, ox=BW*0.014, oy=BH*0.016;
   const leaf=document.createElement('div'); leaf.className='bv-lid';
   Object.assign(leaf.style,{left:(BW/2)+'px', top:(-oy)+'px', width:(BW/2+ox)+'px', height:(BH+2*oy)+'px'});
-  leaf.innerHTML=`<div class="bv-lid-front"><div class="bv-lid-deco"><div class="orn">❦</div><div class="t1">Gravity<br>Tale</div><div class="orn">· · ·</div></div><div class="bv-lid-shade"></div></div>
+  leaf.innerHTML=`<div class="bv-lid-front"><div class="bv-lid-deco"><div class="orn">❦</div><div class="t1">Gravity<br>Tales</div><div class="orn">· · ·</div></div><div class="bv-lid-shade"></div></div>
     <div class="bv-lid-back"><div class="bv-face l"></div><div class="bv-lid-shade"></div></div>`;
   book.appendChild(leaf);
   const pg=leaf.querySelector('.bv-face');

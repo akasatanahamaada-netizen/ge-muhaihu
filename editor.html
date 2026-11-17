@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gravity Tale ── ステージエディタ</title>
+<title>Gravity Tales ── ステージエディタ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Zen+Old+Mincho:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -117,7 +117,7 @@
 <div class="app">
   <header>
     <div>
-      <h1>GRAVITY TALE · Stage Editor</h1>
+      <h1>GRAVITY TALES · Stage Editor</h1>
       <div class="sub">地形も・キャラも・会話も、マウスで置いて書き出す</div>
     </div>
     <div class="spacer"></div>
@@ -1231,7 +1231,7 @@ canvas#game{display:block;width:100%;height:auto;aspect-ratio:900/480;border-rad
 <div class="controls"><span><b>←→</b>移動</span><span><b>↑/W</b>ジャンプ</span><span><b>F/Space</b>重力反転</span><span>人物に近づいて<b>▲</b>・Enterで話す</span></div>
 <div class="touch-ui"><div class="touch-group"><div class="b2" id="btnLeft">◀</div><div class="b2" id="btnRight">▶</div></div><div class="b2 flip" id="btnFlip">裏返す</div><div class="touch-group"><div class="b2" id="btnJump">▲</div></div></div>
 <button class="bookbtn" id="openBook">📖 本を開く</button>
-<div class="modal" id="bookModal"><div class="book-inner"><h2>『Gravity Tale』</h2><div id="pageList"></div><div class="close"><button id="closeBook">閉じる</button></div></div></div>`;
+<div class="modal" id="bookModal"><div class="book-inner"><h2>『Gravity Tales』</h2><div id="pageList"></div><div class="close"><button id="closeBook">閉じる</button></div></div></div>`;
   return `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Zen+Old+Mincho:wght@500;700&display=swap" rel="stylesheet"><style>${CSS}</style></head><body>${SCAFFOLD}<script src="js/engine.js"><\/script><script src="js/paper.js"><\/script><script src="js/sprites.js"><\/script><script src="stages/_decor.js"><\/script><script>${init}<\/script></body></html>`;
 }
 function startPlay(){ playFrame.srcdoc=buildPlaytestSrcdoc(); playFrame.onload=()=>{ try{ playFrame.contentWindow.focus(); }catch(e){} }; }
