@@ -714,7 +714,7 @@ function showLine(line){
 function showNameAsk(){
   choicesShown=true; dlgHint.style.display='none'; dlgChoices.innerHTML='';
   const box=document.createElement('div'); box.className='name-ask';
-  box.innerHTML='<input type="text" maxlength="8" placeholder="なまえ（8文字まで）" aria-label="主人公の名前"><button class="choice" type="button">これにする</button>';
+  box.innerHTML='<input type="text" maxlength="8" placeholder="なまえ（8文字まで）" aria-label="主人公の名前"><button class="choice ui-en" type="button">OK</button>';
   const input=box.querySelector('input'), ok=box.querySelector('button');
   input.value=(GT.flags && GT.flags.playerName) || '';
   const decide=()=>{
@@ -773,11 +773,11 @@ function skipDialogue(){
 GT.skipDialogue=skipDialogue;
 // 会話の枠の右上に「スキップ」ボタンを置く（index.html は触らずに、ここで作る）
 const skipBtn=document.createElement('button');
-skipBtn.textContent='スキップ ≫';
+skipBtn.textContent='Skip ≫';
 skipBtn.title='会話を飛ばす（S キー）';
 Object.assign(skipBtn.style,{ position:'absolute', top:'1.1cqw', right:'1.33cqw', padding:'0.33em 1em',
   background:'rgba(176,141,87,0.15)', border:'1px solid rgba(176,141,87,0.55)', borderRadius:'14px',
-  color:'#e8dcc0', fontFamily:"'Zen Old Mincho',serif", fontSize:'clamp(11px,1.33cqw,32px)', letterSpacing:'0.08em', cursor:'pointer' });
+  color:'#e8dcc0', fontFamily:"'Caveat',cursive", fontSize:'clamp(15px,1.85cqw,44px)', lineHeight:'1', letterSpacing:'0.02em', cursor:'pointer' });   // ボタンの文字は英語の筆記体
 skipBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); skipDialogue(); });
 dlg.appendChild(skipBtn);
 // 選択肢を出しているあいだは、スキップボタンを隠す
@@ -834,22 +834,22 @@ function restartStage(){
 }
 GT.restartStage=restartStage;
 const resetBtn=document.createElement('button');
-resetBtn.textContent='↺ やり直す';
+resetBtn.textContent='↺ Reset';
 resetBtn.title='このステージを最初からやり直す（R キー）';
 Object.assign(resetBtn.style,{ position:'absolute', top:'0.67cqw', right:'0.9cqw', padding:'0.25em 0.85em', zIndex:'2',
   background:'rgba(43,36,24,0.72)', border:'1px solid rgba(176,141,87,0.6)', borderRadius:'12px',
-  color:'#e8dcc0', fontFamily:"'Zen Old Mincho',serif", fontSize:'clamp(11px,1.33cqw,32px)', letterSpacing:'0.06em', cursor:'pointer' });
+  color:'#e8dcc0', fontFamily:"'Caveat',cursive", fontSize:'clamp(15px,1.85cqw,44px)', lineHeight:'1', letterSpacing:'0.02em', cursor:'pointer' });
 // 1回目のタップでは「もう一度で やり直す」と出すだけ。2.5 秒以内にもう一度押したら、やり直す
 // （スマホで会話を進めようと画面の端をタップしたとき、うっかりやり直さないように）
 let resetArmT=0;
 // 表示の文字は dataset で変えられる（js/page.js が「Reset」の旗にする）。押した1回目は .armed が付く
-const resetLabel=()=>{ resetBtn.textContent=resetBtn.dataset.label||'↺ やり直す'; resetBtn.classList.remove('armed');
+const resetLabel=()=>{ resetBtn.textContent=resetBtn.dataset.label||'↺ Reset'; resetBtn.classList.remove('armed');
   if(!resetBtn.dataset.label) resetBtn.style.background='rgba(43,36,24,0.72)'; };
 resetBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation();
   if(performance.now()<resetArmT){ resetArmT=0; resetLabel(); restartStage(); return; }
   resetArmT=performance.now()+2500; resetBtn.classList.add('armed');
   if(resetBtn.dataset.label) resetBtn.textContent=resetBtn.dataset.arm||'Reset?';
-  else { resetBtn.textContent='もう一度で やり直す'; resetBtn.style.background='rgba(139,47,38,0.85)'; }
+  else { resetBtn.textContent='Tap again to reset'; resetBtn.style.background='rgba(139,47,38,0.85)'; }
   setTimeout(()=>{ if(performance.now()>=resetArmT) resetLabel(); },2600); });
 canvas.parentNode.appendChild(resetBtn); resetBtn.id='resetBtn';
 window.addEventListener('keydown',e=>{ if(e.key==='r'||e.key==='R'){ e.preventDefault(); restartStage(); } });
@@ -1499,7 +1499,7 @@ function drawGameOver(){
   ctx.save();
   ctx.fillStyle=`rgba(30,14,10,${0.55*k})`; ctx.fillRect(0,0,W,H);
   ctx.globalAlpha=k; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillStyle='#f3ead0'; ctx.font="700 34px 'Zen Old Mincho',serif"; ctx.fillText('ゲームオーバー',W/2,H/2-14);
+  ctx.fillStyle='#f3ead0'; ctx.font="700 54px 'Caveat',cursive"; ctx.fillText('Game Over',W/2,H/2-18);
   ctx.globalAlpha=Math.min(1,Math.max(0,(t-0.5)/0.4));
   ctx.fillStyle='#d9c79a'; ctx.font="600 15px 'Zen Old Mincho',serif"; ctx.fillText('ページを もどって、やりなおす……',W/2,H/2+26);
   ctx.restore();
@@ -1635,8 +1635,8 @@ function drawNpc(n){
   if(n===activeNpc && !storyTalking){
     const p=0.5+0.5*Math.sin(goalPulse*5);
     ctx.save(); ctx.textAlign='center'; ctx.globalAlpha=0.65+0.35*p;
-    ctx.fillStyle='#b08d57'; ctx.font="700 13px 'Zen Old Mincho',serif";
-    ctx.fillText(GT.ctl('タップ / Enter で はなす','タップで はなす'), cx, g>0 ? headY-66 : headY+74);
+    ctx.fillStyle='#b08d57'; ctx.font="700 19px 'Caveat',cursive";
+    ctx.fillText(GT.ctl('Tap / Enter to talk','Tap to talk'), cx, g>0 ? headY-66 : headY+74);
     ctx.restore();
   }
   if(n.speech) GT.drawSpeech(cx, g>0 ? headY-14 : headY+14, n.speech.text, n.speech.t/0.4, g<0, n.speech.angry);
@@ -1670,8 +1670,8 @@ function render(){
   if((storyStage||missionReq) && stageExit && !flipping && !storyTalking){
     const p=0.5+0.5*Math.sin(goalPulse*4);
     ctx.save(); ctx.textAlign='right'; ctx.globalAlpha=0.55+0.45*p;
-    ctx.fillStyle='#b08d57'; ctx.font="700 16px 'Zen Old Mincho',serif";
-    ctx.fillText('右の端へ →', W-26, H/2);
+    ctx.fillStyle='#b08d57'; ctx.font="700 22px 'Caveat',cursive";
+    ctx.fillText('Go to the right edge →', W-26, H/2);
     ctx.restore();
   }
   for(const fn of drawWorld) fn();          // ボスなど（プレイヤーより後ろ）

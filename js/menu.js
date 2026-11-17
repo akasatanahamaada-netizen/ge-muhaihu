@@ -99,6 +99,17 @@ const css=`
 .gtm-vol output{ text-align:right; font-size:0.85em; color:#8a7350; font-weight:500; }
 .gtm-range{ width:100%; accent-color:#b08d57; cursor:pointer; margin:0; height:1.4em; }
 @media (max-width:640px){ .gtm-card{ width:50%; left:2%; top:4%; height:92%; } .gtm-title{ left:54%; } }
+/* ボタン・見出しは英語の筆記体（Caveat）。物語の言葉（ステージの名前・説明の文）は日本語の明朝のまま */
+.gtm-card h3{ font-family:'Caveat',cursive; font-size:clamp(16px,2.6cqw,60px); letter-spacing:0.06em; font-weight:700; }
+.gtm-btn, .gtm-vol span, .gtm-start span, .gtm-open{ font-family:'Caveat',cursive; letter-spacing:0.03em; }
+.gtm-btn{ font-size:clamp(17px,3.1cqw,70px); font-weight:600; line-height:1.15; }
+.gtm-back{ font-size:clamp(15px,2.5cqw,56px); }
+.gtm-vol{ font-size:clamp(15px,2.6cqw,58px); }
+.gtm-vol output{ font-family:'Zen Old Mincho',serif; font-size:0.6em; }
+.gtm-start span{ font-size:clamp(17px,3cqw,68px); letter-spacing:0.05em; }
+.gtm-btn small, .gtm-stages .gtm-btn{ font-family:'Zen Old Mincho',serif; letter-spacing:0.04em; }
+.gtm-stages .gtm-btn{ font-weight:700; line-height:1.4; }
+.gtm-howto b{ font-family:'Caveat',cursive; font-size:1.3em; font-weight:700; letter-spacing:0.02em; }
 `;
 const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
 
@@ -108,49 +119,49 @@ menu.innerHTML=`
   <div class="gtm-title"><h2>GRAVITY<br>TALE</h2><p>第一章「赤い頭巾」</p></div>
   <div class="gtm-card">
     <div class="gtm-view" data-view="main">
-      <h3>もくじ</h3>
-      <button class="gtm-btn" data-act="resume">つづける</button>
-      <button class="gtm-btn" data-act="new">はじめから</button>
-      <button class="gtm-btn" data-act="continue">つづきから<small></small></button>
-      <button class="gtm-btn" data-act="stages">ステージをえらぶ</button>
-      <button class="gtm-btn" data-act="book">物語を振り返る</button>
-      <button class="gtm-btn" data-act="howto">あそびかた</button>
-      <button class="gtm-btn" data-act="settings">せってい</button>
+      <h3>Contents</h3>
+      <button class="gtm-btn" data-act="resume">Resume</button>
+      <button class="gtm-btn" data-act="new">New Game</button>
+      <button class="gtm-btn" data-act="continue">Continue<small></small></button>
+      <button class="gtm-btn" data-act="stages">Select Stage</button>
+      <button class="gtm-btn" data-act="book">Reread the Story</button>
+      <button class="gtm-btn" data-act="howto">How to Play</button>
+      <button class="gtm-btn" data-act="settings">Settings</button>
     </div>
     <div class="gtm-view" data-view="settings">
-      <h3>せってい</h3>
-      <label class="gtm-vol"><span>BGM</span><input type="range" class="gtm-range" data-vol="bgm" min="0" max="100" step="5"><output></output></label>
-      <label class="gtm-vol"><span>効果音</span><input type="range" class="gtm-range" data-vol="se" min="0" max="100" step="5"><output></output></label>
+      <h3>Settings</h3>
+      <label class="gtm-vol"><span>Music</span><input type="range" class="gtm-range" data-vol="bgm" min="0" max="100" step="5"><output></output></label>
+      <label class="gtm-vol"><span>Sound</span><input type="range" class="gtm-range" data-vol="se" min="0" max="100" step="5"><output></output></label>
       <p class="gtm-howto gtm-pc" style="margin-top:0.4em">← → で大きさを変える（↑ ↓ で選ぶ）</p>
-      <button class="gtm-btn gtm-back" data-act="back">← もどる</button>
+      <button class="gtm-btn gtm-back" data-act="back">← Back</button>
     </div>
     <div class="gtm-view" data-view="stages">
-      <h3>ステージをえらぶ</h3>
+      <h3>Select Stage</h3>
       <div class="gtm-stages"></div>
-      <button class="gtm-btn gtm-back" data-act="back">← もどる</button>
+      <button class="gtm-btn gtm-back" data-act="back">← Back</button>
     </div>
     <div class="gtm-view" data-view="howto">
-      <h3>あそびかた</h3>
+      <h3>How to Play</h3>
       <ul class="gtm-howto gtm-touch">
         <li><b>◀ ▶</b>あるく</li>
         <li><b>▲</b>ジャンプ</li>
-        <li><b>本を裏返す</b>そのページの重力が反転（床か天井に立っているときだけ）</li>
-        <li><b>タップ</b>近くの人に話しかける・調べる・会話を進める</li>
-        <li><b>スキップ ≫</b>会話を飛ばす</li>
-        <li><b>↺ やり直す</b>ステージをやり直す（2回押す）</li>
+        <li><b>Flip</b>本を裏返す。そのページの重力が反転（床か天井に立っているときだけ）</li>
+        <li><b>Tap</b>近くの人に話しかける・調べる・会話を進める</li>
+        <li><b>Skip ≫</b>会話を飛ばす</li>
+        <li><b>↺ Reset</b>ステージをやり直す（2回押す）</li>
         <li><b>menu</b>メニューを開く</li>
       </ul>
       <ul class="gtm-howto gtm-pc">
         <li><b>← →</b>あるく</li>
         <li><b>↑ / W</b>ジャンプ</li>
         <li><b>F / Space</b>本を裏返す（そのページの重力が反転。床か天井に立っているときだけ）</li>
-        <li><b>タップ / Enter</b>近くの人に話しかける・会話を進める</li>
+        <li><b>Tap / Enter</b>近くの人に話しかける・会話を進める</li>
         <li><b>S</b>会話をスキップ</li>
         <li><b>R</b>ステージをやり直す</li>
         <li><b>Esc</b>メニューを開く・閉じる</li>
       </ul>
       <p class="gtm-howto" style="margin-top:0.6em">右ページの右の端まで行くと、ページがめくれて次へ進む。</p>
-      <button class="gtm-btn gtm-back" data-act="back">← もどる</button>
+      <button class="gtm-btn gtm-back" data-act="back">← Back</button>
     </div>
   </div>
   <div class="gtm-foot">本を裏返すと、世界の重力が反転する</div>`;
@@ -158,7 +169,7 @@ wrap.appendChild(menu);
 
 /* はじめの画面：タップかキーで はじめる（ブラウザは、操作があるまで音を出せないため。その操作でタイトルの曲が流れはじめる） */
 const startCover=document.createElement('div'); startCover.className='gtm-start show';
-startCover.innerHTML='<span>タップ／キーを押して はじめる</span>';
+startCover.innerHTML='<span>Tap or press any key to start</span>';
 menu.appendChild(startCover);
 function dismissStart(e){
   if(!startCover.classList.contains('show')) return;
@@ -171,7 +182,7 @@ startCover.addEventListener('pointerdown',dismissStart);
 window.addEventListener('keydown',e=>{ if(startCover.classList.contains('show') && menu.classList.contains('show')) dismissStart(e); }, true);
 
 const openBtn=document.createElement('button');
-openBtn.className='gtm-open'; openBtn.textContent='≡ メニュー'; openBtn.title='メニュー（Esc キー）';
+openBtn.className='gtm-open'; openBtn.textContent='≡ Menu'; openBtn.title='メニュー（Esc キー）';
 openBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); showMenu(true); });
 wrap.appendChild(openBtn);
 

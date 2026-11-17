@@ -459,3 +459,10 @@ canvas#game{ border-radius:0; }
 @keyframes gtMarkGlow{
   from{ filter:drop-shadow(0 0 0 rgba(255,222,150,0)) drop-shadow(0 0 0 rgba(255,210,130,0)); }
   to{ filter:drop-shadow(0 0 2px rgba(255,236,180,1)) drop-shadow(0 0 6px rgba(255,214,130,0.8)); } }
+/* 会話の「▶ Tap / Click」・名前の「OK」・本を裏返すボタン・「Now! Flip the book」は英語の筆記体（物語のセリフや選択肢は日本語のまま） */
+.dhint{ font-family:'Caveat',cursive; font-size:clamp(14px,1.7cqw,40px); letter-spacing:0.03em; }
+.choice.ui-en{ font-family:'Caveat',cursive; font-size:1.35em; line-height:1; letter-spacing:0.03em; }
+.qte .flipnow, .btn.flip{ font-family:'Caveat',cursive; letter-spacing:0.03em; }
+.qte .flipnow{ font-size:clamp(19px,2.7cqw,66px); }
+.btn.flip{ font-size:20px; }
+

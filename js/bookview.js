@@ -67,10 +67,10 @@ const css=`
 /* 操作 */
 .bv-bar{ display:flex; align-items:center; gap:14px; color:#cbb98f; font-family:'Zen Old Mincho',serif; font-size:13px; letter-spacing:0.08em; }
 .bv-bar button{ background:rgba(232,220,192,0.08); border:1px solid rgba(203,185,143,0.45); color:#e8dcc0; border-radius:20px;
-  padding:7px 16px; font-family:inherit; font-size:14px; cursor:pointer; }
+  padding:5px 16px; font-family:'Caveat',cursive; font-size:20px; line-height:1.1; letter-spacing:0.03em; cursor:pointer; }   /* ボタンは英語の筆記体 */
 .bv-bar button:hover:not([disabled]){ background:rgba(232,220,192,0.2); }
 .bv-bar button[disabled]{ opacity:0.35; cursor:default; }
-.bv-go{ position:absolute; z-index:6; right:7%; bottom:8%; font-family:'Zen Old Mincho',serif; font-size:clamp(10px,1.3cqw,30px); color:#f3ead0; cursor:pointer;
+.bv-go{ position:absolute; z-index:6; right:7%; bottom:8%; font-family:'Caveat',cursive; font-size:clamp(14px,1.8cqw,42px); line-height:1.1; color:#f3ead0; cursor:pointer;
   background:#7a2e28; border:none; border-radius:2em; padding:0.45em 1.1em; letter-spacing:0.06em; box-shadow:0 2px 4px rgba(0,0,0,0.25); }
 .bv-go:hover{ background:#9a3a32; }
 .bv-hit{ position:absolute; top:0; height:100%; width:50%; z-index:5; cursor:pointer; background:none; border:none; padding:0; }
@@ -107,10 +107,10 @@ modal.innerHTML=`
     <button class="bv-hit r" aria-label="次のページ"></button>
   </div>
   <div class="bv-bar">
-    <button class="bv-prev">◀ まえ</button>
+    <button class="bv-prev">◀ Prev</button>
     <span class="bv-count"></span>
-    <button class="bv-next">つぎ ▶</button>
-    <button class="bv-close">閉じる</button>
+    <button class="bv-next">Next ▶</button>
+    <button class="bv-close">Close</button>
   </div>`;
 const book=modal.querySelector('.bv-book');
 const pageL=modal.querySelector('.bv-page.l'), pageR=modal.querySelector('.bv-page.r');
@@ -165,7 +165,7 @@ function slotInner(slot){
   const body=(p.filled ? art : '') + `<div class="bv-body">${damagedText(text, pc, slot, !p.filled)}</div>` + (worm>0 ? holes(slot,worm) : '');
   // このページの場面へもどる（一度来たことのある場面だけ。menu.js の GT.canStartFrom / GT.startFrom）
   const sid=PAGE_SCENE[p.key];
-  const go = (sid && GT.canStartFrom && GT.canStartFrom(sid)) ? `<button type="button" class="bv-go" data-scene="${esc(sid)}">このページへもどる</button>` : '';
+  const go = (sid && GT.canStartFrom && GT.canStartFrom(sid)) ? `<button type="button" class="bv-go" data-scene="${esc(sid)}">Go back to this page</button>` : '';
   return head+body+go+`<div class="bv-no">— ${pno} —</div>`;
 }
 /* ページ（playlist.js の GT.definePages の key）と、そのページの場面（シーンの id） */
@@ -296,8 +296,8 @@ function turn(dir){
     g.strokeStyle='rgba(255,250,235,0.55)'; g.lineWidth=2;
     g.beginPath(); g.moveTo(edgeX,b); g.lineTo(edgeX,BH-b); g.stroke();
     g.save(); g.globalAlpha=dim; g.fillStyle='rgba(74,70,60,0.95)';
-    g.font=`600 ${fs}px 'Zen Old Mincho', serif`; g.textAlign='center'; g.textBaseline='middle';
-    g.fillText('ページをめくる…', BW/2, BH-BH*(38/480)); g.restore();
+    g.font=`700 ${Math.round(fs*1.35)}px 'Caveat', cursive`; g.textAlign='center'; g.textBaseline='middle';
+    g.fillText('Turning the page…', BW/2, BH-BH*(38/480)); g.restore();
     if(p<1) requestAnimationFrame(frame);
     else { show(); front.leaf.remove(); back.leaf.remove(); dimEl.remove(); cv.remove(); turning=false; }   // 紙がおりきったら、倒れた先のページも次の見開きに
   }
@@ -420,8 +420,8 @@ modal.querySelector('.bv-close').addEventListener('click',close);
 // 「このページへもどる」：本をすぐに閉じて、その場面のはじめから（来たときの分岐・本のページの状態にもどる）
 //   1回押すと「もう一度押すと、もどる」。2.5秒以内にもう一度押すと、もどる（うっかり押して、いまの進みがなくならないように）
 modal.addEventListener('click',e=>{ const g=e.target.closest('.bv-go'); if(!g) return; e.stopPropagation();
-  if(!(g._armT>performance.now())){ g._armT=performance.now()+2500; g.textContent='もう一度押すと、もどる';
-    setTimeout(()=>{ if(!(g._armT>performance.now())) g.textContent='このページへもどる'; },2600); return; }
+  if(!(g._armT>performance.now())){ g._armT=performance.now()+2500; g.textContent='Tap again to go back';
+    setTimeout(()=>{ if(!(g._armT>performance.now())) g.textContent='Go back to this page'; },2600); return; }
   const id=g.dataset.scene; modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=false;
   if(GT.startFrom) GT.startFrom(id); }, true);
 modal.addEventListener('click',e=>{ if(e.target===modal) close(); });
