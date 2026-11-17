@@ -420,3 +420,31 @@ canvas#game{ border-radius:0; }
 .gt-mark .word{ top:29.5%; font-size:clamp(13px,2.4cqw,46px); }
 .canvas-wrap, .book-frame.is-full .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.13) !important; }
 .book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.135) !important; }
+
+/* ---- 机の上の、ほかの本（ゲームの本のまわりに、ななめに置いてある。index.html の .desk-books） ----
+   一冊ずつ：--c 表紙の色、--w 幅、--r かたむき。場所は left/right/top/bottom（画面のはしから少しはみ出させる）
+   描き方は参考画像２に合わせる：焦げ茶の線、表紙の右と下から、クリーム色のページのふち（紙の重なりの線）がのぞく */
+.desk-books{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; filter:saturate(0.85) brightness(0.93); }   /* ゲームの本より目立たないように、少し沈ませる */
+.db{ position:absolute; width:clamp(130px,var(--w),460px); aspect-ratio:0.72; transform:rotate(var(--r)); border-radius:2px 5px 5px 2px;
+  background:
+    repeating-linear-gradient(90deg,#efe6d4 0 2px,#c9b48a 2px 3px) right top/5.5% 100% no-repeat,     /* 右のページのふち（小口） */
+    repeating-linear-gradient(0deg,#efe6d4 0 2px,#c9b48a 2px 3px) left bottom/100% 4% no-repeat,       /* 下のページのふち */
+    #e6dcc6;
+  outline:2px solid rgba(52,38,28,0.75); outline-offset:-1px;
+  box-shadow:5px 9px 16px rgba(0,0,0,0.32), 1px 2px 3px rgba(0,0,0,0.25); }
+.db::before{ content:''; position:absolute; left:-1.5%; top:-1.2%; right:4%; bottom:3%; border-radius:3px 6px 6px 3px;       /* 表紙 */
+  background:
+    linear-gradient(90deg,rgba(0,0,0,0.30) 0 11%,rgba(255,255,255,0.10) 11% 12%,rgba(0,0,0,0) 12%),                            /* 背の折り目 */
+    radial-gradient(ellipse 80% 60% at 35% 25%,rgba(255,255,255,0.10),rgba(255,255,255,0) 70%),                                 /* うすい光 */
+    radial-gradient(ellipse 120% 90% at 50% 50%,rgba(0,0,0,0) 55%,rgba(0,0,0,0.28) 100%),                                       /* すみのくすみ */
+    var(--c);
+  border:2px solid rgba(40,28,20,0.8); box-shadow:inset 0 0 0 3px rgba(255,255,255,0.04); }
+.db::after{ content:''; position:absolute; left:-1.5%; top:-1.2%; width:12%; bottom:3%;                                          /* 背の金の帯 */
+  background:
+    linear-gradient(#cdb06a,#cdb06a) 0 13%/100% 2px no-repeat, linear-gradient(#cdb06a,#cdb06a) 0 16%/100% 1px no-repeat,
+    linear-gradient(#cdb06a,#cdb06a) 0 84%/100% 1px no-repeat, linear-gradient(#cdb06a,#cdb06a) 0 87%/100% 2px no-repeat;
+  opacity:0.8; }
+.db b{ position:absolute; left:28%; top:20%; width:48%; height:15%; border:1.5px solid rgba(205,176,106,0.75); border-radius:2px;   /* 題名の枠 */
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,0), inset 0 0 0 4px rgba(205,176,106,0.35); }
+.db b::after{ content:''; position:absolute; left:18%; right:18%; top:46%; height:2px; background:rgba(205,176,106,0.55); }          /* 題名（読めない金の線） */
+
