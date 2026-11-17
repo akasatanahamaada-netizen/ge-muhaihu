@@ -7,7 +7,7 @@
      1) 森の小道を抜けると、森のはずれの家。左ページは庭（柵・物干し・井戸）、右ページが家。
         窓には明かりがともり、中で人影が動いている。
      2) 右ページのマリに、自分から話しかける（タップ / Enter）。
-        「話しかける前に、まず見ておいたほうがいいよ。……あの窓」（話しかけずに窓をのぞいてもよい）
+        「話しかける前に、まず見ておいたほうがいいよ。……あの窓」（マリと話すまでは、薪の山に乗っても窓はのぞけない）
      3) 窓の下の薪の山に乗って、窓の前に立つと、窓のぞきが始まる（自動）
         窓の中で、母親が赤ずきんにお使いを頼む場面が見える。
      4) 窓から離れると、戸が開いて、赤ずきんがかごを持って駆けだしていく。
@@ -132,7 +132,7 @@ GT.registerUpdate(()=>{
   if(mari){
     if(!st.briefed){
       if(!mari._final){ mari._final={lines:mari.lines, onEnd:mari.onEnd, noExit:mari.noExit};
-        mari.lines=BRIEF; mari.noExit=true; mari.onEnd=()=>{ st.briefed=true; }; }
+        mari.lines=BRIEF; mari.noExit=true; mari.required=true; mari.onEnd=()=>{ st.briefed=true; }; }   // 話さないと先へ進めない（吹き出しは「！」）
       mari.talkable=true;
     } else {
       if(mari._final){ Object.assign(mari,mari._final); mari._final=null; mari.talked=false; }   // のぞいたあとの会話にもどす
@@ -142,7 +142,8 @@ GT.registerUpdate(()=>{
   if(st.busy) return;
   const onWood = pl.onGround && GT.gravity.right===1 && Math.abs(pl.y+pl.h-WOOD.y)<2
               && pcx>WOOD.x+4 && pcx<WOOD.x+WOOD.w-4;
-  if(!st.peeked && onWood && !document.getElementById('dlg').classList.contains('show')){ st.peeked=true; st.briefed=true;
+  // 窓をのぞけるのは、マリと話したあとだけ（先にのぞくと、のぞいたあとのマリの会話が始まらなくなるため）
+  if(!st.peeked && st.briefed && onWood && !document.getElementById('dlg').classList.contains('show')){ st.peeked=true;
     autoTalk(PEEK, ()=>{ if(isHouse()) GT.talkTo(GT.getNpcs().find(n=>n.who==='mari')); });   // のぞき終わったら、そのままマリが話しかけてくる
   }
 });
