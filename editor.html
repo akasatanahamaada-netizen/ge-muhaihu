@@ -1179,7 +1179,7 @@ const playModal=el('playModal'), playFrame=el('playFrame');
 function buildPlaytestSrcdoc(){
   const id=(state.meta.id||'my_stage').trim();
   const stage=buildStageCode();
-  const pages=`GT.definePages([{key:'prologue',chapter:'序章',title:'森で目覚める'},{key:'window',title:'窓の向こう'},{key:'meet',title:'赤い頭巾の少女'},{key:'wolf',title:'森で出会った狼'},{key:'granny',title:'おばあさんの家'},{key:'result',title:'第一章の結末'}]);`;
+  const pages=`GT.definePages([{key:'prologue',chapter:'序章',title:'森での目覚め'},{key:'window',title:'窓の向こう'},{key:'meet',title:'赤い頭巾の少女'},{key:'wolf',title:'森で出会った狼'},{key:'granny',title:'おばあさんの家'},{key:'result',title:'第一章の結末'}]);`;
   const endScene=`GT.registerScene({id:'__end',type:'talk',label:'テスト終了',lines:[{s:'',c:'narr',t:'― テストプレイ終了。「閉じる」で編集に戻ります。'}]});`;
   const flags=`GT.flags={warnedHood:false,route:null,stoppedAtDoor:false,saved:null,grannyAlive:null};`;
   const init=`(function(){if(!window.GT){document.body.innerHTML='<div class="loaderr">⚠ js/engine.js を読み込めませんでした。editor.html を gravity_tale フォルダの中に置いて開いてください。</div>';return;}${pages}${stage}${endScene}${flags}GT.playlist=['${id}','__end'];})();`;

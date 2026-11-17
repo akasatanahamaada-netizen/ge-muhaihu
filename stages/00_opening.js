@@ -53,7 +53,7 @@ GT.defineStage('opening', {
     {page:'left',  x:22,  y:434, w:26, h:26},   // 倒れていた場所の葉の陰（手前の葉で隠れる）
   ],
   mission:['items'],
-  bookPage:'prologue',   // ここのかけらは、本の序章「森で目覚める」のページのもの（このステージのかけらで完結。全部拾うと、欠けた文字・挿絵が埋まる）
+  bookPage:'prologue',   // ここのかけらは、本の序章「森での目覚め」のページのもの（このステージのかけらで完結。全部拾うと、欠けた文字・挿絵が埋まる）
   // 見た目：輪郭線なしのフラットな絵本ふう（背景は playlist.js で見開き全体に敷く）
   decor:[
     {layer:'back',  kind:'tree',      x:16,  y:150, w:100, h:314},
@@ -366,13 +366,8 @@ function drawBookView(){
     ctx.fillStyle=g; ctx.fillRect(x0,top,pw,ph);
   }
   const ink='#3a2f2a', pad=24;
-  // ---- 左ページ：見出しと本文 ----
-  ctx.save(); ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  ctx.fillStyle='#9a8462'; ctx.font="500 10px 'Zen Old Mincho',serif"; ctx.fillText('序　章', cx-pw+pad, top+30);
-  ctx.fillStyle=ink; ctx.font="700 17px 'Zen Old Mincho',serif"; ctx.filter='blur(0.6px)'; ctx.globalAlpha=k*0.8; ctx.fillText('森で目覚める', cx-pw+pad, top+52); ctx.filter='none'; ctx.globalAlpha=k;
-  ctx.strokeStyle='rgba(120,92,52,0.4)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx-pw+pad,top+62); ctx.lineTo(cx-pad,top+62); ctx.stroke();
-  ctx.restore();
-  bookText(cx-pw+pad, top+84, pw-pad*2, BOOK_TEXT_L, 3, 0.3, 22);
+  // ---- 左ページ：本文だけ（見出しは書かない。ぼやけた文章が並んでいる） ----
+  bookText(cx-pw+pad, top+40, pw-pad*2, BOOK_TEXT_L, 3, 0.35, 22);
   // 小さな飾り（つる草の文様）
   ctx.save(); ctx.strokeStyle='rgba(176,141,87,0.55)'; ctx.lineWidth=1.2; const oy=top+ph-46, ox=cx-pw/2;
   ctx.beginPath(); ctx.moveTo(ox-46,oy); ctx.bezierCurveTo(ox-24,oy-12,ox-10,oy+10,ox,oy); ctx.bezierCurveTo(ox+10,oy-10,ox+24,oy+12,ox+46,oy); ctx.stroke();
@@ -392,7 +387,7 @@ function drawBookView(){
   ctx.save(); ctx.fillStyle='#9a8462'; ctx.font="500 10px 'Zen Old Mincho',serif"; ctx.textAlign='center';
   ctx.fillText('― 1 ―',cx-pw/2,top+ph-14); ctx.fillText('― 2 ―',cx+pw/2,top+ph-14); ctx.restore();
   // 虫食い（左ページは少し、右ページはたくさん食べられている）
-  GT.wormEaten(ctx, cx-pw, top, pw, ph, 3, { edges:['left','top','bottom'], under:'#dccb9f', outside:'#4a3222', count:3, avoid:[{x:cx-pw+pad,y:top+20,w:140,h:46}] });
+  GT.wormEaten(ctx, cx-pw, top, pw, ph, 3, { edges:['left','top','bottom'], under:'#dccb9f', outside:'#4a3222', count:3 });
   GT.wormEaten(ctx, cx,    top, pw, ph, 7, { edges:['right','top','bottom'], under:'#dccb9f', outside:'#4a3222', count:5, avoid:[{x:ax,y:ay,w:aw,h:ah}] });
   // のど（真ん中の影）
   const sg=ctx.createLinearGradient(cx-16,0,cx+16,0);
