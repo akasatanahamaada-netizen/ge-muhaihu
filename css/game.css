@@ -343,3 +343,12 @@ canvas#game{ border-radius:0; }
 .gt-flags{ right:100%; }
 .canvas-wrap, .book-frame.is-full .canvas-wrap{ margin:calc(var(--gw,900px) * 0.12) calc(var(--gw,900px) * 0.145) calc(var(--gw,900px) * 0.05) calc(var(--gw,900px) * 0.145) !important; }
 .book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.13) !important; }
+/* しおりを大きく。机の上の栞は、本の上（右がわ）に横にして置く */
+.gt-tabs{ top:calc(-1 * (17.4cqw * 0.66 + 1.4cqw)); }
+.gt-tab{ --h:17.4cqw; width:5cqw; }
+.gt-tab .num{ font-size:clamp(15px,3cqw,56px); }
+.gt-spare{ left:calc(100% - 24cqw); top:-17.7cqw; width:5cqw; height:17.4cqw; transform:rotate(90deg); }
+.gt-spare, .gt-spare:hover, .gt-spare:focus-visible{ transform:rotate(90deg); }
+.gt-spare:hover, .gt-spare:focus-visible{ transform:rotate(90deg) translateX(-1cqw); }
+.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.155) !important; }
+.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.165) !important; }
