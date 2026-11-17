@@ -134,20 +134,20 @@ GT.registerSceneType('qte', ()=>{
   GT.setHudStage('第一章 ── ！');
   GT.musicMute && GT.musicMute(true);     // 狼がおばあさんのふりをしているあいだは、BGM を止める（跳ね起きたら流す）
   const lines=[
-    {s:'狼',c:'wolf',f:'granny',t:'おやおや、よく来たね。カスタードとバターの小瓶は、そこの椅子に置いておくれ。'},
-    {s:'狼',c:'wolf',f:'granny',t:'さあ、もっと近くへおいで。'},
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おやおや、よく来たね。カスタードとバターの小瓶は、そこの椅子に置いておくれ。'},
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'さあ、もっと近くへおいで。'},
     {s:'赤ずきん',c:'hood',f:'surprise',t:'……おばあちゃん？'},
     {s:'赤ずきん',c:'hood',t:'まあ、おばあちゃん、なんて大きな腕なの。'},
-    {s:'狼',c:'wolf',f:'granny',t:'おまえを抱きしめるためだよ、かわいい子。'},
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえを抱きしめるためだよ、かわいい子。'},
     {s:'赤ずきん',c:'hood',t:'それに、なんて立派な脚なの。'},
-    {s:'狼',c:'wolf',f:'granny',t:'もっと速く走るためだよ、かわいい子。'},
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'もっと速く走るためだよ、かわいい子。'},
     {s:'赤ずきん',c:'hood',t:'なんて大きな耳なの。'},
-    {s:'狼',c:'wolf',f:'granny',t:'おまえの声を、よく聞くためだよ。'},
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえの声を、よく聞くためだよ。'},
     {s:'赤ずきん',c:'hood',t:'なんて大きな目なの。'},
-    {s:'狼',c:'wolf',f:'granny',t:'おまえを、よく見るためだよ。'},
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえを、よく見るためだよ。'},
     {s:'赤ずきん',c:'hood',f:'surprise',t:'……なんて大きな歯なの。'},
-    {s:'狼',c:'wolf',f:'granny',t:'それは、'},                     // ひと呼吸おいてから
-    {s:'狼',c:'wolf',f:'granny',big:true,t:'おまえを食べるためだよ！'},   // big … 太く大きな文字で
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'それは、'},                     // ひと呼吸おいてから
+    {s:'狼',c:'wolf',f:'granny',big:true,t:'おまえを食べるためだよ！'},   // ここで正体を見せる（名前は「狼」、立ち絵も黒塗りでなくなる）。big … 太く大きな文字で
     {s:'',c:'narr',t:'狼が、勢いよくベッドから跳ね起きた。',act:'bgm-on'},
   ];
   GT.beginDialogue(lines,null,()=>{

@@ -677,7 +677,8 @@ GT.playerName=()=>(GT.flags && GT.flags.playerName) || '少年';
 GT.speakerName=(c,name)=> (c==='mari' && GT.flags && GT.flags.mariNamed===false) ? '？？？' : name;
 const withName=t=>String(t||'').replace(/\{name\}/g, GT.playerName());
 function showLine(line){
-  dlgSpeaker.className='speaker '+(line.c||''); dlgSpeaker.textContent = line.c==='boy' ? GT.playerName() : GT.speakerName(line.c, line.s||'');
+  // sc … 名前の色だけ別の人にする（正体をかくすとき）
+  dlgSpeaker.className='speaker '+(line.sc||line.c||''); dlgSpeaker.textContent = line.c==='boy' ? GT.playerName() : GT.speakerName(line.c, line.s||'');
   showPortrait(line.c, line);
   dlgLine.classList.toggle('big', !!line.big);   // セリフに big:true と書くと、太く大きな文字（叫ぶところなど）
   typing=true; typeTarget=withName(line.t); typeI=0; typeAcc=0; dlgLine.textContent=''; dlgHint.style.display='block';

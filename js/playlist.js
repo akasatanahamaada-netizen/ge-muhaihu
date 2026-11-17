@@ -128,14 +128,15 @@ GT.portraitMirror = [];   // いまの絵は、どれも もとから左向き�
 // 会話の立ち絵のファイル（ゲームの起動時に先に読みこんでおき、会話で切りかえるとき、前の人の絵が一瞬見えないようにする）
 GT.portraitFiles = [ '物憂げな琥珀眼の少年.webp', '水彩タッチの赤ずきん少女.webp', '笑顔の赤ずきんと basket.webp', '赤ずきんの驚き顔バスケット少女.webp',
   '水彩風の優しいお母さん.webp', '優しい笑顔の祖母キャラクター.webp', '杖を握る不安げなおばあさん.webp',
-  'mari honnmono (hidari).webp', 'マリ口開いている.webp', '狡猾な人狼の立ち姿.webp', 'おばあちゃん狼の不敵な微笑み.webp' ].map(f=>'assets/character/'+f);
+  'mari honnmono (hidari).webp', 'マリ口開いている.webp', '狡猾な人狼の立ち姿.webp', 'おばあちゃん狼の不敵な微笑み.webp', 'おばあちゃん狼の不敵な微笑み_影.webp' ].map(f=>'assets/character/'+f);
 if(GT.preloadPortraits) GT.preloadPortraits(GT.portraitFiles);
 /* 表情の差分（笑顔・驚き・怯え・口を開いたマリ・化けた狼）の webp は、元の PNG から作るときに
    ふだんの絵にぴったり重なる位置・大きさに合わせてある。表情を変えても、人物がずれない */
 GT.portraits = {
   boy:   BOY_PORTRAIT,                                           // 少年のセリフ（c:'boy'）
   // 狼：左向き『狡猾な人狼の立ち姿』。おばあさんに化けているセリフ（f:'granny'）は『おばあちゃん狼の不敵な微笑み』
-  wolf:  l=> l.f==='granny' ? P+'おばあちゃん狼の不敵な微笑み.webp' : P+'狡猾な人狼の立ち姿.webp',
+  //     正体をかくしているあいだ（f:'disguise'）は、その絵を黒く塗りつぶした影『おばあちゃん狼の不敵な微笑み_影』
+  wolf:  l=> l.f==='disguise' ? P+'おばあちゃん狼の不敵な微笑み_影.webp' : l.f==='granny' ? P+'おばあちゃん狼の不敵な微笑み.webp' : P+'狡猾な人狼の立ち姿.webp',
   // 赤ずきん：ふだん『水彩タッチの赤ずきん少女』／笑顔（f:'smile'）『笑顔の赤ずきんと basket』／驚き（f:'surprise'）『赤ずきんの驚き顔バスケット少女』
   hood:  l=> l.f==='smile' ? P+'笑顔の赤ずきんと basket.webp' : l.f==='surprise' ? P+'赤ずきんの驚き顔バスケット少女.webp' : P+'水彩タッチの赤ずきん少女.webp',
   mother:P+'水彩風の優しいお母さん.webp',                         // お母さん
