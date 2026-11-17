@@ -12,7 +12,7 @@
      4) 本を裏返すと、赤ずきんも一緒に天井へ「落ちる」。天井を歩いて水たまりを越え、
         もう一度裏返して向こう岸へ降りる。
         （赤ずきんがまだ水たまりの上にいるうちに戻すと、岸へ逃げる。置いていくと「待って……！」）
-     5) 二人とも向こう岸に着いたら、赤ずきんに話しかける（タップ / Enter）。話し終えると右の端が開く。
+     5) 二人とも向こう岸に着いたら、赤ずきんのほうから話しかけてくる（自動で会話）。話し終えると右の端が開く。
 
    ◆ 赤ずきんは、このファイルが自分で動かして描いている（engine の NPC は、
      最後に話しかけるときだけ、その場所に出して使う）。
@@ -170,6 +170,9 @@ GT.registerUpdate(dt=>{
   // 向こう岸に、二人とも着いた
   const across = h.settled && h.g===1 && h.x>=rightBank()-0.5 && pcx>POND.x+POND.w && pl.onGround && GT.gravity.right===1;
   if(st.phase==='follow' && across){ st.phase='talk'; st.bubble=null; return; }
+  // 向こう岸で待っている赤ずきんが、そのまま話しかけてくる（自分から話しかけなくても始まる）
+  if(st.phase==='talk' && n && n.talkable && !n.talked && GT.mode==='play'
+     && !document.getElementById('dlg').classList.contains('show')){ GT.player.vx=0; GT.talkTo(n); return; }
   // 置いていかれた
   if(st.phase==='follow' && h.g===1 && pondSide(h.x+HW/2)==='left' && pcx>POND.x+POND.w){
     st.waitT-=dt; if(st.waitT<=0){ say('待って……！'); st.waitT=3.2; } }

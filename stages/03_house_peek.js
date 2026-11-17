@@ -6,13 +6,13 @@
    ◆ このステージの流れ
      1) 森の小道を抜けると、森のはずれの家。左ページは庭（柵・物干し・井戸）、右ページが家。
         窓には明かりがともり、中で人影が動いている。
-     2) 右ページに入ると、マリが声をかけてくる（自動で会話）。
-        「話しかける前に、まず見ておいたほうがいいよ。……あの窓」
+     2) 右ページのマリに、自分から話しかける（タップ / Enter）。
+        「話しかける前に、まず見ておいたほうがいいよ。……あの窓」（話しかけずに窓をのぞいてもよい）
      3) 窓の下の薪の山に乗って、窓の前に立つと、窓のぞきが始まる（自動）
         窓の中で、母親が赤ずきんにお使いを頼む場面が見える。
      4) 窓から離れると、戸が開いて、赤ずきんがかごを持って駆けだしていく。
      5) のぞき終わると、マリのほうから話しかけてくる（自動）「これが、このお話のはじまり」。話し終えると右の端が開く。
-        （マリには自分から話しかけることはできない）
+        （のぞいたあとは、マリには自分から話しかけることはできない）
 
    ◆ このファイルが持っている独自の仕掛け（engine.js は触らない）
      セリフ中の act 合図：
@@ -58,7 +58,7 @@ GT.defineStage('house_peek', {
 });
 
 // --- セリフ ----------------------------------------------------------------
-// 右ページに入ったとき、マリが声をかけてくる
+// マリに話しかけたとき（窓をのぞく前）
 const BRIEF=[
   {s:'マリ',c:'mari',t:'驚いた？　そう。本を裏返すと重力が反転するの。'},
   {s:'少年',c:'boy',t:'どうして空に落ちていかないの？'},
@@ -125,12 +125,23 @@ function autoTalk(lines, then){
 GT.registerUpdate(()=>{
   if(!isHouse()) return;
   const pl=GT.player, pcx=pl.x+pl.w/2;
-  const mari=GT.getNpcs().find(n=>n.who==='mari'); if(mari) mari.talkable=false;   // マリには自分から話しかけない（のぞいたあと、マリのほうから話しかけてくる）
+  /* マリ：窓をのぞく前は、自分から話しかけると BRIEF を話す（話し終えても右の端は開かない）。
+     のぞいたあとは、自分からは話しかけられない（マリのほうから話しかけてきて、npcs の lines を話す） */
+  const mari=GT.getNpcs().find(n=>n.who==='mari');
+  if(mari){
+    if(!st.briefed){
+      if(!mari._final){ mari._final={lines:mari.lines, onEnd:mari.onEnd, noExit:mari.noExit};
+        mari.lines=BRIEF; mari.noExit=true; mari.onEnd=()=>{ st.briefed=true; }; }
+      mari.talkable=true;
+    } else {
+      if(mari._final){ Object.assign(mari,mari._final); mari._final=null; mari.talked=false; }   // のぞいたあとの会話にもどす
+      mari.talkable=false;
+    }
+  }
   if(st.busy) return;
-  if(!st.briefed && pcx>GT.SPINE+20){ st.briefed=true; autoTalk(BRIEF); return; }
   const onWood = pl.onGround && GT.gravity.right===1 && Math.abs(pl.y+pl.h-WOOD.y)<2
               && pcx>WOOD.x+4 && pcx<WOOD.x+WOOD.w-4;
-  if(!st.peeked && onWood){ st.peeked=true; st.briefed=true;
+  if(!st.peeked && onWood && !document.getElementById('dlg').classList.contains('show')){ st.peeked=true; st.briefed=true;
     autoTalk(PEEK, ()=>{ if(isHouse()) GT.talkTo(GT.getNpcs().find(n=>n.who==='mari')); });   // のぞき終わったら、そのままマリが話しかけてくる
   }
 });
