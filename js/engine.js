@@ -671,7 +671,15 @@ function beginDialogue(lines,choices,onComplete){
 }
 function nextLine(){
   dlgChoices.innerHTML='';
-  if(dq.length===0){ if(dChoices){ showChoices(dChoices); return; } dlgHint.style.display='none'; finishDialogue(); return; }
+  if(dq.length===0){
+    if(dChoices && GT.flags && !GT.flags.bookmarkTip){   // はじめて選択肢が出るとき：しおりの説明を一度だけ
+      GT.flags.bookmarkTip=true;
+      const sp=document.querySelector('.gt-spare'); if(sp) sp.classList.add('gt-guide');
+      dq.push({s:'',c:'narr',t:'（選択肢だ。選ぶ前に、本の上の「Save」の栞を押しておくと、このページにしおりを挟める。挟んだしおりを押せば、いつでもこのページにもどって、選びなおせる）'});
+    } else {
+      document.querySelectorAll('.gt-spare.gt-guide').forEach(e=>e.classList.remove('gt-guide'));
+      if(dChoices){ showChoices(dChoices); return; } dlgHint.style.display='none'; finishDialogue(); return; }
+  }
   const line=dq.shift();
   for(const h of lineHooks) h(line);
   if(line.act && actHooks[line.act]) actHooks[line.act]();

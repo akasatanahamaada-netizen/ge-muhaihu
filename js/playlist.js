@@ -46,7 +46,7 @@ GT.definePages([
 ]);
 
 // 分岐フラグの初期値（各ステージの choices が書き換える）
-GT.flags = { playerName:null, mariNamed:false, warnedHood:false, route:null, stoppedAtDoor:false, saved:null, grannyAlive:null,
+GT.flags = { playerName:null, mariNamed:false, bookmarkTip:false, warnedHood:false, route:null, stoppedAtDoor:false, saved:null, grannyAlive:null,
              wolfClues:0, houseClues:0, ending:null };
 
 // シーンの並び順（= ゲームの進行順）。id は各ステージファイルで登録したもの。

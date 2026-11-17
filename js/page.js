@@ -68,7 +68,7 @@
 
 /* 本のまわり（参考画像２のデザイン）：
      ・.gt-cover … 焦げ茶の表紙と、開いたページのふち（重なった紙の線）。ゲーム画面のうしろに SVG で描く
-     ・.gt-flags … 左がわの赤いリボンの旗。「Reread」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）
+     ・.gt-flags … 左がわの赤いリボンの旗。「Book」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）
      ・.gt-tabs  … 上の紺色のしおり（menu.js の「しおりを挟む」で挟んだもの。Ⅰ〜Ⅴ）
    全画面ボタンは机の右上へ */
 (function(){
@@ -112,7 +112,7 @@
   // 左がわの旗
   const flags=document.createElement('div'); flags.className='gt-flags'; wrap.appendChild(flags);
   const book=document.getElementById('openBook');
-  if(book){ book.className='gt-flag reread'; book.textContent='Reread'; book.title='本を読み返す'; book.setAttribute('aria-label','本を読み返す'); flags.appendChild(book); }
+  if(book){ book.className='gt-flag reread'; book.textContent='Book'; book.title='本を読み返す'; book.setAttribute('aria-label','本を読み返す'); flags.appendChild(book); }
   const menuBtn=wrap.querySelector('.gtm-open');
   if(menuBtn){ menuBtn.className='gt-flag menu'; menuBtn.textContent='menu'; menuBtn.setAttribute('aria-label','メニュー'); flags.appendChild(menuBtn); }
   // やり直すボタンは、ゲーム画面の右上のまま（engine.js の「↺ やり直す」。旗にすると分かりにくいため）
