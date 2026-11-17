@@ -147,7 +147,7 @@ GT.registerSceneType('qte', ()=>{
     {s:'狼',c:'wolf',f:'granny',t:'おまえを、よく見るためだよ。'},
     {s:'赤ずきん',c:'hood',f:'surprise',t:'……なんて大きな歯なの。'},
     {s:'狼',c:'wolf',f:'granny',t:'それは、'},                     // ひと呼吸おいてから
-    {s:'狼',c:'wolf',f:'granny',t:'おまえを食べるためだよ。'},
+    {s:'狼',c:'wolf',f:'granny',big:true,t:'おまえを食べるためだよ！'},   // big … 太く大きな文字で
     {s:'',c:'narr',t:'狼が、勢いよくベッドから跳ね起きた。',act:'bgm-on'},
   ];
   GT.beginDialogue(lines,null,()=>{
