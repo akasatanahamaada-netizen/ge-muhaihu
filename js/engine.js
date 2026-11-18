@@ -1616,7 +1616,7 @@ function drawGameOver(){
   ctx.globalAlpha=k; ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle='#f3ead0'; ctx.font="700 54px 'Caveat',cursive"; ctx.fillText('Game Over',W/2,H/2-18);
   ctx.globalAlpha=Math.min(1,Math.max(0,(t-0.5)/0.4));
-  ctx.fillStyle='#d9c79a'; ctx.font="600 15px 'Zen Old Mincho',serif"; ctx.fillText('もう一度、このページから……',W/2,H/2+26);
+  // （「ページをもどって、やりなおす」などの文は出さない）
   ctx.restore();
 }
 /* ミッションの表示（HTML）。文字がくっきり出る。位置はキャンバスの上から 48/480 */

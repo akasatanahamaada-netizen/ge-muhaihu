@@ -296,7 +296,7 @@ GT.registerGameOver('wolf',{
     if(t>3.0){ c.globalAlpha=Math.min(1,(t-3.0)/0.5); c.textAlign='center'; c.font="600 17px 'Zen Old Mincho',serif";
       c.fillStyle='#b08d77'; c.fillText('―― おしまい……？',W/2,H/2+30); }
     if(t>3.6){ c.globalAlpha=Math.min(1,(t-3.6)/0.4)*0.85; c.font="500 13px 'Zen Old Mincho',serif";
-      c.fillStyle='#d9c79a'; c.fillText('もう一度、このページから……',W/2,H/2+60); }
+      }   // （「ページをもどって、やりなおす」などの文は出さない）
     c.restore();
   },
 });
