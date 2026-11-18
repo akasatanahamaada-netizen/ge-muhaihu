@@ -259,10 +259,10 @@ function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':
 const pageSound=()=>{ GT.sfx&&GT.sfx('page'); };   // メニューを開いたとき・メニューの中で何かを選んだときは、ページをめくる音
 function showMenu(sound){
   if(sound) pageSound();
-  GT.paused=true; refreshMain(); menu.classList.add('show'); openBtn.style.display='none'; setView('main');
+  GT.paused=true; refreshMain(); menu.classList.add('show'); openBtn.style.visibility='hidden';   // 場所は残す（となりの Reread の栞が動かないように） setView('main');
 }
 function hideMenu(){
-  menu.classList.remove('show'); openBtn.style.display=''; GT.paused=false;
+  menu.classList.remove('show'); openBtn.style.visibility=''; GT.paused=false;
 }
 function startNew(){
   applyState(INIT); rebuildScenes(); inGame=true; hideMenu(); GT.flipToScene(0,1);   // ページをめくってから始める

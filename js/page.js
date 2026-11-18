@@ -156,8 +156,8 @@
   const marks=document.createElement('div'); marks.className='gt-marks'; wrap.appendChild(marks);
   const asMark=(el,word,label)=>{ if(!el) return; el.className='gt-mark'; el.innerHTML='<span class="word"></span>';
     el.querySelector('.word').textContent=word; el.title=label; el.setAttribute('aria-label',label); el.removeAttribute('style'); marks.appendChild(el); };
+  asMark(wrap.querySelector('.gtm-open'),'menu','メニュー');          // 左が menu、右が Reread
   asMark(document.getElementById('openBook'),'Reread','本を読み返す');
-  asMark(wrap.querySelector('.gtm-open'),'menu','メニュー');
   const fs=document.getElementById('fsBtn'); if(fs) document.body.appendChild(fs);
   const under=document.querySelector('.under'); if(under) under.style.display='none';
 })();
