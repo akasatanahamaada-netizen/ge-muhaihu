@@ -484,8 +484,8 @@ GT.registerAct('after-setup',()=>{
   if(m){ m.lines=EPILOGUE[ending.kind].concat([{s:'',c:'narr',t:'第一章「赤い頭巾」　おわり',act:'end-card'}]); }
 });
 GT.registerScene({
-  id:'afterword', type:'story', stage:'opening_after', label:'序章 ── 森',   // マリと初めて会ったページにもどる（切り株のあるページ。stages/00_opening.js が描く）
-  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年はマリと初めて会った森に立っていた。',act:'after-setup'},
+  id:'afterword', type:'story', stage:'mari_gate', label:'序章 ── 森の出口',   // マリが待っている、森の出口にもどる（stages/02c_mari_gate.js が描く）
+  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年は森の出口に立っていた。',act:'after-setup'},
           {s:'',c:'narr',t:'大きな木の下で、マリが待っていた。'} ],
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:630, noExit:true, required:true,   // 話すとエンディング

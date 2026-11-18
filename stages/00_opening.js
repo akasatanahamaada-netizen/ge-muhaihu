@@ -63,10 +63,7 @@ GT.defineStage('opening', {
 });
 
 GT.setLedgeStyle('opening','flat');   // 足場は輪郭線なしの平らな茶色
-// 赤ずきんのお話のあとに もどってくる、同じページ（切り株もそのまま。光の玉はない）
-GT.defineStage('opening_after', { label:'序章 ── 森', platforms:GT.STAGE_DEFS.opening.platforms.map(p=>({...p})), boxes:[], enemies:[], items:[],
-  decor:GT.STAGE_DEFS.opening.decor.map(d=>({...d})) });
-GT.setLedgeStyle('opening_after','flat');
+
 
 // --- セリフ ----------------------------------------------------------------
 // 最初に話しかけたとき。拾ったかけらの数で、途中が変わる。
@@ -552,10 +549,7 @@ GT.goth=GOTH;   // ゴシックの森の描き方を、ほかのステージに�
 
 function drawHill(){}   // 丘の岩は、なくした
 
-const isAfterPage=()=>GT.scene&&GT.scene.id==='afterword';   // 赤ずきんのお話のあと：マリと初めて会ったページにもどる
-GT.registerDraw(()=>{ if(!isOpening()&&!isAfterPage()) return; drawLightShafts(); GOTH.back(); GOTH.props(); GOTH.fog(false); }, 'back');
-GT.registerDraw(()=>{ if(!isAfterPage()) return; drawStump(); GOTH.shrooms(); drawMariTree(); GOTH.lantern(); drawLeaves(); }, 'world');
-GT.registerDraw(()=>{ if(!isAfterPage()) return; GOTH.fog(true); GOTH.top(); GOTH.wisps(); GTDecor.forest.air(); }, 'overlay');
+GT.registerDraw(()=>{ if(!isOpening()) return; drawLightShafts(); GOTH.back(); GOTH.props(); GOTH.fog(false); }, 'back');
 GT.registerDraw(()=>{ if(!isOpening()) return; drawHill(); drawPages(); drawStump(); GOTH.shrooms(); drawMariTree(); GOTH.lantern(); drawLeaves(); drawMarks(); }, 'world');
 // （「光にさわる → お話のかけら」の説明は出さない。マリが話すので）
 GT.registerDraw(()=>{ if(!isOpening()) return; GOTH.fog(true); GOTH.top(); GOTH.wisps(); GTDecor.forest.air(); drawHiddenGlint(); drawBookView(); drawWake(); }, 'overlay');

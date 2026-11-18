@@ -102,8 +102,7 @@ GT.stageBackgrounds = {
   wake:DARK,          // 序章（ひとりで目覚める）：暗い森
   opening:DARK,        // 序章（マリと出会う）：暗い森
   afterword:DARK,
-  mari_gate:DARK,
-  opening_after:DARK,                                    // チュートリアルのおわり：森の出口      // 第一章のあと：はじめの暗い森にもどる
+  mari_gate:DARK,                                    // チュートリアルのおわり：森の出口      // 第一章のあと：はじめの暗い森にもどる
   komichi1:DARK, komichi2:DARK,   // チュートリアルも、序章のゴシックの森
   path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
   house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
