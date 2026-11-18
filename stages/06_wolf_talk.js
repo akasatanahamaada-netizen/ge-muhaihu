@@ -333,10 +333,10 @@ const FX=(()=>{
 
   // どのくらいこわいか（0〜1）
   function dread(){ const pl=GT.player;
-    if(st.phase==='walk') return Math.max(0,Math.min(1,(pl.x-200)/(SPINE+30-200)))*0.7;
-    if(st.phase==='appear') return 1;
-    if(st.phase==='wolf') return st.leaveT0?0.45:0.75;
-    return 0.35; }
+    if(st.phase==='walk') return Math.max(0,Math.min(1,(pl.x-200)/(SPINE+30-200)))*0.4;   // 近づくと、少し暗く
+    if(st.phase==='appear') return 0.85;                                              // 狼が出てくる瞬間だけ、ぐっと暗く
+    if(st.phase==='wolf') return st.leaveT0?0.25:0.4;
+    return 0.2; }
   function appearK(){ return st.phase==='appear' ? (performance.now()-st.appearT0)/1000 : -1; }
 
   // 時間で鳴る音（描画のついでに見る）
