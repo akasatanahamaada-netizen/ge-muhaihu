@@ -36,10 +36,7 @@ const ctx=GT.ctx, W=GT.W, H=GT.H, EDGE=GT.EDGE, FLOOR=H-GT.EDGE;
 // --- 地形 ------------------------------------------------------------------
 GT.defineStage('opening', {
   platforms:[
-    // 左ページ：少年が落ちてきた小さな丘（3段）
-    {page:'left', x:90,  y:420, w:140, h:40,  kind:'ledge'},
-    {page:'left', x:180, y:380, w:160, h:80,  kind:'ledge'},
-    {page:'left', x:280, y:340, w:150, h:120, kind:'ledge'},
+    // （前は左ページに丘の岩が3段あった。岩はなくした）
     // 右ページ：切り株（ジャンプで乗る）
     {page:'right', x:520, y:380, w:56, h:84,  kind:'ledge'},
   ],
@@ -48,7 +45,7 @@ GT.defineStage('opening', {
   enemies:[
   ],
   items:[
-    {page:'left',  x:340, y:296, w:40, h:40},   // 丘のてっぺん
+    {page:'left',  x:320, y:376, w:40, h:40},   // 床の上に浮かぶ（ジャンプで取る）
     {page:'right', x:534, y:334, w:28, h:28},   // 切り株の上
     {page:'left',  x:22,  y:434, w:26, h:26},   // 倒れていた場所の葉の陰（手前の葉で隠れる）
   ],
@@ -59,7 +56,6 @@ GT.defineStage('opening', {
     // 奥の木は、ゴシックの枯れ木（下の GOTH.back で描く）
     // 石・茂みは、ゴシックの石と薔薇の茂み（下の GOTH で描く）
     {layer:'front', kind:'fernFlat',  x:-6,  y:386, w:96,  h:80},   // かけらを隠す葉
-    {layer:'front', kind:'grassFlat', x:298, y:310, w:58,  h:30},
     {layer:'front', kind:'grassFlat', x:466, y:434, w:62,  h:30},
     {layer:'front', kind:'grassFlat', x:806, y:434, w:56,  h:30},
   ],
@@ -561,10 +557,7 @@ const GOTH=(()=>{
 })();
 GT.goth=GOTH;   // ゴシックの森の描き方を、ほかのステージにも貸す
 
-function drawHill(){
-  const P=i=>GT.STAGE_DEFS.opening.platforms[i];
-  GTDecor.forest.rock([P(0),P(1),P(2)],3);
-}
+function drawHill(){}   // 丘の岩は、なくした
 
 GT.registerDraw(()=>{ if(!isOpening()) return; drawLightShafts(); GOTH.back(); GOTH.props(); GOTH.fog(false); }, 'back');
 GT.registerDraw(()=>{ if(!isOpening()) return; drawHill(); drawPages(); drawStump(); GOTH.shrooms(); drawMariTree(); GOTH.lantern(); drawLeaves(); drawMarks(); }, 'world');

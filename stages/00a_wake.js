@@ -14,7 +14,12 @@ const ctx=GT.ctx, W=GT.W, H=GT.H, EDGE=GT.EDGE, FLOOR=H-GT.EDGE;
 const START_X=150, BOOK_X=206;
 
 GT.defineStage('wake', {
-  platforms:[], boxes:[], enemies:[], items:[],
+  platforms:[   // 右のはしの、岩の階段（ジャンプの練習）
+    {page:'right', x:650, y:424, w:80,  h:40,  kind:'ledge'},
+    {page:'right', x:720, y:384, w:80,  h:80,  kind:'ledge'},
+    {page:'right', x:790, y:344, w:94,  h:120, kind:'ledge'},
+  ],
+  boxes:[], enemies:[], items:[],
   decor:[
     {layer:'front', kind:'grassFlat', x:380, y:434, w:62, h:30},
     {layer:'front', kind:'grassFlat', x:760, y:434, w:56, h:30},
@@ -94,14 +99,16 @@ function drawBook(){   // 地面に落ちている本（拾うまで）
   ctx.strokeStyle='#c9a45a'; ctx.lineWidth=1; ctx.strokeRect(-17,-8,34,10);  // 金の線
   ctx.restore();
 }
-function drawHintMove(){   // 説明は「→ 右へ進む」だけ
+function drawHintMove(){   // 説明：はじめは「→ 右へ進む」、階段の手前で「↑ ジャンプ」
   if(!isWake() || GT.mode!=='play' || !st.picked) return;
-  const pl=GT.player; if(pl.x>W*0.62) return;
-  GT.drawHint(W/2, 190, [[['→','D'],'右へ進む']]);
+  const pl=GT.player, top=GT.STAGE_DEFS.wake.platforms[2];
+  if(pl.x<520) GT.drawHint(W/2, 190, [[['→','D'],'右へ進む']]);
+  else if(!(pl.onGround && Math.abs(pl.y+pl.h-top.y)<2)) GT.drawHint(600, 200, [[['↑','W'],'ジャンプ'],'岩の段を のぼろう']);
 }
+function drawStairs(){ const P=GT.STAGE_DEFS.wake.platforms; GTDecor.forest.rock([P[0],P[1],P[2]],5); }
 
 GT.registerDraw(()=>{ if(!isWake()||!GT.goth) return; GT.goth.back(); GT.goth.props(); GT.goth.fog(false); }, 'back');
-GT.registerDraw(()=>{ if(!isWake()) return; updateFall(); GT.goth&&GT.goth.shrooms(); drawBook(); drawStreaks(); drawDust(); }, 'world');
+GT.registerDraw(()=>{ if(!isWake()) return; updateFall(); drawStairs(); GT.goth&&GT.goth.shrooms(); drawBook(); drawStreaks(); drawDust(); }, 'world');
 GT.registerDraw(()=>{ if(!isWake()||!GT.goth) return; GT.goth.fog(true); GT.goth.top(); GT.goth.wisps(); }, 'overlay');
 GT.registerDraw(()=>{ drawHintMove(); }, 'speech');
 

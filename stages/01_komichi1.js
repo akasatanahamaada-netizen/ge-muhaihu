@@ -78,8 +78,7 @@ GT.registerSceneReset(()=>{ if(!isHere()) return; tut.step=0;
   // 森の小道に入ったら、本の「森の小道」のページに書きこまれる（虫食いは、ここのかけらを拾うほど読めるようになる）
   GT.fillPage('komichi','――少年は、マリと別れて、森の小道を進んだ。本を裏返すと、そのページの重さの向きが変わる。少年は天井を歩いて大木を越え、木箱を押して道をひらいた。'); });
 const STEPS=[
-  { done:()=>{ const pl=GT.player; return pl.onGround && Math.abs(pl.y+pl.h-ROCK_L.y)<2; },
-    at:[150,230], lines:[[['↑','W'],'ジャンプ'],'岩の段を のぼろう'] },
+  // （ジャンプの説明は、目覚めの場面の階段で出すので、ここではしない）
   { done:()=>GT.gravity.left===-1,
     at:[200,120], lines:['大きな木が 道をふさいでいる',[['F','Space'],'本を裏返す → このページの重力が反転'],'（床や天井に立っているときだけ 裏返せる）'] },
   { done:()=>GT.currentPage()==='right',
