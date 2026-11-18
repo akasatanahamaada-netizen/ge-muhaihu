@@ -164,7 +164,7 @@ GT.registerAct('front-setup',()=>{
     GT.openStoryExit&&GT.openStoryExit(); }
   else { if(h) h.x=EDGE; GT.flags.stoppedAtDoor=false; }
 });
-GT.registerAct('front-walk',()=>{ st.walkDoor=true; GT.holdDialogue(()=>{ const h=npc('hood'); return !h || Math.abs(h.x-HOOD_DOOR)<10; }); });   // 赤ずきんが戸の前に着くまで、会話の枠を消して見せる
+GT.registerAct('front-walk',()=>{ st.walkDoor=true; const t0=performance.now(); GT.holdDialogue(()=>{ const h=npc('hood'); return !h || Math.abs(h.x-HOOD_DOOR)<10 || performance.now()-t0>5000; }); });   // （念のため、5秒たったら先へ）   // 赤ずきんが戸の前に着くまで、会話の枠を消して見せる
 GT.registerAct('front-knock',()=>{ st.knockT0=performance.now(); });
 GT.registerAct('front-hood-enter',()=>{ st.hoodEnterT0=performance.now(); GT.holdDialogue(()=>st.hoodInside); });   // 赤ずきんが戸の中へ入るまで、会話の枠を消して見せる
 // 赤ずきんを止める：少年が、戸の前の赤ずきんのそばまで自動で駆けよる
