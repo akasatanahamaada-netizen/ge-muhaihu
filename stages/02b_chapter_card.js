@@ -15,7 +15,7 @@ GT.registerScene({ id:'chapter1', type:'card', label:'第一章「赤い頭巾�
 
 const card={ t0:0, flipped:false, sfx:false, ch:1 };
 const isCard=()=>GT.scene&&GT.scene.id==='chapter1';
-const T_GLOW=0.9, T_OPEN0=1.6, T_OPEN1=2.8, T_TEXT=3.0, T_END=6.6;   // T_GLOW … 画面いっぱいに光りかがやく いちばん明るいとき
+const T_GLOW=0.9, T_OPEN0=1.6, T_OPEN1=2.8, T_TEXT=3.0, T_END=6.6;   // T_GLOW … 画面全体が まっ白になるとき
 
 GT.registerDynamic('chapterCard', scene=>{
   GT.loadStageDef(GT.STAGE_DEFS['chapter1_card']); GT.mode='idle';
@@ -98,18 +98,10 @@ function drawCard(){
     ctx.fillStyle='#8a1c24'; ctx.globalAlpha=k2*0.9; ctx.beginPath(); ctx.arc(0,82,4.5,0,Math.PI*2); ctx.fill();   // 小さな赤い点（赤い頭巾）
     ctx.strokeStyle='rgba(120,80,40,0.45)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-64,82); ctx.lineTo(-14,82); ctx.moveTo(14,82); ctx.lineTo(64,82); ctx.stroke(); }
   ctx.restore();
-  // はじめに、画面いっぱいが光りかがやく（光のすじと、まぶしい白金色）。光がひいていくと、本があらわれる
+  // はじめに、画面全体が白くなる（ふわっと白くなり、少しそのまま、白がひいていくと本があらわれる）
   if(t<T_GLOW+0.9){
     const up=Math.min(1,t/T_GLOW), down=t>T_GLOW?Math.max(0,1-(t-T_GLOW)/0.9):1, L=ease(up)*down;
-    ctx.save(); ctx.globalCompositeOperation='lighter';
-    ctx.translate(W/2,H/2); ctx.rotate(t*0.25);
-    for(let i=0;i<14;i++){ ctx.rotate(Math.PI*2/14);                     // ひろがる光のすじ
-      const g2=ctx.createLinearGradient(0,0,W*0.75,0); g2.addColorStop(0,`rgba(255,236,180,${0.55*L})`); g2.addColorStop(1,'rgba(255,236,180,0)');
-      ctx.fillStyle=g2; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(W*0.75,-22-12*(i%3)); ctx.lineTo(W*0.75,22+12*(i%3)); ctx.closePath(); ctx.fill(); }
-    ctx.restore();
-    ctx.save();
-    const g3=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*0.7); g3.addColorStop(0,`rgba(255,250,232,${L})`); g3.addColorStop(0.5,`rgba(255,232,170,${0.85*L})`); g3.addColorStop(1,`rgba(240,200,120,${0.6*L})`);
-    ctx.fillStyle=g3; ctx.fillRect(0,0,W,H); ctx.restore();
+    ctx.save(); ctx.fillStyle=`rgba(255,253,248,${L})`; ctx.fillRect(0,0,W,H); ctx.restore();
   }
   // 最後は、すこし白くとんで、めくりへ
   const fade=ease((t-(T_END-0.6))/0.6);
