@@ -1477,16 +1477,10 @@ let chimeAC=null;
 function chime(){
   const vol=GT.volume?GT.volume.se:1; if(vol<=0) return;
   try{ chimeAC=chimeAC||new (window.AudioContext||window.webkitAudioContext)(); if(chimeAC.state==='suspended') chimeAC.resume(); }catch(e){ return; }
-  // 光の魔法の音：やわらかい「ぽわん」に、きらきら上がっていく高い音の粒と、ふわっとした空気の音を重ねる。こだまで光が残るように
+  // 光の魔法の音：きらきら上がっていく高い音の粒と、ふわっとした空気の音。こだまで光が残るように
   const a=chimeAC, t=a.currentTime, out=a.createGain(); out.gain.value=vol; out.connect(a.destination);
   const dl=a.createDelay(1), fb=a.createGain(), wet=a.createGain(); dl.delayTime.value=0.13; fb.gain.value=0.38; wet.gain.value=0.5;   // こだま（きらきらが残る）
   dl.connect(fb).connect(dl); dl.connect(wet).connect(out);
-  // ① やわらかい土台（ぽわん）
-  const lp=a.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1800;
-  const bg=a.createGain(); bg.gain.setValueAtTime(0.0001,t); bg.gain.exponentialRampToValueAtTime(0.13,t+0.06); bg.gain.exponentialRampToValueAtTime(0.0001,t+1.2);
-  [[523.25,1],[784,0.4]].forEach(([f,amp])=>{ const o=a.createOscillator(), og=a.createGain(); o.type='sine'; og.gain.value=amp;
-    o.frequency.setValueAtTime(f*0.85,t); o.frequency.exponentialRampToValueAtTime(f,t+0.12); o.connect(og).connect(lp); o.start(t); o.stop(t+1.25); });
-  lp.connect(bg).connect(out);
   // ② きらきら：高い音の粒が、すばやく上がっていく（ド・レ・ミ・ソ・ラ・ド）
   [1046.5,1174.7,1318.5,1568,1760,2093].forEach((f,i)=>{ const o=a.createOscillator(), g=a.createGain(), tt=t+0.05+i*0.045;
     o.type='sine'; o.frequency.value=f;
