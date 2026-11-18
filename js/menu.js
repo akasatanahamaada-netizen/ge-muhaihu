@@ -259,7 +259,7 @@ function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':
 const pageSound=()=>{ GT.sfx&&GT.sfx('page'); };   // メニューを開いたとき・メニューの中で何かを選んだときは、ページをめくる音
 function showMenu(sound){
   if(sound) pageSound();
-  GT.paused=true; refreshMain(); menu.classList.add('show'); openBtn.style.visibility='hidden';   // 場所は残す（となりの Reread の栞が動かないように） setView('main');
+  GT.paused=true; refreshMain(); menu.classList.add('show'); openBtn.style.visibility='hidden'; setView('main');   // menu の栞は場所を残して隠す（となりの Reread の栞が動かないように）
 }
 function hideMenu(){
   menu.classList.remove('show'); openBtn.style.visibility=''; GT.paused=false;
