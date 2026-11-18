@@ -155,7 +155,7 @@ GT.sceneMusic = {
 // 最終戦闘（おばあさんの家で差しこまれるボス戦・QTE。id が無いので、シーンの種類で決める）
 GT.sceneTypeMusic = { boss:M('Foehn_Wind'), qte:M('Foehn_Wind') };
 GT.titleMusic = M('魔法の扉は夜開く (1)');    // タイトル（メニュー）画面。前は『世界の最果てで、自由を謳う』
-GT.bookMusic  = M('時計図書館 (1)');          // 本を読み返す画面（Reread）
+GT.bookMusic  = null;   // 本を読み返す画面（Reread）では、本だけの曲にせず、いまのステージの曲をそのまま流す（前は『時計図書館 (1)』）
 
 // 走るときの足音（シーンの id ごとの地面）。'grass'=芝生 / 'leaves'=落ち葉 / 'dirt'=土。書いていないシーン（家の中など）は足音なし。
 GT.sceneFootsteps = {
