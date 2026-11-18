@@ -83,20 +83,35 @@ const BG_DARK='assets/background/霧深き森のゴシック童話.webp';   // �
 const BG_ROSE='assets/background/薔薇咲く霧深きゴシックの森.webp';   // 霧の深い、薔薇の咲く森（近道②：いばらのトンネル）
 const S=src=>({src,page:'spread'});
 // ゴシック：明るい森の絵は、暗く・色を抜き・赤紫をかぶせて使う（タイトル画面の霧の薔薇の森に合わせる）
-const G=src=>({src,page:'spread',filter:'brightness(0.72) saturate(0.55) contrast(1.05) blur(0.8px)',tint:'rgb(178,172,164)',wash:'rgba(244,240,230,0.06)'});
+// m … 不気味さ（0〜1）。大きいほど、絵を暗く・色を抜く（お話が進むほど大きくする）
+const G=(src,m=0.5)=>({src,page:'spread',filter:`brightness(${(0.95-0.45*m).toFixed(2)}) saturate(${(0.8-0.45*m).toFixed(2)}) contrast(1.05) blur(0.8px)`,tint:'rgb(178,172,164)',wash:'rgba(244,240,230,0.06)'});
 const BG_TITLE='assets/background/タイトル背景.webp';   // タイトル画面の背景（道のある、霧の薔薇の森）
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
-  opening:Object.assign({},DARK,{shade:0.3}),       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
-  komichi1:G(BG_DAY), komichi2:G(BG_DAY), path1:G(BG_DAY), meet_hood:G(BG_DAY), cliff:G(BG_DAY),
-  house_peek:Object.assign({},DARK,{shade:0.15}),   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
+  opening:Object.assign({},DARK,{shade:0.2}),       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
+  komichi1:G(BG_DAY,0), komichi2:G(BG_DAY,0.1), path1:G(BG_DAY,0.3), meet_hood:G(BG_DAY,0.35), cliff:G(BG_DAY,0.5),   // だんだん暗く
+  house_peek:DARK,   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
   wolf_talk:DARK,                                    // 狼（暗い森）
   crossroads:{src:BG_TITLE,page:'spread',wash:'rgba(244,240,230,0.08)'},   // 分かれ道（道のある、霧の薔薇の森）
   path2:DARK, path2b:ROSE,                           // 近道（①暗い森 ②いばらと薔薇の森）
   flowers:ROSE,                                      // お花畑（遠回りの はじめ。薔薇の森）
-  path3:G(BG_DAY), path4:G(BG_EVENING),              // 遠回り：歩くうちに日が傾く
-  house_front:f=>G(f.route==='shortcut'?BG_DAY:BG_EVENING),
+  path3:G(BG_DAY,0.75), path4:G(BG_EVENING,0.85),              // 遠回り：歩くうちに日が傾く
+  house_front:f=>G(f.route==='shortcut'?BG_DAY:BG_EVENING,0.9),
+};
+
+/* 不気味さ（0〜1）：お話が進むほど、暗く・色が抜け・冷たい色になり、霧が出る（js/engine.js の drawGothicWorld）。
+   書いていないシーンは 0.5。'@boss' のように、種類でも決められる */
+const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
+GT.sceneMood = {
+  opening:0.3,                                   // 序章：ふしぎで、少し暗い
+  komichi1:0, komichi2:0.05,                     // チュートリアル：いちばん明るい
+  house_peek:0.15, path1:0.25, meet_hood:0.3, cliff:0.4,
+  wolf_talk:0.6,                                 // 狼：ここから不気味に
+  crossroads:0.6, path2:0.72, path2b:0.8, flowers:0.6, path3:0.7, path4:0.8,
+  house_front:0.88, arrive:0.9, '@boss':0.8, '@qte':0.8,   // おばあさんの家・戦い：いちばん暗い（戦いは部屋の暗さがあるので、少しひかえめに）
+  ending:f=>GOOD_END(f)?0.35:1,                  // 助けられたら、少し明るさが戻る
+  epilogue:f=>GOOD_END(f)?0.05:0.8,               // よい結末は、夜明けの明るさ
 };
 
 // 音楽（BGM）：シーンの id ごとに流す曲（assets/music/ フォルダの mp3）。ループ再生する。

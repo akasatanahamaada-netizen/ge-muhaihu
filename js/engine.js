@@ -1721,16 +1721,37 @@ function render(){
 
 /* ゴシックの色合い：世界（背景・地形・人物）を赤紫の色みに寄せ、少し色を抜き、四すみを暗くする（表示類・ふちのぼかしより奥） */
 let gothVig=null;
+/* 不気味さ（0〜1）：お話が進むほど暗く・色が抜け・霧が出る。値は js/playlist.js の GT.sceneMood（シーンの id ごと。'@種類' でも決められる） */
+let moodCur=null;
+function sceneMood(){
+  const sc=GT.scene; if(!sc) return 0.3; const T=GT.sceneMood||{};
+  let v = sc.id!=null && T[sc.id]!=null ? T[sc.id] : T['@'+sc.type]!=null ? T['@'+sc.type] : 0.5;
+  if(typeof v==='function') v=v(GT.flags);
+  return Math.max(0,Math.min(1,+v||0));
+}
+GT.moodNow=()=>moodCur;
+function drawMoodFog(m){   // 地面をはう霧（不気味さが 0.45 をこえると出てくる）
+  const a=(m-0.45)*0.3; if(a<=0) return; const t=performance.now()/1000;
+  for(let k=0;k<2;k++){ const y=H-GT.EDGE-8-k*30, sp=9+k*5;
+    for(let i=0;i<6;i++){ const x=((i*210+t*sp+k*120)%(W+380))-190;
+      const g=ctx.createRadialGradient(x,y,0,x,y,190); g.addColorStop(0,`rgba(205,202,204,${a*(1-k*0.35)})`); g.addColorStop(1,'rgba(205,202,204,0)');
+      ctx.save(); ctx.translate(x,y); ctx.scale(1,0.22); ctx.translate(-x,-y); ctx.fillStyle=g; ctx.fillRect(x-190,y-190,380,380); ctx.restore(); } }
+}
 function drawGothicWorld(){
+  const target=sceneMood(); moodCur = moodCur==null ? target : moodCur+(target-moodCur)*0.04;   // ゆっくり変わる
+  const m=moodCur;
   ctx.save();
-  ctx.globalCompositeOperation='saturation'; ctx.globalAlpha=0.3; ctx.fillStyle='#808080'; ctx.fillRect(0,0,W,H);   // 色を少し抜く（明るい緑の木などを、なじませる）
+  drawMoodFog(m);
+  ctx.globalCompositeOperation='saturation'; ctx.globalAlpha=0.16+0.3*m; ctx.fillStyle='#808080'; ctx.fillRect(0,0,W,H);   // 色を抜く（進むほど、色が消えていく）
+  if(m>0.3){ ctx.globalCompositeOperation='color'; ctx.globalAlpha=(m-0.3)*0.16; ctx.fillStyle='#4a5a5e'; ctx.fillRect(0,0,W,H); }   // 進むと、冷たく青ざめた色みに
   ctx.globalCompositeOperation='color'; ctx.globalAlpha=GRADE_HUE; ctx.fillStyle='#8a3d62'; ctx.fillRect(0,0,W,H);  // 赤紫の色みに寄せる（明るさはそのまま）
   ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
   const sp=stageBackgroundSpec();                                                     // 背景の shade（0〜1）… そのステージだけ、世界ぜんたいを暗くする（暗い森など）
-  if(sp&&sp.shade){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgba(16,14,12,${sp.shade})`; ctx.fillRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; }
-  if(!gothVig){ gothVig=ctx.createRadialGradient(W/2,H*0.5,H*0.35,W/2,H*0.5,W*0.62);
-    gothVig.addColorStop(0,'rgba(10,8,6,0)'); gothVig.addColorStop(1,`rgba(10,8,6,${GRADE_VIG})`); }
-  ctx.fillStyle=gothVig; ctx.fillRect(0,0,W,H);
+  const shade=(sp&&sp.shade||0)+0.5*m;                                               // 進むほど、世界ぜんたいが暗くなる
+  if(shade>0){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgba(16,14,12,${Math.min(0.85,shade)})`; ctx.fillRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; }
+  const vig=ctx.createRadialGradient(W/2,H*0.5,H*(0.42-0.12*m),W/2,H*0.5,W*0.62);       // 四すみの暗さも、進むほど強く・内がわへ
+  vig.addColorStop(0,'rgba(10,8,6,0)'); vig.addColorStop(1,`rgba(10,8,6,${GRADE_VIG*(0.55+0.75*m)})`);
+  ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
   ctx.restore();
 }
 /* ゲーム画面のふちを、まわりのページ（js/page.js の .gt-pages。色は PAGE_COLOR）へ だんだん溶けこませる */

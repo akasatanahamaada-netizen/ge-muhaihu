@@ -248,7 +248,7 @@ function drawLightShafts(){
   [[120,70,0.6],[330,50,1.7],[600,90,2.9],[760,40,4.1]].forEach(([x,w,s])=>{
     const a=0.026+0.012*Math.sin(t*0.7+s);
     const g=ctx.createLinearGradient(0,EDGE,0,FLOOR);
-    g.addColorStop(0,`rgba(200,185,255,${a*1.6})`); g.addColorStop(1,'rgba(200,185,255,0)');
+    g.addColorStop(0,`rgba(210,214,230,${a*1.6})`); g.addColorStop(1,'rgba(210,214,230,0)');
     ctx.fillStyle=g; ctx.beginPath();
     ctx.moveTo(x,EDGE); ctx.lineTo(x+w,EDGE); ctx.lineTo(x+w-110,FLOOR); ctx.lineTo(x-150,FLOOR); ctx.closePath(); ctx.fill();
   });
@@ -552,15 +552,15 @@ const GOTH=(()=>{
       ctx.save();
       for(let k=0;k<(near?1:2);k++){ const y=near?FLOOR-6:FLOOR-34-k*34, a=near?0.07:0.11-k*0.03, sp=near?14:7+k*4;
         for(let i=0;i<7;i++){ const x=((i*190+t*sp+k*90)%(W+340))-170;
-          const g=ctx.createRadialGradient(x,y,0,x,y,170); g.addColorStop(0,`rgba(228,200,222,${a})`); g.addColorStop(1,'rgba(228,200,222,0)');
+          const g=ctx.createRadialGradient(x,y,0,x,y,170); g.addColorStop(0,`rgba(215,212,214,${a})`); g.addColorStop(1,'rgba(215,212,214,0)');
           ctx.fillStyle=g; ctx.save(); ctx.translate(x,y); ctx.scale(1,0.2); ctx.translate(-x,-y); ctx.fillRect(x-170,y-170,340,340); ctx.restore(); } }
       ctx.restore(); },
     wisps(){ const t=performance.now()/1000;
       ctx.save(); ctx.globalCompositeOperation='lighter';
       for(let i=0;i<12;i++){ const x=rnd(i+300)*W+Math.sin(t*0.4+i)*30, y=EDGE+70+rnd(i+310)*(FLOOR-EDGE-130)+Math.sin(t*0.6+i*2)*22;
         const a=0.22+0.18*Math.sin(t*1.7+i*1.3);
-        const g=ctx.createRadialGradient(x,y,0,x,y,9); g.addColorStop(0,`rgba(255,205,225,${a})`); g.addColorStop(1,'rgba(255,205,225,0)');
-        ctx.fillStyle=g; ctx.fillRect(x-9,y-9,18,18); ell(x,y,1.3,1.3,`rgba(255,235,245,${a+0.3})`); }
+        const g=ctx.createRadialGradient(x,y,0,x,y,9); g.addColorStop(0,`rgba(255,226,196,${a})`); g.addColorStop(1,'rgba(255,226,196,0)');
+        ctx.fillStyle=g; ctx.fillRect(x-9,y-9,18,18); ell(x,y,1.3,1.3,`rgba(255,244,228,${a+0.3})`); }
       ctx.restore(); },
   };
 })();
