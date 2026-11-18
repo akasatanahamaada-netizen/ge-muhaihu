@@ -120,6 +120,14 @@ const css=`
 .gtm-title p{ margin:0; font-size:clamp(11px,1.7cqw,40px); letter-spacing:0.3em; color:#e6d8b8; }
 .gtm-title p::before, .gtm-title p::after{ content:'❧'; color:#b9a27a; margin:0 0.8em; letter-spacing:0; font-size:0.9em; }
 .gtm-title p::before{ display:inline-block; transform:scaleX(-1); }
+/* 章の名前の横の飾り（❧）は、タップできる。タップすると章の名前が「第二章「？？？」」…と変わる */
+.gtm-title p::before, .gtm-title p::after{ content:none !important; }
+.gtm-title{ z-index:6; }
+.gtm-orn{ pointer-events:auto; background:none; border:none; padding:0.1em 0.2em; margin:0 0.6em; color:#b9a27a; font:inherit; font-size:0.9em; letter-spacing:0; cursor:pointer; display:inline-block; transition:transform .2s, color .2s; }
+.gtm-orn.l{ transform:scaleX(-1); }
+.gtm-orn:hover{ color:#e8d4a0; }
+.gtm-orn.l:active{ transform:scaleX(-1) scale(0.85); } .gtm-orn.r:active{ transform:scale(0.85); }
+.gtm-ch{ display:inline-block; transition:opacity .25s; }
 .gtm-foot{ left:0; right:0; bottom:3.2%; text-align:center; color:rgba(232,207,214,0.6); text-shadow:0 1px 4px rgba(0,0,0,0.9); letter-spacing:0.22em; font-size:clamp(9px,1.25cqw,28px); }
 /* 案内（はじめる前） */
 .gtm-start{ background:none; }
@@ -168,7 +176,7 @@ const wrap=document.querySelector('.canvas-wrap');
 const menu=document.createElement('div'); menu.className='gtm'; menu.dataset.view='main'; menu.setAttribute('role','dialog'); menu.setAttribute('aria-label','メニュー');
 menu.innerHTML=`
   <img class="gtm-logo" src="${encodeURI(TITLE_LOGO)}" alt="" draggable="false">
-  <div class="gtm-title"><h2>Gravity Tales</h2><p>第一章「赤い頭巾」</p></div>
+  <div class="gtm-title"><h2>Gravity Tales</h2><p><button class="gtm-orn l" type="button" tabindex="-1" aria-label="章">❧</button><span class="gtm-ch">第一章「赤い頭巾」</span><button class="gtm-orn r" type="button" tabindex="-1" aria-label="章">❧</button></p></div>
   <div class="gtm-card">
     <div class="gtm-view" data-view="main">
       <h3>Contents</h3>
@@ -225,6 +233,16 @@ function dismissStart(e){
   if(e){ e.preventDefault(); e.stopPropagation(); }        // この操作では、メニューのボタンは押さない
 }
 startCover.addEventListener('pointerdown',dismissStart);
+/* 章の名前の横の飾りをタップすると、まだ書かれていない章の名前が出る（第五章のつぎは、すべて「？？？」。そのつぎは第一章にもどる） */
+const CH_NAMES=['第一章「赤い頭巾」','第二章「？？？」','第三章「？？？」','第四章「？？？」','第五章「？？？」','？？？'];
+let chIdx=0;
+menu.querySelectorAll('.gtm-orn').forEach(b=>b.addEventListener('pointerdown',e=>{
+  e.preventDefault(); e.stopPropagation();                 // はじめの画面を閉じない・メニューのボタンも押さない
+  const ch=menu.querySelector('.gtm-ch'); if(!ch) return;
+  chIdx=(chIdx+1)%CH_NAMES.length; ch.style.opacity='0';
+  setTimeout(()=>{ ch.textContent=CH_NAMES[chIdx]; ch.style.opacity='1'; },180);
+  GT.sfx&&GT.sfx('page');
+}));
 window.addEventListener('keydown',e=>{ if(startCover.classList.contains('show') && menu.classList.contains('show')) dismissStart(e); }, true);
 
 const openBtn=document.createElement('button');
