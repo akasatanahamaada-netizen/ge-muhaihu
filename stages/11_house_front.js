@@ -78,7 +78,7 @@ const MARI_LINES=[
   {s:'マリ',c:'mari',t:'戸を開けられるのは、あなただけ。'},
 ];
 const KNOCK=[
-  {s:'赤ずきん',c:'hood',t:'じゃあ、戸を叩くね。'},
+  {s:'赤ずきん',c:'hood',t:'じゃあ、戸を叩くね。',act:'front-walk'},   // 戸の前まで歩いてから、つぎの語りへ
   {s:'',c:'narr',t:'赤ずきんが、戸を叩く。',act:'front-knock'},
   {s:'赤ずきん',c:'hood',t:'おばあちゃん、わたしよ。カスタードとバターを持ってきたの。'},
   {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'（おばあさんの声を真似て）糸巻きを引いてごらん。掛け金が外れるよ。',act:'bgm-off'},   // ふりをしているあいだは BGM を止める
@@ -150,12 +150,12 @@ GT.registerScene({
 /* ==========================================================================
    進行
    ========================================================================== */
-const st={ talked:false, busy:false, opened:false, found:{}, hoodEnterT0:0, hoodInside:false, knockT0:0, runTo:null, last:performance.now() };
+const st={ talked:false, busy:false, opened:false, found:{}, hoodEnterT0:0, hoodInside:false, knockT0:0, walkDoor:false, runTo:null, last:performance.now() };
 const isFront=()=>GT.scene&&GT.scene.id==='house_front';
 const npc=who=>GT.getNpcs().find(n=>n.who===who);
 const shortcut=()=>GT.flags.route==='shortcut';
 GT.registerSceneReset(()=>{ if(!isFront()) return;
-  st.talked=false; st.busy=false; st.opened=false; st.found={}; st.spot=null; st.hoodEnterT0=0; st.hoodInside=false; st.knockT0=0; st.runTo=null; GT.flags.houseClues=0; });
+  st.talked=false; st.busy=false; st.opened=false; st.found={}; st.spot=null; st.hoodEnterT0=0; st.hoodInside=false; st.knockT0=0; st.walkDoor=false; st.runTo=null; GT.flags.houseClues=0; });
 GT.registerAct('front-setup',()=>{
   const h=npc('hood'), m=npc('mari');
   if(shortcut()){ st.talked=true;                                            // 近道：着いたら、そのまま戸から中へ入れる
@@ -164,6 +164,7 @@ GT.registerAct('front-setup',()=>{
     GT.openStoryExit&&GT.openStoryExit(); }
   else { if(h) h.x=EDGE; GT.flags.stoppedAtDoor=false; }
 });
+GT.registerAct('front-walk',()=>{ st.walkDoor=true; GT.holdDialogue(()=>{ const h=npc('hood'); return !h || Math.abs(h.x-HOOD_DOOR)<10; }); });   // 赤ずきんが戸の前に着くまで、会話の枠を消して見せる
 GT.registerAct('front-knock',()=>{ st.knockT0=performance.now(); });
 GT.registerAct('front-hood-enter',()=>{ st.hoodEnterT0=performance.now(); GT.holdDialogue(()=>st.hoodInside); });   // 赤ずきんが戸の中へ入るまで、会話の枠を消して見せる
 // 赤ずきんを止める：少年が、戸の前の赤ずきんのそばまで自動で駆けよる
@@ -213,8 +214,9 @@ function moveHood(){
   if(st.hoodEnterT0){ if(h.x<DOOR.x+10) h.x+=Math.min(140*dt,DOOR.x+10-h.x); else { h.x=-300; st.hoodInside=true; GT.sfx&&GT.sfx('door'); } return; }
   if(h.x<-100) return;
   const pcx=GT.player.x+GT.player.w/2;
-  const target = (st.knockT0 && !st.talked) ? HOOD_DOOR : pcx+(pcx>h.x+16?-42:42)-16;
-  if(GT.mode!=='play' && !st.knockT0) return;
+  const toDoor=(st.walkDoor||st.knockT0) && !st.talked;
+  const target = toDoor ? HOOD_DOOR : pcx+(pcx>h.x+16?-42:42)-16;
+  if(GT.mode!=='play' && !toDoor) return;
   GT.npcStep(h,target,200,dt);                              // 石垣や樽は、すり抜けずに跳び乗る
 }
 
