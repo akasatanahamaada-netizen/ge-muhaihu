@@ -1477,17 +1477,28 @@ let chimeAC=null;
 function chime(){
   const vol=GT.volume?GT.volume.se:1; if(vol<=0) return;
   try{ chimeAC=chimeAC||new (window.AudioContext||window.webkitAudioContext)(); if(chimeAC.state==='suspended') chimeAC.resume(); }catch(e){ return; }
-  // 「ぽわん」：低めのやわらかい音が、ふくらむように始まって、ゆっくり消える（音の高さが少しだけ上へすべる・かすかにゆれる）
-  const a=chimeAC, t=a.currentTime, dur=1.1;
-  const lp=a.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1600; lp.Q.value=0.7;
-  const g=a.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.22*vol,t+0.06); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-  const lfo=a.createOscillator(), lg=a.createGain(); lfo.frequency.value=5.5; lg.gain.value=5;
-  [[523.25,'sine',1],[784,'sine',0.45],[261.6,'triangle',0.35]].forEach(([f,type,amp])=>{
-    const o=a.createOscillator(), og=a.createGain(); o.type=type; og.gain.value=amp;
-    o.frequency.setValueAtTime(f*0.82,t); o.frequency.exponentialRampToValueAtTime(f,t+0.14);   // ぽわっと、少し上へ
-    lfo.connect(lg).connect(o.frequency);
-    o.connect(og).connect(lp); o.start(t); o.stop(t+dur+0.05); });
-  lp.connect(g).connect(a.destination); lfo.start(t); lfo.stop(t+dur+0.05);
+  // 光の魔法の音：やわらかい「ぽわん」に、きらきら上がっていく高い音の粒と、ふわっとした空気の音を重ねる。こだまで光が残るように
+  const a=chimeAC, t=a.currentTime, out=a.createGain(); out.gain.value=vol; out.connect(a.destination);
+  const dl=a.createDelay(1), fb=a.createGain(), wet=a.createGain(); dl.delayTime.value=0.13; fb.gain.value=0.38; wet.gain.value=0.5;   // こだま（きらきらが残る）
+  dl.connect(fb).connect(dl); dl.connect(wet).connect(out);
+  // ① やわらかい土台（ぽわん）
+  const lp=a.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1800;
+  const bg=a.createGain(); bg.gain.setValueAtTime(0.0001,t); bg.gain.exponentialRampToValueAtTime(0.13,t+0.06); bg.gain.exponentialRampToValueAtTime(0.0001,t+1.2);
+  [[523.25,1],[784,0.4]].forEach(([f,amp])=>{ const o=a.createOscillator(), og=a.createGain(); o.type='sine'; og.gain.value=amp;
+    o.frequency.setValueAtTime(f*0.85,t); o.frequency.exponentialRampToValueAtTime(f,t+0.12); o.connect(og).connect(lp); o.start(t); o.stop(t+1.25); });
+  lp.connect(bg).connect(out);
+  // ② きらきら：高い音の粒が、すばやく上がっていく（ド・レ・ミ・ソ・ラ・ド）
+  [1046.5,1174.7,1318.5,1568,1760,2093].forEach((f,i)=>{ const o=a.createOscillator(), g=a.createGain(), tt=t+0.05+i*0.045;
+    o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,tt); g.gain.exponentialRampToValueAtTime(0.06,tt+0.01); g.gain.exponentialRampToValueAtTime(0.0001,tt+0.45);
+    o.connect(g); g.connect(out); g.connect(dl); o.start(tt); o.stop(tt+0.5); });
+  // ③ ふわっとした空気の音（高いところだけの、うすい「しゃらん」）
+  const n=a.createBufferSource(), b=a.createBuffer(1,Math.ceil(a.sampleRate*0.8),a.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; n.buffer=b;
+  const bp=a.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=1.4; bp.frequency.setValueAtTime(5000,t); bp.frequency.exponentialRampToValueAtTime(9000,t+0.7);
+  const ng=a.createGain(); ng.gain.setValueAtTime(0.0001,t); ng.gain.exponentialRampToValueAtTime(0.035,t+0.18); ng.gain.exponentialRampToValueAtTime(0.0001,t+0.8);
+  n.connect(bp).connect(ng); ng.connect(out); ng.connect(dl); n.start(t); n.stop(t+0.8);
+  setTimeout(()=>{ try{ out.disconnect(); dl.disconnect(); fb.disconnect(); }catch(e){} }, 2600);   // こだまを止める
 }
 GT.chime=chime;
 GT.drawPageScrap=drawPageScrap;   // ステージ側からも使う（落ちてくるかけらなど）
