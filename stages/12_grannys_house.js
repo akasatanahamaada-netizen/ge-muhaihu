@@ -397,7 +397,8 @@ GT.registerAct('epi-setup',()=>{
   ending.epilogue=true; ending.card=false;
   GT.setHudStage(epilogueDusk()?'第一章 ── 夕暮れ':'第一章 ── 夜明け');
   const h=get('hood'), g=get('granny'), m=get('mari');
-  if(h){ if(kind==='bad'){ h.x=-300; } else { h.x=kind==='true'?400:330; h.lines=OUT_TALK.hood[kind](f); } }
+  if(h){ if(kind==='bad'){ h.x=-300; } else { h.x=kind==='true'?400:330; h.lines=OUT_TALK.hood[kind](f);
+    h.onEnd=()=>{ setTimeout(()=>{ GT.mode='idle'; GT.beginDialogue([{s:'少年',c:'boy',t:'……マリと初めて会ったページに戻ろう。'}],null,()=>{ GT.hideDialogue(); GT.mode='play'; }); },60); }; } }   // 話し終えたら、少年がひとこと
   if(g){ if(kind==='true'){ g.x=300; g.lines=OUT_TALK.granny.true(f); } else g.x=-300; }
   if(kind==='bad' && GT.openStoryExit) GT.openStoryExit();   // だれもいないので、そのまま右の端へ
 });
@@ -457,7 +458,7 @@ GT.registerScene({ id:'ending', type:'end',  label:'第一章 ── 戦いの�
 GT.registerScene({
   id:'epilogue', type:'story', stage:'epilogue_out', label:'第一章 ── 外',
   intro:[ {s:'',c:'narr',get t(){ return OUTSIDE[ending.kind]||OUTSIDE.true; }, act:'epi-setup'},
-          {s:'',c:'narr',get t(){ return ending.kind==='bad' ? '……そこには、もう誰もいなかった。' : '外には、見知った顔があった。'; }} ],
+          {s:'',c:'narr',get t(){ return ending.kind==='bad' ? '……そこには、もう誰もいなかった。' : '外には、見知った顔があった。'; }},],
   npcs:[
     { who:'granny', name:'おばあさん', page:'left', x:-300, noExit:true, lines:[{s:'おばあさん',c:'granny',t:'……。'}] },   // セリフは epi-setup で入れる
     { who:'hood',   name:'赤ずきん',   page:'left', x:-300, required:true, lines:[{s:'赤ずきん',c:'hood',t:'……。'}] },   // 話すと右の端が開く
@@ -469,6 +470,15 @@ GT.registerScene({
 GT.defineStage('afterword', { label:'序章 ── 暗い森', platforms:[], boxes:[], enemies:[],
   decor:[ {layer:'front', kind:'grassFlat', x:466, y:434, w:62, h:30}, {layer:'front', kind:'grassFlat', x:806, y:434, w:56, h:30} ] });
 const isAfter=()=>GT.scene&&GT.scene.id==='afterword';
+// だれもいない結末：語りが終わったら、少年がひとこと
+const epiSay={ said:false };
+GT.registerSceneReset(()=>{ if(isEpi()) epiSay.said=false; });
+GT.registerUpdate(()=>{ if(!isEpi() || ending.kind!=='bad' || epiSay.said || GT.mode!=='play') return; epiSay.said=true;
+  GT.mode='idle'; GT.beginDialogue([{s:'少年',c:'boy',t:'……マリと初めて会ったページに戻ろう。'}],null,()=>{ GT.hideDialogue(); GT.mode='play'; }); });
+const aft={ talked:false };
+GT.registerSceneReset(()=>{ if(GT.scene&&GT.scene.id==='afterword') aft.talked=false; });
+GT.registerUpdate(()=>{ if(!(GT.scene&&GT.scene.id==='afterword') || aft.talked || GT.mode!=='play') return;
+  const m=GT.getNpcs().find(n=>n.who==='mari'); if(!m) return; aft.talked=true; GT.talkTo(m); });   // 語りが終わったら、マリのほうから話しかけてくる（エンディングのあとのセリフ）
 GT.registerAct('after-setup',()=>{
   const m=GT.getNpcs().find(n=>n.who==='mari');
   if(m){ m.lines=EPILOGUE[ending.kind].concat([{s:'',c:'narr',t:'第一章「赤い頭巾」　おわり',act:'end-card'}]); }
