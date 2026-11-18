@@ -69,8 +69,7 @@ GT.setLedgeStyle('opening','flat');   // 足場は輪郭線なしの平らな茶
 function MARI_FIRST(c){
   const rest=c.itemsAll-c.items;
   const head=[
-    {s:'マリ',c:'mari',t:'あ、起きた。'},
-    {s:'マリ',c:'mari',t:'だいじょうぶ？　落ちてきたとき、けっこう派手だったよ。'},
+    {s:'マリ',c:'mari',t:'……大丈夫？　落ちてきたとき、結構派手だったよ。'},
     {s:'少年',c:'boy',t:'……ここ、どこ？'},
     {s:'マリ',c:'mari',t:'ここは、本の中の世界なの。'},
     {s:'少年',c:'boy',t:'よくわからないけど、そうなんだ……。'},
