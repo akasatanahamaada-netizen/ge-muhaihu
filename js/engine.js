@@ -1729,7 +1729,7 @@ function sceneMood(){
   if(typeof v==='function') v=v(GT.flags);
   return Math.max(0,Math.min(1,+v||0));
 }
-GT.moodNow=()=>moodCur;
+GT.moodNow=()=>moodCur; GT.moodTarget=sceneMood;   // いまの不気味さ／このシーンの不気味さ
 function drawMoodFog(m){   // 地面をはう霧（不気味さが 0.45 をこえると出てくる）
   const a=(m-0.45)*0.3; if(a<=0) return; const t=performance.now()/1000;
   for(let k=0;k<2;k++){ const y=H-GT.EDGE-8-k*30, sp=9+k*5;
