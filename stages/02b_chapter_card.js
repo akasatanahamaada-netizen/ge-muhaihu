@@ -15,7 +15,7 @@ GT.registerScene({ id:'chapter1', type:'card', label:'第一章「赤い頭巾�
 
 const card={ t0:0, flipped:false, sfx:false, ch:1 };
 const isCard=()=>GT.scene&&GT.scene.id==='chapter1';
-const T_OPEN0=0.9, T_OPEN1=2.1, T_TEXT=2.3, T_END=6.0;
+const T_GLOW=0.9, T_OPEN0=1.6, T_OPEN1=2.8, T_TEXT=3.0, T_END=6.6;   // T_GLOW … 画面いっぱいに光りかがやく いちばん明るいとき
 
 GT.registerDynamic('chapterCard', scene=>{
   GT.loadStageDef(GT.STAGE_DEFS['chapter1_card']); GT.mode='idle';
@@ -44,7 +44,7 @@ function drawCard(){
   for(let i=0;i<26;i++){ const s=Math.sin(i*91.7)*43758.5, r=s-Math.floor(s), s2=Math.sin(i*37.3)*24634.6, r2=s2-Math.floor(s2);
     const x=(r*W+t*8*(0.5+r2))%W, y=(r2*H-t*12*(0.4+r))%H+(r2*H-t*12*(0.4+r)<0?H:0);
     ctx.globalAlpha=0.25+0.25*Math.sin(t*1.5+i); ctx.fillStyle='#f0dcb0'; ctx.beginPath(); ctx.arc(x,y,1.1,0,Math.PI*2); ctx.fill(); }
-  ctx.globalAlpha=Math.min(1,t/0.6);                                   // 本が、暗やみから浮かびあがる
+  ctx.globalAlpha=Math.min(1,Math.max(0,(t-T_GLOW+0.1)/0.5));         // 光のあとに、本があらわれる
   ctx.translate(cx,cy); ctx.scale(zoom,zoom);
   const PW=230, PH=300, o=ease((t-T_OPEN0)/(T_OPEN1-T_OPEN0));
   const c=Math.cos(Math.PI*o);                 // 表紙の向き（1：閉じている → -1：左へ開ききる）
@@ -98,6 +98,19 @@ function drawCard(){
     ctx.fillStyle='#8a1c24'; ctx.globalAlpha=k2*0.9; ctx.beginPath(); ctx.arc(0,82,4.5,0,Math.PI*2); ctx.fill();   // 小さな赤い点（赤い頭巾）
     ctx.strokeStyle='rgba(120,80,40,0.45)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-64,82); ctx.lineTo(-14,82); ctx.moveTo(14,82); ctx.lineTo(64,82); ctx.stroke(); }
   ctx.restore();
+  // はじめに、画面いっぱいが光りかがやく（光のすじと、まぶしい白金色）。光がひいていくと、本があらわれる
+  if(t<T_GLOW+0.9){
+    const up=Math.min(1,t/T_GLOW), down=t>T_GLOW?Math.max(0,1-(t-T_GLOW)/0.9):1, L=ease(up)*down;
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    ctx.translate(W/2,H/2); ctx.rotate(t*0.25);
+    for(let i=0;i<14;i++){ ctx.rotate(Math.PI*2/14);                     // ひろがる光のすじ
+      const g2=ctx.createLinearGradient(0,0,W*0.75,0); g2.addColorStop(0,`rgba(255,236,180,${0.55*L})`); g2.addColorStop(1,'rgba(255,236,180,0)');
+      ctx.fillStyle=g2; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(W*0.75,-22-12*(i%3)); ctx.lineTo(W*0.75,22+12*(i%3)); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+    ctx.save();
+    const g3=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*0.7); g3.addColorStop(0,`rgba(255,250,232,${L})`); g3.addColorStop(0.5,`rgba(255,232,170,${0.85*L})`); g3.addColorStop(1,`rgba(240,200,120,${0.6*L})`);
+    ctx.fillStyle=g3; ctx.fillRect(0,0,W,H); ctx.restore();
+  }
   // 最後は、すこし白くとんで、めくりへ
   const fade=ease((t-(T_END-0.6))/0.6);
   if(fade>0){ ctx.save(); ctx.globalAlpha=fade*0.35; ctx.fillStyle='#fff4dc'; ctx.fillRect(0,0,W,H); ctx.restore(); }
