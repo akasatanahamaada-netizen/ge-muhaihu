@@ -1629,6 +1629,7 @@ canvas.parentElement.appendChild(missionEl);
     font-family:'Zen Old Mincho',serif; font-weight:700; font-size:clamp(11px,1.6cqw,38px); letter-spacing:0.04em; box-shadow:0 0 0 0 rgba(255,226,140,0); }
   #gtMission.show{ display:flex; }
   #gtMission.done{ background:rgba(176,141,87,0.92); }
+  #gtMission.done .tx{ font-family:'Caveat',cursive; font-size:1.35em; letter-spacing:0.04em; line-height:1; }
   #gtMission .ic{ width:1.35em; height:1.35em; flex:none; filter:drop-shadow(0 0 4px rgba(255,214,130,0.9)); }
   #gtMission.nopage .ic{ display:none; }`; document.head.appendChild(st); })();
 let missionTxt=null;
@@ -1646,7 +1647,7 @@ function drawMissionHud(){
   if(missionReq.enemies) parts.push(`狼の手下を倒す ${c.enemies}/${c.enemiesAll}`);
   const done = (curStageDef&&curStageDef.itemsOptional) ? (c.items>=c.itemsAll && (!missionReq.enemies||c.enemies>=c.enemiesAll)) : missionDone();
   // そろったときの言葉（絵本の語りのように）
-  const doneTxt = itemLook==='flower' ? '花束が、できあがった' : missionReq.enemies && !missionReq.items ? '森が、しずかになった' : missionReq.enemies ? '道が、ひらけた' : 'ページが、光で満ちた';
+  const doneTxt = 'Complete';   // 全部そろったとき（英語の筆記体）
   const txt = done ? doneTxt : parts.join('　');
   // キャンバスに描くと、画面を大きくしたときに文字がぼやけるので、ゲーム画面の上に重ねた HTML（#gtMission）で出す
   missionDom(txt, page, done, hudPulse); return;
