@@ -531,32 +531,32 @@ function rockPath(rs,pad,seed){
 }
 function drawRockGoth(rs,seed){
   ctx.save();
-  rockPath(rs,2.2,seed); ctx.fillStyle='#140b12'; ctx.fill();                        // 輪郭
+  rockPath(rs,2.2,seed); ctx.fillStyle='#12100c'; ctx.fill();                        // 輪郭
   rockPath(rs,0,seed);
   const top=Math.min(...rs.map(p=>p.y)), bot=Math.max(...rs.map(p=>p.y+p.h));
-  const g=ctx.createLinearGradient(0,top,0,bot); g.addColorStop(0,'#6a5a68'); g.addColorStop(0.5,'#4a3c4a'); g.addColorStop(1,'#2a2030');
+  const g=ctx.createLinearGradient(0,top,0,bot); g.addColorStop(0,'#5e5a50'); g.addColorStop(0.5,'#45423a'); g.addColorStop(1,'#26241f');
   ctx.fillStyle=g; ctx.fill();
   ctx.save(); rockPath(rs,0,seed); ctx.clip();
   for(let i=0;i<46;i++){ const p=rs[i%rs.length], x=p.x+rnd(seed+i)*p.w, y=p.y+12+rnd(seed+i+50)*(p.h-12);   // 石のまだら
-    ell(x,y,3+rnd(seed+i+9)*7,2+rnd(seed+i+7)*3.5,i%3?'rgba(20,10,18,0.22)':'rgba(220,200,230,0.10)'); }
+    ell(x,y,3+rnd(seed+i+9)*7,2+rnd(seed+i+7)*3.5,i%3?'rgba(16,14,10,0.22)':'rgba(215,218,205,0.10)'); }
   for(const p of rs){ for(let i=0;i<Math.max(1,p.w/50);i++){                                                     // 石の欠け（角ばった明るい面）
     const x=p.x+12+rnd(seed+i*11+p.x)*(p.w-30), y=p.y+18+rnd(seed+i*13+p.y)*(p.h-26), s=6+rnd(seed+i+p.w)*7;
     ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+s,y-s*0.3); ctx.lineTo(x+s*1.3,y+s*0.6); ctx.lineTo(x+s*0.2,y+s*0.8); ctx.closePath();
-    ctx.fillStyle='rgba(150,130,155,0.22)'; ctx.fill(); ctx.strokeStyle='rgba(15,8,14,0.5)'; ctx.lineWidth=0.8; ctx.stroke(); } }
-  const sh=ctx.createLinearGradient(0,top,0,bot); sh.addColorStop(0,'rgba(10,4,10,0)'); sh.addColorStop(1,'rgba(10,4,10,0.45)');   // 下ほど暗く
+    ctx.fillStyle='rgba(140,140,128,0.22)'; ctx.fill(); ctx.strokeStyle='rgba(12,10,8,0.5)'; ctx.lineWidth=0.8; ctx.stroke(); } }
+  const sh=ctx.createLinearGradient(0,top,0,bot); sh.addColorStop(0,'rgba(8,7,5,0)'); sh.addColorStop(1,'rgba(8,7,5,0.45)');   // 下ほど暗く
   ctx.fillStyle=sh; ctx.fillRect(Math.min(...rs.map(p=>p.x))-4,top,Math.max(...rs.map(p=>p.x+p.w))-Math.min(...rs.map(p=>p.x))+8,bot-top);
-  ctx.strokeStyle='rgba(12,6,12,0.75)'; ctx.lineWidth=1.2;                         // ひび（枝わかれ）
+  ctx.strokeStyle='rgba(10,9,7,0.75)'; ctx.lineWidth=1.2;                         // ひび（枝わかれ）
   for(let i=0;i<6;i++){ const p=rs[i%rs.length], x=p.x+10+rnd(seed+i*3)*(p.w-20), y=p.y+16+rnd(seed+i*5)*(p.h-30);
     ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+7,y+9); ctx.lineTo(x+3,y+18); ctx.moveTo(x+7,y+9); ctx.lineTo(x+14,y+13); ctx.stroke(); }
   // 上のふちの月あかり
-  for(const e of topEdges(rs)){ ctx.strokeStyle='rgba(225,205,240,0.35)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(e.x0+6,e.y+1.5); ctx.lineTo(e.x1-6,e.y+1.5); ctx.stroke(); }
+  for(const e of topEdges(rs)){ ctx.strokeStyle='rgba(220,222,210,0.35)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(e.x0+6,e.y+1.5); ctx.lineTo(e.x1-6,e.y+1.5); ctx.stroke(); }
   // 暗い苔（上の面からたれる）
   for(const e of topEdges(rs)){
     ctx.beginPath(); ctx.moveTo(e.x0-2,e.y-2);
     for(let x=e.x0;x<=e.x1+2;x+=6){ ctx.lineTo(x, e.y+7+Math.sin(x*0.35+seed)*4+rnd(seed+x)*6); }
     ctx.lineTo(e.x1+2,e.y-2); ctx.closePath();
     const mg=ctx.createLinearGradient(0,e.y,0,e.y+18); mg.addColorStop(0,'#55603e'); mg.addColorStop(1,'#2c3522');
-    ctx.fillStyle=mg; ctx.fill(); ctx.strokeStyle='rgba(12,6,12,0.6)'; ctx.lineWidth=0.9; ctx.stroke(); }
+    ctx.fillStyle=mg; ctx.fill(); ctx.strokeStyle='rgba(10,9,7,0.6)'; ctx.lineWidth=0.9; ctx.stroke(); }
   // つた（岩の横をはう）と、小さな薔薇
   for(const p of rs){ if(p.h<50) continue; const vx=p.x+6+rnd(seed+p.x)*Math.min(30,p.w*0.3);
     ctx.strokeStyle='#26301e'; ctx.lineWidth=1.6; ctx.beginPath();
@@ -577,7 +577,7 @@ function drawTrunk(p){
   if(brightNow()){ api.paint.trunk(ctx, p.x, p.y-6, FLOOR, p.w, p.x*7+p.y); return; }
   // ゴシック：黒ずんだ幹（色を抜いて暗く）に、いばらのつると薔薇、片がわに月あかりのふち
   ctx.save(); ctx.filter='brightness(0.38) saturate(0.3) contrast(1.15)'; api.paint.trunk(ctx, p.x, p.y-6, FLOOR, p.w, p.x*7+p.y); ctx.restore();
-  ctx.save(); ctx.strokeStyle='rgba(215,205,225,0.25)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(p.x+p.w-2,p.y); ctx.lineTo(p.x+p.w-2,FLOOR-4); ctx.stroke();
+  ctx.save(); ctx.strokeStyle='rgba(210,214,200,0.25)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(p.x+p.w-2,p.y); ctx.lineTo(p.x+p.w-2,FLOOR-4); ctx.stroke();
   if(GT.goth){ const P=GT.goth.paint; P.vine(ctx,P.R(p.x|0),p.x+p.w/2,FLOOR,p.y+20,p.w*0.45,0); }
   ctx.restore();
 }
@@ -593,23 +593,23 @@ function drawCrownGoth(rs,seed){
   ctx.save();
   // かたまり（ふちを でこぼこに）
   for(const p of rs){
-    ctx.fillStyle='#1b1316';
+    ctx.fillStyle='#17150f';
     rectsPath([p],3,10); ctx.fill();
     for(let i=0;i<Math.max(14,(p.w+p.h)/4);i++){ const e=i%4, u=rnd(seed+i+p.x), out=4+rnd(seed+i*7)*6;   // ふちを大きく でこぼこに（丸い葉むらではなく、ごつごつした かたまり）
       const x=e===0?p.x+u*p.w : e===1?p.x+p.w+out*0.5 : e===2?p.x+u*p.w : p.x-out*0.5, y=e===0?p.y-out*0.4 : e===1?p.y+u*p.h : e===2?p.y+p.h+out*0.4 : p.y+u*p.h;
-      ell(x,y,9+rnd(seed+i*3)*9,7+rnd(seed+i*5)*7,'#1b1316',rnd(seed+i*9)*3); }
+      ell(x,y,9+rnd(seed+i*3)*9,7+rnd(seed+i*5)*7,'#17150f',rnd(seed+i*9)*3); }
     const vg=ctx.createRadialGradient(p.x+p.w*0.4,p.y+p.h*0.3,4,p.x+p.w/2,p.y+p.h/2,Math.max(p.w,p.h)*0.8);   // 中を少し明るく（ふくらみ）
-    vg.addColorStop(0,'rgba(72,52,60,0.55)'); vg.addColorStop(1,'rgba(72,52,60,0)'); ctx.fillStyle=vg; rectsPath([p],0,10); ctx.fill();
+    vg.addColorStop(0,'rgba(62,60,50,0.55)'); vg.addColorStop(1,'rgba(62,60,50,0)'); ctx.fillStyle=vg; rectsPath([p],0,10); ctx.fill();
   }
   // 中の、からみあう枝
   ctx.save(); rectsPath(rs,2,10); ctx.clip();
-  ctx.strokeStyle='rgba(70,52,58,0.55)'; ctx.lineWidth=1.3; ctx.lineCap='round';
+  ctx.strokeStyle='rgba(60,58,48,0.55)'; ctx.lineWidth=1.3; ctx.lineCap='round';
   for(const p of rs) for(let i=0;i<(p.w*p.h)/700;i++){ const x=p.x+rnd(seed+i*7+p.y)*p.w, y=p.y+rnd(seed+i*11+p.x)*p.h, a=rnd(seed+i*13)*Math.PI*2, l=14+rnd(seed+i)*22;
     ctx.beginPath(); ctx.moveTo(x,y); ctx.quadraticCurveTo(x+Math.cos(a+0.6)*l*0.5,y+Math.sin(a+0.6)*l*0.5,x+Math.cos(a)*l,y+Math.sin(a)*l); ctx.stroke(); }
   for(const p of rs) for(let i=0;i<(p.w*p.h)/1600;i++) ell(p.x+rnd(seed+i*17)*p.w,p.y+rnd(seed+i*19)*p.h,4,2.2,i%2?'#1f2a1c':'#26321f',rnd(seed+i)*3);   // 暗い葉
   ctx.restore();
   // 外へ のびる とげのある枝
-  if(P){ ctx.strokeStyle='#1b1316'; ctx.lineCap='round';
+  if(P){ ctx.strokeStyle='#17150f'; ctx.lineCap='round';
     for(const p of rs){ const r=P.R((seed*31+p.x)|0);
       for(let i=0;i<Math.max(3,p.w/22);i++){ const x=p.x+6+rnd(seed+i*23+p.x)*(p.w-12); P.branch(ctx,r,x,p.y+6,22+rnd(seed+i)*24,-Math.PI/2+(rnd(seed+i*29)-0.5)*1.6,3.4,3); }   // 上へ
       for(let i=0;i<Math.max(2,p.h/30);i++){ const y=p.y+8+rnd(seed+i*31+p.y)*(p.h-16);
@@ -617,7 +617,7 @@ function drawCrownGoth(rs,seed){
         P.branch(ctx,r,p.x+p.w-6,y,20+rnd(seed+i*7)*16,(rnd(seed+i*11)-0.5)*1.0,3,2); }                  // 右へ
       for(let i=0;i<2;i++) P.branch(ctx,r,p.x+p.w*(0.25+i*0.5),p.y+p.h-6,14+rnd(seed+i*13)*10,Math.PI/2+(rnd(seed+i*17)-0.5)*0.8,2.4,2); } }   // 下に たれる
   // 上のふちの月あかり
-  for(const e of topEdges(rs)){ ctx.strokeStyle='rgba(215,205,225,0.3)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(e.x0+6,e.y+1.5); ctx.lineTo(e.x1-6,e.y+1.5); ctx.stroke(); }
+  for(const e of topEdges(rs)){ ctx.strokeStyle='rgba(210,214,200,0.3)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(e.x0+6,e.y+1.5); ctx.lineTo(e.x1-6,e.y+1.5); ctx.stroke(); }
   // 薔薇
   if(P) for(const p of rs) for(let i=0;i<Math.max(1,p.w/50);i++) P.rose(ctx,p.x+10+rnd(seed+i*37+p.y)*(p.w-20),p.y+6+rnd(seed+i*41)*(p.h-12),4+rnd(seed+i)*2);
   ctx.restore();
@@ -714,13 +714,13 @@ function drawButterfly(x,y,s,flap,ang,tone){
   ctx.save(); ctx.translate(x,y); ctx.rotate(ang); ctx.scale(s,s);
   for(const side of [-1,1]){ ctx.save(); ctx.scale(side*(0.25+0.75*flap),1);
     ctx.beginPath(); ctx.moveTo(0,-1); ctx.bezierCurveTo(6,-10,16,-12,17,-6); ctx.bezierCurveTo(17,-1,9,1,0,1); ctx.closePath();   // 前ばね
-    ctx.fillStyle='#160a12'; ctx.fill(); ctx.strokeStyle=tone; ctx.lineWidth=1.3; ctx.stroke();
+    ctx.fillStyle='#14110c'; ctx.fill(); ctx.strokeStyle=tone; ctx.lineWidth=1.3; ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0,1); ctx.bezierCurveTo(9,1,13,6,10,10); ctx.lineTo(8,17); ctx.lineTo(6,11); ctx.bezierCurveTo(3,10,1,6,0,3); ctx.closePath();   // 後ろばね（尾つき）
-    ctx.fillStyle='#1d0c17'; ctx.fill(); ctx.stroke();
-    ell(12,-6,1.4,1.1,'rgba(240,225,245,0.8)'); ell(8,-4,1,0.8,'rgba(240,225,245,0.6)'); ell(8,7,1.6,1.2,tone);   // 白い点・赤い目玉もよう
+    ctx.fillStyle='#1a1610'; ctx.fill(); ctx.stroke();
+    ell(12,-6,1.4,1.1,'rgba(240,238,225,0.8)'); ell(8,-4,1,0.8,'rgba(240,238,225,0.6)'); ell(8,7,1.6,1.2,tone);   // 白い点・赤い目玉もよう
     ctx.restore(); }
-  ell(0,0,1.2,5,'#0d060a');                                                         // からだ
-  ctx.strokeStyle='#0d060a'; ctx.lineWidth=0.7; ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(-3,-9); ctx.moveTo(0,-4); ctx.lineTo(3,-9); ctx.stroke();   // 触角
+  ell(0,0,1.2,5,'#0b0907');                                                         // からだ
+  ctx.strokeStyle='#0b0907'; ctx.lineWidth=0.7; ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(-3,-9); ctx.moveTo(0,-4); ctx.lineTo(3,-9); ctx.stroke();   // 触角
   ctx.restore();
 }
 function drawAir(){ return brightNow() ? drawAirBright() : drawAirGoth(); }
@@ -739,10 +739,10 @@ function drawAirBright(){
 function drawAirGoth(){
   const t=performance.now()/1000;
   ctx.save();
-  [[0,'#b3263f'],[2.4,'#c4344d'],[4.1,'#8a5aa8']].forEach(([s,c],i)=>{
+  [[0,'#b3263f'],[2.4,'#c4344d'],[4.1,'#8a7a48']].forEach(([s,c],i)=>{
     const x=150+i*300+Math.sin(t*0.5+s)*90, y=210+(i%2?-40:10)+Math.sin(t*0.9+s)*40;
     const flap=Math.abs(Math.sin(t*9+s)), ang=Math.cos(t*0.5+s)*0.35;
-    ctx.save(); ctx.shadowColor='rgba(200,60,100,0.45)'; ctx.shadowBlur=8; drawButterfly(x,y,0.95,flap,ang,c); ctx.restore(); });
+    ctx.save(); ctx.shadowColor='rgba(200,150,80,0.45)'; ctx.shadowBlur=8; drawButterfly(x,y,0.95,flap,ang,c); ctx.restore(); });
   for(let i=0;i<6;i++){ const sp=16+rnd(i+3)*12, span=FLOOR-EDGE+40, y=EDGE-20+((t*sp+rnd(i)*span)%span);
     const x=rnd(i+20)*W+Math.sin(t*1.1+i*2)*24, r=t*2+i;
     ell(x,y,4.5,2.4*Math.abs(Math.cos(r)),i%2?'rgba(150,26,52,0.85)':'rgba(196,52,77,0.85)',Math.sin(r)*0.8); }   // 薔薇の花びら

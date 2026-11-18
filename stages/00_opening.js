@@ -219,7 +219,7 @@ function drawLightShafts(){
   // 光の中を漂うちり
   for(let i=0;i<22;i++){
     const x=(rnd(i)*W+Math.sin(t*0.3+i)*20)%W, y=EDGE+((rnd(i+50)*H+t*(6+rnd(i+9)*8))%(FLOOR-EDGE));
-    ctx.globalAlpha=0.25+0.25*Math.sin(t*2+i); ell(x,y,1.2,1.2,'#e8dcff');
+    ctx.globalAlpha=0.25+0.25*Math.sin(t*2+i); ell(x,y,1.2,1.2,'#eeeadc');
   }
   ctx.restore();
 }
@@ -251,8 +251,8 @@ function drawStump(){
   ctx.save();
   GT.roundRect(p.x,p.y,p.w,p.h,6); const sg=ctx.createLinearGradient(p.x,0,p.x+p.w,0);
   sg.addColorStop(0,'#2a1a20'); sg.addColorStop(0.55,'#3e2a2e'); sg.addColorStop(1,'#1e1218'); ctx.fillStyle=sg; ctx.fill();   // 暗い木
-  ctx.strokeStyle='#120a0e'; ctx.lineWidth=1.6; ctx.stroke();
-  ctx.strokeStyle='rgba(10,4,8,0.55)'; ctx.lineWidth=1.3;
+  ctx.strokeStyle='#100e0a'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.strokeStyle='rgba(8,7,5,0.55)'; ctx.lineWidth=1.3;
   for(let i=1;i<4;i++){ const bx=p.x+i*p.w/4; ctx.beginPath(); ctx.moveTo(bx,p.y+16); ctx.lineTo(bx+(i-2)*2,p.y+p.h-2); ctx.stroke(); }
   ctx.beginPath(); ctx.ellipse(p.x+p.w/2,p.y+7,p.w/2-3,5,0,0,Math.PI*2); ctx.fillStyle='#6a5258'; ctx.fill();   // 切り口（月あかり）
   ctx.strokeStyle='rgba(30,16,24,0.6)'; ctx.lineWidth=1;
@@ -408,60 +408,60 @@ const GOTH=(()=>{
   }
   function vine(c,r,x,base,topY,tw,lean){
     const at=y=>{ const u=(base-y)/(base-topY); return x+lean*u+Math.sin(y*0.055)*tw*0.95; };
-    c.strokeStyle='#2c2026'; c.lineWidth=1.8; c.beginPath();
+    c.strokeStyle='#24221c'; c.lineWidth=1.8; c.beginPath();
     for(let y=base;y>topY+16;y-=4){ y===base?c.moveTo(at(y),y):c.lineTo(at(y),y); } c.stroke();
     c.lineWidth=1; for(let y=base-10;y>topY+24;y-=13){ const vx=at(y), s=r()<0.5?-1:1; c.beginPath(); c.moveTo(vx,y); c.lineTo(vx+s*4,y-3); c.stroke(); }
     for(let i=0;i<3;i++){ const y=base-(base-topY)*(0.12+r()*0.62); rose(c,at(y),y,4+r()*2.5); }
   }
   function tree(c,x,base,h,seed,lean){
     const r=R(seed), topY=base-h*0.55, tw=Math.max(13,h*0.065);
-    c.fillStyle=c.strokeStyle='#22141b'; c.lineCap='round';
+    c.fillStyle=c.strokeStyle='#1c1a15'; c.lineCap='round';
     c.beginPath(); c.moveTo(x-tw*1.35,base); c.quadraticCurveTo(x-tw*0.55+lean*0.3,base-h*0.3,x-tw*0.32+lean,topY);
     c.lineTo(x+tw*0.32+lean,topY); c.quadraticCurveTo(x+tw*0.55+lean*0.3,base-h*0.3,x+tw*1.35,base); c.closePath(); c.fill();
     for(const s of [-1,1]){ c.lineWidth=tw*0.38; c.beginPath(); c.moveTo(x+s*tw*0.8,base-8); c.quadraticCurveTo(x+s*tw*1.7,base-3,x+s*tw*2.6,base); c.stroke(); }   // 根
     branch(c,r,x+lean,topY,h*0.23,-Math.PI/2-0.55,tw*0.55,4);
     branch(c,r,x+lean,topY,h*0.25,-Math.PI/2+0.5,tw*0.55,4);
     branch(c,r,x+lean*0.6,topY+h*0.16,h*0.18,-Math.PI/2+(r()<0.5?-1:1)*1.15,tw*0.4,3);
-    c.fillStyle='#0f070b'; c.beginPath(); c.ellipse(x+lean*0.4,base-h*0.3,tw*0.24,tw*0.42,0,0,Math.PI*2); c.fill();   // うろ
-    c.strokeStyle='rgba(200,165,215,0.3)'; c.lineWidth=1.6; c.beginPath();                                          // 月あかりのふち
+    c.fillStyle='#0c0b09'; c.beginPath(); c.ellipse(x+lean*0.4,base-h*0.3,tw*0.24,tw*0.42,0,0,Math.PI*2); c.fill();   // うろ
+    c.strokeStyle='rgba(205,210,200,0.3)'; c.lineWidth=1.6; c.beginPath();                                          // 月あかりのふち
     c.moveTo(x+tw*1.15,base-6); c.quadraticCurveTo(x+tw*0.5+lean*0.3,base-h*0.3,x+tw*0.28+lean,topY); c.stroke();
     vine(c,r,x,base,topY,tw,lean);
   }
   // マリが隠れる大きな木：幹の太さ・場所は前と同じ（マリがかくれられるように）。丸い葉のかたまりのかわりに、ねじれた枝の冠
   function bigTree(c,x,w,top,base){
-    const r=R(97); c.fillStyle=c.strokeStyle='#22141b'; c.lineCap='round';
+    const r=R(97); c.fillStyle=c.strokeStyle='#1c1a15'; c.lineCap='round';
     c.beginPath(); c.moveTo(x-10,base); c.quadraticCurveTo(x+4,base-80,x+6,top+60); c.lineTo(x+w*0.3,top); c.lineTo(x+w*0.7,top); c.lineTo(x+w-6,top+60);
     c.quadraticCurveTo(x+w-4,base-80,x+w+10,base); c.closePath(); c.fill();
     for(const [sx,ex] of [[x+6,x-34],[x+w-6,x+w+34],[x+w*0.4,x+w*0.2-6]]){ c.lineWidth=12; c.beginPath(); c.moveTo(sx,base-14); c.quadraticCurveTo((sx+ex)/2,base-4,ex,base); c.stroke(); }   // 根
     c.strokeStyle='rgba(0,0,0,0.35)'; c.lineWidth=1.4;                                                                                    // 樹皮のすじ
     for(let i=0;i<5;i++){ const bx=x+10+i*(w-20)/4; c.beginPath(); c.moveTo(bx,top+70); c.quadraticCurveTo(bx+(r()-0.5)*10,(top+base)/2,bx+(r()-0.5)*6,base-10); c.stroke(); }
-    c.fillStyle='#0f070b'; c.beginPath(); c.ellipse(x+w*0.55,250,8,13,0,0,Math.PI*2); c.fill();                                          // うろ
-    c.strokeStyle='rgba(200,165,215,0.3)'; c.lineWidth=1.8; c.beginPath(); c.moveTo(x+w+8,base-4); c.quadraticCurveTo(x+w-4,base-80,x+w-6,top+60); c.stroke();
-    c.strokeStyle='#22141b';
+    c.fillStyle='#0c0b09'; c.beginPath(); c.ellipse(x+w*0.55,250,8,13,0,0,Math.PI*2); c.fill();                                          // うろ
+    c.strokeStyle='rgba(205,210,200,0.3)'; c.lineWidth=1.8; c.beginPath(); c.moveTo(x+w+8,base-4); c.quadraticCurveTo(x+w-4,base-80,x+w-6,top+60); c.stroke();
+    c.strokeStyle='#1c1a15';
     branch(c,r,x+w*0.35,top+6,96,-Math.PI/2-0.75,13,4); branch(c,r,x+w*0.65,top+6,100,-Math.PI/2+0.7,13,4);
     branch(c,r,x+w*0.5,top,70,-Math.PI/2+0.05,10,4); branch(c,r,x+6,top+70,74,Math.PI+0.35,9,3); branch(c,r,x+w-6,top+86,64,-0.3,8,3);
     vine(c,r,x+w*0.5,base,top+40,w*0.42,0);
   }
   // 遠くの木（うすい影絵。奥行き）
-  function farTrees(c){ const r=R(5); c.fillStyle=c.strokeStyle='rgba(60,36,56,0.55)'; c.lineCap='round';
+  function farTrees(c){ const r=R(5); c.fillStyle=c.strokeStyle='rgba(44,46,40,0.55)'; c.lineCap='round';
     for(const [x,h] of [[150,250],[360,280],[560,240],[610,300],[840,260]]){ const b=FLOOR+4, tw=8+h*0.02;
       c.beginPath(); c.moveTo(x-tw,b); c.lineTo(x-tw*0.4,b-h*0.6); c.lineTo(x+tw*0.4,b-h*0.6); c.lineTo(x+tw,b); c.fill();
       branch(c,r,x,b-h*0.6,h*0.2,-Math.PI/2-0.5,tw*0.7,3); branch(c,r,x,b-h*0.6,h*0.2,-Math.PI/2+0.5,tw*0.7,3); } }
   // こわれかけた木の柵と、からむ薔薇（タイトル画面の絵のように）
   function fence(c,x0,x1,seed){ const r=R(seed), b=FLOOR+2;
-    c.strokeStyle='#120a0e'; c.lineWidth=1.4;
-    const post=(x,h,tilt)=>{ c.save(); c.translate(x,b); c.rotate(tilt); c.fillStyle='#3a2a2c'; c.beginPath(); c.moveTo(-6,0); c.lineTo(-6,-h); c.lineTo(0,-h-8); c.lineTo(6,-h); c.lineTo(6,0); c.closePath(); c.fill(); c.stroke();
-      c.strokeStyle='rgba(10,4,8,0.5)'; c.beginPath(); c.moveTo(-1,-h+6); c.lineTo(1,-8); c.stroke(); c.strokeStyle='#120a0e'; c.restore(); };
+    c.strokeStyle='#100e0a'; c.lineWidth=1.4;
+    const post=(x,h,tilt)=>{ c.save(); c.translate(x,b); c.rotate(tilt); c.fillStyle='#3a332a'; c.beginPath(); c.moveTo(-6,0); c.lineTo(-6,-h); c.lineTo(0,-h-8); c.lineTo(6,-h); c.lineTo(6,0); c.closePath(); c.fill(); c.stroke();
+      c.strokeStyle='rgba(8,7,5,0.5)'; c.beginPath(); c.moveTo(-1,-h+6); c.lineTo(1,-8); c.stroke(); c.strokeStyle='#100e0a'; c.restore(); };
     const n=Math.max(2,Math.round((x1-x0)/60)); const xs=[]; for(let i=0;i<=n;i++) xs.push(x0+(x1-x0)*i/n);
-    for(const yy of [b-30,b-54]){ c.fillStyle='#4a3436'; c.beginPath(); c.moveTo(x0,yy); c.lineTo(x1,yy+(r()-0.5)*10); c.lineTo(x1,yy+7+(r()-0.5)*4); c.lineTo(x0,yy+7); c.closePath(); c.fill(); c.stroke(); }
+    for(const yy of [b-30,b-54]){ c.fillStyle='#4a4236'; c.beginPath(); c.moveTo(x0,yy); c.lineTo(x1,yy+(r()-0.5)*10); c.lineTo(x1,yy+7+(r()-0.5)*4); c.lineTo(x0,yy+7); c.closePath(); c.fill(); c.stroke(); }
     xs.forEach((x,i)=>post(x,56+r()*16,(r()-0.5)*0.18));
     for(let i=0;i<5;i++) rose(c,x0+r()*(x1-x0),b-24-r()*36,4+r()*2.5); }
   // 石（苔とつた。墓石のように少し傾いた、上の丸い石）
   function stone(c,x,w,h){ const b=FLOOR+2; c.save(); c.translate(x+w/2,b); c.rotate(-0.06);
     c.beginPath(); c.moveTo(-w/2,0); c.lineTo(-w/2,-h+w/2); c.arc(0,-h+w/2,w/2,Math.PI,0); c.lineTo(w/2,0); c.closePath();
-    const g=c.createLinearGradient(-w/2,0,w/2,0); g.addColorStop(0,'#5a4a58'); g.addColorStop(1,'#2e2430'); c.fillStyle=g; c.fill(); c.strokeStyle='#120a10'; c.lineWidth=1.6; c.stroke();
-    c.strokeStyle='rgba(12,6,12,0.6)'; c.lineWidth=1; c.beginPath(); c.moveTo(-w*0.1,-h*0.7); c.lineTo(w*0.05,-h*0.5); c.lineTo(-w*0.05,-h*0.3); c.stroke();
-    c.strokeStyle='rgba(225,205,240,0.3)'; c.lineWidth=1.4; c.beginPath(); c.arc(0,-h+w/2,w/2-2,Math.PI*1.1,Math.PI*1.6); c.stroke();
+    const g=c.createLinearGradient(-w/2,0,w/2,0); g.addColorStop(0,'#5a564e'); g.addColorStop(1,'#2e2b26'); c.fillStyle=g; c.fill(); c.strokeStyle='#100e0b'; c.lineWidth=1.6; c.stroke();
+    c.strokeStyle='rgba(10,9,7,0.6)'; c.lineWidth=1; c.beginPath(); c.moveTo(-w*0.1,-h*0.7); c.lineTo(w*0.05,-h*0.5); c.lineTo(-w*0.05,-h*0.3); c.stroke();
+    c.strokeStyle='rgba(220,222,210,0.3)'; c.lineWidth=1.4; c.beginPath(); c.arc(0,-h+w/2,w/2-2,Math.PI*1.1,Math.PI*1.6); c.stroke();
     c.fillStyle='#34422a'; c.beginPath(); c.ellipse(-w*0.15,-3,w*0.45,5,0,0,Math.PI*2); c.fill(); c.restore(); }
   // 薔薇の茂み
   function roseBush(c,x,w,h,seed){ const r=R(seed), b=FLOOR+3;
@@ -485,14 +485,14 @@ const GOTH=(()=>{
       ctx.save(); ctx.globalCompositeOperation='lighter';
       let g=ctx.createRadialGradient(lx,ly+10,2,lx,ly+10,110*fl); g.addColorStop(0,`rgba(255,170,90,${0.32*fl})`); g.addColorStop(1,'rgba(255,170,90,0)');
       ctx.fillStyle=g; ctx.fillRect(lx-120,ly-110,240,240); ctx.restore();
-      ctx.save(); ctx.strokeStyle='#1a1014'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(hx,hy); ctx.lineTo(lx,ly); ctx.stroke();   // くさり
+      ctx.save(); ctx.strokeStyle='#16130f'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(hx,hy); ctx.lineTo(lx,ly); ctx.stroke();   // くさり
       ctx.translate(lx,ly); ctx.rotate(-a);
-      ctx.fillStyle='#1a1014'; ctx.beginPath(); ctx.moveTo(-6,2); ctx.lineTo(6,2); ctx.lineTo(9,8); ctx.lineTo(-9,8); ctx.closePath(); ctx.fill();   // 屋根
-      ctx.beginPath(); ctx.arc(0,1,3,Math.PI,0); ctx.strokeStyle='#1a1014'; ctx.stroke();
+      ctx.fillStyle='#16130f'; ctx.beginPath(); ctx.moveTo(-6,2); ctx.lineTo(6,2); ctx.lineTo(9,8); ctx.lineTo(-9,8); ctx.closePath(); ctx.fill();   // 屋根
+      ctx.beginPath(); ctx.arc(0,1,3,Math.PI,0); ctx.strokeStyle='#16130f'; ctx.stroke();
       g=ctx.createLinearGradient(0,8,0,26); g.addColorStop(0,`rgba(255,214,140,${0.9*fl})`); g.addColorStop(1,`rgba(230,120,60,${0.85*fl})`);
       ctx.fillStyle=g; ctx.fillRect(-7,8,14,18);                                                               // ガラスの中の灯り
-      ctx.strokeStyle='#1a1014'; ctx.lineWidth=1.6; ctx.strokeRect(-7,8,14,18); ctx.beginPath(); ctx.moveTo(0,8); ctx.lineTo(0,26); ctx.stroke();
-      ctx.fillStyle='#1a1014'; ctx.fillRect(-8,26,16,3); ctx.restore(); },
+      ctx.strokeStyle='#16130f'; ctx.lineWidth=1.6; ctx.strokeRect(-7,8,14,18); ctx.beginPath(); ctx.moveTo(0,8); ctx.lineTo(0,26); ctx.stroke();
+      ctx.fillStyle='#16130f'; ctx.fillRect(-8,26,16,3); ctx.restore(); },
     // 青白く光るきのこ
     shrooms(){ const t=performance.now()/1000;
       for(const [x,s,k] of [[136,1,0],[150,0.7,1],[598,0.9,2],[880,1.1,3],[896,0.7,4]]){ const y=FLOOR+1, a=0.55+0.25*Math.sin(t*1.6+k*1.7);
@@ -503,7 +503,7 @@ const GOTH=(()=>{
         ctx.beginPath(); ctx.ellipse(x,y-8*s,7*s,4.5*s,0,Math.PI,0); ctx.fillStyle=`rgba(190,225,255,${0.75+0.25*a})`; ctx.fill();
         ell(x-2*s,y-10*s,1.1*s,0.9*s,'#ffffff'); } },
     big(x,w){ if(!bigCv){ bigCv=mk(); bigTree(bigCv.getContext('2d'),x,w,104,FLOOR+4); } ctx.drawImage(bigCv,0,0); },
-    top(){ if(!topCv){ topCv=mk(); const c=topCv.getContext('2d'); c.strokeStyle='#1a0e14'; c.lineCap='round';
+    top(){ if(!topCv){ topCv=mk(); const c=topCv.getContext('2d'); c.strokeStyle='#16140f'; c.lineCap='round';
         let r=R(71); branch(c,r,-8,EDGE-4,96,0.32,10,4); branch(c,r,-8,EDGE+40,70,0.62,6,3);
         r=R(83); branch(c,r,W+8,EDGE-4,96,Math.PI-0.32,10,4); branch(c,r,W+8,EDGE+44,64,Math.PI-0.66,6,3);
         rose(c,58,EDGE+22,6); rose(c,92,EDGE+12,4.5); rose(c,W-64,EDGE+20,6); rose(c,W-104,EDGE+34,4.5); }
