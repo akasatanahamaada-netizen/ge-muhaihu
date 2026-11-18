@@ -128,10 +128,6 @@ function MARI_AGAIN(c, hiddenLeft){
 // --- シーン（会話と進行） --------------------------------------------------
 GT.registerScene({
   id:'opening', type:'story', stage:'opening', label:'序章 ── 森',
-  intro:[
-    {s:'',c:'narr',t:'ページの向こうも霧の深い森だった。'},
-    {s:'',c:'narr',t:'大きな木の陰から、誰かがこちらをうかがっている。'},
-  ],
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:710, noLift:true,   // はじめは木の陰（出てくると update で false）
       lines:MARI_FIRST({items:0,itemsAll:3}),          // 実際は話しかける直前に作り直す（下の update）
