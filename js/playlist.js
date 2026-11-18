@@ -100,7 +100,7 @@ GT.stageBackgrounds = {
   house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
   wolf_talk:S(BG_DAY),                           // 狼：昼の森
   crossroads:S(BG_DAY),   // 分かれ道（道のある、霧の薔薇の森）
-  path2:DARK, path2b:ROSE,                           // 近道（①暗い森 ②いばらと薔薇の森）
+  path2:{src:BG_DAY,page:'spread',dim:0.45}, path2b:{src:BG_DAY,page:'spread',dim:0.55},   // 近道：昼の森のまま、暗くするだけ（dim。①より②のほうが暗い）。人物は暗くしない
   flowers:S(BG_DAY),                                      // お花畑（遠回りの はじめ。薔薇の森）
   path3:S(BG_DAY), path4:S(BG_EVENING),              // 遠回り：歩くうちに日が傾く
   house_front:f=>S(f.route==='shortcut'?BG_DAY:BG_EVENING),

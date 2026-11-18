@@ -1793,7 +1793,10 @@ function drawMoodFog(m){   // 地面をはう霧（不気味さが 0.45 をこ�
       const g=ctx.createRadialGradient(x,y,0,x,y,190); g.addColorStop(0,`rgba(205,202,204,${a*(1-k*0.35)})`); g.addColorStop(1,'rgba(205,202,204,0)');
       ctx.save(); ctx.translate(x,y); ctx.scale(1,0.22); ctx.translate(-x,-y); ctx.fillStyle=g; ctx.fillRect(x-190,y-190,380,380); ctx.restore(); } }
 }
+let dimNow=0;   // そのステージだけ暗くする量（背景の spec.dim）。ゴシックの色合いとは別（色は変えず、暗くするだけ）
 function drawGothicWorld(){
+  const spd=stageBackgroundSpec(); dimNow=(spd&&spd.dim)||0;
+  if(dimNow>0){ ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgba(40,38,44,${dimNow})`; ctx.fillRect(0,0,W,H); ctx.restore(); }
   const target=sceneMood(); moodCur = moodCur==null ? target : moodCur+(target-moodCur)*0.04;   // ゆっくり変わる
   const m=moodCur;
   const gk=GT.isBright()?0:1; gradeK = gradeK==null ? gk : gradeK+(gk-gradeK)*0.04; const K=gradeK;
@@ -1817,8 +1820,8 @@ function drawGothicWorld(){
    ・木の陰に隠れているなど、まわりの絵に隠したい人は n.noLift=true（ステージ側で決める）
    ・沼に入っているときの少年は、足もとを沼で隠すので描きなおさない */
 function liftCharacters(){
-  if(gradeK==null || gradeK<0.02) return;
-  ctx.save(); ctx.globalAlpha=Math.min(1,gradeK);
+  if((gradeK==null || gradeK<0.02) && !(dimNow>0)) return;
+  ctx.save(); ctx.globalAlpha=dimNow>0?1:Math.min(1,gradeK);
   if(storyStage) for(const n of npcs){ if(n.noLift || n.x<-100 || n.x>W+100) continue; drawNpc(n); }
   const pl=GT.player, inSwamp=(GT.swamps||[]).some(s=>GT.rectsOverlap&&GT.rectsOverlap(pl,s));
   if(!inSwamp && !gameOver) drawPlayer();
