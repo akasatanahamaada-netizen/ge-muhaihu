@@ -864,6 +864,14 @@ window.addEventListener('keydown',e=>{ if(e.key==='r'||e.key==='R'){ e.preventDe
 
 /* 操作の説明の枠（チュートリアル用）。ステージ側から GT.drawHint(中心x, 中心y, 行の配列) で描く。
    行は '文字' か [['キー','キー'], '説明'] の形。キーはキーボードのキーの形で描く。 */
+function drawKeycapBright(x,y,label){   // 明るい絵本のころのキー（チュートリアル）
+  ctx.font="700 12px 'Zen Old Mincho',serif";
+  const w=Math.max(20,ctx.measureText(label).width+12);
+  roundRect(x,y-11,w,22,5); ctx.fillStyle='#f3ead0'; ctx.fill();
+  ctx.strokeStyle='#8a7a5a'; ctx.lineWidth=1.2; ctx.stroke();
+  ctx.fillStyle='#3a2f2a'; ctx.textAlign='center'; ctx.fillText(label,x+w/2,y+1);
+  return w;
+}
 function drawKeycap(x,y,label){                     // ゴシック：暗い板に、くすんだ金のふち（下に厚み）
   ctx.font="700 12px 'Zen Old Mincho',serif";
   const w=Math.max(20,ctx.measureText(label).width+12);
@@ -973,7 +981,27 @@ GT.wormEaten=function(c,x,y,w,h,seed,o){
   c.restore();
 };
 
+function drawHintBright(cx,cy,lines){   // 明るい絵本のころの案内の枠（チュートリアル）
+  ctx.save(); ctx.textBaseline='middle';
+  const FONT="700 14px 'Zen Old Mincho',serif";
+  const widths=lines.map(l=>{ ctx.font=FONT; if(typeof l==='string') return ctx.measureText(l).width;
+    ctx.font="700 12px 'Zen Old Mincho',serif"; const kw=touchKeys(l[0]).reduce((a,k)=>a+Math.max(20,ctx.measureText(k).width+12)+14,0);
+    ctx.font=FONT; return kw+ctx.measureText(l[1]).width+6; });
+  const bw=Math.max(...widths)+28, bh=lines.length*26+16;
+  const bx=Math.max(EDGE+6,Math.min(W-EDGE-6-bw,cx-bw/2)), by=Math.max(EDGE+30,Math.min(H-EDGE-6-bh,cy-bh/2));
+  ctx.globalAlpha=0.88+0.12*Math.sin(performance.now()/300);
+  roundRect(bx,by,bw,bh,12); ctx.fillStyle='rgba(43,36,24,0.82)'; ctx.fill();
+  ctx.strokeStyle='rgba(232,195,90,0.7)'; ctx.lineWidth=1.5; ctx.stroke();
+  lines.forEach((l,i)=>{ const y=by+20+i*26; let x=bx+14; ctx.textAlign='left';
+    if(typeof l==='string'){ ctx.font=FONT; ctx.fillStyle='#f3ead0'; ctx.fillText(l,x,y); return; }
+    const ks=touchKeys(l[0]);
+    ks.forEach((k,j)=>{ x+=drawKeycapBright(x,y,k)+4;
+      if(j<ks.length-1){ ctx.fillStyle='#cbb98f'; ctx.font="700 12px serif"; ctx.textAlign='left'; ctx.fillText('/',x,y); x+=10; } });
+    ctx.font=FONT; ctx.textAlign='left'; ctx.fillStyle='#e8c35a'; ctx.fillText(l[1],x+4,y); });
+  ctx.restore();
+}
 GT.drawHint=function(cx,cy,lines){
+  if(GT.isBright&&GT.isBright()) return drawHintBright(cx,cy,lines);   // チュートリアル（明るい場面）は、前の枠のまま
   ctx.save(); ctx.textBaseline='middle';
   const FONT="700 14px 'Zen Old Mincho',serif";
   const widths=lines.map(l=>{ ctx.font=FONT; if(typeof l==='string') return ctx.measureText(l).width;
@@ -1708,7 +1736,7 @@ function render(){
   drawGothicWorld();                                                                                                // 世界を赤紫の色みに寄せ、四すみを暗く
   ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.drawImage(GT.paperArt.agedPaper,0,0); ctx.restore();   // 古い紙の色むら・しみ（表示類より奥）
   drawEdgeFade();                                                                                                   // ふちを、まわりのページの色へ ぼかす（ページのふくらみとのさかいを目立たせない）
-  ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgb(${GRADE_MUL})`; ctx.fillRect(0,0,W,H); ctx.restore();   // 全体の色合い（まわりのページと同じ色）
+  drawGradeMul();   // 全体の色合い（まわりのページと同じ色）
   if(missionReq) drawMissionHud();
   if(GT.hurtFlash>0){ ctx.fillStyle=`rgba(139,20,20,${GT.hurtFlash*0.35})`; ctx.fillRect(0,0,W,H); }
   drawHearts();
@@ -1729,7 +1757,9 @@ function sceneMood(){
   if(typeof v==='function') v=v(GT.flags);
   return Math.max(0,Math.min(1,+v||0));
 }
-GT.moodNow=()=>moodCur; GT.moodTarget=sceneMood;   // いまの不気味さ／このシーンの不気味さ
+GT.moodNow=()=>moodCur; GT.moodTarget=sceneMood;
+GT.isBright=()=>!!(GT.scene && GT.scene.id!=='opening' && sceneMood()===0);   // 不気味さ 0 の場面は、ゴシックにする前と同じ見た目
+let gradeK=null;   // ゴシックの色合いのかかり具合（0＝前と同じ明るさ、1＝ゴシック）   // いまの不気味さ／このシーンの不気味さ
 function drawMoodFog(m){   // 地面をはう霧（不気味さが 0.45 をこえると出てくる）
   const a=(m-0.45)*0.3; if(a<=0) return; const t=performance.now()/1000;
   for(let k=0;k<2;k++){ const y=H-GT.EDGE-8-k*30, sp=9+k*5;
@@ -1740,18 +1770,33 @@ function drawMoodFog(m){   // 地面をはう霧（不気味さが 0.45 をこ�
 function drawGothicWorld(){
   const target=sceneMood(); moodCur = moodCur==null ? target : moodCur+(target-moodCur)*0.04;   // ゆっくり変わる
   const m=moodCur;
-  ctx.save();
+  const gk=GT.isBright()?0:1; gradeK = gradeK==null ? gk : gradeK+(gk-gradeK)*0.04; const K=gradeK;
+  if(K<0.005) return;
+  ctx.save(); ctx.globalAlpha=K;
   drawMoodFog(m);
-  ctx.globalCompositeOperation='saturation'; ctx.globalAlpha=0.16+0.3*m; ctx.fillStyle='#808080'; ctx.fillRect(0,0,W,H);   // 色を抜く（進むほど、色が消えていく）
-  if(m>0.3){ ctx.globalCompositeOperation='color'; ctx.globalAlpha=(m-0.3)*0.16; ctx.fillStyle='#4a5a5e'; ctx.fillRect(0,0,W,H); }   // 進むと、冷たく青ざめた色みに
+  ctx.globalCompositeOperation='saturation'; ctx.globalAlpha=(0.16+0.3*m)*K; ctx.fillStyle='#808080'; ctx.fillRect(0,0,W,H);   // 色を抜く（進むほど、色が消えていく）
+  if(m>0.3){ ctx.globalCompositeOperation='color'; ctx.globalAlpha=(m-0.3)*0.16*K; ctx.fillStyle='#4a5a5e'; ctx.fillRect(0,0,W,H); }   // 進むと、冷たく青ざめた色みに
   ctx.globalCompositeOperation='color'; ctx.globalAlpha=GRADE_HUE; ctx.fillStyle='#8a3d62'; ctx.fillRect(0,0,W,H);  // 赤紫の色みに寄せる（明るさはそのまま）
   ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
   const sp=stageBackgroundSpec();                                                     // 背景の shade（0〜1）… そのステージだけ、世界ぜんたいを暗くする（暗い森など）
+  ctx.globalAlpha=K;
   const shade=(sp&&sp.shade||0)+0.5*m;                                               // 進むほど、世界ぜんたいが暗くなる
   if(shade>0){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgba(16,14,12,${Math.min(0.85,shade)})`; ctx.fillRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; }
   const vig=ctx.createRadialGradient(W/2,H*0.5,H*(0.42-0.12*m),W/2,H*0.5,W*0.62);       // 四すみの暗さも、進むほど強く・内がわへ
   vig.addColorStop(0,'rgba(10,8,6,0)'); vig.addColorStop(1,`rgba(10,8,6,${GRADE_VIG*(0.55+0.75*m)})`);
   ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+  ctx.restore();
+}
+/* 全体の色合い（乗算）。明るい場面（gradeK＝0）では、まん中にはかけず、ふちだけにかける（まわりのページの紙の色と、さかいを合わせる） */
+function drawGradeMul(){
+  const K=gradeK==null?1:gradeK, col=GRADE_MUL.join(',');
+  ctx.save(); ctx.globalCompositeOperation='multiply';
+  if(K>0.005){ ctx.fillStyle=`rgba(${col},${K})`; ctx.fillRect(0,0,W,H); }
+  if(K<0.995){ const F=EDGE_FADE*2.4, a=1-K;
+    for(const e of ['left','right','top','bottom']){
+      const g = e==='left'?ctx.createLinearGradient(0,0,F,0) : e==='right'?ctx.createLinearGradient(W,0,W-F,0) : e==='top'?ctx.createLinearGradient(0,0,0,F) : ctx.createLinearGradient(0,H,0,H-F);
+      g.addColorStop(0,`rgba(${col},${a})`); g.addColorStop(1,`rgba(${col},0)`); ctx.fillStyle=g;
+      if(e==='left') ctx.fillRect(0,0,F,H); else if(e==='right') ctx.fillRect(W-F,0,F,H); else if(e==='top') ctx.fillRect(0,0,W,F); else ctx.fillRect(0,H-F,W,F); } }
   ctx.restore();
 }
 /* ゲーム画面のふちを、まわりのページ（js/page.js の .gt-pages。色は PAGE_COLOR）へ だんだん溶けこませる */

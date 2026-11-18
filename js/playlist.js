@@ -90,7 +90,8 @@ const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗�
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
   opening:Object.assign({},DARK,{shade:0.2}),       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
-  komichi1:G(BG_DAY,0), komichi2:G(BG_DAY,0.1), path1:G(BG_DAY,0.3), meet_hood:G(BG_DAY,0.35), cliff:G(BG_DAY,0.5),   // だんだん暗く
+  komichi1:S(BG_DAY), komichi2:S(BG_DAY),   // チュートリアル：ゴシックにする前と同じ明るい森
+  path1:G(BG_DAY,0.3), meet_hood:G(BG_DAY,0.35), cliff:G(BG_DAY,0.5),   // だんだん暗く
   house_peek:DARK,   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
   wolf_talk:DARK,                                    // 狼（暗い森）
   crossroads:{src:BG_TITLE,page:'spread',wash:'rgba(244,240,230,0.08)'},   // 分かれ道（道のある、霧の薔薇の森）
@@ -105,7 +106,7 @@ GT.stageBackgrounds = {
 const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
   opening:0.3,                                   // 序章：ふしぎで、少し暗い
-  komichi1:0, komichi2:0.05,                     // チュートリアル：いちばん明るい
+  komichi1:0, komichi2:0,                        // チュートリアル：0 は、ゴシックにする前と同じ見た目（色合い・案内の枠も）
   house_peek:0.15, path1:0.25, meet_hood:0.3, cliff:0.4,
   wolf_talk:0.6,                                 // 狼：ここから不気味に
   crossroads:0.6, path2:0.72, path2b:0.8, flowers:0.6, path3:0.7, path4:0.8,
