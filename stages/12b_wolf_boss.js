@@ -402,7 +402,7 @@ GT.registerDraw(()=>{
     ctx.save(); ctx.font="700 16px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.fillStyle='rgba(90,70,48,0.85)';
     for(let i=0;i<3;i++){ const k=(t*0.6+i/3)%1; ctx.globalAlpha=Math.sin(k*Math.PI); ctx.fillText('z',96+k*22+i*4,BED.top-62-k*40); }
     ctx.restore();
-    GT.drawHint(W/2-20,150,['狼は、ベッドで寝たふりをしている……',[['F','Space'],'本を裏返して、狼を天井へたたきつけろ！']]);
+    GT.drawHint(W/2-20,150,['狼は、ベッドで寝たふりをしている……',[['F','Space'],'本を裏返す']]);
   } else if(a.phase==='rise' || a.phase==='fall'){
     drawSpinWolf(a.x,a.y,a.rot,false);
   } else if(a.phase==='stuck'){                                           // 天井でひるむ：ぶるぶる・赤く点滅・目を回す星

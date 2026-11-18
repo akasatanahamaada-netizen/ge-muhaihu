@@ -38,7 +38,7 @@ GT.registerScene({
   dynamic:'detourOnly',     // 遠回りのときだけ遊ぶ（07_crossroads.js）
   companion:'hood',         // 赤ずきんが、うしろからついてくる
   intro:[
-    {s:'赤ずきん',c:'hood',f:'smile',t:'わあ、きれい！　おばあちゃんに、お花を摘んでいってあげよう！'},
+    {s:'赤ずきん',c:'hood',f:'smile',get t(){ return GT.flags.warnedHood ? 'お花……。おばあちゃん、きっと元気が出る。急いで、少しだけ摘んでいこう。' : 'わあ、きれい！　おばあちゃんに、お花を摘んでいってあげよう！'; }},   // 狼のことを伝えていたら、急いで摘む
     {s:'赤ずきん',c:'hood',t:'あっ、あんな高いところにも咲いてる……。'},
   ],
 });
@@ -61,7 +61,7 @@ GT.registerDraw(()=>{ if(!isHere()) return; F.air(); }, 'overlay');
 
 /* 赤ずきんのひとこと（お花を摘むたび）。高いところ・天井の花は、ちがうことを言う */
 const SAY_FLOOR=['きれい！　いいにおい……','おばあちゃん、よろこぶかな','この色、すき！','あっちにも咲いてるよ！'];
-const SAY_HIGH=['そんな高いところの、よく取れたね！','わあ、さかさまで摘んでる……！','すごい、天井のお花まで！'];
+const SAY_HIGH=['そんな高いところのお花、よく取れたね！','わあ、さかさまで摘んでる……！','すごい、天井のお花まで！'];
 const fl={ got:0, n:0, done:false };
 GT.registerSceneReset(()=>{ if(isHere()){ fl.got=-1; fl.n=0; fl.done=false; } });   // 数は、ステージを読みこんだあとの最初の update で数える
 GT.registerUpdate(()=>{

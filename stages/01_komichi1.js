@@ -95,7 +95,7 @@ function mariSays(lines){ GT.mode='idle'; GT.player.vx=0; GT.beginDialogue(lines
 GT.registerUpdate(()=>{
   if(!isHere() || GT.mode!=='play') return;
   const pl=GT.player;
-  if(!mv.ask && pl.onGround && GT.gravity.left===1 && Math.abs(pl.y+pl.h-ROCK_L.y)<2){ mv.ask=true; mariSays([{s:'マリ',c:'mari',t:'本をひっくり返してみて。'}]); return; }
+  if(!mv.ask && pl.onGround && GT.gravity.left===1 && Math.abs(pl.y+pl.h-ROCK_L.y)<2){ mv.ask=true; mariSays([{s:'',c:'narr',t:'どこからか、マリの声がした。'},{s:'マリ',c:'mari',t:'本をひっくり返してみて。'}]); return; }
   if(!mv.told && GT.gravity.left===-1 && pl.onGround){ mv.ask=true; mv.told=true; mariSays([{s:'マリ',c:'mari',t:'驚いた？　その本は重力を変えることができるの。'}]); return; }
   // 背表紙（まん中）に近づいたら：ページごとに重力がちがうことを、マリが説明する
   if(mv.told && !mv.spine && pl.onGround && pl.x+pl.w/2 > GT.SPINE-90 && GT.gravity.left!==GT.gravity.right){ mv.spine=true;

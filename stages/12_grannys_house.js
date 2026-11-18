@@ -128,10 +128,16 @@ let qteActive=false, qteTimer=0, qteWindow=0;
 
 GT.registerAct('bgm-off',()=>{ GT.musicMute && GT.musicMute(true); });
 GT.registerAct('bgm-on', ()=>{ GT.musicMute && GT.musicMute(false); });
-const CLASSIC=()=>[   // 「なんて大きな〜なの」「おまえを食べるためだよ！」（遠回りなら、かならず流れる）
-  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おやおや、よく来たね。カスタードとバターの小瓶は、そこの椅子に置いておくれ。'},
-  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'さあ、もっと近くへおいで。'},
-  {s:'赤ずきん',c:'hood',f:'surprise',t:'……おばあちゃん？'},
+const CLASSIC=(atDoor)=>[   // 「なんて大きな〜なの」「おまえを食べるためだよ！」（遠回りなら、かならず流れる）。atDoor … 赤ずきんが戸口にいる（止めたとき）
+  ...(atDoor ? [
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おやおや、よく来たね。そんな戸口にいないで、もっと近くへおいで。'},
+    {s:'赤ずきん',c:'hood',f:'surprise',t:'……おばあちゃん？'},
+    {s:'',c:'narr',t:'赤ずきんは少年のうしろで、声をふるわせた。'},
+  ] : [
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おやおや、よく来たね。カスタードとバターの小瓶は、そこの椅子に置いておくれ。'},
+    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'さあ、もっと近くへおいで。'},
+    {s:'赤ずきん',c:'hood',f:'surprise',t:'……おばあちゃん？'},
+  ]),
   {s:'赤ずきん',c:'hood',t:'まあ、おばあちゃん、なんて大きな腕なの。'},
   {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえを抱きしめるためだよ、かわいい子。'},
   {s:'赤ずきん',c:'hood',t:'それに、なんて立派な脚なの。'},
@@ -172,7 +178,7 @@ function resolveQTE(success){
     // 間に合った：狼はベッドから天井へたたきつけられて、ひるむ（演出は 12b_wolf_boss.js の startAmbush）
     GT.injectSceneAfterCurrent({type:'boss',saveHood:true,intro:[
       {s:'',c:'narr',t:'間に合った。少年が本を裏返すと、狼の牙は空を切り、赤ずきんは天井へ引きはなされた。'},
-      {s:'',c:'narr',t:'狼が牙をむく。本を裏返し、家具を落として反撃しろ。'} ]});
+      {s:'',c:'narr',t:'狼が、牙をむいた。'} ]});
     GT.advanceScene();
   } else {
     GT.flags.saved=false;
@@ -202,7 +208,7 @@ GT.registerDynamic('arriveHouse', ()=>{
       {s:'',c:'narr',t:'狼が、こちらを振り向く。間に合った。'},
     ], null, ()=>{
       GT.injectSceneAfterCurrent({type:'boss',intro:[
-        {s:'',c:'narr',t:'本を裏返し、天井から家具を落として狼を追い詰めろ。'} ]});
+        {s:'',c:'narr',t:'狼が、低くうなった。'} ]});
       GT.advanceScene();
     });
     return;
@@ -211,12 +217,11 @@ GT.registerDynamic('arriveHouse', ()=>{
     GT.musicMute && GT.musicMute(true);     // 狼がおばあさんのふりをしているあいだは、BGM を止める（跳ね起きたら流す）
     GT.beginDialogue([
       {s:'',c:'narr',t:'少年が先に、そっと中をうかがう。ベッドに、おばあさんの寝間着を着た誰かが横たわっていた。'},
-      {s:'',c:'narr',t:'赤ずきんは少年のうしろで、声をふるわせた。'},
-      ...CLASSIC(),
+      ...CLASSIC(true),
       {s:'',c:'narr',t:'狼が、ベッドから跳ね起きた。――けれど、少年はもう本に手をかけていた。',act:'bgm-on'},
     ], null, ()=>{
       GT.injectSceneAfterCurrent({type:'boss',ambush:true,intro:[
-        {s:'',c:'narr',t:'天井にたたきつけられた狼が、目を回している。いまのうちに、家具を落としてたたみかけろ。'} ]});
+        {s:'',c:'narr',t:'天井にたたきつけられた狼が、目を回している。'} ]});
       GT.advanceScene();
     });
     return;
@@ -321,7 +326,7 @@ const EPILOGUE={
     {s:'マリ',c:'mari',t:'ほら。一話ぶん、埋まった。'},
     {s:'',c:'narr',t:'少年が本を開く。虫食いだったページが、文字と絵で埋まっていた。'},
     {s:'マリ',c:'mari',t:'でも、本はまだずっと続いてる。……次のお話も、白いままだよ。'},
-    {s:'マリ',c:'mari',t:'また、一緒に行こう。'},
+    {s:'マリ',c:'mari',t:'次のお話も、ここで待ってる。'},
   ],
   normal:[
     {s:'マリ',c:'mari',t:'おかえり。'},
@@ -375,7 +380,7 @@ const OUT_TALK={
   hood:{
     true:f=>[
       {s:'赤ずきん',c:'hood',f:'smile',t:'夕焼け、きれいだね。……あなたがいなかったら、今日のこの空、見られなかったかも。'},
-      ...(f.warnedHood?[{s:'赤ずきん',c:'hood',t:'森であなたが止めてくれたこと、ずっと忘れない。'}]
+      ...(f.warnedHood?[{s:'赤ずきん',c:'hood',t:'森であなたが教えてくれたこと、ずっと忘れない。'}]
                      :[{s:'赤ずきん',c:'hood',t:'狼さんに道を教えちゃったこと、後悔してる……。'}]),
       {s:'赤ずきん',c:'hood',t:'今度は、ちゃんと道を守って来る。……また、会えるといいな。'},
     ],
@@ -390,7 +395,7 @@ const OUT_TALK={
     true:()=>[
       {s:'おばあさん',c:'granny',t:'外の風は気持ちいいねえ。……生きてるって、いいもんだ。'},
       {s:'おばあさん',c:'granny',t:'カスタード、まだ残ってるよ。……ほら、あんたの分。'},
-      {s:'おばあさん',c:'granny',t:'その本、大事にするんだよ。あんたのことが、ちゃんと書いてあるんだろうからね。'},
+      {s:'おばあさん',c:'granny',t:'その本、大事にするんだよ。……なんだか、あんたにとって大切なものに見えるからね。'},
     ],
   },
 };

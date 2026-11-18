@@ -51,7 +51,7 @@ GT.defineStage('cliff', {
 GT.registerScene({
   id:'cliff', type:'play', stage:'cliff', clear:'exit', label:'第一章 ── 森の崖',
   intro:[
-    {s:'赤ずきん',c:'hood',f:'surprise',t:'わあ、高い崖……。あなたの魔法で、なんとかならない？'},
+    {s:'赤ずきん',c:'hood',f:'surprise',t:'わあ、高い崖……。その本で、なんとかならない？'},
   ],
 });
 
