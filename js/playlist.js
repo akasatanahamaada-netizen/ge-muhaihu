@@ -85,7 +85,7 @@ const S=src=>({src,page:'spread'});
 // ゴシック：明るい森の絵は、暗く・色を抜き・赤紫をかぶせて使う（タイトル画面の霧の薔薇の森に合わせる）
 // m … 不気味さ（0〜1）。大きいほど、絵を暗く・色を抜く（お話が進むほど大きくする）
 const G=(src,m=0.5)=>({src,page:'spread',filter:`brightness(${(0.95-0.45*m).toFixed(2)}) saturate(${(0.8-0.45*m).toFixed(2)}) contrast(1.05) blur(0.8px)`,tint:'rgb(178,172,164)',wash:'rgba(244,240,230,0.06)'});
-const BG_TITLE='assets/background/タイトル背景.webp';   // タイトル画面の背景（道のある、霧の薔薇の森）
+const BG_TITLE='assets/background/タイトル背景_森.webp';   // 紫をぬいた版（もとは タイトル背景.webp）   // タイトル画面の背景（道のある、霧の薔薇の森）
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
