@@ -493,3 +493,6 @@ html,body, body.gt-full{ background:
   background:radial-gradient(ellipse 55% 60% at 18% 8%, rgba(255,190,110,0.32), rgba(255,190,110,0) 70%); mix-blend-mode:screen; }
 #fsBtn{ background:rgba(34,12,24,0.85) !important; border-color:rgba(201,160,112,0.55) !important; }
 
+
+/* 栞（Reread・menu）は赤（青い絵の色を、深い赤に変えた絵。もとの青は shiori_plain.webp） */
+.gt-mark{ background-image:url('../assets/komono/shiori_plain_red.webp') !important; }
