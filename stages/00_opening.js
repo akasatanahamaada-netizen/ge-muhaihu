@@ -83,7 +83,7 @@ function MARI_FIRST(c){   // マリは、最低限のことしか言わない（
     {s:'マリ',c:'mari',t:'その本。全部埋めないと、帰れないよ。'},
     {s:'少年',c:'boy',t:'埋めるって、どうやって？'},
     {s:'マリ',c:'mari',t:'……説明は、しない。自分の目で見てきて。'},
-    ...(rest>0 ? [{s:'マリ',c:'mari',t:'まずは、そこらに落ちてる紙きれ。拾っておいて。'}] : []),
+    ...(rest>0 ? [{s:'マリ',c:'mari',t:'まずは、そこらに浮いてる光。集めておいて。'}] : []),
     {s:'少年',c:'boy',t:'……きみは？'},
     {s:'マリ',c:'mari',t:'マリ。',act:'mari-named'},
   ];
@@ -192,7 +192,7 @@ function drawPages(){
     const y=hy+(ey-hy)*k, sway=Math.sin(k*Math.PI*4+i)*34*(1-k)*Math.min(1,k*4);
     const bx=hx+(ex-hx)*k*k*(3-2*k);
     const rot=Math.sin(k*Math.PI*5+i)*0.9*(1-k);
-    ctx.save(); ctx.translate(bx+sway,y); ctx.scale(1,0.4+0.6*Math.abs(Math.cos(k*9*(1-k)+i)));
+    ctx.save(); ctx.translate(bx+sway,y);   // 光の玉が、ふわふわ ゆれながら降りてくる
     const sz=GT.pageScrapSize(it);
     GT.drawPageScrap(0,0,sz.w,sz.h,rot,GT.pageScrapSeed(it),0); ctx.restore();
   });
@@ -202,7 +202,7 @@ function drawPages(){
 function drawScrapHint(){
   if(GT.mode!=='play' || !st.movedFar || GT.items.some(i=>i.got)) return;
   const it=GT.items[0]; if(!it || it.hidden) return;
-  GT.drawHint(it.x+it.w/2, it.y-58, ['落ちている紙きれ ＝ お話のかけら','さわると 拾える']);
+  GT.drawHint(it.x+it.w/2, it.y-58, ['浮かんでいる光 ＝ お話のかけら','さわると 本に吸いこまれる']);
 }
 
 /* 月あかりの筋（青白く、うすく） */

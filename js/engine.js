@@ -89,7 +89,7 @@ GT.definePages        = (list)=>{ GT.pageBases={}; GT.pageInfo={}; list.forEach(
    そのページのかけらを全部拾うと、本を読みかえす画面で、そのページの欠けた文字・挿絵が埋まる。
    GT.pagePieces(key) → {found:拾った数, total:全部の数} */
 GT.pagePieces         = (key)=>{ const p=GT.pageRecord.find(p=>p.key===key), ids=[];
-  for(const id in GT.STAGE_DEFS){ const d=GT.STAGE_DEFS[id]; if(d.bookPage===key) (d.items||[]).forEach((_,i)=>ids.push(id+':'+i)); }
+  for(const id in GT.STAGE_DEFS){ const d=GT.STAGE_DEFS[id]; if(d.bookPage===key) (d.items||[]).forEach((_,i)=>{ const pid=(d.pieceKey||id)+':'+i; if(!ids.includes(pid)) ids.push(pid); }); }   // pieceKey が同じステージ（近道と遠回りなど）は、同じかけらを数える
   const info=GT.pageInfo&&GT.pageInfo[key], extra=(info&&info.extra)||[];
   extra.forEach(e=>ids.push(e.id));                                   // 会話などで手に入るピースは、いちばん後ろ
   const got=new Set((p&&p.found)||[]), foundIds=ids.filter(id=>got.has(id));
@@ -97,7 +97,7 @@ GT.pagePieces         = (key)=>{ const p=GT.pageRecord.find(p=>p.key===key), ids
 /* かけら以外のピース（会話など）を手に入れる。from:{x,y,w,h}（ゲーム画面の位置）があれば、そこから本のボタンへ飛んでいく */
 GT.addPagePiece       = (key,id,from)=>{ const p=GT.pageRecord.find(p=>p.key===key); if(!p) return;
   p.found=p.found||[]; if(p.found.includes(id)) return; p.found.push(id);
-  GT.sfx&&GT.sfx('page'); if(from && GT.flyScrapToBook) GT.flyScrapToBook({...from, pid:id}); };
+  (GT.chime?GT.chime():GT.sfx&&GT.sfx('page')); if(from && GT.flyScrapToBook) GT.flyScrapToBook({...from, pid:id}); };
 GT.fillPage           = (key,text)=>{ const p=GT.pageRecord.find(p=>p.key===key); if(p){ p.filled=true;p.text=text;} };
 GT.registerSceneType  = (t,fn)=>{ sceneTypeHandlers[t]=fn; };
 GT.registerDynamic    = (n,fn)=>{ dynamicHandlers[n]=fn; };
@@ -299,7 +299,7 @@ GT.loadStageDef = function(def, opt){
   const bp=def.bookPage && GT.pageRecord.find(p=>p.key===def.bookPage);
   if(bp && !bp.found) bp.found=[];
   // 前に拾ったかけらは、拾ったまま（やり直しても、もう一度は出てこない）
-  GT.items = (def.items||[]).map((it,i)=>{ const pid=def.id+':'+i, had=!!(bp && bp.found.includes(pid));
+  GT.items = (def.items||[]).map((it,i)=>{ const pid=(def.pieceKey||def.id)+':'+i, had=!!(bp && bp.found.includes(pid));
     return {...it,pid,got:had,gotT:had?99:0}; });
   bookShown=def.bookPage ? GT.pagePieces(def.bookPage).found : GT.items.filter(i=>i.got).length; updateBookFill();         // 「本を開く」ボタンの本の絵（集めたぶんだけ埋まる）は、ステージごとに空から
   itemLook  = def.itemLook||'page';      // 'page'（光るお話のかけら。ふつうはこれ）／'flower'（お花。摘むと消える）／'star'（前の★）
@@ -323,7 +323,7 @@ function missionCount(){
 }
 function missionDone(){
   if(!missionReq) return true;
-  if(missionReq.items && GT.items.some(i=>!i.got)) return false;
+  if(missionReq.items && !(curStageDef&&curStageDef.itemsOptional) && GT.items.some(i=>!i.got)) return false;   // itemsOptional … かけらは拾わなくても進める
   if(missionReq.enemies && GT.enemies.some(e=>e.alive)) return false;
   return true;
 }
@@ -1207,7 +1207,7 @@ function update(dt){
   if(player.onGround) player.flipFall=false;   // 着地したら、また左右に動ける
 
   for(const it of GT.items){ if(!it.got&&!it.hidden&&GT.rectsOverlap(player,GT.itemHitbox(it))){ it.got=true; it.gotT=0;   // アイテムを取る（hidden のあいだは取れない）
-    if(itemLook==='page'){ hudPulse=1; GT.sfx&&GT.sfx('page'); flyScrapToBook(it); }
+    if(itemLook==='page'){ hudPulse=1; chime(); flyScrapToBook(it); if(curStageDef&&curStageDef.itemsOptional&&GT.items.every(i=>i.got)) missionFlash=2.2; }
     const bp=curStageDef&&curStageDef.bookPage&&GT.pageRecord.find(p=>p.key===curStageDef.bookPage);   // 本のページに記録
     if(bp){ bp.found=bp.found||[]; if(!bp.found.includes(it.pid)) bp.found.push(it.pid); } } }
   hudPulse=Math.max(0,hudPulse-dt*1.8);
@@ -1422,41 +1422,67 @@ function flyScrapToBook(it){
   const {w,h}=GT.pageScrapSize(it), pw=w*sc, ph=h*sc;
   const x0=cr.left+(it.x+it.w/2)*sc, y0=cr.top+(it.y+it.h/2)*sc;
   const x1=br.left+br.width/2, y1=br.top+br.height/2, dx=x1-x0, dy=y1-y0;
-  const poly=scrapPoints(w,h,GT.pageScrapSeed(it)).map(([x,y])=>`${((x/w+0.5)*100).toFixed(1)}% ${((y/h+0.5)*100).toFixed(1)}%`).join(',');
+  const D=Math.max(16,Math.min(pw,ph)*0.8);
   const el=document.createElement('div');
-  el.innerHTML=`<div style="width:100%;height:100%;background:#fbf3dc;clip-path:polygon(${poly})"></div>`;
-  Object.assign(el.style,{position:'fixed',left:(x0-pw/2)+'px',top:(y0-ph/2)+'px',width:pw+'px',height:ph+'px',
-    pointerEvents:'none',zIndex:60,filter:'drop-shadow(0 2px 3px rgba(40,30,18,0.45)) drop-shadow(0 0 1px rgba(110,82,50,0.9))'});   // 光らせない（紙の影とふちだけ）
+  Object.assign(el.style,{position:'fixed',left:(x0-D/2)+'px',top:(y0-D/2)+'px',width:D+'px',height:D+'px',borderRadius:'50%',pointerEvents:'none',zIndex:60,
+    background:'radial-gradient(circle at 40% 38%, #fffff5 0%, #fff0be 40%, rgba(255,200,110,0.7) 70%, rgba(255,200,110,0) 100%)',
+    boxShadow:'0 0 12px 6px rgba(255,220,140,0.75), 0 0 28px 12px rgba(255,200,110,0.35)'});
   host.appendChild(el);
-  const lift=-Math.min(140, 50+Math.abs(dy)*0.35), kf=[];
-  for(let i=0;i<=12;i++){ const t=i/12, e=t*t*(3-2*t);           // ふわっと浮いてから、弧をえがいてボタンへ
-    kf.push({transform:`translate(${dx*e}px,${dy*e+lift*Math.sin(Math.PI*Math.min(1,t*1.2))}px) rotate(${e*420}deg) scale(${1-0.7*e})`, opacity:t>0.85?1-(t-0.85)/0.15*0.8:1}); }
-  let ended=false; const finish=()=>{ if(ended) return; ended=true; el.remove(); done(); };
-  if(el.animate){ el.animate(kf,{duration:950,easing:'linear'}).onfinish=finish; }
-  setTimeout(finish,1100);                                         // 念のため（アニメーションが止まっていても、かならず埋まる）
+  const lift=-Math.min(140, 50+Math.abs(dy)*0.35), kf=[], DUR=1000, path=[];
+  for(let i=0;i<=16;i++){ const t=i/16, e=t*t*(3-2*t);                          // ふわっと浮いてから、弧をえがいて栞へ
+    const px=dx*e, py=dy*e+lift*Math.sin(Math.PI*Math.min(1,t*1.2)); path.push([px,py]);
+    kf.push({transform:`translate(${px}px,${py}px) scale(${1-0.45*e})`, opacity:t>0.9?1-(t-0.9)/0.1*0.7:1}); }
+  // 光の粒の尾（とちゅうの位置に、小さな光を置いていき、すっと消える）
+  const sparks=[]; for(let i=1;i<path.length-1;i++){ const [px,py]=path[i];
+    setTimeout(()=>{ for(let k=0;k<2;k++){ const sp=document.createElement('div'), s=3+Math.random()*4;
+      Object.assign(sp.style,{position:'fixed',left:(x0+px-s/2+(Math.random()-0.5)*10)+'px',top:(y0+py-s/2+(Math.random()-0.5)*10)+'px',width:s+'px',height:s+'px',borderRadius:'50%',
+        pointerEvents:'none',zIndex:59,background:'#fff3c8',boxShadow:'0 0 6px 2px rgba(255,214,130,0.8)'});
+      host.appendChild(sp); sparks.push(sp);
+      if(sp.animate) sp.animate([{opacity:1,transform:'translateY(0) scale(1)'},{opacity:0,transform:`translateY(${6+Math.random()*10}px) scale(0.3)`}],{duration:520,easing:'ease-out'}).onfinish=()=>sp.remove();
+      else setTimeout(()=>sp.remove(),520); } }, DUR*i/16); }
+  const burst=()=>{ for(let k=0;k<14;k++){ const sp=document.createElement('div'), a=k/14*Math.PI*2, d=18+Math.random()*26, s=3+Math.random()*4;   // 栞のまわりで、光がはじける
+      Object.assign(sp.style,{position:'fixed',left:(x1-s/2)+'px',top:(y1-s/2)+'px',width:s+'px',height:s+'px',borderRadius:'50%',pointerEvents:'none',zIndex:61,
+        background:'#fff6d6',boxShadow:'0 0 8px 3px rgba(255,220,140,0.85)'});
+      host.appendChild(sp);
+      if(sp.animate) sp.animate([{opacity:1,transform:'translate(0,0) scale(1)'},{opacity:0,transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(0.2)`}],{duration:650,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>sp.remove();
+      else setTimeout(()=>sp.remove(),650); } };
+  let ended=false; const finish=()=>{ if(ended) return; ended=true; el.remove(); burst(); done(); };
+  if(el.animate){ el.animate(kf,{duration:DUR,easing:'linear'}).onfinish=finish; }
+  setTimeout(finish,DUR+150);                                      // 念のため（アニメーションが止まっていても、かならず埋まる）
 }
 GT.flyScrapToBook=flyScrapToBook; GT.scrapPoints=scrapPoints;   // ステージ側からも使える（拾った扱いにしたかけらを、本へ飛ばす）
 function el_visible(e){ if(!e) return false; const s=getComputedStyle(e); return s.display!=='none' && s.visibility!=='hidden'; }
 
+/* お話のかけら：ふわふわ浮かぶ、光の玉。まわりにやわらかい光、中は白く明るい芯、まわりを小さな光の粒が回る。
+   （もとは紙きれ。呼びかたは同じ：drawPageScrap(中心x, 中心y, 幅, 高さ, 回転, 種, 光の強さ)） */
 function drawPageScrap(cx,cy,w,h,rot,seed,glow){
-  ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot);
-  if(glow>0){                                                     // まわりの、金色の光（遠くからでも目立つように）
-    const R=Math.max(w,h)*1.25;
-    ctx.save(); ctx.globalCompositeOperation='lighter';
-    const g=ctx.createRadialGradient(0,0,2,0,0,R);
-    g.addColorStop(0,`rgba(255,220,120,${0.38*glow})`); g.addColorStop(0.45,`rgba(255,200,90,${0.14*glow})`); g.addColorStop(1,'rgba(255,200,90,0)');
-    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,R,0,Math.PI*2); ctx.fill();
-    ctx.rotate(-rot+goalPulse*0.35);                               // ゆっくり回る光の筋
-    ctx.fillStyle=`rgba(255,232,150,${0.1*glow})`;
-    for(let i=0;i<6;i++){ ctx.rotate(Math.PI/3); ctx.beginPath(); ctx.moveTo(0,-3); ctx.lineTo(R*1.05,-1); ctx.lineTo(R*1.05,1); ctx.lineTo(0,3); ctx.closePath(); ctx.fill(); }
-    ctx.restore();
-    ctx.shadowColor=`rgba(255,214,110,${0.7*glow})`; ctx.shadowBlur=7;
-  }
-  pageScrapPath(w,h,seed); ctx.fillStyle='#fbf3dc'; ctx.fill();   // 紙（ちぎれたふちに、白い紙の地が残る）
-  ctx.shadowBlur=0;
-  pageScrapPath(w,h,seed); ctx.strokeStyle=glow>0?`rgba(214,160,50,${0.6+0.4*glow})`:'rgba(138,106,42,0.85)'; ctx.lineWidth=glow>0?2:1.3; ctx.stroke();
+  const t=performance.now()/1000+seed*0.37, R=Math.min(w,h)*0.42, pulse=0.85+0.15*Math.sin(t*3.1);
+  ctx.save(); ctx.translate(cx,cy);
+  ctx.globalCompositeOperation='lighter';
+  let g=ctx.createRadialGradient(0,0,0,0,0,R*3.2*pulse);                       // 外の、やわらかい光
+  g.addColorStop(0,'rgba(255,236,170,0.55)'); g.addColorStop(0.35,'rgba(255,214,120,0.22)'); g.addColorStop(1,'rgba(255,200,100,0)');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,R*3.2*pulse,0,Math.PI*2); ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+  g=ctx.createRadialGradient(-R*0.25,-R*0.3,0,0,0,R);                            // 玉（白い芯 → 金色のふち）
+  g.addColorStop(0,'rgba(255,255,245,1)'); g.addColorStop(0.45,'rgba(255,240,190,0.95)'); g.addColorStop(1,'rgba(255,200,110,0.55)');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,R*pulse,0,Math.PI*2); ctx.fill();
+  ctx.globalCompositeOperation='lighter';
+  for(let i=0;i<5;i++){ const a=t*(1.4+i*0.15)+i*1.26, rr=R*(1.35+0.35*Math.sin(t*2+i));   // まわりを回る、小さな光の粒
+    const x=Math.cos(a)*rr, y=Math.sin(a)*rr*0.75, s=1.1+0.7*Math.sin(t*5+i*2);
+    ctx.fillStyle=`rgba(255,246,210,${0.55+0.35*Math.sin(t*4+i)})`; ctx.beginPath(); ctx.arc(x,y,Math.max(0.4,s),0,Math.PI*2); ctx.fill(); }
   ctx.restore();
 }
+/* 拾ったときの、小さな鈴の音（その場で作る。効果音の音量にしたがう） */
+let chimeAC=null;
+function chime(){
+  const vol=GT.volume?GT.volume.se:1; if(vol<=0) return;
+  try{ chimeAC=chimeAC||new (window.AudioContext||window.webkitAudioContext)(); if(chimeAC.state==='suspended') chimeAC.resume(); }catch(e){ return; }
+  const a=chimeAC, t0=a.currentTime;
+  [1318.5,1760,2349.3].forEach((f,i)=>{ const o=a.createOscillator(), g=a.createGain(), t=t0+i*0.07;
+    o.type='sine'; o.frequency.value=f; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.16*vol,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+0.7);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t+0.75); });
+}
+GT.chime=chime;
 GT.drawPageScrap=drawPageScrap;   // ステージ側からも使う（落ちてくるかけらなど）
 GT.pageScrapSeed=it=>Math.round(it.x*7+it.y*3);
 GT.pageScrapSize=it=>{ const s=Math.max(it.w,32); return {w:s*1.12, h:s*1.0}; };   // 小さいアイテムでも見えるように、少し大きめに描く
@@ -1478,9 +1504,8 @@ function drawItem(it){
       ctx.fillStyle='#ffe9a0'; ctx.fillText(txt,sx,ty2); ctx.restore();
       return;
     }
-    const bob=Math.sin(goalPulse*2.4+it.x*0.07)*3, rot=Math.sin(goalPulse*1.7+it.x)*0.12;
-    ctx.save(); ctx.shadowColor='rgba(40,30,18,0.35)'; ctx.shadowBlur=4; ctx.shadowOffsetY=2;   // 光らせない。ふつうの紙きれ（うすい影だけ）
-    drawPageScrap(cx,it.y+it.h/2+bob,sw,sh,rot,seed,0); ctx.restore();
+    const bob=Math.sin(goalPulse*2.0+it.x*0.07)*5;                                 // ふわふわ浮かぶ光の玉
+    drawPageScrap(cx,it.y+it.h/2+bob,sw,sh,0,seed,1);
     return;
   }
   if(itemLook==='flower'){ drawFlowerItem(it,cx,r); return; }
@@ -1563,7 +1588,7 @@ function drawGameOver(){
 }
 /* ミッションの表示（HTML）。文字がくっきり出る。位置はキャンバスの上から 48/480 */
 const missionEl=document.createElement('div'); missionEl.id='gtMission';
-missionEl.innerHTML='<svg class="ic" viewBox="0 0 20 16" aria-hidden="true"><path d="M2 3 L7 1.5 L11 2.8 L18 1 L17 7 L18.6 13 L12 14.6 L7 13.4 L1.5 15 L2.6 9z" fill="#fbf3dc" stroke="#8a7a5a" stroke-width="0.8"/><path d="M5 6 H14 M5 9 H15 M5 12 H11" stroke="#b9a885" stroke-width="0.8"/></svg><span class="tx"></span>';
+missionEl.innerHTML='<svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><defs><radialGradient id="gtOrbIc" cx="0.42" cy="0.4" r="0.6"><stop offset="0" stop-color="#fffff5"/><stop offset="0.45" stop-color="#fff0be"/><stop offset="1" stop-color="#ffc86e" stop-opacity="0"/></radialGradient></defs><circle cx="10" cy="10" r="9.5" fill="url(#gtOrbIc)"/><circle cx="10" cy="10" r="4.6" fill="#fffbe8"/></svg><span class="tx"></span>';
 canvas.parentElement.appendChild(missionEl);
 (function(){ const st=document.createElement('style'); st.textContent=`
   #gtMission{ position:absolute; left:50%; top:${(48/480*100).toFixed(2)}%; transform:translate(-50%,-50%); z-index:1; display:none; align-items:center; gap:0.5em;
@@ -1571,7 +1596,7 @@ canvas.parentElement.appendChild(missionEl);
     font-family:'Zen Old Mincho',serif; font-weight:700; font-size:clamp(11px,1.6cqw,38px); letter-spacing:0.04em; box-shadow:0 0 0 0 rgba(255,226,140,0); }
   #gtMission.show{ display:flex; }
   #gtMission.done{ background:rgba(176,141,87,0.92); }
-  #gtMission .ic{ width:1.4em; height:1.15em; transform:rotate(-7deg); flex:none; }
+  #gtMission .ic{ width:1.35em; height:1.35em; flex:none; filter:drop-shadow(0 0 4px rgba(255,214,130,0.9)); }
   #gtMission.nopage .ic{ display:none; }`; document.head.appendChild(st); })();
 let missionTxt=null;
 function missionDom(txt,page,done,pulse){
@@ -1586,7 +1611,7 @@ function drawMissionHud(){
   const page=itemLook==='page', verb = page?'を集める':itemLook==='flower'?'を摘む':null;   // 見出しの言いかた
   if(missionReq.items) parts.push(verb ? `${itemLabel}${verb} ${c.items}/${c.itemsAll}` : `${itemLabel} ${c.items}/${c.itemsAll}`);
   if(missionReq.enemies) parts.push(`狼の手下を倒す ${c.enemies}/${c.enemiesAll}`);
-  const done=missionDone();
+  const done = (curStageDef&&curStageDef.itemsOptional) ? (c.items>=c.itemsAll && (!missionReq.enemies||c.enemies>=c.enemiesAll)) : missionDone();
   const txt = done ? (verb&&!missionReq.enemies ? `${itemLabel}が そろった！` : missionReq.items ? 'ミッション達成！' : 'みんな倒した！') : ((verb||!missionReq.items) ? '' : 'ミッション　')+parts.join('　');
   // キャンバスに描くと、画面を大きくしたときに文字がぼやけるので、ゲーム画面の上に重ねた HTML（#gtMission）で出す
   missionDom(txt, page, done, hudPulse); return;
@@ -1759,6 +1784,7 @@ function render(){
   for(const fn of drawOverlay) fn();         // 手前の木・窓のぞきなど（ゴシックの色合いをかけるため、色合いより先に描く）
   drawGothicWorld();                                                                                                // 世界を暗く・色を抜く（不気味さに合わせて）
   liftCharacters();                                                                                                 // 少年と人物は、暗くしない（色合いの上に描きなおす）
+  if(itemLook==='page') for(const it of GT.items) if(!it.got&&!it.hidden) drawItem(it);                            // 光の玉（お話のかけら）は、色合いの上にも重ねて、くっきり光らせる
   ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.drawImage(GT.paperArt.agedPaper,0,0); ctx.restore();   // 古い紙の色むら・しみ（表示類より奥）
   drawEdgeFade();                                                                                                   // ふちを、まわりのページの色へ ぼかす（ページのふくらみとのさかいを目立たせない）
   drawGradeMul();   // 全体の色合い（まわりのページと同じ色）

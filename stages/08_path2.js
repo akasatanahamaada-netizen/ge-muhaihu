@@ -7,6 +7,15 @@
 
 /* stages/XX_path2.js  ── ステージエディタで作成 */
 GT.defineStage('path2', {
+  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「wolf」のページが埋まっていく
+  items:[
+    {page:'left', x:60, y:18, w:32, h:32},
+    {page:'right', x:470, y:428, w:32, h:32},
+    {page:'right', x:805, y:152, w:32, h:32},
+  ],
+  itemsOptional:true,
+  bookPage:'wolf',
+  pieceKey:'wolfroad1',   // 近道と遠回りで、同じかけらを数える（どちらの道を通っても、ページを埋められる）
   platforms:[
     {page:'left', x:375, y:185, w:20, h:280, kind:'ledge'},
     {page:'right', x:545, y:125, w:150, h:20, kind:'ledge'},
@@ -41,7 +50,7 @@ GT.defineStage('path2', {
     {layer:'front', kind:'fern', x:790, y:400, w:75, h:70},
     {layer:'front', kind:'grass', x:745, y:385, w:60, h:79},
   ],
-  mission:['enemies'],   // 狼の手下を全部倒すまで、右の端は閉じている（木箱を上から落として倒す）
+  mission:['enemies','items'],   // かけらは拾わなくてもよい（itemsOptional）   // 狼の手下を全部倒すまで、右の端は閉じている（木箱を上から落として倒す）
 });
 
 GT.registerScene({

@@ -26,6 +26,15 @@
    ========================================================================== */
 
 GT.defineStage('cliff', {
+  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「meet」のページが埋まっていく
+  items:[
+    {page:'left', x:300, y:428, w:32, h:32},
+    {page:'right', x:600, y:18, w:32, h:32},
+    {page:'right', x:744, y:302, w:32, h:32},
+  ],
+  itemsOptional:true,
+  bookPage:'meet',
+  mission:['items'],
   platforms:[
     {page:'left',  x:60,  y:150, w:110, h:24,  kind:'ledge'},   // 0 高い棚（丸太）。木箱がのっている
     {page:'left',  x:225, y:16,  w:30,  h:110, kind:'ledge'},   // 1 天井から垂れたつる（天井で押す木箱を止める）

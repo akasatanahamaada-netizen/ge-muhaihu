@@ -26,6 +26,15 @@
 /* stages/XX_path1.js  ── ステージエディタで作成 */
 /* stages/XX_path1.js  ── ステージエディタで作成 */
 GT.defineStage('path1', {
+  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「window」のページが埋まっていく
+  items:[
+    {page:'left', x:172, y:322, w:32, h:32},
+    {page:'left', x:339, y:242, w:32, h:32},
+    {page:'right', x:610, y:18, w:32, h:32},
+  ],
+  itemsOptional:true,
+  bookPage:'window',
+  mission:['items'],
   platforms:[
     {page:'left', x:120, y:360, w:140, h:20, kind:'ledge'},
     {page:'left', x:300, y:280, w:110, h:20, kind:'ledge'},

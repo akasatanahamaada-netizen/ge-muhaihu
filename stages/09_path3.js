@@ -23,6 +23,16 @@
    ========================================================================== */
 
 GT.defineStage('path3', {
+  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「wolf」のページが埋まっていく
+  items:[
+    {page:'left', x:370, y:322, w:32, h:32},
+    {page:'left', x:80, y:18, w:32, h:32},
+    {page:'right', x:470, y:428, w:32, h:32},
+  ],
+  itemsOptional:true,
+  bookPage:'wolf',
+  pieceKey:'wolfroad1',   // 近道と遠回りで、同じかけらを数える（どちらの道を通っても、ページを埋められる）
+  mission:['items'],
   platforms:[
     {page:'left', x:70, y:55, w:80, h:75, kind:'ledge'},
     {page:'left', x:295, y:85, w:105, h:60, kind:'ledge'},
