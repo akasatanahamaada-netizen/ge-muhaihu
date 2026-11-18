@@ -553,10 +553,55 @@ function drawRockGoth(rs,seed){
 }
 
 /* 木の幹（根は床に広がる）：凝った幹（GTDecor.paint.trunk） */
-function drawTrunk(p){ api.paint.trunk(ctx, p.x, p.y-6, FLOOR, p.w, p.x*7+p.y); }
+function drawTrunk(p){
+  if(brightNow()){ api.paint.trunk(ctx, p.x, p.y-6, FLOOR, p.w, p.x*7+p.y); return; }
+  // ゴシック：黒ずんだ幹（色を抜いて暗く）に、いばらのつると薔薇、片がわに月あかりのふち
+  ctx.save(); ctx.filter='brightness(0.38) saturate(0.3) contrast(1.15)'; api.paint.trunk(ctx, p.x, p.y-6, FLOOR, p.w, p.x*7+p.y); ctx.restore();
+  ctx.save(); ctx.strokeStyle='rgba(215,205,225,0.25)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(p.x+p.w-2,p.y); ctx.lineTo(p.x+p.w-2,FLOOR-4); ctx.stroke();
+  if(GT.goth){ const P=GT.goth.paint; P.vine(ctx,P.R(p.x|0),p.x+p.w/2,FLOOR,p.y+20,p.w*0.45,0); }
+  ctx.restore();
+}
 
 /* 木の葉の茂み（足場の四角にそって、葉のかたまりで覆う）：凝った茂み（GTDecor.paint.canopy） */
-function drawCrown(rs,seed){ api.paint.canopy(ctx, rs.map(p=>({rect:true,x:p.x,y:p.y,w:p.w,h:p.h})), seed||1); }
+function drawCrown(rs,seed){
+  if(brightNow()){ api.paint.canopy(ctx, rs.map(p=>({rect:true,x:p.x,y:p.y,w:p.w,h:p.h})), seed||1); return; }
+  drawCrownGoth(rs,seed||1);
+}
+/* ゴシックの木の上：葉のない、からみあった黒い枝のかたまり（乗れる足場の形のまま）。とげ・暗い葉・薔薇、上のふちに月あかり */
+function drawCrownGoth(rs,seed){
+  const P=GT.goth&&GT.goth.paint;
+  ctx.save();
+  // かたまり（ふちを でこぼこに）
+  for(const p of rs){
+    ctx.fillStyle='#1b1316';
+    rectsPath([p],3,10); ctx.fill();
+    for(let i=0;i<Math.max(14,(p.w+p.h)/4);i++){ const e=i%4, u=rnd(seed+i+p.x), out=4+rnd(seed+i*7)*6;   // ふちを大きく でこぼこに（丸い葉むらではなく、ごつごつした かたまり）
+      const x=e===0?p.x+u*p.w : e===1?p.x+p.w+out*0.5 : e===2?p.x+u*p.w : p.x-out*0.5, y=e===0?p.y-out*0.4 : e===1?p.y+u*p.h : e===2?p.y+p.h+out*0.4 : p.y+u*p.h;
+      ell(x,y,9+rnd(seed+i*3)*9,7+rnd(seed+i*5)*7,'#1b1316',rnd(seed+i*9)*3); }
+    const vg=ctx.createRadialGradient(p.x+p.w*0.4,p.y+p.h*0.3,4,p.x+p.w/2,p.y+p.h/2,Math.max(p.w,p.h)*0.8);   // 中を少し明るく（ふくらみ）
+    vg.addColorStop(0,'rgba(72,52,60,0.55)'); vg.addColorStop(1,'rgba(72,52,60,0)'); ctx.fillStyle=vg; rectsPath([p],0,10); ctx.fill();
+  }
+  // 中の、からみあう枝
+  ctx.save(); rectsPath(rs,2,10); ctx.clip();
+  ctx.strokeStyle='rgba(70,52,58,0.55)'; ctx.lineWidth=1.3; ctx.lineCap='round';
+  for(const p of rs) for(let i=0;i<(p.w*p.h)/700;i++){ const x=p.x+rnd(seed+i*7+p.y)*p.w, y=p.y+rnd(seed+i*11+p.x)*p.h, a=rnd(seed+i*13)*Math.PI*2, l=14+rnd(seed+i)*22;
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.quadraticCurveTo(x+Math.cos(a+0.6)*l*0.5,y+Math.sin(a+0.6)*l*0.5,x+Math.cos(a)*l,y+Math.sin(a)*l); ctx.stroke(); }
+  for(const p of rs) for(let i=0;i<(p.w*p.h)/1600;i++) ell(p.x+rnd(seed+i*17)*p.w,p.y+rnd(seed+i*19)*p.h,4,2.2,i%2?'#1f2a1c':'#26321f',rnd(seed+i)*3);   // 暗い葉
+  ctx.restore();
+  // 外へ のびる とげのある枝
+  if(P){ ctx.strokeStyle='#1b1316'; ctx.lineCap='round';
+    for(const p of rs){ const r=P.R((seed*31+p.x)|0);
+      for(let i=0;i<Math.max(3,p.w/22);i++){ const x=p.x+6+rnd(seed+i*23+p.x)*(p.w-12); P.branch(ctx,r,x,p.y+6,22+rnd(seed+i)*24,-Math.PI/2+(rnd(seed+i*29)-0.5)*1.6,3.4,3); }   // 上へ
+      for(let i=0;i<Math.max(2,p.h/30);i++){ const y=p.y+8+rnd(seed+i*31+p.y)*(p.h-16);
+        P.branch(ctx,r,p.x+6,y,20+rnd(seed+i*3)*16,Math.PI+(rnd(seed+i*5)-0.5)*1.0,3,2);                 // 左へ
+        P.branch(ctx,r,p.x+p.w-6,y,20+rnd(seed+i*7)*16,(rnd(seed+i*11)-0.5)*1.0,3,2); }                  // 右へ
+      for(let i=0;i<2;i++) P.branch(ctx,r,p.x+p.w*(0.25+i*0.5),p.y+p.h-6,14+rnd(seed+i*13)*10,Math.PI/2+(rnd(seed+i*17)-0.5)*0.8,2.4,2); } }   // 下に たれる
+  // 上のふちの月あかり
+  for(const e of topEdges(rs)){ ctx.strokeStyle='rgba(215,205,225,0.3)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(e.x0+6,e.y+1.5); ctx.lineTo(e.x1-6,e.y+1.5); ctx.stroke(); }
+  // 薔薇
+  if(P) for(const p of rs) for(let i=0;i<Math.max(1,p.w/50);i++) P.rose(ctx,p.x+10+rnd(seed+i*37+p.y)*(p.w-20),p.y+6+rnd(seed+i*41)*(p.h-12),4+rnd(seed+i)*2);
+  ctx.restore();
+}
 
 /* 丸太（宙に浮いた細い足場）：木の皮の横すじ・切り口の年輪・上に小さな苔 */
 function drawLog(p,seed){
@@ -586,6 +631,11 @@ function drawLog(p,seed){
 
 /* 天井から垂れさがる太いつる */
 function drawVine(p){
+  if(!brightNow()){ ctx.save(); ctx.filter='brightness(0.45) saturate(0.35)'; drawVineBase(p); ctx.restore();   // ゴシック：暗いつる＋薔薇
+    if(GT.goth){ const P=GT.goth.paint; for(let y=p.y+20;y<p.y+p.h-6;y+=34) P.rose(ctx,p.x+p.w/2+((y/34)%2?5:-5),y,3.6); } return; }
+  drawVineBase(p);
+}
+function drawVineBase(p){
   const t=performance.now()/1000;
   ctx.save();
   ctx.fillStyle='#4a3a28';

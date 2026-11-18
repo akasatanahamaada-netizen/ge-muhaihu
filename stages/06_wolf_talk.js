@@ -70,7 +70,7 @@ GT.registerScene({
   ],
   npcs:[
     { who:'hood', name:'赤ずきん', page:'right', x:560 },   // その場にいる（会話相手は狼）。位置は update で動かす
-    { who:'wolf', name:'狼', page:'right', x:WOLF_STAND, lines:[
+    { who:'wolf', name:'狼', page:'right', x:WOLF_STAND, noLift:true, lines:[
       {s:'',c:'narr',t:'狼は赤ずきんに話しかけようとした。'},
       {s:'',c:'narr',t:'しかし、その隣に立つ少年の姿を目にすると、わずかに眉をひそめた。'},
       {s:'',c:'narr',t:'一瞬だけ不快そうな表情を浮かべたあと、何事もなかったかのように笑みを戻す。'},
@@ -137,6 +137,7 @@ GT.registerUpdate(dt=>{
   if(!isWolf()) return;
   const pl=GT.player, pcx=pl.x+pl.w/2, w=npc('wolf');
   if(w) w.talkable = st.phase==='wolf';
+  if(w) w.noLift = st.phase==='walk' || (st.phase==='appear' && (performance.now()-st.appearT0)/1000<LEAP);   // 茂みの中にいるあいだは、茂みに隠れたまま
   if(st.busy) return;
 
   // 狼が現れる
@@ -435,6 +436,7 @@ const FX=(()=>{
 
 GT.registerDraw(()=>{ if(!isWolf()) return; drawBack(); }, 'back');
 GT.registerDraw(()=>{ if(!isWolf()) return; FX.tick(); FX.dark(); }, 'overlay');
+GT.registerDraw(()=>{ if(!isWolf()) return; drawBlood(); }, 'lift');   // 描きなおした狼の上にも、血を重ねる
 GT.registerDraw(()=>{ if(!isWolf()) return; FX.glow(); drawHud(); }, 'speech');   // 「？」は暗さに隠れないよう、いちばん手前に
 GT.registerDraw(()=>{ if(!isWolf()) return; drawFront(); drawBlood(); }, 'world');   // 血は茂みより手前（足もとのしずくが茂みに隠れないように）
 })();

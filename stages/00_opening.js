@@ -102,7 +102,7 @@ GT.registerScene({
     {s:'',c:'narr',t:'大きな木の陰から、誰かがこちらをうかがっている。'},
   ],
   npcs:[
-    { who:'mari', name:'マリ', page:'right', x:710,
+    { who:'mari', name:'マリ', page:'right', x:710, noLift:true,   // はじめは木の陰（出てくると update で false）
       lines:MARI_FIRST({items:0,itemsAll:3}),          // 実際は話しかける直前に作り直す（下の update）
       onEnd:()=>{ st.talkedOnce=true;
         GT.fillPage('prologue','――少年は、ところどころ欠けた本とともに森で目を覚ました。そして、木の陰にいた少女と出会った。少女は、マリと名乗った。');
@@ -162,6 +162,7 @@ GT.registerUpdate(dt=>{
   // 木の陰にいるあいだは話しかけられない
   const c=GT.missionCount();
   n.talkable=st.mariOut;
+  n.noLift=!st.mariOut;   // 木の陰にいるあいだは、木に隠れたまま（人物を明るく描きなおさない）
   // 話しかける直前の状態でセリフを作る。1回話したあとは、ヒントを何度でもくれる
   if(!st.talkedOnce){ n.lines=MARI_FIRST(c); }
   else {

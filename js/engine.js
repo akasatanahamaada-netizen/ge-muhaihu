@@ -71,6 +71,7 @@ const modeUpdaters      = {};        // mode -> fn(dt) そのモード専用の�
 const drawBack          = [];        // fn() 最背面に描く（地形より奥。判定なしの飾り用）
 const drawWorld         = [];        // fn() プレイヤーより後ろに描く
 const drawOverlay       = [];        // fn() 画面の最前面に描く
+const drawLiftFns      = [];        // fn() 人物を色合いの上に描きなおしたあと（人物に重ねる印など）
 const drawSpeechFns     = [];        // fn() 吹き出し（overlay よりさらに前。木や手前の飾りに隠れない）
 const actHooks          = {};        // name -> fn()  会話行の act 合図
 const lineHooks         = [];        // fn(line)      会話行が表示される度
@@ -102,7 +103,7 @@ GT.registerSceneType  = (t,fn)=>{ sceneTypeHandlers[t]=fn; };
 GT.registerDynamic    = (n,fn)=>{ dynamicHandlers[n]=fn; };
 GT.registerUpdate     = (fn)=>{ updatePasses.push(fn); };
 GT.registerModeUpdate = (m,fn)=>{ modeUpdaters[m]=fn; };
-GT.registerDraw       = (fn,phase)=>{ (phase==='back'?drawBack:phase==='overlay'?drawOverlay:phase==='speech'?drawSpeechFns:drawWorld).push(fn); };   // 'speech' … 吹き出し（最前面）
+GT.registerDraw       = (fn,phase)=>{ (phase==='back'?drawBack:phase==='overlay'?drawOverlay:phase==='speech'?drawSpeechFns:phase==='lift'?drawLiftFns:drawWorld).push(fn); };   // 'speech' … 吹き出し（最前面）
 GT.registerAct        = (n,fn)=>{ actHooks[n]=fn; };
 GT.registerLineHook   = (fn)=>{ lineHooks.push(fn); };
 GT.registerSceneReset = (fn)=>{ sceneResets.push(fn); };
@@ -587,7 +588,7 @@ function paintSpeech(cx,headY,text,alpha,below,angry){
 function setupNpcs(defs){
   npcs=(defs||[]).map(d=>({
     who:d.who, name:d.name||'', page:d.page||'right', x:d.x, w:d.w||32, h:d.h||40, y:H-EDGE-(d.h||40), vy:0, g:1,
-    lines:d.lines||null, choices:d.choices||null, onEnd:d.onEnd||null, noExit:!!d.noExit, required:d.required,
+    lines:d.lines||null, choices:d.choices||null, onEnd:d.onEnd||null, noExit:!!d.noExit, required:d.required, noLift:!!d.noLift,
     talkable:!!(d.lines), talked:false
   }));
   activeNpc=null; storyTalking=false;
@@ -1756,7 +1757,8 @@ function render(){
   drawPlayer();
   for(const sw of GT.swamps) drawSwamp(sw);   // 沼はプレイヤーの足元を隠すよう手前に描く
   for(const fn of drawOverlay) fn();         // 手前の木・窓のぞきなど（ゴシックの色合いをかけるため、色合いより先に描く）
-  drawGothicWorld();                                                                                                // 世界を赤紫の色みに寄せ、四すみを暗く
+  drawGothicWorld();                                                                                                // 世界を暗く・色を抜く（不気味さに合わせて）
+  liftCharacters();                                                                                                 // 少年と人物は、暗くしない（色合いの上に描きなおす）
   ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.drawImage(GT.paperArt.agedPaper,0,0); ctx.restore();   // 古い紙の色むら・しみ（表示類より奥）
   drawEdgeFade();                                                                                                   // ふちを、まわりのページの色へ ぼかす（ページのふくらみとのさかいを目立たせない）
   drawGradeMul();   // 全体の色合い（まわりのページと同じ色）
@@ -1810,6 +1812,18 @@ function drawGothicWorld(){
   vig.addColorStop(0,'rgba(10,8,6,0)'); vig.addColorStop(1,`rgba(10,8,6,${GRADE_VIG*(0.55+0.75*m)})`);
   ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
   ctx.restore();
+}
+/* 少年と人物は、ゴシックの色合い（暗さ・色抜け）をかけない。色合いをかけたあとに、同じ場所へもう一度描く。
+   ・木の陰に隠れているなど、まわりの絵に隠したい人は n.noLift=true（ステージ側で決める）
+   ・沼に入っているときの少年は、足もとを沼で隠すので描きなおさない */
+function liftCharacters(){
+  if(gradeK==null || gradeK<0.02) return;
+  ctx.save(); ctx.globalAlpha=Math.min(1,gradeK);
+  if(storyStage) for(const n of npcs){ if(n.noLift || n.x<-100 || n.x>W+100) continue; drawNpc(n); }
+  const pl=GT.player, inSwamp=(GT.swamps||[]).some(s=>GT.rectsOverlap&&GT.rectsOverlap(pl,s));
+  if(!inSwamp && !gameOver) drawPlayer();
+  ctx.restore();
+  for(const fn of drawLiftFns) fn();
 }
 /* 全体の色合い（乗算）。明るい場面（gradeK＝0）では、まん中にはかけず、ふちだけにかける（まわりのページの紙の色と、さかいを合わせる） */
 function drawGradeMul(){

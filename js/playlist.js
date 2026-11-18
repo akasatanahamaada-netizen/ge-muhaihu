@@ -134,7 +134,7 @@ GT.sceneMusic = {
   // wake（ひとりで目覚める）と chapter1（章のとびら）は、曲なし（静けさ）
   opening:  M('異世界へようこそ'),            // マリと出会う
   afterword: M('ふしぎな絵本'),              // 第一章のあと：はじめの暗い森で、マリと話す
-  komichi1: BGM_ADVENTURE, komichi2: BGM_ADVENTURE,   // チュートリアルのステージ（森の小道①②）：前と同じ『小さな勇者の探検』（森の道①・崖まで続けて流れる）
+  // チュートリアル（森の小道①②）は、曲なし
   path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
   house_peek: M('魔法使いの箱庭'),             // 赤ずきんの家（窓のぞき）
   meet_hood:  M('魔法使いの箱庭'),             // 赤ずきんと出会う・水たまりを越える

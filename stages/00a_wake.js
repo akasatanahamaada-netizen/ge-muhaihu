@@ -107,6 +107,6 @@ GT.registerDraw(()=>{ drawHintMove(); }, 'speech');
 
 /* チュートリアル（森の小道①②）も、序章のゴシックの森の空気に：地面の霧・上のすみのいばら・ただよう光の粒 */
 const isTutorial=()=>GT.scene&&(GT.scene.id==='komichi1'||GT.scene.id==='komichi2');
-GT.registerDraw(()=>{ if(!isTutorial()||!GT.goth) return; GT.goth.fog(false); }, 'back');
+GT.registerDraw(()=>{ if(!isTutorial()||!GT.goth) return; GT.goth.back(); GT.goth.fog(false); }, 'back');   // 奥にゴシックの枯れ木
 GT.registerDraw(()=>{ if(!isTutorial()||!GT.goth) return; GT.goth.fog(true); GT.goth.top(); GT.goth.wisps(); }, 'overlay');
 })();
