@@ -49,16 +49,14 @@ GT.defineStage('wolf_talk', {
     {layer:'back',  kind:'tree',  x:610, y:120, w:90,  h:300},
     {layer:'back',  kind:'rock',  x:420, y:430, w:40,  h:34},
     {layer:'front', kind:'fern',  x:-10, y:396, w:80,  h:72},
-    {layer:'front', kind:'grass', x:560, y:436, w:50,  h:28},
     {layer:'front', kind:'grass', x:270, y:436, w:60,  h:28},
+    {layer:'front', kind:'grass', x:560, y:436, w:50,  h:28},
   ],
 });
 
 // --- セリフ ----------------------------------------------------------------
 const APPEAR=[
-  {s:'',c:'narr',t:'鳥の声も、風の音も、ふっと消えた。'},
-  {s:'',c:'narr',t:'茂みの奥で、赤い目が光る。――狼が、のそりと現れた。'},
-  {s:'',c:'narr',t:'口のはしから、白い牙がのぞいている。'},
+  {s:'',c:'narr',t:'茂みががさりと揺れる。――狼が、茂みから現れた。'},
   {s:'赤ずきん',c:'hood',f:'surprise',t:'あら、狼さん！'},
   {s:'',c:'narr',t:'赤ずきんが、何のためらいもなく狼に近づいていく。'},
   {s:'少年',c:'boy',t:'（狼に話しかけよう。……その前に、まわりをよく見ておこう。何かがおかしい気がする。）'},
@@ -78,11 +76,10 @@ GT.registerScene({
   id:'wolf_talk', type:'story', stage:'wolf_talk', label:'第一章 ── 狼',
   intro:[
     {s:'',c:'narr',t:'昼の日ざしの中、森の奥へ進むほどに木々は高くなっていく。',act:'wolf-setup'},
-    {s:'',c:'narr',t:'どこかから、だれかに見られている気がした。'},
   ],
   npcs:[
     { who:'hood', name:'赤ずきん', page:'right', x:560 },   // その場にいる（会話相手は狼）。位置は update で動かす
-    { who:'wolf', name:'狼', page:'right', x:WOLF_STAND, noLift:true, lines:[
+    { who:'wolf', name:'狼', page:'right', x:WOLF_STAND, lines:[
       {s:'',c:'narr',t:'狼は赤ずきんに話しかけようとした。'},
       {s:'',c:'narr',t:'しかし、その隣に立つ少年の姿を目にすると、わずかに眉をひそめた。'},
       {s:'',c:'narr',t:'一瞬だけ不快そうな表情を浮かべたあと、何事もなかったかのように笑みを戻す。'},
@@ -134,7 +131,7 @@ const st={ phase:'walk', busy:false, found:{}, appearT0:0, leaveT0:0, last:perfo
 const isWolf=()=>GT.scene&&GT.scene.id==='wolf_talk';
 const npc=who=>GT.getNpcs().find(n=>n.who===who);
 GT.registerSceneReset(()=>{ if(!isWolf()) return;
-  st.phase='walk'; st.busy=false; st.rustled=false; st.leapt=false; FX.reset(); st.found={}; st.appearT0=0; st.leaveT0=0; GT.flags.wolfClues=0; });
+  st.phase='walk'; st.busy=false; st.rustled=false; st.found={}; st.appearT0=0; st.leaveT0=0; GT.flags.wolfClues=0; });
 GT.registerAct('wolf-setup',()=>{ const h=npc('hood'), w=npc('wolf');
   if(h) h.x=EDGE; if(w){ w.x=WOLF_HIDE; w.talkable=false; } });
 GT.registerAct('wolf-leave',()=>{ st.leaveT0=performance.now(); const w=npc('wolf');
@@ -149,12 +146,11 @@ GT.registerUpdate(dt=>{
   if(!isWolf()) return;
   const pl=GT.player, pcx=pl.x+pl.w/2, w=npc('wolf');
   if(w) w.talkable = st.phase==='wolf';
-  if(w) w.noLift = st.phase==='walk' || (st.phase==='appear' && (performance.now()-st.appearT0)/1000<LEAP);   // 茂みの中にいるあいだは、茂みに隠れたまま
   if(st.busy) return;
 
   // 狼が現れる
   if(st.phase==='walk' && pl.x>280 && !st.rustled){ st.rustled=true; GT.sfx&&GT.sfx('bush'); }   // 少年が近づくと、茂みがガサガサ
-  if(st.phase==='walk' && pcx>SPINE+30){ GT.sfx&&GT.sfx('bush'); st.phase='appear'; st.appearT0=performance.now(); GT.mode='idle'; pl.vx=0; GT.musicHush&&GT.musicHush(APPEAR_T+1.5); return; }   // 曲も止まる
+  if(st.phase==='walk' && pcx>SPINE+30){ GT.sfx&&GT.sfx('bush'); st.phase='appear'; st.appearT0=performance.now(); GT.mode='idle'; pl.vx=0; return; }
 
   // 違和感を見つける
   const onFloor = pl.onGround && Math.abs(pl.y+pl.h-FLOOR)<2;
@@ -185,7 +181,7 @@ function moveActors(){
   const w=npc('wolf'), h=npc('hood'); if(!w||!h) return;
   const now=performance.now(), dt=Math.min(0.05,(now-st.last)/1000); st.last=now;
   // 赤ずきん：狼が出てきたら狼のそばへ駆け寄る。それ以外は少年のうしろをついてくる（会話中は止まる）
-  const toWolf = st.phase==='wolf' || (st.phase==='appear' && now-st.appearT0>3000);
+  const toWolf = st.phase==='wolf' || (st.phase==='appear' && now-st.appearT0>1400);
   if(toWolf || (GT.mode==='play' && !st.busy)){
     const pcx=GT.player.x+GT.player.w/2;
     const target = toWolf ? HOOD_BY_WOLF : pcx+(pcx>h.x+16?-42:42)-16;
@@ -193,10 +189,8 @@ function moveActors(){
   }
   if(st.phase==='appear'){
     const k=(now-st.appearT0)/1000;
-    const u=Math.min(1,Math.max(0,(k-LEAP)/0.35));                       // 一気に飛び出す
-    w.x = WOLF_HIDE-(WOLF_HIDE-WOLF_STAND)*(1-(1-u)*(1-u));
-    if(k>LEAP && !st.leapt){ st.leapt=true; GT.shake&&GT.shake(9,0.45); GT.sfx&&GT.sfx('bush'); FX.flash=1; }
-    if(k>APPEAR_T){ st.phase='wolf'; GT.mode='play'; autoTalk(APPEAR); }
+    w.x = WOLF_HIDE-(WOLF_HIDE-WOLF_STAND)*Math.min(1,Math.max(0,(k-0.9)/0.9));
+    if(k>2.0){ st.phase='wolf'; GT.mode='play'; autoTalk(APPEAR); }
   }
   if(st.leaveT0){ w.x = WOLF_STAND+Math.max(0,(now-st.leaveT0)/1000-0.3)*120; if(w.x>W+80) w.x=W+80; }   // 去っていく（120px/秒。約2秒で見えなくなる）
 }
@@ -218,7 +212,6 @@ function drawBack(){
   GTDecor.paint.trunk(ctx, tr.x, tr.top, FLOOR, tr.w, 17, { branches:[{y:tr.top+30,dir:-1,len:60},{y:tr.top+20,dir:1,len:62}] });
   GTDecor.paint.canopy(ctx,[ {x:tr.x+tr.w/2,y:tr.top-4,rx:66,ry:46}, {x:tr.x-30,y:tr.top+30,rx:46,ry:34}, {x:tr.x+tr.w+30,y:tr.top+24,rx:48,ry:34} ], 19);
   ctx.restore();
-  FX.bigShadow();                                                             // 木に映る、大きな狼の影
   ctx.strokeStyle='#e8dcc0'; ctx.lineWidth=2.4; ctx.lineCap='round';
   for(let i=0;i<3;i++){ const x=tr.x+10+i*9; ctx.beginPath(); ctx.moveTo(x,300); ctx.quadraticCurveTo(x+4,322,x+2,348); ctx.stroke(); }
   // 足あと（大きな獣の）
@@ -247,12 +240,12 @@ function drawFront(){
   moveActors();
   // 茂み（少年が近づくと揺れる。奥で目が光る）
   const near = st.phase==='walk' && pl.x>280;
-  const ak=st.phase==='appear'?(performance.now()-st.appearT0)/1000:0;
-  const shake = (st.phase==='appear' ? (ak<LEAP?2+ak*3:1) : near ? 1.6 : 0)*Math.sin(t*28);
+  const shake = (st.phase==='appear' ? 4 : near ? 1.6 : 0)*Math.sin(t*28);
   ctx.save(); ctx.translate(shake,0); ctx.filter='brightness(0.7) saturate(0.85)';   // 狼が隠れる、こんもりした茂み（陰になっている）
   GTDecor.paint.bush(ctx, BUSH.x-4, FLOOR-70, BUSH.w+16, 70, 23);
   ctx.restore();
-  FX.bushShake=shake;
+  if(st.phase==='walk' && Math.sin(t*1.3)>0.6){                                      // 茂みのすき間で、目が光る
+    ell(BUSH.x+60+shake,FLOOR-34,2.6,1.8,'#c9503f'); ell(BUSH.x+74+shake,FLOOR-34,2.6,1.8,'#c9503f'); }
   // 霧
   ctx.save();
   for(let i=0;i<5;i++){ const x=((t*(10+i*3)+i*240)%(W+300))-150;
@@ -299,159 +292,6 @@ function drawHud(){
   ctx.restore();
 }
 
-/* ==========================================================================
-   こわい演出
-   ・近づくほど、まわりが暗くなる（少年のまわりだけ見える）。闇の中に、いくつもの赤い目
-   ・茂みの前に来ると曲が止まり、心臓の音。茂みの奥で大きな赤い目 → うなり声 → 狼が飛び出す（画面ゆれ・赤い光）
-   ・狼のうしろの木に、牙をむいた大きな狼の影が映る。狼が笑う・顔をしかめるセリフで、影が口を開く
-   ========================================================================== */
-const LEAP=2.0, APPEAR_T=3.8;   // 飛び出す時間・話しはじめる時間（秒）
-let goCv=null;
-function gothTrees(){
-  if(goCv) return goCv;
-  goCv=document.createElement('canvas'); goCv.width=W; goCv.height=H; const c=goCv.getContext('2d');
-  const P=GT.goth&&GT.goth.paint, tr=TRUNK;
-  if(P){ P.farTrees(c);
-    for(const [x,h,sd,l] of [[318,330,51,-8],[486,370,53,12],[620,300,57,-10],[880,350,59,6]]) P.tree(c,x,FLOOR+6,h,sd,l); }
-  c.save(); c.filter='brightness(0.45) saturate(0.4)';                 // 爪あとの木（枝に乗れる。葉はない）
-  GTDecor.paint.trunk(c, tr.x, tr.top, FLOOR, tr.w, 17, { branches:[{y:tr.top+30,dir:-1,len:60},{y:tr.top+20,dir:1,len:62}] });
-  c.restore();
-  if(P){ c.strokeStyle='#22141b'; c.lineCap='round'; const R=P.R(77);
-    P.branch(c,R,tr.x+tr.w*0.3,tr.top+6,80,-Math.PI/2-0.6,9,4); P.branch(c,R,tr.x+tr.w*0.7,tr.top+6,84,-Math.PI/2+0.6,9,4);
-    P.vine(c,R,tr.x+tr.w/2,FLOOR,tr.top+60,tr.w*0.4,0); }
-  return goCv;
-}
-const FX=(()=>{
-  const fx={ dk:0, flash:0, scareT:0, nextBeat:0, growled:false, bushShake:0 };
-  fx.reset=()=>{ fx.dk=0; fx.flash=0; fx.scareT=0; fx.nextBeat=0; fx.growled=false; };
-  // ── 音（その場で作る：心臓の音・うなり声）──
-  let ac=null; const A=()=>{ try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); }catch(e){ ac=null; } return ac; };
-  const vol=()=>(GT.volume?GT.volume.se:1);
-  fx.beat=(g=1)=>{ const a=A(); if(!a||vol()<=0) return; const t0=a.currentTime;
-    for(const [d,k] of [[0,1],[0.2,0.65]]){ const o=a.createOscillator(), gn=a.createGain(), t=t0+d;
-      o.type='sine'; o.frequency.setValueAtTime(75,t); o.frequency.exponentialRampToValueAtTime(36,t+0.16);
-      gn.gain.setValueAtTime(0.0001,t); gn.gain.exponentialRampToValueAtTime(0.9*g*k*vol(),t+0.012); gn.gain.exponentialRampToValueAtTime(0.0001,t+0.24);
-      o.connect(gn).connect(a.destination); o.start(t); o.stop(t+0.3); } };
-  fx.growl=(dur=1.8)=>{ const a=A(); if(!a||vol()<=0) return; const t=a.currentTime;
-    const n=a.createBufferSource(), b=a.createBuffer(1,a.sampleRate*dur,a.sampleRate), d=b.getChannelData(0);
-    for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; n.buffer=b;
-    const lp=a.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=260; lp.Q.value=6;
-    const o=a.createOscillator(); o.type='sawtooth'; o.frequency.setValueAtTime(58,t); o.frequency.linearRampToValueAtTime(46,t+dur);
-    const og=a.createGain(); og.gain.value=0.35;
-    const trem=a.createGain(), lfo=a.createOscillator(), lg=a.createGain(); lfo.frequency.value=19; lg.gain.value=0.5; trem.gain.value=0.5;
-    lfo.connect(lg).connect(trem.gain);
-    const env=a.createGain(); env.gain.setValueAtTime(0.0001,t); env.gain.exponentialRampToValueAtTime(0.8*vol(),t+0.35); env.gain.setValueAtTime(0.8*vol(),t+dur-0.5); env.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-    n.connect(lp); o.connect(og).connect(lp); lp.connect(trem).connect(env).connect(a.destination);
-    n.start(t); o.start(t); lfo.start(t); n.stop(t+dur); o.stop(t+dur); lfo.stop(t+dur); };
-  // セリフで影が口を開く・心臓が鳴る
-  GT.registerLineHook(line=>{ if(!isWolf()) return;
-    if(/笑み|眉|不快|不愉快|表情を崩/.test(line.t||'')){ fx.scareT=performance.now(); fx.beat(1); setTimeout(()=>fx.beat(0.8),700); if(/笑み/.test(line.t)) fx.growl(1.2); } });
-
-  // どのくらいこわいか（0〜1）
-  function dread(){ const pl=GT.player;
-    if(st.phase==='walk') return Math.max(0,Math.min(1,(pl.x-200)/(SPINE+30-200)))*0.4;   // 近づくと、少し暗く
-    if(st.phase==='appear') return 0.85;                                              // 狼が出てくる瞬間だけ、ぐっと暗く
-    if(st.phase==='wolf') return st.leaveT0?0.25:0.4;
-    return 0.2; }
-  function appearK(){ return st.phase==='appear' ? (performance.now()-st.appearT0)/1000 : -1; }
-
-  // 時間で鳴る音（描画のついでに見る）
-  fx.tick=()=>{ const now=performance.now(), k=appearK();
-    fx.dk += (dread()-fx.dk)*0.04;
-    if(k>=0){ if(now>fx.nextBeat){ fx.beat(0.7+Math.min(0.3,k*0.15)); fx.nextBeat=now+Math.max(420,820-k*140); }   // だんだん速くなる
-      if(k>0.8 && !fx.growled){ fx.growled=true; fx.growl(2.2); } }
-    else if(st.phase==='walk' && fx.dk>0.45 && now>fx.nextBeat){ fx.beat(0.45); fx.nextBeat=now+1100; }
-    fx.flash=Math.max(0,fx.flash-0.035); };
-
-  // 牙をむいた狼の頭の影（左向き）。jaw 0〜1 で口が開く
-  function wolfHead(c,cx,base,s,jaw,f){
-    c.save(); c.translate(cx,base); c.scale(s*f,s);
-    const j=jaw*26;
-    c.beginPath();
-    c.moveTo(70,0); c.quadraticCurveTo(84,-80,66,-150);                 // 首のうしろ
-    c.lineTo(70,-212); c.lineTo(44,-176);                               // 耳（うしろ）
-    c.lineTo(30,-226); c.lineTo(14,-182);                               // 耳（前）
-    c.quadraticCurveTo(-20,-184,-60,-164); c.lineTo(-104,-150);         // 額 → 鼻すじ
-    c.lineTo(-108,-140); c.lineTo(-30,-130);                            // 上あご
-    c.lineTo(-94,-124+j); c.lineTo(-88,-114+j);                         // 下あご
-    c.quadraticCurveTo(-40,-96+j*0.4,-20,-80); c.quadraticCurveTo(-34,-40,-40,0); c.closePath();
-    c.fill();
-    c.restore(); }
-  function teeth(c,cx,base,s,jaw,f){ if(jaw<0.15) return; c.save(); c.translate(cx,base); c.scale(s*f,s); const j=jaw*26;
-    c.fillStyle='rgba(225,215,215,0.55)';
-    for(let i=0;i<5;i++){ const x=-98+i*13; c.beginPath(); c.moveTo(x,-139+i*1.6); c.lineTo(x+4,-139+i*1.6+7+(i===0?5:0)); c.lineTo(x+8,-139+i*1.6); c.fill(); }
-    for(let i=0;i<4;i++){ const x=-86+i*13; const y=-122+j-i*1.5; c.beginPath(); c.moveTo(x,y); c.lineTo(x+4,y-6-(i===0?4:0)); c.lineTo(x+8,y); c.fill(); }
-    c.restore(); }
-  fx.bigShadow=()=>{ const w=npc('wolf'); if(!w) return; const now=performance.now(), k=appearK();
-    let a=0; if(k>=LEAP) a=Math.min(1,(k-LEAP)/0.3)*(0.85-Math.min(0.45,(k-LEAP)*0.25)); else if(st.phase==='wolf') a=0.38; else if(st.phase==='done') a=0;
-    const sk=fx.scareT?Math.max(0,1-(now-fx.scareT)/1800):0; a=Math.max(a,0.75*sk);
-    if(st.leaveT0) a*=Math.max(0,1-(now-st.leaveT0)/1500);
-    if(a<=0.01 || w.x>W) return;
-    const breathe=1+0.02*Math.sin(now/600), jaw=Math.max(k>=LEAP?Math.max(0,1-(k-LEAP)/1.2):0.12, sk);
-    const f = GT.player.x<w.x?1:-1;
-    const hx=w.x+w.w/2+f*70, sc=1.55*breathe;
-    ctx.save(); ctx.globalAlpha=a; ctx.globalCompositeOperation='lighter';      // 影のうしろの、うす明かり（影が見えるように）
-    const bg=ctx.createRadialGradient(hx-f*sc*20,FLOOR-sc*150,10,hx-f*sc*20,FLOOR-sc*150,sc*190);
-    bg.addColorStop(0,'rgba(120,100,110,0.45)'); bg.addColorStop(1,'rgba(120,100,110,0)');
-    ctx.fillStyle=bg; ctx.fillRect(hx-sc*260,FLOOR-sc*360,sc*520,sc*380); ctx.restore();
-    ctx.save(); ctx.globalAlpha=a; ctx.fillStyle='#050203';
-    ctx.shadowColor='rgba(150,10,20,0.9)'; ctx.shadowBlur=14;                   // ふちが赤くにじむ
-    ctx.filter='blur(1.5px)'; wolfHead(ctx,hx,FLOOR+4,sc,jaw,f); ctx.filter='none'; ctx.shadowBlur=0;
-    teeth(ctx,w.x+w.w/2+f*70,FLOOR+4,1.55*breathe,jaw,f);
-    ctx.restore();
-    fx.shadowEye={x:w.x+w.w/2+f*70-f*1.55*breathe*34, y:FLOOR+4-1.55*breathe*166, a}; };
-
-  // 暗さ（少年のまわりだけ見える）：グレーディングの前に描く
-  fx.dark=()=>{ const pl=GT.player, cx=pl.x+pl.w/2, cy=pl.y+pl.h/2, d=fx.dk; if(d<0.02) return;
-    const rad=320-150*d;
-    const g=ctx.createRadialGradient(cx,cy,rad*0.35,cx,cy,rad*2.2);
-    g.addColorStop(0,'rgba(4,2,3,0)'); g.addColorStop(0.45,`rgba(4,2,3,${0.45*d})`); g.addColorStop(1,`rgba(4,2,3,${0.88*d})`);
-    ctx.fillStyle=g; ctx.fillRect(0,0,W,H); };
-
-  // 赤い目・赤い光（色を抜かれないよう、グレーディングのあとに描く）
-  const EYES=[[520,220,0],[600,300,1.7],[860,250,3.1],[420,330,4.4],[690,190,5.2],[790,340,2.4],[350,240,6.1]];
-  const eye=(x,y,r,a,gap)=>{ ctx.save(); ctx.globalCompositeOperation='lighter';
-    for(const dx of [-gap/2,gap/2]){ const g=ctx.createRadialGradient(x+dx,y,0,x+dx,y,r*5); g.addColorStop(0,`rgba(255,40,30,${a*0.5})`); g.addColorStop(1,'rgba(255,40,30,0)');
-      ctx.fillStyle=g; ctx.fillRect(x+dx-r*5,y-r*5,r*10,r*10); }
-    ctx.restore();
-    for(const dx of [-gap/2,gap/2]){ ctx.beginPath(); ctx.ellipse(x+dx,y,r,r*0.55,dx<0?0.25:-0.25,0,Math.PI*2); ctx.fillStyle=`rgba(255,70,50,${a})`; ctx.fill();
-      ctx.beginPath(); ctx.ellipse(x+dx,y,r*0.25,r*0.5,0,0,Math.PI*2); ctx.fillStyle=`rgba(40,0,0,${a})`; ctx.fill(); } };
-  fx.glow=()=>{ const now=performance.now(), t=now/1000, k=appearK();
-    // 闇の中の目（近づくほど増える。狼が出ると消える）
-    if(st.phase==='walk' || (k>=0 && k<LEAP)){ const fade=k>=0?Math.max(0,1-k/0.8):1;
-      EYES.forEach(([x,y,ph],i)=>{ if(i/EYES.length>fx.dk*1.3) return; const bl=Math.sin(t*0.9+ph); if(bl<0.1) return;   // ときどき、まばたきして消える
-        eye(x+Math.sin(t*0.3+ph)*3,y,2.2,Math.min(1,bl*1.6)*0.8*fade,11); }); }
-    // 茂みの奥の目：近づくと見え、登場のときは大きく光る
-    const near=st.phase==='walk' && GT.player.x>280;
-    if((near && Math.sin(t*1.3)>0.3) || (k>=0 && k<LEAP+0.1)){
-      const big=k>=0?Math.min(1,k/1.2):0; eye(BUSH.x+67+fx.bushShake,FLOOR-36,2.6+big*2.2,0.9,14+big*6); }
-    // 影の目
-    if(fx.shadowEye && fx.shadowEye.a>0.05){ const e=fx.shadowEye; eye(e.x,e.y,2.6,Math.min(1,e.a*1.3),0.01); }
-    // 赤い光（飛び出した瞬間）と、心臓に合わせて赤くなる四すみ（ページのふちには かからないよう、ふちをぼかした別の層に描く）
-    const sk=fx.scareT?Math.max(0,1-(now-fx.scareT)/1500):0;
-    const pulse=(k>=0?0.55:st.phase==='wolf'&&!st.leaveT0?0.22:0)+sk*0.5;
-    if(fx.flash<=0 && pulse<=0) return;
-    const L=redLayer(), c=L.getContext('2d');
-    c.globalCompositeOperation='source-over'; c.clearRect(0,0,W,H);
-    if(fx.flash>0){ c.fillStyle=`rgba(150,0,10,${0.45*fx.flash})`; c.fillRect(0,0,W,H); }
-    if(pulse>0){ const hb=Math.pow(Math.max(0,Math.sin(now/1000*Math.PI*1.6)),6);
-      const g=c.createRadialGradient(W/2,H/2,H*0.35,W/2,H/2,H*0.95); g.addColorStop(0,'rgba(90,0,8,0)'); g.addColorStop(1,`rgba(90,0,8,${Math.min(0.9,pulse*(0.45+0.55*hb))})`);
-      c.fillStyle=g; c.fillRect(0,0,W,H); }
-    c.globalCompositeOperation='destination-in'; c.drawImage(edgeMask(),0,0);
-    ctx.drawImage(L,0,0); };
-  let redCv=null, maskCv=null;
-  const redLayer=()=>{ if(!redCv){ redCv=document.createElement('canvas'); redCv.width=W; redCv.height=H; } return redCv; };
-  const edgeMask=()=>{ if(maskCv) return maskCv; maskCv=document.createElement('canvas'); maskCv.width=W; maskCv.height=H; const c=maskCv.getContext('2d'), F=56;
-    c.fillStyle='#fff'; c.fillRect(0,0,W,H); c.globalCompositeOperation='destination-out';
-    for(const [x0,y0,x1,y1,rx,ry,rw,rh] of [[0,0,F,0,0,0,F,H],[W,0,W-F,0,W-F,0,F,H],[0,0,0,F,0,0,W,F],[0,H,0,H-F,0,H-F,W,F]]){
-      const g=c.createLinearGradient(x0,y0,x1,y1); g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=g; c.fillRect(rx,ry,rw,rh); }
-    return maskCv; };
-  return fx;
-})();
-
 GT.registerDraw(()=>{ if(!isWolf()) return; drawBack(); }, 'back');
-GT.registerDraw(()=>{ if(!isWolf()) return; FX.tick(); FX.dark(); }, 'overlay');
-GT.registerDraw(()=>{ if(!isWolf()) return; drawBlood(); }, 'lift');   // 描きなおした狼の上にも、血を重ねる
-GT.registerDraw(()=>{ if(!isWolf()) return; FX.glow(); drawHud(); }, 'speech');   // 「？」は暗さに隠れないよう、いちばん手前に
-GT.registerDraw(()=>{ if(!isWolf()) return; drawFront(); drawBlood(); }, 'world');   // 血は茂みより手前（足もとのしずくが茂みに隠れないように）
+GT.registerDraw(()=>{ if(!isWolf()) return; drawFront(); drawBlood(); drawHud(); }, 'world');   // 血は茂みより手前（足もとのしずくが茂みに隠れないように）
 })();

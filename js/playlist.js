@@ -98,7 +98,7 @@ GT.stageBackgrounds = {
   komichi1:DARK, komichi2:DARK,   // チュートリアルも、序章のゴシックの森
   path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
   house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
-  wolf_talk:S(BG_DAY),                           // 狼：ここから暗くなりはじめる（前は暗い森 DARK）
+  wolf_talk:S(BG_DAY),                           // 狼：昼の森
   crossroads:S(BG_DAY),   // 分かれ道（道のある、霧の薔薇の森）
   path2:DARK, path2b:ROSE,                           // 近道（①暗い森 ②いばらと薔薇の森）
   flowers:S(BG_DAY),                                      // お花畑（遠回りの はじめ。薔薇の森）
@@ -133,7 +133,7 @@ GT.sceneMusic = {
   path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
   house_peek: M('魔法使いの箱庭'),             // 赤ずきんの家（窓のぞき）
   meet_hood:  M('魔法使いの箱庭'),             // 赤ずきんと出会う・水たまりを越える
-  wolf_talk:M('お騒がせなオバケたち'),         // 狼の初登場（狼が茂みから出てくる数秒だけは、曲が止まる：06_wolf_talk.js の musicHush）
+  wolf_talk:M('お騒がせなオバケたち'),         // 狼の初登場
   crossroads:M('かくれんぼの庭。'),            // 分かれ道（近道か遠回りかを選ぶ）
   path2: BGM_THORN, path2b: BGM_THORN,          // 近道（いばらの道）。前は『悪魔の悪戯』
   flowers:  M('魔法使いの箱庭'),               // お花畑（のんびりした曲）
