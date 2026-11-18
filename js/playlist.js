@@ -128,7 +128,7 @@ GT.sceneMusic = {
   path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
   house_peek: M('魔法使いの箱庭'),             // 赤ずきんの家（窓のぞき）
   meet_hood:  M('魔法使いの箱庭'),             // 赤ずきんと出会う・水たまりを越える
-  wolf_talk:null,                              // 狼の初登場：曲なし（静けさと、心臓の音・うなり声だけ）。前は『お騒がせなオバケたち』
+  wolf_talk:M('お騒がせなオバケたち'),         // 狼の初登場（狼が茂みから出てくる数秒だけは、曲が止まる：06_wolf_talk.js の musicHush）
   crossroads:M('かくれんぼの庭。'),            // 分かれ道（近道か遠回りかを選ぶ）
   path2: BGM_THORN, path2b: BGM_THORN,          // 近道（いばらの道）。前は『悪魔の悪戯』
   flowers:  M('魔法使いの箱庭'),               // お花畑（のんびりした曲）
