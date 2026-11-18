@@ -864,11 +864,7 @@ let resetArmT=0;
 const resetLabel=()=>{ resetBtn.textContent=resetBtn.dataset.label||'↺ Reset'; resetBtn.classList.remove('armed');
   if(!resetBtn.dataset.label) resetBtn.style.background='rgba(34,12,24,0.78)'; };
 resetBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation();
-  if(performance.now()<resetArmT){ resetArmT=0; resetLabel(); restartStage(); return; }
-  resetArmT=performance.now()+2500; resetBtn.classList.add('armed');
-  if(resetBtn.dataset.label) resetBtn.textContent=resetBtn.dataset.arm||'Reset?';
-  else { resetBtn.textContent='Tap again to reset'; resetBtn.style.background='rgba(139,47,38,0.85)'; }
-  setTimeout(()=>{ if(performance.now()>=resetArmT) resetLabel(); },2600); });
+  resetArmT=0; resetLabel(); restartStage(); });   // 1回押すだけで、やり直す
 canvas.parentNode.appendChild(resetBtn); resetBtn.id='resetBtn';
 window.addEventListener('keydown',e=>{ if(e.key==='r'||e.key==='R'){ e.preventDefault(); restartStage(); } });
 
