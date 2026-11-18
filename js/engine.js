@@ -879,8 +879,8 @@ function drawKeycapBright(x,y,label){   // 明るい絵本のころのキー（�
 function drawKeycap(x,y,label){                     // ゴシック：暗い板に、くすんだ金のふち（下に厚み）
   ctx.font="700 12px 'Zen Old Mincho',serif";
   const w=Math.max(20,ctx.measureText(label).width+12);
-  roundRect(x,y-9,w,22,4); ctx.fillStyle='#120609'; ctx.fill();                       // 厚み
-  roundRect(x,y-11,w,21,4); const g=ctx.createLinearGradient(0,y-11,0,y+10); g.addColorStop(0,'#4a2a3a'); g.addColorStop(1,'#2a1420');
+  roundRect(x,y-9,w,22,4); ctx.fillStyle='#100c08'; ctx.fill();                       // 厚み
+  roundRect(x,y-11,w,21,4); const g=ctx.createLinearGradient(0,y-11,0,y+10); g.addColorStop(0,'#3e3226'); g.addColorStop(1,'#241c14');
   ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle='rgba(214,176,118,0.85)'; ctx.lineWidth=1.1; ctx.stroke();
   ctx.fillStyle='#f3dfb0'; ctx.textAlign='center'; ctx.fillText(label,x+w/2,y);
   return w;
@@ -1016,7 +1016,7 @@ GT.drawHint=function(cx,cy,lines){
   const pulse=0.5+0.5*Math.sin(performance.now()/420);
   // 枠：赤紫の黒（上ほど少し明るい）、影、くすんだ金の二重のふち、すみのいばら、上のまん中に薔薇
   ctx.save(); ctx.shadowColor='rgba(8,2,6,0.7)'; ctx.shadowBlur=14; ctx.shadowOffsetY=4;
-  roundRect(bx,by,bw,bh,6); const bg=ctx.createLinearGradient(0,by,0,by+bh); bg.addColorStop(0,'rgba(48,18,34,0.94)'); bg.addColorStop(1,'rgba(22,7,16,0.94)');
+  roundRect(bx,by,bw,bh,6); const bg=ctx.createLinearGradient(0,by,0,by+bh); bg.addColorStop(0,'rgba(40,32,24,0.94)'); bg.addColorStop(1,'rgba(18,14,10,0.94)');
   ctx.fillStyle=bg; ctx.fill(); ctx.restore();
   roundRect(bx,by,bw,bh,6); ctx.strokeStyle=`rgba(214,176,118,${0.7+0.25*pulse})`; ctx.lineWidth=1.4; ctx.stroke();
   roundRect(bx+4,by+4,bw-8,bh-8,3); ctx.strokeStyle='rgba(214,176,118,0.35)'; ctx.lineWidth=1; ctx.stroke();
@@ -1027,10 +1027,10 @@ GT.drawHint=function(cx,cy,lines){
     ctx.beginPath(); ctx.arc(rx-1,ry-1,3.4,0,Math.PI*2); ctx.fillStyle='#b3263f'; ctx.fill();
     ctx.beginPath(); ctx.arc(rx-0.6,ry-0.6,1.8,0.5,5.6); ctx.strokeStyle='#4a0816'; ctx.lineWidth=0.8; ctx.stroke(); }
   lines.forEach((l,i)=>{ const y=by+24+i*26; let x=bx+20; ctx.textAlign='left';
-    if(typeof l==='string'){ ctx.font=FONT; ctx.fillStyle='#f1e3e6'; ctx.fillText(l,x,y); return; }
+    if(typeof l==='string'){ ctx.font=FONT; ctx.fillStyle='#f1e8d6'; ctx.fillText(l,x,y); return; }
     const ks=touchKeys(l[0]);
     ks.forEach((k,j)=>{ x+=drawKeycap(x,y,k)+4;
-      if(j<ks.length-1){ ctx.fillStyle='#b98a92'; ctx.font="700 12px serif"; ctx.textAlign='left'; ctx.fillText('/',x,y); x+=10; } });
+      if(j<ks.length-1){ ctx.fillStyle='#b9a27a'; ctx.font="700 12px serif"; ctx.textAlign='left'; ctx.fillText('/',x,y); x+=10; } });
     ctx.font=FONT; ctx.textAlign='left'; ctx.fillStyle='#e8c88a'; ctx.fillText(l[1],x+4,y); });
   ctx.restore();
 };
@@ -1352,6 +1352,9 @@ function drawEnemy(en){
   const sx=en.squash, sy=2-en.squash; const hw=(en.w/2)*sx, hh=(en.h/2)*sy;
   ctx.translate(en.x+en.w/2,en.y+en.h/2); ctx.scale(en.dir>=0?1:-1,eg);
   if(!en.alive){ ctx.globalAlpha=Math.max(0.25,1-en.deathT*0.6); ctx.beginPath(); roundRectPath(-hw*1.3,-hh*0.35,hw*2.6,hh*0.7,5); ctx.fillStyle='#4a4e6d'; ctx.fill(); ctx.restore(); return; }
+  // 見やすいように、白いふちで囲む（からだと耳をひとつの形にして、外がわに白い線）
+  const shape=()=>{ ctx.beginPath(); roundRectPath(-hw,-hh,hw*2,hh*2,7); ctx.moveTo(hw-6,-hh+1); ctx.lineTo(hw-2,-hh-8); ctx.lineTo(hw+2,-hh+1); ctx.closePath(); };
+  shape(); ctx.strokeStyle='rgba(255,255,255,0.95)'; ctx.lineWidth=4; ctx.lineJoin='round'; ctx.stroke();
   ctx.beginPath(); roundRectPath(-hw,-hh,hw*2,hh*2,7); ctx.fillStyle='#3a2f2a'; ctx.fill();
   ctx.fillStyle='#3a2f2a'; ctx.beginPath(); ctx.moveTo(hw-6,-hh); ctx.lineTo(hw-2,-hh-8); ctx.lineTo(hw+2,-hh); ctx.closePath(); ctx.fill();
   ctx.fillStyle='#c9503f'; ctx.beginPath(); ctx.arc(hw-8,-2,2.2,0,Math.PI*2); ctx.fill();
@@ -1868,6 +1871,7 @@ function liftCharacters(){
   ctx.save(); ctx.globalAlpha=dimNow>0?1:Math.min(1,gradeK);
   if(storyStage) for(const n of npcs){ if(n.noLift || n.x<-100 || n.x>W+100) continue; drawNpc(n); }
   const pl=GT.player, inSwamp=(GT.swamps||[]).some(s=>GT.rectsOverlap&&GT.rectsOverlap(pl,s));
+  for(const en of GT.enemies) drawEnemy(en);   // 敵も、暗さに沈まないように
   if(!inSwamp && !gameOver) drawPlayer();
   ctx.restore();
   for(const fn of drawLiftFns) fn();
