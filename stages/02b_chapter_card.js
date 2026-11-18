@@ -13,14 +13,14 @@ const ctx=GT.ctx, W=GT.W, H=GT.H;
 GT.defineStage('chapter1_card', { label:'第一章「赤い頭巾」', platforms:[], boxes:[], enemies:[] });
 GT.registerScene({ id:'chapter1', type:'card', label:'第一章「赤い頭巾」', dynamic:'chapterCard', chapter:1 });
 
-const card={ t0:0, flipped:false, sfx:false, ch:1 };
+const card={ t0:0, flipped:false, sfx:false, ch:1, pen:{} };   // pen … ペンの音を鳴らした字（一字に一回）
 const isCard=()=>GT.scene&&GT.scene.id==='chapter1';
 const T_OPEN0=0.9, T_OPEN1=2.1, T_TEXT=2.3, T_END=7.0;   // T_TEXT … 書きはじめる時間
 
 GT.registerDynamic('chapterCard', scene=>{
   GT.loadStageDef(GT.STAGE_DEFS['chapter1_card']); GT.mode='idle';
   GT.player.x=-600; GT.player.y=H-GT.EDGE-GT.player.h;           // 少年は見せない
-  card.t0=performance.now(); card.flipped=false; card.sfx=false; card.ch=scene.chapter||1;
+  card.t0=performance.now(); card.flipped=false; card.sfx=false; card.pen={}; card.ch=scene.chapter||1;
   GT.setHudStage&&GT.setHudStage(scene.label||'');
   const rb=document.getElementById('resetBtn'); if(rb) rb.style.visibility='hidden';   // とびらのあいだは「Reset」を隠す
 });
@@ -92,11 +92,12 @@ function drawCard(){
        「第 一 章」→ 罫線 → 「「赤い頭巾」」を一文字ずつ → 赤ずきんと狼のシルエットを下から描いていく */
   const W1=T_TEXT, W2=W1+0.75, W3=W2+0.25, PER=0.2;                          // 書きはじめる時間（秒）
   ctx.textAlign='left'; ctx.textBaseline='middle';
+  const pen=key=>{ if(card.pen[key]) return; card.pen[key]=true; GT.sfx&&GT.sfx('write'); };   // ペンで書く音
   const writeLine=(str,font,color,y,t0,per)=>{                              // 一文字ずつ、左から右へ書いていく（書いている字のはしに、インクのにじみ）
     ctx.font=font; const chs=[...str], ws=chs.map(ch=>ctx.measureText(ch).width), total=ws.reduce((a,b)=>a+b,0);
     let x=-total/2;
     chs.forEach((ch,n)=>{ const p=Math.max(0,Math.min(1,(t-t0-n*per)/per)), w=ws[n];
-      if(p>0){ ctx.save(); ctx.beginPath(); ctx.rect(x-2,y-40,(w+4)*p,80); ctx.clip();
+      if(p>0){ if(ch.trim()) pen(y+':'+n); ctx.save(); ctx.beginPath(); ctx.rect(x-2,y-40,(w+4)*p,80); ctx.clip();
         ctx.globalAlpha=Math.min(1,0.4+p); ctx.fillStyle=color; ctx.fillText(ch,x,y); ctx.restore();
         if(p<1){ ctx.save(); ctx.globalAlpha=0.35*(1-p); ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x+w*p,y+4,3,0,Math.PI*2); ctx.fill(); ctx.restore(); } }
       x+=w; }); };
@@ -109,7 +110,7 @@ function drawCard(){
     // シルエット：下から上へ、筆でぬっていくように（ぬっているふちは、ゆらゆら）
     const S0=W3+PER*([...chap.sub].length+2)+0.1;
     ctx.save(); ctx.beginPath(); ctx.rect(-PW+6,-PH/2+6,PW*2-12,PH-12); ctx.clip();
-    const paint=(img,x,right,t0)=>{ if(!img.complete||!img.naturalWidth) return; const p=ease((t-t0)/1.1); if(p<=0) return;
+    const paint=(img,x,right,t0)=>{ if(!img.complete||!img.naturalWidth) return; const p=ease((t-t0)/1.1); if(p<=0) return; pen('sil'+t0);
       const h=150, w=h*img.naturalWidth/img.naturalHeight, ix=right? x-w : x, iy=PH/2-6-h;
       ctx.save(); ctx.beginPath(); ctx.moveTo(ix-4,iy+h+4);
       for(let k=0;k<=12;k++){ const xx=ix-4+(w+8)*k/12, yy=iy+h-h*p*1.08+Math.sin(k*1.7+t*6)*6*(1-p); ctx.lineTo(xx,yy); }
