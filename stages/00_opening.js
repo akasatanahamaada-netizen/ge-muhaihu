@@ -233,7 +233,7 @@ function drawPages(){
 function drawScrapHint(){
   if(GT.mode!=='play' || !st.movedFar || GT.items.some(i=>i.got)) return;
   const it=GT.items[0]; if(!it || it.hidden) return;
-  GT.drawHint(it.x+it.w/2, it.y-58, ['浮かんでいる光 ＝ お話のかけら','さわると 本に吸いこまれる']);
+  GT.drawHint(it.x+it.w/2, it.y-58, ['光にさわる → お話のかけら']);
 }
 
 /* 月あかりの筋（青白く、うすく） */

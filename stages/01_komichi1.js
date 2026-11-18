@@ -80,16 +80,26 @@ GT.registerSceneReset(()=>{ if(!isHere()) return; tut.step=0;
 const STEPS=[
   // （ジャンプの説明は、目覚めの場面の階段で出すので、ここではしない）
   { done:()=>GT.gravity.left===-1,
-    at:[200,120], lines:['大きな木が 道をふさいでいる',[['F','Space'],'本を裏返す → このページの重力が反転'],'（床や天井に立っているときだけ 裏返せる）'] },
+    at:[200,120], lines:[[['F','Space'],'本を裏返す（このページの重力が反転）'],'床・天井に立っているときだけ'] },
   { done:()=>GT.currentPage()==='right',
-    at:[200,300], lines:['天井を歩いて お話のかけらを拾おう','背表紙をこえると、右のページの重力に したがう'] },
+    at:[200,300], lines:['背表紙をこえると 右のページの重力'] },
   { done:()=>GT.gravity.right===-1,
-    at:[640,200], lines:[[['F','Space'],'右のページも 裏返して、天井のかけらへ']] },
+    at:[640,200], lines:[[['F','Space'],'本を裏返す']] },
   { done:()=>{ const pl=GT.player; return GT.gravity.right===1 && pl.onGround && pl.x+pl.w/2>ROCK_R.x-20 && pl.y+pl.h<=ROCK_R.y+52; },
-    at:[600,190], lines:['つるの手前で もう一度裏返すと','大岩の上に 降りられる'] },
+    at:[600,190], lines:[[['F','Space'],'もう一度 裏返す']] },
   { done:()=>GT.missionDone(),
-    at:[450,200], lines:()=>['まだ '+(GT.items.filter(i=>!i.got).length)+' つ、光が残っている','本を裏返せば、届くはず'] },
+    at:[450,200], lines:()=>['のこり '+(GT.items.filter(i=>!i.got).length)+' つ'] },
 ];
+/* マリの声（姿は見えない）：大きな木の前で「本をひっくり返してみて」。はじめて裏返して着地すると「驚いた？…」 */
+const mv={ ask:false, told:false };
+GT.registerSceneReset(()=>{ if(isHere()){ mv.ask=false; mv.told=false; } });
+function mariSays(lines){ GT.mode='idle'; GT.player.vx=0; GT.beginDialogue(lines,null,()=>{ GT.hideDialogue(); GT.mode='play'; }); }
+GT.registerUpdate(()=>{
+  if(!isHere() || GT.mode!=='play') return;
+  const pl=GT.player;
+  if(!mv.ask && pl.onGround && GT.gravity.left===1 && Math.abs(pl.y+pl.h-ROCK_L.y)<2){ mv.ask=true; mariSays([{s:'マリ',c:'mari',t:'本をひっくり返してみて。'}]); return; }
+  if(!mv.told && GT.gravity.left===-1 && pl.onGround){ mv.ask=true; mv.told=true; mariSays([{s:'マリ',c:'mari',t:'驚いた？　それは、重力を変えることができる本なの。'}]); }
+});
 GT.registerUpdate(()=>{
   if(!isHere()) return;
   while(tut.step<STEPS.length && STEPS[tut.step].done()) tut.step++;

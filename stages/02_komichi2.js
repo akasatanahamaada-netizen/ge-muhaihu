@@ -53,17 +53,17 @@ GT.registerUpdate(()=>{
 });
 const STEPS=[
   { done:()=>GT.boxes[0].x>=165 || onTop(STEP_L) || onTop(TOP_L),
-    at:[170,300], lines:[[['→'],'木箱に体を当てて 押そう'],'段の手前まで 押していこう'] },
+    at:[170,300], lines:[[['→'],'木箱を押す']] },
   { done:()=>onTop(STEP_L) || onTop(TOP_L) || GT.currentPage()==='right',
-    at:[170,250], lines:[[['↑','W'],'木箱に乗って、ジャンプで段の上へ'],'木箱を 踏み台にしよう'] },
+    at:[170,250], lines:[[['↑','W'],'木箱から ジャンプ']] },
   { done:()=>GT.currentPage()==='right',
-    at:[200,230], lines:['上の すきまを通って、右のページへ'] },
+    at:[200,230], lines:[[['→'],'右のページへ']] },
   { done:()=>onTop(LEDGE) || GT.missionDone(),
-    at:[640,250], lines:[[['↑','W'],'ジャンプで 台に乗ろう'],'敵に さわらないように'] },
+    at:[640,250], lines:[[['↑','W'],'ジャンプ'],'敵にさわると ダメージ'] },
   { done:()=>GT.missionDone(),
     at:[640,250], lines:()=> (GT.boxes[1].y+GT.boxes[1].h>=GT.H-GT.EDGE-1)
-      ? ['木箱が 落ちてしまった',[['R'],'↺ やり直す で、もう一度']]
-      : [[['→'],'台の木箱を 押し出して'],'下を歩く敵の上に 落とそう'] },
+      ? [[['R'],'やり直す']]
+      : [[['→'],'木箱を押して 敵の上に落とす']] },
 ];
 GT.registerUpdate(()=>{
   if(!isHere()) return;

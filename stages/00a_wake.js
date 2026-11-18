@@ -103,7 +103,7 @@ function drawHintMove(){   // 説明：はじめは「→ 右へ進む」、階�
   if(!isWake() || GT.mode!=='play' || !st.picked) return;
   const pl=GT.player, top=GT.STAGE_DEFS.wake.platforms[2];
   if(pl.x<520) GT.drawHint(W/2, 190, [[['→','D'],'右へ進む']]);
-  else if(!(pl.onGround && Math.abs(pl.y+pl.h-top.y)<2)) GT.drawHint(600, 200, [[['↑','W'],'ジャンプ'],'岩の段を のぼろう']);
+  else if(!(pl.onGround && Math.abs(pl.y+pl.h-top.y)<2)) GT.drawHint(600, 200, [[['↑','W'],'ジャンプ']]);
 }
 function drawStairs(){ const P=GT.STAGE_DEFS.wake.platforms; GTDecor.forest.rock([P[0],P[1],P[2]],5); }
 
