@@ -398,7 +398,7 @@ GT.registerAct('epi-setup',()=>{
   GT.setHudStage(epilogueDusk()?'第一章 ── 夕暮れ':'第一章 ── 夜明け');
   const h=get('hood'), g=get('granny'), m=get('mari');
   if(h){ if(kind==='bad'){ h.x=-300; } else { h.x=kind==='true'?400:330; h.lines=OUT_TALK.hood[kind](f);
-    h.onEnd=()=>{ setTimeout(()=>{ GT.mode='idle'; GT.beginDialogue([{s:'少年',c:'boy',t:'……マリと初めて会ったページに戻ろう。'}],null,()=>{ GT.hideDialogue(); GT.mode='play'; }); },60); }; } }   // 話し終えたら、少年がひとこと
+    h.onEnd=()=>{ setTimeout(()=>{ GT.mode='idle'; GT.beginDialogue([{s:'少年',c:'boy',t:'……マリが待っているページに戻ろう。'}],null,()=>{ GT.hideDialogue(); GT.mode='play'; }); },60); }; } }   // 話し終えたら、少年がひとこと
   if(g){ if(kind==='true'){ g.x=300; g.lines=OUT_TALK.granny.true(f); } else g.x=-300; }
   if(kind==='bad' && GT.openStoryExit) GT.openStoryExit();   // だれもいないので、そのまま右の端へ
 });
@@ -474,7 +474,7 @@ const isAfter=()=>GT.scene&&GT.scene.id==='afterword';
 const epiSay={ said:false };
 GT.registerSceneReset(()=>{ if(isEpi()) epiSay.said=false; });
 GT.registerUpdate(()=>{ if(!isEpi() || ending.kind!=='bad' || epiSay.said || GT.mode!=='play') return; epiSay.said=true;
-  GT.mode='idle'; GT.beginDialogue([{s:'少年',c:'boy',t:'……マリと初めて会ったページに戻ろう。'}],null,()=>{ GT.hideDialogue(); GT.mode='play'; }); });
+  GT.mode='idle'; GT.beginDialogue([{s:'少年',c:'boy',t:'……マリが待っているページに戻ろう。'}],null,()=>{ GT.hideDialogue(); GT.mode='play'; }); });
 const aft={ talked:false };
 GT.registerSceneReset(()=>{ if(GT.scene&&GT.scene.id==='afterword') aft.talked=false; });
 GT.registerUpdate(()=>{ if(!(GT.scene&&GT.scene.id==='afterword') || aft.talked || GT.mode!=='play') return;
@@ -484,8 +484,8 @@ GT.registerAct('after-setup',()=>{
   if(m){ m.lines=EPILOGUE[ending.kind].concat([{s:'',c:'narr',t:'第一章「赤い頭巾」　おわり',act:'end-card'}]); }
 });
 GT.registerScene({
-  id:'afterword', type:'story', stage:'mari_gate', label:'序章 ── 森の出口',   // マリが待っていた、森の出口と同じステージ（stages/02c_mari_gate.js が描く）
-  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年は森の出口に立っていた。',act:'after-setup'},
+  id:'afterword', type:'story', stage:'opening_after', label:'序章 ── 森',   // マリと初めて会ったページにもどる（切り株のあるページ。stages/00_opening.js が描く）
+  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年はマリと初めて会った森に立っていた。',act:'after-setup'},
           {s:'',c:'narr',t:'大きな木の下で、マリが待っていた。'} ],
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:630, noExit:true, required:true,   // 話すとエンディング
