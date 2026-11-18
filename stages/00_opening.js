@@ -114,10 +114,6 @@ function MARI_AGAIN(c, hiddenLeft){
     {s:'マリ',c:'mari',t:'次のページに行って。物語があなたを待ってる。'},
     {s:'マリ',c:'mari',t:'……わたし？　わたしは、まだここにいる。'},
   ];
-  if(hiddenLeft) return [
-    {s:'マリ',c:'mari',t:`あと ${rest}つ。`},
-    {s:'マリ',c:'mari',t:'足もと、ちゃんと見た？　左のはしの、葉っぱの陰とか。'},
-  ];
   return [
     {s:'マリ',c:'mari',t:`あと ${rest}つ。`},
     {s:'マリ',c:'mari',t:'高いところも、見てみて。'},
