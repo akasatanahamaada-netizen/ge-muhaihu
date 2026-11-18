@@ -12,7 +12,7 @@
      3) 狼に話しかける前に、まわりを見ると「違和感」が見つかる（3つ。見なくても進める）
           ・道の上の大きな足あと（左ページ・背表紙の手前）
           ・木の幹の爪あと（左ページ。切り株 → 枝に乗って、近くで見る）
-          ・狼についた血（右ページ・狼のうしろに回りこむ）……毛に血がこびりつき、足もとにも血のしずくが落ちている
+          ・狼のおなかの音（右ページ・狼のうしろに回りこむ）……ぐうう……と低く鳴っている。ひどくおなかをすかせている
      4) 狼に話しかける → 狼は脇道へ去る → 「赤ずきんに伝えるか」を選ぶ
         「狼はあやしい、と伝える」は、違和感を 3つとも調べたときだけ選べる（足りなければ、うすく出て選べない）。
         見つけた数は GT.flags.wolfClues に入る（0〜3）。
@@ -20,7 +20,7 @@
    ◆ このファイルが持っている独自の仕掛け（engine.js は触らない）
      act：'wolf-setup'（はじめの位置）/ 'wolf-leave'（狼が脇道へ去る）
      GT.registerUpdate        … 赤ずきんがついてくる・狼の登場・違和感を見つける
-     GT.registerDraw          … 昼の森の奥・霧・茂み・爪あと・足あと・影・狼についた血・違和感のありか（？）
+     GT.registerDraw          … 昼の森の奥・霧・茂み・爪あと・足あと・影・狼のおなかの音・違和感のありか（？）
    ========================================================================== */
 (function(){
 const ctx=GT.ctx, W=GT.W, H=GT.H, EDGE=GT.EDGE, FLOOR=H-GT.EDGE, SPINE=GT.SPINE;
@@ -66,8 +66,9 @@ const CLUES=[
     {s:'',c:'narr',t:'道の上に大きな獣の足あと。爪の先が、深く土に食いこんでいる。'} ]},
   { key:'claws', lines:[
     {s:'',c:'narr',t:'木の幹に大きな爪あと。木の皮がめくれている。'} ]},
-  { key:'blood', lines:[
-    {s:'',c:'narr',t:'狼には血がついている。'} ]},
+  { key:'hungry', lines:[
+    {s:'',c:'narr',t:'ぐうう……と、狼のおなかが低く鳴った。'},
+    {s:'',c:'narr',t:'ひどく、おなかをすかせているようだ。'} ]},
 ];
 const clueCount=()=>CLUES.filter(c=>st.found[c.key]).length;
 
@@ -107,7 +108,7 @@ GT.registerScene({
         // ここに来るのは、違和感を 3つとも調べたときだけ
         return [
           {s:'少年',c:'boy',f:'disgust',t:'……あの狼、なんだか変だよ。'},
-          {s:'',c:'narr',t:'少年は、見てきたものを話した。'+[st.found.prints&&'大きな足あと',st.found.claws&&'木の爪あと',st.found.blood&&'それから――狼についた血'].filter(Boolean).join('、')+'。'},
+          {s:'',c:'narr',t:'少年は、見てきたものを話した。'+[st.found.prints&&'大きな足あと',st.found.claws&&'木の爪あと',st.found.hungry&&'それから――狼が、ひどくおなかをすかせていること'].filter(Boolean).join('、')+'。'},
           {s:'',c:'narr',t:'赤ずきんが、狼の消えた脇道をふり返る。かごを抱く手に、力がこもった。'},
           {s:'赤ずきん',c:'hood',t:'……分かった。急ごう。おばあちゃんのところへ。'},
         ];
@@ -156,7 +157,7 @@ GT.registerUpdate(dt=>{
   const spots={
     prints: onFloor && pcx>PRINTS.x+20 && pcx<PRINTS.x+PRINTS.w-20,
     claws:  pl.onGround && Math.abs(pl.y+pl.h-BRANCH.y)<2 && pcx<BRANCH.x+BRANCH.w,
-    blood:  st.phase==='wolf' && !st.leaveT0 && onFloor && pcx>WOLF_STAND+80,   // 狼のうしろ（右）に回りこむと、血に気づく
+    hungry: st.phase==='wolf' && !st.leaveT0 && onFloor && pcx>WOLF_STAND+80,   // 狼のうしろ（右）に回りこむと、おなかの音に気づく
   };
   // 近づいただけでは気づかない。その場所で Enter／画面タップをしたときだけ調べる（下の inspect）
   st.spot=null;
@@ -252,20 +253,16 @@ function drawFront(){
   ctx.restore();
 }
 
-/* 狼についた血（違和感の3つめ）。狼の絵の上に、口もと・胸・前足の血と、足もとに落ちた血のしずくを重ねる。
-   狼は止まっているとき、少年のほうを向く（engine の drawNpc と同じ向きにそろえる） */
-function drawBlood(){
-  const w=npc('wolf'); if(!w || w.x>=WOLF_HIDE-20 || w.x>W) return;
-  const cx=w.x+w.w/2, foot=w.y+w.h, Hh=GT.WOLF_H;
-  const moving = w._walkT!=null && performance.now()-w._walkT<120;
-  const f = moving ? (w._walkDir||1) : (GT.player.x<w.x?-1:1);
-  ctx.save();
-  const smear=(x,y,rx,ry,rot,a)=>{ ctx.beginPath(); ctx.ellipse(x,y,rx,ry,rot,0,Math.PI*2); ctx.fillStyle=`rgba(122,20,14,${a})`; ctx.fill(); };
-  smear(cx+f*Hh*0.17, foot-Hh*0.55, 3.6, 2.2, f*0.5, 0.85);              // 口もと
-  smear(cx+f*Hh*0.19, foot-Hh*0.49, 1.4, 3.0, 0, 0.8);                  //   したたり
-  smear(cx+f*Hh*0.05, foot-Hh*0.40, 4.6, 3.2, f*0.3, 0.7);               // 胸
-  smear(cx+f*Hh*0.10, foot-Hh*0.07, 2.8, 2.0, 0, 0.8);                   // 前足
-  if(!st.leaveT0) for(const [dx,r] of [[58,3.2],[76,2.2],[92,2.8],[110,1.9],[124,2.4]]) smear(WOLF_STAND+dx, FLOOR-2, r*1.7, r*0.7, 0, 0.85);   // 足もとに落ちた血（狼のうしろ）
+/* 狼のおなかの音（違和感の3つめ）。ときどき、狼のおなかのあたりから「ぐうう……」と小さな文字がゆれながら浮かぶ */
+function drawHunger(){
+  const w=npc('wolf'); if(!w || w.x>=WOLF_HIDE-20 || w.x>W || st.leaveT0) return;
+  const t=performance.now()/1000, ph=t%3.6; if(ph>1.6) return;             // 3.6秒ごとに、1.6秒だけ
+  const k=ph/1.6, cx=w.x+w.w/2+18, y=w.y+w.h*0.45-k*16;
+  ctx.save(); ctx.globalAlpha=Math.sin(Math.PI*k)*0.85;
+  ctx.font="700 13px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.fillStyle='#5a4630';
+  ctx.fillText('ぐうう……',cx+Math.sin(t*9)*1.5,y);
+  ctx.strokeStyle='rgba(90,70,48,0.6)'; ctx.lineWidth=1.2;                   // おなかの音のなみ線
+  for(let i=0;i<2;i++){ ctx.beginPath(); for(let x=0;x<=14;x+=2){ const yy=y+8+i*5+Math.sin(x*0.9+t*12)*1.5; x?ctx.lineTo(cx-7+x,yy):ctx.moveTo(cx-7+x,yy); } ctx.stroke(); }
   ctx.restore();
 }
 
@@ -287,10 +284,10 @@ function drawHud(){
   }
   if(!st.found.prints) mark(PRINTS.x+PRINTS.w/2,FLOOR-24);
   if(!st.found.claws)  mark(TRUNK.x+TRUNK.w/2,290);
-  if(!st.found.blood && st.phase==='wolf' && !st.leaveT0) mark(WOLF_STAND+140,FLOOR-30);
+  if(!st.found.hungry && st.phase==='wolf' && !st.leaveT0) mark(WOLF_STAND+140,FLOOR-30);
   ctx.restore();
 }
 
 GT.registerDraw(()=>{ if(!isWolf()) return; drawBack(); }, 'back');
-GT.registerDraw(()=>{ if(!isWolf()) return; drawFront(); drawBlood(); drawHud(); }, 'world');   // 血は茂みより手前（足もとのしずくが茂みに隠れないように）
+GT.registerDraw(()=>{ if(!isWolf()) return; drawFront(); drawHunger(); drawHud(); }, 'world');   // おなかの音は茂みより手前
 })();
