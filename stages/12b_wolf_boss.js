@@ -389,7 +389,7 @@ GT.registerModeUpdate('ambush', dt=>{
     if(a.y>=floorY){ a.phase='done'; a.t=0; GT.shake(6,0.2); GT.sfx&&GT.sfx('land');
       wolf.x=a.opt.land-wolf.w/2; wolf.y=H-EDGE-wolf.h; wolf.vy=0; wolf.vx=0; wolf.onGround=true; wolf.page='left'; wolf.lastG=GT.gravity.left;
       wolf.dir=-1; wolf.dizzy=DIZZY+1.8; wolf.squash=0.5; wolf.lungeCD=2.2;
-      GT.sfx&&GT.sfx('dizzy'); fx.banner={text:a.opt.banner, t:0}; }
+      GT.sfx&&GT.sfx('dizzy'); }   // （「奇襲成功！」「間に合った！」の文字は出さない）
   } else if(a.phase==='done'){
     wolf.squash+=(1-wolf.squash)*Math.min(1,dt*6);
     if(a.t>1.6 && a.done){ const d=a.done; a.done=null; a.phase=null; a.cap=null; d(); }
