@@ -15,7 +15,7 @@ GT.registerScene({ id:'chapter1', type:'card', label:'第一章「赤い頭巾�
 
 const card={ t0:0, flipped:false, sfx:false, ch:1 };
 const isCard=()=>GT.scene&&GT.scene.id==='chapter1';
-const T_GLOW=0.9, T_OPEN0=1.6, T_OPEN1=2.8, T_TEXT=3.0, T_END=6.6;   // T_GLOW … 画面全体が まっ白になるとき
+const T_OPEN0=0.9, T_OPEN1=2.1, T_TEXT=2.3, T_END=6.2;
 
 GT.registerDynamic('chapterCard', scene=>{
   GT.loadStageDef(GT.STAGE_DEFS['chapter1_card']); GT.mode='idle';
@@ -27,6 +27,8 @@ GT.registerDynamic('chapterCard', scene=>{
 GT.registerSceneReset(()=>{ if(isCard()) return; const rb=document.getElementById('resetBtn'); if(rb) rb.style.visibility=''; });
 
 const ease=x=>x<0?0:x>1?1:x*x*(3-2*x);
+const SIL={ hood:new Image(), wolf:new Image() };   // とびらのページの、赤ずきんと狼のシルエット（上半身）
+SIL.hood.src='assets/character/とびら_赤ずきん上半身.webp'; SIL.wolf.src='assets/character/とびら_狼上半身.webp';
 function drawCard(){
   if(!isCard() || !card.t0) return;
   const t=(performance.now()-card.t0)/1000;
@@ -44,7 +46,7 @@ function drawCard(){
   for(let i=0;i<26;i++){ const s=Math.sin(i*91.7)*43758.5, r=s-Math.floor(s), s2=Math.sin(i*37.3)*24634.6, r2=s2-Math.floor(s2);
     const x=(r*W+t*8*(0.5+r2))%W, y=(r2*H-t*12*(0.4+r))%H+(r2*H-t*12*(0.4+r)<0?H:0);
     ctx.globalAlpha=0.25+0.25*Math.sin(t*1.5+i); ctx.fillStyle='#f0dcb0'; ctx.beginPath(); ctx.arc(x,y,1.1,0,Math.PI*2); ctx.fill(); }
-  ctx.globalAlpha=Math.min(1,Math.max(0,(t-T_GLOW+0.1)/0.5));         // 光のあとに、本があらわれる
+  ctx.globalAlpha=Math.min(1,t/0.6);                                   // 本が、暗やみから浮かびあがる
   ctx.translate(cx,cy); ctx.scale(zoom,zoom);
   const PW=230, PH=300, o=ease((t-T_OPEN0)/(T_OPEN1-T_OPEN0));
   const c=Math.cos(Math.PI*o);                 // 表紙の向き（1：閉じている → -1：左へ開ききる）
@@ -86,23 +88,24 @@ function drawCard(){
   // のどの影
   if(o>=1){ g=ctx.createLinearGradient(-14,0,14,0); g.addColorStop(0,'rgba(60,40,20,0)'); g.addColorStop(0.5,'rgba(60,40,20,0.35)'); g.addColorStop(1,'rgba(60,40,20,0)');
     ctx.fillStyle=g; ctx.fillRect(-14,-PH/2,28,PH); }
+  // ひらいたページに、赤ずきん（左・右向き）と狼（右・左向き）のシルエットが向かい合う（上半身。ページの下から）
+  if(o>=1){ const ks=ease((t-T_TEXT+0.3)/1.0);
+    if(ks>0){ ctx.save(); ctx.beginPath(); ctx.rect(-PW+6,-PH/2+6,PW*2-12,PH-12); ctx.clip(); ctx.globalAlpha=ks*0.92;
+      const sil=(img,x,right)=>{ if(!img.complete||!img.naturalWidth) return; const h=150, w=h*img.naturalWidth/img.naturalHeight;
+        ctx.drawImage(img, right? x-w : x, PH/2-6-h+(1-ks)*10, w, h); };
+      sil(SIL.hood,-PW+18,false); sil(SIL.wolf,PW-18,true);
+      ctx.restore(); } }
   // 文字：インクがにじむように、ゆっくり出る
   const k1=ease((t-T_TEXT)/0.9), k2=ease((t-T_TEXT-0.6)/1.2);
   ctx.textAlign='center'; ctx.textBaseline='middle';
   if(k1>0){ ctx.globalAlpha=k1; ctx.fillStyle='#5a3a22'; ctx.font="700 24px 'Zen Old Mincho',serif";
-    ctx.fillText(spaced(chap.name),0,-80);
-    ctx.strokeStyle='rgba(120,80,40,0.55)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-90*k1,-54); ctx.lineTo(90*k1,-54); ctx.stroke(); }
+    ctx.fillText(spaced(chap.name),0,-112);
+    ctx.strokeStyle='rgba(120,80,40,0.55)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-90*k1,-90); ctx.lineTo(90*k1,-90); ctx.stroke(); }
   if(k2>0){ ctx.globalAlpha=k2; ctx.save(); ctx.filter=`blur(${((1-k2)*3).toFixed(2)}px)`;
-    ctx.fillStyle='#2a160c'; ctx.font="900 62px 'Zen Old Mincho',serif"; ctx.fillText('「'+chap.sub+'」',0,10);
+    ctx.fillStyle='#2a160c'; ctx.font="900 54px 'Zen Old Mincho',serif"; ctx.fillText('「'+chap.sub+'」',0,-50);
     ctx.restore();
-    ctx.fillStyle='#8a1c24'; ctx.globalAlpha=k2*0.9; ctx.beginPath(); ctx.arc(0,82,4.5,0,Math.PI*2); ctx.fill();   // 小さな赤い点（赤い頭巾）
-    ctx.strokeStyle='rgba(120,80,40,0.45)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-64,82); ctx.lineTo(-14,82); ctx.moveTo(14,82); ctx.lineTo(64,82); ctx.stroke(); }
+    }
   ctx.restore();
-  // はじめに、画面全体が白くなる（ふわっと白くなり、少しそのまま、白がひいていくと本があらわれる）
-  if(t<T_GLOW+0.9){
-    const up=Math.min(1,t/T_GLOW), down=t>T_GLOW?Math.max(0,1-(t-T_GLOW)/0.9):1, L=ease(up)*down;
-    ctx.save(); ctx.fillStyle=`rgba(255,253,248,${L})`; ctx.fillRect(0,0,W,H); ctx.restore();
-  }
   // 最後は、すこし白くとんで、めくりへ
   const fade=ease((t-(T_END-0.6))/0.6);
   if(fade>0){ ctx.save(); ctx.globalAlpha=fade*0.35; ctx.fillStyle='#fff4dc'; ctx.fillRect(0,0,W,H); ctx.restore(); }

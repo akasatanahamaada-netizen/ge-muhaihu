@@ -11,7 +11,7 @@ GT.registerScene({
   id:'mari_gate', type:'story', stage:'mari_gate', label:'序章 ── 森の出口',
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:630, required:true, lines:[
-      {s:'マリ',c:'mari',t:'ここまで来たね。'},
+      {s:'マリ',c:'mari',t:'……ここが、森の出口。'},
       {s:'マリ',c:'mari',t:'その本の使いかたは、もうわかったでしょ。'},
       {s:'マリ',c:'mari',t:'この先には、絵本の世界が広がってる。'},
       {s:'マリ',c:'mari',t:'物語の中の人たちに会って。ちゃんと見て、ちゃんと話して。'},
