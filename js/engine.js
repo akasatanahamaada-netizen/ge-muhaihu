@@ -788,7 +788,7 @@ const skipBtn=document.createElement('button');
 skipBtn.textContent='Skip ≫';
 skipBtn.title='会話を飛ばす（S キー）';
 Object.assign(skipBtn.style,{ position:'absolute', top:'1.1cqw', right:'1.33cqw', padding:'0.33em 1em',
-  background:'rgba(110,80,50,0.25)', border:'1px solid rgba(201,160,112,0.55)', borderRadius:'14px',
+  background:'rgba(120,40,70,0.25)', border:'1px solid rgba(201,160,112,0.55)', borderRadius:'14px',
   color:'#e8dcc0', fontFamily:"'Caveat',cursive", fontSize:'clamp(15px,1.85cqw,44px)', lineHeight:'1', letterSpacing:'0.02em', cursor:'pointer' });   // ボタンの文字は英語の筆記体
 skipBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); skipDialogue(); });
 dlg.appendChild(skipBtn);
@@ -849,14 +849,14 @@ const resetBtn=document.createElement('button');
 resetBtn.textContent='↺ Reset';
 resetBtn.title='このステージを最初からやり直す（R キー）';
 Object.assign(resetBtn.style,{ position:'absolute', top:'0.67cqw', right:'0.9cqw', padding:'0.25em 0.85em', zIndex:'2',
-  background:'rgba(30,24,18,0.78)', border:'1px solid rgba(201,160,112,0.6)', borderRadius:'12px',
+  background:'rgba(34,12,24,0.78)', border:'1px solid rgba(201,160,112,0.6)', borderRadius:'12px',
   color:'#e8dcc0', fontFamily:"'Caveat',cursive", fontSize:'clamp(15px,1.85cqw,44px)', lineHeight:'1', letterSpacing:'0.02em', cursor:'pointer' });
 // 1回目のタップでは「もう一度で やり直す」と出すだけ。2.5 秒以内にもう一度押したら、やり直す
 // （スマホで会話を進めようと画面の端をタップしたとき、うっかりやり直さないように）
 let resetArmT=0;
 // 表示の文字は dataset で変えられる（js/page.js が「Reset」の旗にする）。押した1回目は .armed が付く
 const resetLabel=()=>{ resetBtn.textContent=resetBtn.dataset.label||'↺ Reset'; resetBtn.classList.remove('armed');
-  if(!resetBtn.dataset.label) resetBtn.style.background='rgba(30,24,18,0.78)'; };
+  if(!resetBtn.dataset.label) resetBtn.style.background='rgba(34,12,24,0.78)'; };
 resetBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation();
   if(performance.now()<resetArmT){ resetArmT=0; resetLabel(); restartStage(); return; }
   resetArmT=performance.now()+2500; resetBtn.classList.add('armed');
@@ -879,8 +879,8 @@ function drawKeycapBright(x,y,label){   // 明るい絵本のころのキー（�
 function drawKeycap(x,y,label){                     // ゴシック：暗い板に、くすんだ金のふち（下に厚み）
   ctx.font="700 12px 'Zen Old Mincho',serif";
   const w=Math.max(20,ctx.measureText(label).width+12);
-  roundRect(x,y-9,w,22,4); ctx.fillStyle='#100c08'; ctx.fill();                       // 厚み
-  roundRect(x,y-11,w,21,4); const g=ctx.createLinearGradient(0,y-11,0,y+10); g.addColorStop(0,'#3e3226'); g.addColorStop(1,'#241c14');
+  roundRect(x,y-9,w,22,4); ctx.fillStyle='#120609'; ctx.fill();                       // 厚み
+  roundRect(x,y-11,w,21,4); const g=ctx.createLinearGradient(0,y-11,0,y+10); g.addColorStop(0,'#4a2a3a'); g.addColorStop(1,'#2a1420');
   ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle='rgba(214,176,118,0.85)'; ctx.lineWidth=1.1; ctx.stroke();
   ctx.fillStyle='#f3dfb0'; ctx.textAlign='center'; ctx.fillText(label,x+w/2,y);
   return w;
@@ -1016,7 +1016,7 @@ GT.drawHint=function(cx,cy,lines){
   const pulse=0.5+0.5*Math.sin(performance.now()/420);
   // 枠：赤紫の黒（上ほど少し明るい）、影、くすんだ金の二重のふち、すみのいばら、上のまん中に薔薇
   ctx.save(); ctx.shadowColor='rgba(8,2,6,0.7)'; ctx.shadowBlur=14; ctx.shadowOffsetY=4;
-  roundRect(bx,by,bw,bh,6); const bg=ctx.createLinearGradient(0,by,0,by+bh); bg.addColorStop(0,'rgba(40,32,24,0.94)'); bg.addColorStop(1,'rgba(18,14,10,0.94)');
+  roundRect(bx,by,bw,bh,6); const bg=ctx.createLinearGradient(0,by,0,by+bh); bg.addColorStop(0,'rgba(48,18,34,0.94)'); bg.addColorStop(1,'rgba(22,7,16,0.94)');
   ctx.fillStyle=bg; ctx.fill(); ctx.restore();
   roundRect(bx,by,bw,bh,6); ctx.strokeStyle=`rgba(214,176,118,${0.7+0.25*pulse})`; ctx.lineWidth=1.4; ctx.stroke();
   roundRect(bx+4,by+4,bw-8,bh-8,3); ctx.strokeStyle='rgba(214,176,118,0.35)'; ctx.lineWidth=1; ctx.stroke();
@@ -1027,10 +1027,10 @@ GT.drawHint=function(cx,cy,lines){
     ctx.beginPath(); ctx.arc(rx-1,ry-1,3.4,0,Math.PI*2); ctx.fillStyle='#b3263f'; ctx.fill();
     ctx.beginPath(); ctx.arc(rx-0.6,ry-0.6,1.8,0.5,5.6); ctx.strokeStyle='#4a0816'; ctx.lineWidth=0.8; ctx.stroke(); }
   lines.forEach((l,i)=>{ const y=by+24+i*26; let x=bx+20; ctx.textAlign='left';
-    if(typeof l==='string'){ ctx.font=FONT; ctx.fillStyle='#f1e8d6'; ctx.fillText(l,x,y); return; }
+    if(typeof l==='string'){ ctx.font=FONT; ctx.fillStyle='#f1e3e6'; ctx.fillText(l,x,y); return; }
     const ks=touchKeys(l[0]);
     ks.forEach((k,j)=>{ x+=drawKeycap(x,y,k)+4;
-      if(j<ks.length-1){ ctx.fillStyle='#b9a27a'; ctx.font="700 12px serif"; ctx.textAlign='left'; ctx.fillText('/',x,y); x+=10; } });
+      if(j<ks.length-1){ ctx.fillStyle='#b98a92'; ctx.font="700 12px serif"; ctx.textAlign='left'; ctx.fillText('/',x,y); x+=10; } });
     ctx.font=FONT; ctx.textAlign='left'; ctx.fillStyle='#e8c88a'; ctx.fillText(l[1],x+4,y); });
   ctx.restore();
 };

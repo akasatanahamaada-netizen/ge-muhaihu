@@ -120,7 +120,7 @@ const css=`
 .gtm-title p{ margin:0; font-size:clamp(11px,1.7cqw,40px); letter-spacing:0.3em; color:#e6d8b8; }
 .gtm-title p::before, .gtm-title p::after{ content:'❧'; color:#b9a27a; margin:0 0.8em; letter-spacing:0; font-size:0.9em; }
 .gtm-title p::before{ display:inline-block; transform:scaleX(-1); }
-.gtm-foot{ left:0; right:0; bottom:3.2%; text-align:center; color:rgba(230,220,200,0.6); text-shadow:0 1px 4px rgba(0,0,0,0.9); letter-spacing:0.22em; font-size:clamp(9px,1.25cqw,28px); }
+.gtm-foot{ left:0; right:0; bottom:3.2%; text-align:center; color:rgba(232,207,214,0.6); text-shadow:0 1px 4px rgba(0,0,0,0.9); letter-spacing:0.22em; font-size:clamp(9px,1.25cqw,28px); }
 /* 案内（はじめる前） */
 .gtm-start{ background:none; }
 .gtm-start span{ left:50%; top:75%; border:none; background:none; padding:0.2em 0.6em; color:#f6e6ea; font-size:clamp(18px,3cqw,70px);

@@ -471,17 +471,17 @@ canvas#game{ border-radius:0; }
 
 /* ==== ゴシック（タイトル画面の、霧の薔薇の森に合わせる） ==== */
 /* 会話の枠・選択肢：赤紫の黒に、くすんだ金のふち */
-.dialogue{ background:linear-gradient(180deg, rgba(18,14,10,0) 0%, rgba(18,14,10,0.84) 30%, rgba(16,12,9,0.95) 100%) !important; }
+.dialogue{ background:linear-gradient(180deg, rgba(22,8,16,0) 0%, rgba(22,8,16,0.84) 30%, rgba(18,6,13,0.95) 100%) !important; }
 .dialogue::before{ content:''; position:absolute; left:4%; right:4%; top:22%; height:1px; pointer-events:none;
   background:linear-gradient(90deg, rgba(201,160,112,0), rgba(201,160,112,0.55) 20%, rgba(201,160,112,0.55) 80%, rgba(201,160,112,0)); }
-.dline{ color:#f1e8d6; }
-.speaker{ color:#d9c39a; } .speaker.narr{ color:#9c9280; } .speaker.boy{ color:#b7c3a2; }
-.dhint{ color:#9c9280; }
-.choice{ background:rgba(110,80,50,0.18); border-color:rgba(201,160,112,0.5); color:#f1e8d6; }
-.choice:hover,.choice:active{ background:rgba(150,110,60,0.38); }
-.name-ask input{ background:#efe1e4; color:#241c14; border-color:#a8906a; }
-.qte{ background:rgba(18,14,10,0.45); }
-.qte .flipnow{ background:rgba(160,110,60,0.3); border-color:#c4344d; }
+.dline{ color:#f1e3e6; }
+.speaker{ color:#d9a9b5; } .speaker.narr{ color:#9c8590; } .speaker.boy{ color:#b7c3a2; }
+.dhint{ color:#9c8590; }
+.choice{ background:rgba(120,40,70,0.18); border-color:rgba(201,160,112,0.5); color:#f1e3e6; }
+.choice:hover,.choice:active{ background:rgba(160,50,85,0.38); }
+.name-ask input{ background:#efe1e4; color:#2a1520; border-color:#a86a7d; }
+.qte{ background:rgba(22,6,14,0.45); }
+.qte .flipnow{ background:rgba(170,40,70,0.3); border-color:#c4344d; }
 /* 夜の書斎：机は暗く、ランプの灯り（左上）だけが届く。まわりの本と小物も、闇に沈む */
 html,body, body.gt-full{ background:
     radial-gradient(ellipse 55% 60% at 18% 8%, rgba(255,176,96,0.20), rgba(255,176,96,0) 70%),
@@ -491,7 +491,7 @@ html,body, body.gt-full{ background:
 .desk-books{ filter:saturate(0.6) brightness(0.42) sepia(0.15); }
 .desk-books::after{ content:''; position:absolute; inset:0; pointer-events:none;
   background:radial-gradient(ellipse 55% 60% at 18% 8%, rgba(255,190,110,0.32), rgba(255,190,110,0) 70%); mix-blend-mode:screen; }
-#fsBtn{ background:rgba(30,24,18,0.85) !important; border-color:rgba(201,160,112,0.55) !important; }
+#fsBtn{ background:rgba(34,12,24,0.85) !important; border-color:rgba(201,160,112,0.55) !important; }
 
 
 /* 栞（Reread・menu）は赤（青い絵の色を、深い赤に変えた絵。もとの青は shiori_plain.webp） */

@@ -88,7 +88,7 @@ GT.playlist = [
 // 書いていないステージ（家の中など）は、背景画像なし。
 // （水彩の森と遠い城の絵 'assets/background/水彩で描く静かな森と遠い城.webp' も使える）
 const BG_DAY='assets/background/ohiru no mori.webp', BG_EVENING='assets/background/yuugata no mori.webp';
-const BG_DARK='assets/background/霧深き森のゴシック童話_森.webp';   // 紫をぬいた版（もとは 霧深き森のゴシック童話.webp）   // 霧の深い、暗い森（近道①：狼を追って、森の奥へ）
+const BG_DARK='assets/background/霧深き森のゴシック童話.webp';   // 霧の深い、暗い森（近道①：狼を追って、森の奥へ）
 const BG_ROSE='assets/background/薔薇咲く霧深きゴシックの森.webp';   // 霧の深い、薔薇の咲く森（近道②：いばらのトンネル）
 const S=src=>({src,page:'spread'});
 // ゴシック：明るい森の絵は、暗く・色を抜き・赤紫をかぶせて使う（タイトル画面の霧の薔薇の森に合わせる）
