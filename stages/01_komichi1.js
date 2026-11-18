@@ -80,7 +80,7 @@ GT.registerSceneReset(()=>{ if(!isHere()) return; tut.step=0;
 const STEPS=[
   // （ジャンプの説明は、目覚めの場面の階段で出すので、ここではしない）
   { done:()=>GT.gravity.left===-1,
-    at:[200,120], lines:[[['F','Space'],'本を裏返す（このページの重力が反転）'],'床・天井に立っているときだけ'] },
+    at:[200,120], lines:[[['F','Space'],'本を裏返す']] },
   // （「背表紙をこえると…」は、説明の枠ではなく、マリが話す）
   { done:()=>GT.gravity.right===-1,
     at:[640,200], lines:[[['F','Space'],'本を裏返す']] },
