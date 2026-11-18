@@ -51,7 +51,7 @@ GT.registerScene({
   id:'path4', type:'play', stage:'path4', clear:'exit',
   companion:'hood',         // 遠回り：赤ずきんが、うしろからついてくる
   label:'第一章 ── 遠回りの道 ②',
-  intro:{s:'',c:'narr',t:'右へ進もう。'},
+  intro:{s:'',c:'narr',t:'日が傾きはじめた。道はまだ続いている。'},
   dynamic:'detourOnly',     // 遠回りのときだけ遊ぶ（07_crossroads.js）
 });
 

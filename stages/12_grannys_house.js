@@ -457,7 +457,7 @@ GT.registerScene({ id:'ending', type:'end',  label:'第一章 ── 戦いの�
 GT.registerScene({
   id:'epilogue', type:'story', stage:'epilogue_out', label:'第一章 ── 外',
   intro:[ {s:'',c:'narr',get t(){ return OUTSIDE[ending.kind]||OUTSIDE.true; }, act:'epi-setup'},
-          {s:'',c:'narr',get t(){ return ending.kind==='bad' ? '……そこには、もう誰もいなかった。' : '（まわりの人に、話しかけてみよう）'; }} ],
+          {s:'',c:'narr',get t(){ return ending.kind==='bad' ? '……そこには、もう誰もいなかった。' : '外には、見知った顔があった。'; }} ],
   npcs:[
     { who:'granny', name:'おばあさん', page:'left', x:-300, noExit:true, lines:[{s:'おばあさん',c:'granny',t:'……。'}] },   // セリフは epi-setup で入れる
     { who:'hood',   name:'赤ずきん',   page:'left', x:-300, required:true, lines:[{s:'赤ずきん',c:'hood',t:'……。'}] },   // 話すと右の端が開く

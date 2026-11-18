@@ -65,7 +65,7 @@ GT.defineStage('path1', {
 GT.registerScene({
   id:'path1', type:'play', stage:'path1', clear:'exit',
   label:'第一章 ── 森の道 ①',
-  intro:{s:'',c:'narr',t:'右へ進もう。'},
+  intro:{s:'',c:'narr',t:'森の道が続いている。'},
 });
 
 /* ============================================================================
