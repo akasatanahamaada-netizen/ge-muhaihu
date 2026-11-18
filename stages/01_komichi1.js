@@ -97,13 +97,13 @@ GT.registerUpdate(()=>{
   if(!isHere() || GT.mode!=='play') return;
   const pl=GT.player;
   if(!mv.ask && pl.onGround && GT.gravity.left===1 && Math.abs(pl.y+pl.h-ROCK_L.y)<2){ mv.ask=true; mariSays([{s:'マリ',c:'mari',t:'本をひっくり返してみて。'}]); return; }
-  if(!mv.told && GT.gravity.left===-1 && pl.onGround){ mv.ask=true; mv.told=true; mariSays([{s:'マリ',c:'mari',t:'驚いた？　その本は、重力を変えることができるの。'}]); return; }
+  if(!mv.told && GT.gravity.left===-1 && pl.onGround){ mv.ask=true; mv.told=true; mariSays([{s:'マリ',c:'mari',t:'驚いた？　その本は重力を変えることができるの。'}]); return; }
   // 背表紙（まん中）に近づいたら：ページごとに重力がちがうことを、マリが説明する
   if(mv.told && !mv.spine && pl.onGround && pl.x+pl.w/2 > GT.SPINE-90 && GT.gravity.left!==GT.gravity.right){ mv.spine=true;
     mariSays([
-      {s:'マリ',c:'mari',t:'待って。左と右のページは、別々なの。'},
-      {s:'マリ',c:'mari',t:'本を裏返すと、あなたが立っているページだけ、上と下が入れかわる。'},
-      {s:'マリ',c:'mari',t:'まん中をこえたら、そこから先は、右のページの重さにしたがうから。……落ちないでね。'},
+      {s:'マリ',c:'mari',t:'待って。左と右のページは別々なの。'},
+      {s:'マリ',c:'mari',t:'本を裏返すと、あなたが立っているページだけ上と下が入れかわる。'},
+      {s:'マリ',c:'mari',t:'まん中をこえたら右のページの重さにしたがうから……落ちないでね。'},
     ]); }
 });
 GT.registerUpdate(()=>{

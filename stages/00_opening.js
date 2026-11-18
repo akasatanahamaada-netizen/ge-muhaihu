@@ -129,7 +129,7 @@ function MARI_AGAIN(c, hiddenLeft){
 GT.registerScene({
   id:'opening', type:'story', stage:'opening', label:'序章 ── 森',
   intro:[
-    {s:'',c:'narr',t:'ページの向こうも、霧の深い森だった。'},
+    {s:'',c:'narr',t:'ページの向こうも霧の深い森だった。'},
     {s:'',c:'narr',t:'大きな木の陰から、誰かがこちらをうかがっている。'},
   ],
   npcs:[

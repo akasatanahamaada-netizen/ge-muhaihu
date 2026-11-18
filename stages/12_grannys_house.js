@@ -475,8 +475,8 @@ GT.registerAct('after-setup',()=>{
 });
 GT.registerScene({
   id:'afterword', type:'story', stage:'afterword', label:'序章 ── 暗い森',
-  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年は、はじめの暗い森に立っていた。',act:'after-setup'},
-          {s:'',c:'narr',t:'霧の向こう、大きな木の下に、マリがいる。'} ],
+  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年ははじめの暗い森に立っていた。',act:'after-setup'},
+          {s:'',c:'narr',t:'霧の向こう、大きな木の下にマリがいる。'} ],
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:630, noExit:true, required:true,   // 話すとエンディング
       lines:[{s:'マリ',c:'mari',t:'おかえり。'}],

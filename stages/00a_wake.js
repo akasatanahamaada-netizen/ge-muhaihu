@@ -30,11 +30,11 @@ GT.setLedgeStyle && GT.setLedgeStyle('wake','flat');
 GT.registerScene({
   id:'wake', type:'play', stage:'wake', clear:'exit', label:'序章 ── 暗い森',
   intro:[
-    {s:'',c:'narr',t:'――落ちていく。どこまでも、暗いところへ。',act:'wake-pre'},     // まだ少年は見えない
+    {s:'',c:'narr',t:'――落ちていく。どこまでも暗いところへ。',act:'wake-pre'},     // まだ少年は見えない
     {s:'',c:'narr',t:'背中に衝撃を受け、少年は目を覚ました。',act:'wake-fall'},       // 落ちてきて、着地してから、この語りが出る
-    {s:'',c:'narr',t:'霧の深い、暗い森。あたりには、誰もいない。'},
-    {s:'',c:'narr',t:'すぐそばに、一冊の本が落ちている。'},
-    {s:'',c:'narr',t:'少年は、本を拾い上げた。ところどころ、虫に食われたように文字が欠けている。',act:'wake-pick'},
+    {s:'',c:'narr',t:'霧の深い暗い森。あたりには誰もいない。'},
+    {s:'',c:'narr',t:'すぐそばに一冊の本が落ちている。'},
+    {s:'',c:'narr',t:'少年は本を拾い上げた。ところどころ虫に食われたように文字が欠けている。',act:'wake-pick'},
   ],
 });
 
