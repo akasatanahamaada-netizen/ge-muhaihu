@@ -128,28 +128,29 @@ let qteActive=false, qteTimer=0, qteWindow=0;
 
 GT.registerAct('bgm-off',()=>{ GT.musicMute && GT.musicMute(true); });
 GT.registerAct('bgm-on', ()=>{ GT.musicMute && GT.musicMute(false); });
+const CLASSIC=()=>[   // 「なんて大きな〜なの」「おまえを食べるためだよ！」（遠回りなら、かならず流れる）
+  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おやおや、よく来たね。カスタードとバターの小瓶は、そこの椅子に置いておくれ。'},
+  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'さあ、もっと近くへおいで。'},
+  {s:'赤ずきん',c:'hood',f:'surprise',t:'……おばあちゃん？'},
+  {s:'赤ずきん',c:'hood',t:'まあ、おばあちゃん、なんて大きな腕なの。'},
+  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえを抱きしめるためだよ、かわいい子。'},
+  {s:'赤ずきん',c:'hood',t:'それに、なんて立派な脚なの。'},
+  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'もっと速く走るためだよ、かわいい子。'},
+  {s:'赤ずきん',c:'hood',t:'なんて大きな耳なの。'},
+  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえの声を、よく聞くためだよ。'},
+  {s:'赤ずきん',c:'hood',t:'なんて大きな目なの。'},
+  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえを、よく見るためだよ。'},
+  {s:'赤ずきん',c:'hood',f:'surprise',t:'……なんて大きな歯なの。'},
+  {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'それは、'},                     // ひと呼吸おいてから
+  {s:'狼',c:'wolf',f:'granny',big:true,t:'おまえを食べるためだよ！'},   // ここで正体を見せる（名前は「狼」、立ち絵も黒塗りでなくなる）。big … 太く大きな文字で
+];
+
 GT.registerSceneType('qte', ()=>{
   GT.loadStageDef(GT.STAGE_DEFS['wolf_boss']); GT.mode='idle'; qteActive=false;
   { const pl=GT.player; pl.x=262; pl.y=H-EDGE-pl.h; pl.facing=-1; }   // 少年は戸口のそば（ベッドのほうを向く）
   GT.setHudStage('第一章 ── ！');
   GT.musicMute && GT.musicMute(true);     // 狼がおばあさんのふりをしているあいだは、BGM を止める（跳ね起きたら流す）
-  const lines=[
-    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おやおや、よく来たね。カスタードとバターの小瓶は、そこの椅子に置いておくれ。'},
-    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'さあ、もっと近くへおいで。'},
-    {s:'赤ずきん',c:'hood',f:'surprise',t:'……おばあちゃん？'},
-    {s:'赤ずきん',c:'hood',t:'まあ、おばあちゃん、なんて大きな腕なの。'},
-    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえを抱きしめるためだよ、かわいい子。'},
-    {s:'赤ずきん',c:'hood',t:'それに、なんて立派な脚なの。'},
-    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'もっと速く走るためだよ、かわいい子。'},
-    {s:'赤ずきん',c:'hood',t:'なんて大きな耳なの。'},
-    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえの声を、よく聞くためだよ。'},
-    {s:'赤ずきん',c:'hood',t:'なんて大きな目なの。'},
-    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'おまえを、よく見るためだよ。'},
-    {s:'赤ずきん',c:'hood',f:'surprise',t:'……なんて大きな歯なの。'},
-    {s:'おばあちゃん？',c:'wolf',sc:'granny',f:'disguise',t:'それは、'},                     // ひと呼吸おいてから
-    {s:'狼',c:'wolf',f:'granny',big:true,t:'おまえを食べるためだよ！'},   // ここで正体を見せる（名前は「狼」、立ち絵も黒塗りでなくなる）。big … 太く大きな文字で
-    {s:'',c:'narr',t:'狼が、勢いよくベッドから跳ね起きた。',act:'bgm-on'},
-  ];
+  const lines=CLASSIC().concat([{s:'',c:'narr',t:'狼が、勢いよくベッドから跳ね起きた。',act:'bgm-on'}]);
   GT.beginDialogue(lines,null,()=>{
     GT.hideDialogue(); qteActive=true;
     qteWindow=1.6; qteTimer=0; GT.mode='qte';
@@ -207,9 +208,12 @@ GT.registerDynamic('arriveHouse', ()=>{
     return;
   }
   if(GT.flags.stoppedAtDoor){
+    GT.musicMute && GT.musicMute(true);     // 狼がおばあさんのふりをしているあいだは、BGM を止める（跳ね起きたら流す）
     GT.beginDialogue([
-      {s:'',c:'narr',t:'少年が先に、そっと中をうかがう。ベッドに、おばあさんの寝間着を着た狼が横たわっていた。'},
-      {s:'',c:'narr',t:'赤ずきんが、戸口で息をのむ。……奇襲できる。'},
+      {s:'',c:'narr',t:'少年が先に、そっと中をうかがう。ベッドに、おばあさんの寝間着を着た誰かが横たわっていた。'},
+      {s:'',c:'narr',t:'赤ずきんは少年のうしろで、声をふるわせた。'},
+      ...CLASSIC(),
+      {s:'',c:'narr',t:'狼が、ベッドから跳ね起きた。――けれど、少年はもう本に手をかけていた。',act:'bgm-on'},
     ], null, ()=>{
       GT.injectSceneAfterCurrent({type:'boss',ambush:true,intro:[
         {s:'',c:'narr',t:'天井にたたきつけられた狼が、目を回している。いまのうちに、家具を落としてたたみかけろ。'} ]});
