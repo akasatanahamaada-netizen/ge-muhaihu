@@ -17,7 +17,7 @@
 const SAVE_KEY='gravityTale.ep1.save';
 const BOOKMARK_MAX=5;                 // しおりは5枚まで（下の「しおり」）
 const TITLE_BG='assets/background/タイトル背景.webp';   // タイトル画面の背景（霧の薔薇の森。もとは『ゴシックの森とタイトル背景png.png』）
-const TITLE_LOGO='assets/background/タイトルロゴ.webp'; // タイトルのロゴ（ふちが透明。もとは『タイトルロゴ.png』）
+const TITLE_LOGO='assets/background/タイトルロゴ_金.webp'; // タイトルのロゴ（ふちが透明）。文字といばらを古びた金色にしたもの（もとの色は『タイトルロゴ.webp』）
 const NAMES={ arrive:'おばあさんの家', ending:'結末' };      // label の無いシーンの名前
 
 /* ---- セーブ（ブラウザの localStorage。使えないときはセーブなしで動く） ---- */
@@ -113,7 +113,7 @@ const css=`
    ・Settings・How to Play は、まん中に暗い半透明の枠で出す（薔薇の色と、くすんだ金のふち） */
 .gtm{ background:#1a0d14 url("${encodeURI(TITLE_BG)}") 50% 50%/cover no-repeat; color:#f0e2e6; }
 .gtm::before{ background:radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(10,3,8,0.55) 100%); }
-.gtm-logo{ position:absolute; left:50%; top:5%; width:64%; transform:translateX(-50%); pointer-events:none; user-select:none;
+.gtm-logo{ position:absolute; left:50%; top:12%; width:48%; transform:translateX(-50%); pointer-events:none; user-select:none;
   filter:drop-shadow(0 6px 14px rgba(10,2,8,0.75)); }
 .gtm-title{ left:0; right:0; top:50%; text-shadow:0 1px 6px rgba(10,2,8,0.95), 0 0 14px rgba(10,2,8,0.8); }
 .gtm-title h2{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }   /* ロゴの絵があるので、文字は見せない（読み上げ用に残す） */
@@ -127,7 +127,7 @@ const css=`
   text-shadow:0 0 10px rgba(225,80,110,0.55), 0 1px 4px rgba(0,0,0,0.9); }
 .gtm:has(.gtm-start.show) .gtm-card{ visibility:hidden; }
 .gtm:has(.gtm-start.show) .gtm-title{ top:52%; }
-.gtm:has(.gtm-start.show) .gtm-logo{ top:8%; }
+.gtm:has(.gtm-start.show) .gtm-logo{ top:16%; }
 /* メインのメニュー：枠なしで、ロゴの下に横一列（入りきらなければ折りかえす） */
 .gtm[data-view="main"] .gtm-card{ left:4%; right:4%; width:auto; top:auto; bottom:11%; height:auto; padding:0; background:none; box-shadow:none; overflow:visible; }
 .gtm[data-view="main"] .gtm-card h3{ display:none; }
