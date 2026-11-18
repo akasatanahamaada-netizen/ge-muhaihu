@@ -1477,7 +1477,7 @@ let chimeAC=null;
 function chime(){
   const vol=GT.volume?GT.volume.se:1; if(vol<=0) return;
   try{ chimeAC=chimeAC||new (window.AudioContext||window.webkitAudioContext)(); if(chimeAC.state==='suspended') chimeAC.resume(); }catch(e){ return; }
-  // 光の魔法の音「しゅわーん」：空気の音の、ひびく高さが すーっと上がってから ゆるやかに下りる。うすく、すきとおった音が上へすべって重なる
+  // 光の魔法の音「しゅわーん」＋鈴のきらめき：空気の音の、ひびく高さが すーっと上がってから ゆるやかに下りる。うすく、すきとおった音が上へすべって重なる
   const a=chimeAC, t=a.currentTime, D=1.15, out=a.createGain(); out.gain.value=vol; out.connect(a.destination);
   const dl=a.createDelay(1), fb=a.createGain(), wet=a.createGain(); dl.delayTime.value=0.11; fb.gain.value=0.3; wet.gain.value=0.4;   // こだま
   dl.connect(fb).connect(dl); dl.connect(wet).connect(out);
@@ -1495,6 +1495,13 @@ function chime(){
     o.frequency.setValueAtTime(f*0.6,t); o.frequency.exponentialRampToValueAtTime(f*1.5,t+0.42); o.frequency.exponentialRampToValueAtTime(f*1.4,t+D);
     o.connect(tg); o.start(t); o.stop(t+D); });
   tg.connect(out); tg.connect(dl);
+  // ③ 魔法のきらめき：小さな鈴（ベルの音色）が、しゅわーんの上で ちりちりと鳴る。上がっていく音の並びで、ところどころ ばらつかせる
+  const NOTES=[1568,1760,2093,2349,2637,3136,3520,4186];
+  for(let i=0;i<9;i++){ const f=NOTES[Math.min(NOTES.length-1,Math.floor(i*0.9+Math.random()*1.5))], tt=t+0.08+i*0.075+Math.random()*0.03, amp=0.05*(1-i*0.06);
+    const g=a.createGain(); g.gain.setValueAtTime(0.0001,tt); g.gain.exponentialRampToValueAtTime(amp,tt+0.004); g.gain.exponentialRampToValueAtTime(0.0001,tt+0.6);
+    [[1,1],[2.76,0.25],[5.4,0.08]].forEach(([m,v])=>{ const o=a.createOscillator(), og=a.createGain(); o.type='sine'; o.frequency.value=f*m; og.gain.value=v;   // ベルの音色（上の倍音を少し）
+      o.connect(og).connect(g); o.start(tt); o.stop(tt+0.62); });
+    g.connect(out); g.connect(dl); }
   setTimeout(()=>{ try{ out.disconnect(); dl.disconnect(); fb.disconnect(); }catch(e){} }, 2600);   // こだまを止める
 }
 GT.chime=chime;
