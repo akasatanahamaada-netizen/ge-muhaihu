@@ -401,7 +401,7 @@ GT.registerAct('epi-setup',()=>{
   const h=get('hood'), g=get('granny'), m=get('mari');
   if(h){ if(kind==='bad'){ h.x=-300; } else { h.x=kind==='true'?400:330; h.lines=OUT_TALK.hood[kind](f); } }
   if(g){ if(kind==='true'){ g.x=300; g.lines=OUT_TALK.granny.true(f); } else g.x=-300; }
-  if(m){ m.lines=EPILOGUE[kind].concat([{s:'',c:'narr',t:'第一章「赤い頭巾」　おわり',act:'end-card'}]); }
+  if(kind==='bad' && GT.openStoryExit) GT.openStoryExit();   // だれもいないので、そのまま右の端へ
 });
 GT.registerSceneReset(()=>{ if(isEpi()){ ending.epilogue=true; ending.card=false; } else if(GT.scene&&GT.scene.type!=='end'){ ending.epilogue=false; ending.card=false; } });
 // 最後の選択肢（本を開いたあとも、ここに戻ってくる）
@@ -436,12 +436,12 @@ GT.registerDraw(drawEpilogue,'back');
 
 /* エンディングの画面（最前面） */
 function drawEndCard(){
-  if(!isEpi() || !ending.card) return;
+  if(!(isEpi()||(GT.scene&&GT.scene.id==='afterword')) || !ending.card) return;
   const k=Math.min(1,(performance.now()-ending.cardT)/1200), e=ENDINGS[ending.kind];
   ctx.save(); ctx.globalAlpha=k;
   ctx.fillStyle='rgba(20,16,12,0.82)'; ctx.fillRect(0,0,W,H);
   ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillStyle='#b7ab8a'; ctx.font="600 16px 'Cormorant Garamond',serif"; ctx.fillText('G R A V I T Y   T A L E',W/2,70);
+  ctx.fillStyle='#b7ab8a'; ctx.font="600 16px 'Cormorant Garamond',serif"; ctx.fillText('G R A V I T Y   T A L E S',W/2,70);
   ctx.fillStyle='#e8dcc0'; ctx.font="700 26px 'Zen Old Mincho',serif"; ctx.fillText('第一章「赤い頭巾」',W/2,110);
   ctx.strokeStyle='rgba(176,141,87,0.6)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W/2-140,138); ctx.lineTo(W/2+140,138); ctx.stroke();
   ctx.fillStyle='#d9b877'; ctx.font="700 15px 'Zen Old Mincho',serif"; ctx.fillText('エンディング '+e.mark,W/2,166);
@@ -459,14 +459,34 @@ GT.registerScene({ id:'ending', type:'end',  label:'第一章 ── 戦いの�
 GT.registerScene({
   id:'epilogue', type:'story', stage:'epilogue_out', label:'第一章 ── 外',
   intro:[ {s:'',c:'narr',get t(){ return OUTSIDE[ending.kind]||OUTSIDE.true; }, act:'epi-setup'},
-          {s:'',c:'narr',t:'（まわりの人に、話しかけてみよう）'} ],
+          {s:'',c:'narr',get t(){ return ending.kind==='bad' ? '……そこには、もう誰もいなかった。' : '（まわりの人に、話しかけてみよう）'; }} ],
   npcs:[
     { who:'granny', name:'おばあさん', page:'left', x:-300, noExit:true, lines:[{s:'おばあさん',c:'granny',t:'……。'}] },   // セリフは epi-setup で入れる
-    { who:'hood',   name:'赤ずきん',   page:'left', x:-300, noExit:true, lines:[{s:'赤ずきん',c:'hood',t:'……。'}] },
-    { who:'mari',   name:'マリ',       page:'right', x:690, noExit:true, required:true,   // 話すとエンディング（右の端は開かないが、話さないと進めない）
+    { who:'hood',   name:'赤ずきん',   page:'left', x:-300, required:true, lines:[{s:'赤ずきん',c:'hood',t:'……。'}] },   // 話すと右の端が開く
+    // マリは、ここにはいない（次のページ＝はじめの暗い森で待っている）
+  ],
+});
+
+/* ---- 第一章のあと（afterword）：ページがめくれると、はじめの暗い森。マリが話しかけてくる ---- */
+GT.defineStage('afterword', { label:'序章 ── 暗い森', platforms:[], boxes:[], enemies:[],
+  decor:[ {layer:'front', kind:'grassFlat', x:466, y:434, w:62, h:30}, {layer:'front', kind:'grassFlat', x:806, y:434, w:56, h:30} ] });
+const isAfter=()=>GT.scene&&GT.scene.id==='afterword';
+GT.registerAct('after-setup',()=>{
+  const m=GT.getNpcs().find(n=>n.who==='mari');
+  if(m){ m.lines=EPILOGUE[ending.kind].concat([{s:'',c:'narr',t:'第一章「赤い頭巾」　おわり',act:'end-card'}]); }
+});
+GT.registerScene({
+  id:'afterword', type:'story', stage:'afterword', label:'序章 ── 暗い森',
+  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年は、はじめの暗い森に立っていた。',act:'after-setup'},
+          {s:'',c:'narr',t:'霧の向こう、大きな木の下に、マリがいる。'} ],
+  npcs:[
+    { who:'mari', name:'マリ', page:'right', x:630, noExit:true, required:true,   // 話すとエンディング
       lines:[{s:'マリ',c:'mari',t:'おかえり。'}],
       onEnd:()=>{ GT.mode='idle'; showEndChoices(); } },
   ],
 });
+GT.registerDraw(()=>{ if(!isAfter()||!GT.goth) return; GT.goth.back(); GT.goth.props(); GT.goth.fog(false); }, 'back');
+GT.registerDraw(()=>{ if(!isAfter()||!GT.goth) return; GT.goth.shrooms(); GT.goth.big(690,72); GT.goth.lantern(); }, 'world');
+GT.registerDraw(()=>{ if(!isAfter()||!GT.goth) return; GT.goth.fog(true); GT.goth.top(); GT.goth.wisps(); GTDecor.forest.air(); }, 'overlay');
 
 })();

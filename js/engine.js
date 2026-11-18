@@ -481,6 +481,7 @@ function startScene(idx){
 }
 function advanceScene(){ startScene(GT.sceneIndex+1); }
 function injectSceneAfterCurrent(sc){ GT.SCENES.splice(GT.sceneIndex+1,0,sc); }
+GT.openStoryExit=()=>{ exitWanted=true; storyExitReady=true; updateExitGate(); };   // 話しかけなくても、右の端を開く
 GT.startScene=startScene; GT.advanceScene=advanceScene; GT.injectSceneAfterCurrent=injectSceneAfterCurrent;
 GT.getPageNo=()=>pageNo;
 /* メニューなどから、好きなシーンへ飛ぶ（ページめくり・会話・QTE をいったん片づけてから始める） */
@@ -1780,6 +1781,7 @@ function sceneMood(){
   return Math.max(0,Math.min(1,+v||0));
 }
 GT.moodNow=()=>moodCur; GT.moodTarget=sceneMood;
+GT.moodSnap=()=>{ moodCur=null; gradeK=null; };   // 次の画面で、ゆっくりではなく一気に、そのシーンの色合いにする
 GT.isBright=()=>!!(GT.scene && sceneMood()===0);   // 不気味さ 0 の場面は、ゴシックにする前と同じ見た目
 let gradeK=null;   // ゴシックの色合いのかかり具合（0＝前と同じ明るさ、1＝ゴシック）   // いまの不気味さ／このシーンの不気味さ
 function drawMoodFog(m){   // 地面をはう霧（不気味さが 0.45 をこえると出てくる）

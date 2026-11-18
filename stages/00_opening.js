@@ -1,5 +1,5 @@
 /* ============================================================================
-   ステージ：序章 ── 森（オープニング）  id = 'opening'
+   ステージ：序章 ── 森（マリと出会う）  id = 'opening'　※ひとりで目覚める場面は stages/00a_wake.js
    種類：story（ステージ上のキャラに話しかけて進む）
    担当：
    ----------------------------------------------------------------------------
@@ -56,12 +56,8 @@ GT.defineStage('opening', {
   bookPage:'prologue',   // ここのかけらは、本の序章「森での目覚め」のページのもの（このステージのかけらで完結。全部拾うと、欠けた文字・挿絵が埋まる）
   // 見た目：輪郭線なしのフラットな絵本ふう（背景は playlist.js で見開き全体に敷く）
   decor:[
-    {layer:'back',  kind:'tree',      x:16,  y:150, w:100, h:314},
-    {layer:'back',  kind:'tree',      x:172, y:110, w:132, h:270},
-    {layer:'back',  kind:'tree',      x:462, y:180, w:124, h:284},
-    
-    {layer:'back',  kind:'rockFlat',  x:604, y:422, w:62,  h:42},
-    {layer:'back',  kind:'bushFlat',  x:786, y:420, w:82,  h:44},
+    // 奥の木は、ゴシックの枯れ木（下の GOTH.back で描く）
+    // 石・茂みは、ゴシックの石と薔薇の茂み（下の GOTH で描く）
     {layer:'front', kind:'fernFlat',  x:-6,  y:386, w:96,  h:80},   // かけらを隠す葉
     {layer:'front', kind:'grassFlat', x:298, y:310, w:58,  h:30},
     {layer:'front', kind:'grassFlat', x:466, y:434, w:62,  h:30},
@@ -73,74 +69,37 @@ GT.setLedgeStyle('opening','flat');   // 足場は輪郭線なしの平らな茶
 
 // --- セリフ ----------------------------------------------------------------
 // 最初に話しかけたとき。拾ったかけらの数で、途中が変わる。
-function MARI_FIRST(c){
+function MARI_FIRST(c){   // マリは、最低限のことしか言わない（あとは「自分の目で見てきて」）
   const rest=c.itemsAll-c.items;
-  const head=[
-    {s:'マリ',c:'mari',t:'あ、起きた。'},
-    {s:'マリ',c:'mari',t:'だいじょうぶ？　落ちてきたとき、けっこう派手だったよ。'},
-    {s:'少年',c:'boy',t:'……ここ、どこ？'},
-    {s:'マリ',c:'mari',t:'ここは、本の中の世界なの。'},
-    {s:'少年',c:'boy',t:'本の中？'},
-    {s:'マリ',c:'mari',t:'この本には、いろんな童話が収録されているの。'},
-    {s:'少年',c:'boy',t:'よくわからないけど、そうなんだ……。'},
-    {s:'マリ',c:'mari',t:'……いいわ。いきなりこんなことを言われても、信じられないわよね。'},
-    {s:'マリ',c:'mari',t:'ところで、あなたの名前は？'},
-    {s:'少年',c:'boy',t:'……思い出せない。自分が誰なのかも。'},
-    {s:'',c:'narr',t:'言いようのない不安が少年を襲う。自分が誰なのか、今までどこにいたのか。それすら思い出せない。'},
-    {s:'マリ',c:'mari',t:'記憶が、なにもないの？'},
-    {s:'少年',c:'boy',t:'……うん。名前も、わからない。'},
-    {s:'マリ',c:'mari',t:'そっか……。でも、名前がないと呼びにくいな。'},
-    {s:'マリ',c:'mari',t:'ねえ、自分で決めてみて。あなたの名前。',ask:'name'},
-    {s:'マリ',c:'mari',t:'{name}。……うん、いい名前。よろしくね、{name}。'},
-    {s:'',c:'narr',t:'少年は周囲を見渡す。'},
-    {s:'マリ',c:'mari',t:'これから会う人たちも、みんな絵本の中の住人なの。'},
-    {s:'少年',c:'boy',t:'……絵本の、中？'},
-    {s:'マリ',c:'mari',t:'そう。みんな、自分のお話の中で暮らしてるの。'},
-    {s:'',c:'narr',t:'少年は、抱えていた本に目を落とした。'},
-    {s:'マリ',c:'mari',t:'……うん、それ。その本が大事なの。'},
-    {s:'マリ',c:'mari',t:'その本を全部埋めないと、帰れないから。'},
-    {s:'マリ',c:'mari',t:'ただ先に進むだけじゃダメだよ。ちゃんと見て、ちゃんと話して。そうすれば、物語が紡がれていくの。'},
-    {s:'マリ',c:'mari',t:'飛ばしちゃダメ。一つでも空いていたら、完成しないから。'},
-  ];
-  const mid = rest>0 ? [
-    {s:'マリ',c:'mari',t:'……ほら。落ちたときに、『お話のかけら』が散らばっちゃってる。'},
-    {s:'マリ',c:'mari',t:`落ちてる紙きれを、全部拾って。あと ${rest}つ。`},
-    {s:'マリ',c:'mari',t:'見えているところにあるとは限らないよ。'},
-  ] : [
-    {s:'マリ',c:'mari',t:'……あれ。散らばってたかけら、もう全部拾ったんだ。'},
-    {s:'マリ',c:'mari',t:'ふうん。ちゃんと見てるじゃない。'},
-  ];
-  const tail=[
-    {s:'少年',c:'boy',t:'……きみは、だれ？'},
-    {s:'マリ',c:'mari',t:'わたし？　わたしは、マリ。この本のことを、少しだけ知ってるの。',act:'mari-named'},   // ここで名乗る（ここから名前の欄が「マリ」になる）
-  ];
-  return head.concat(mid,tail);
-}
-// 2回目以降に話しかけたとき（ヒント）
-function MARI_AGAIN(c, hiddenLeft){
-  const rest=c.itemsAll-c.items;
-  if(rest<=0) return [
-    {s:'マリ',c:'mari',t:'次のページに行って。物語があなたを待ってる。'},
-    {s:'マリ',c:'mari',t:'……わたし？　わたしは、まだここにいる。'},
-  ];
-  if(hiddenLeft) return [
-    {s:'マリ',c:'mari',t:`あと ${rest}つ。`},
-    {s:'マリ',c:'mari',t:'あなたが倒れてたところ、ちゃんと見た？　葉っぱの陰とか。'},
-  ];
   return [
-    {s:'マリ',c:'mari',t:`あと ${rest}つ。`},
-    {s:'マリ',c:'mari',t:'高いところも、見てみて。'},
+    {s:'マリ',c:'mari',t:'……来たんだ。'},
+    {s:'少年',c:'boy',t:'……ここ、どこ？'},
+    {s:'マリ',c:'mari',t:'本の中。'},
+    {s:'少年',c:'boy',t:'本の、中……？'},
+    {s:'マリ',c:'mari',t:'名前は？'},
+    {s:'少年',c:'boy',t:'……思い出せない。'},
+    {s:'マリ',c:'mari',t:'じゃあ、自分で決めて。',ask:'name'},
+    {s:'マリ',c:'mari',t:'{name}。……わかった。'},
+    {s:'マリ',c:'mari',t:'その本。全部埋めないと、帰れないよ。'},
+    {s:'少年',c:'boy',t:'埋めるって、どうやって？'},
+    {s:'マリ',c:'mari',t:'……説明は、しない。自分の目で見てきて。'},
+    ...(rest>0 ? [{s:'マリ',c:'mari',t:'まずは、そこらに落ちてる紙きれ。拾っておいて。'}] : []),
+    {s:'少年',c:'boy',t:'……きみは？'},
+    {s:'マリ',c:'mari',t:'マリ。',act:'mari-named'},
   ];
+}
+function MARI_AGAIN(c){
+  const rest=c.itemsAll-c.items;
+  if(rest<=0) return [ {s:'マリ',c:'mari',t:'……行って。'} ];
+  return [ {s:'マリ',c:'mari',t:`あと ${rest}つ。`}, {s:'マリ',c:'mari',t:'自分の目で、探して。'} ];
 }
 
 // --- シーン（会話と進行） --------------------------------------------------
 GT.registerScene({
   id:'opening', type:'story', stage:'opening', label:'序章 ── 森',
   intro:[
-    {s:'',c:'narr',t:'背中に衝撃を受け、少年は目を覚ます。あたりを見回すと、鬱蒼と生い茂る木々に囲まれていた。手には一冊の本を抱えている。',act:'opening-lie'},
-    {s:'',c:'narr',t:'手にした本のページをめくると、まるで虫食いのように、ところどころ文字が欠けていて読めなくなっている。',act:'opening-book-on'},
-    {s:'',c:'narr',get t(){ return GT.ctl('（← → で歩く。↑ でジャンプ。人の近くで画面タップ・Enter で話しかけられる）','（◀ ▶ で歩く。▲ でジャンプ。人の近くで画面をタップすると話しかけられる）'); },act:'opening-book-off'},
-    {s:'',c:'narr',t:'向こうにある大きな木。その陰から、誰かがこちらをうかがっている。'},
+    {s:'',c:'narr',t:'ページの向こうも、霧の深い森だった。'},
+    {s:'',c:'narr',t:'大きな木の陰から、誰かがこちらをうかがっている。'},
   ],
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:710,
@@ -207,7 +166,7 @@ GT.registerUpdate(dt=>{
   if(!st.talkedOnce){ n.lines=MARI_FIRST(c); }
   else {
     if(n.talked){ n.talked=false; n.onEnd=null; }
-    n.lines=MARI_AGAIN(c, !GT.items[HIDDEN_ITEM].got);
+    n.lines=MARI_AGAIN(c);
   }
 });
 
@@ -245,21 +204,21 @@ function drawScrapHint(){
   GT.drawHint(it.x+it.w/2, it.y-58, ['落ちている紙きれ ＝ お話のかけら','さわると 拾える']);
 }
 
-/* 木漏れ日 */
+/* 月あかりの筋（青白く、うすく） */
 function drawLightShafts(){
   const t=performance.now()/1000;
   ctx.save(); ctx.globalCompositeOperation='lighter';
   [[120,70,0.6],[330,50,1.7],[600,90,2.9],[760,40,4.1]].forEach(([x,w,s])=>{
-    const a=0.022+0.012*Math.sin(t*0.7+s);
+    const a=0.026+0.012*Math.sin(t*0.7+s);
     const g=ctx.createLinearGradient(0,EDGE,0,FLOOR);
-    g.addColorStop(0,`rgba(255,236,170,${a*1.6})`); g.addColorStop(1,'rgba(255,236,170,0)');
+    g.addColorStop(0,`rgba(210,214,230,${a*1.6})`); g.addColorStop(1,'rgba(210,214,230,0)');
     ctx.fillStyle=g; ctx.beginPath();
     ctx.moveTo(x,EDGE); ctx.lineTo(x+w,EDGE); ctx.lineTo(x+w-110,FLOOR); ctx.lineTo(x-150,FLOOR); ctx.closePath(); ctx.fill();
   });
   // 光の中を漂うちり
   for(let i=0;i<22;i++){
     const x=(rnd(i)*W+Math.sin(t*0.3+i)*20)%W, y=EDGE+((rnd(i+50)*H+t*(6+rnd(i+9)*8))%(FLOOR-EDGE));
-    ctx.globalAlpha=0.25+0.25*Math.sin(t*2+i); ell(x,y,1.2,1.2,'#fff2c0');
+    ctx.globalAlpha=0.25+0.25*Math.sin(t*2+i); ell(x,y,1.2,1.2,'#e8dcff');
   }
   ctx.restore();
 }
@@ -272,12 +231,13 @@ function drawLeaves(){
     const y=EDGE-20+((t*sp+rnd(i)*span)%span);
     const x=rnd(i+20)*W+Math.sin(t*1.3+i*2)*26;
     const r=t*2+i;
-    ell(x,y,5,2.4*Math.abs(Math.cos(r)),i%3?'rgba(122,128,74,0.75)':'rgba(176,141,87,0.75)',Math.sin(r)*0.8);
+    ell(x,y,4.6,2.6*Math.abs(Math.cos(r)),i%3?'rgba(150,26,52,0.85)':'rgba(196,52,77,0.85)',Math.sin(r)*0.8);   // 薔薇の花びら
   }
 }
 
 /* マリが隠れる大きな木（マリより手前・少年より奥）：凝った木（GTDecor.paint） */
 function drawMariTree(){
+  GOTH.big(TRUNK.x, TRUNK.w); return;                // ゴシックの木（下は、前の丸い木。もどすときは、この行を消す）
   const x=TRUNK.x, w=TRUNK.w, P=GTDecor.paint;
   P.trunk(ctx, x, 104, FLOOR, w, 41, { hollow:{x:x+w*0.55,y:250,rx:8,ry:13},
     branches:[{y:150,dir:-1,len:80},{y:132,dir:1,len:84},{y:190,dir:1,len:46}] });
@@ -288,12 +248,17 @@ function drawMariTree(){
 function drawStump(){
   const p={x:520,y:380,w:56,h:84};
   ctx.save();
-  GT.roundRect(p.x,p.y,p.w,p.h,6); ctx.fillStyle='#634e3a'; ctx.fill();
-  ctx.strokeStyle='rgba(30,20,10,0.35)'; ctx.lineWidth=1.3;
+  GT.roundRect(p.x,p.y,p.w,p.h,6); const sg=ctx.createLinearGradient(p.x,0,p.x+p.w,0);
+  sg.addColorStop(0,'#2a1a20'); sg.addColorStop(0.55,'#3e2a2e'); sg.addColorStop(1,'#1e1218'); ctx.fillStyle=sg; ctx.fill();   // 暗い木
+  ctx.strokeStyle='#120a0e'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.strokeStyle='rgba(10,4,8,0.55)'; ctx.lineWidth=1.3;
   for(let i=1;i<4;i++){ const bx=p.x+i*p.w/4; ctx.beginPath(); ctx.moveTo(bx,p.y+16); ctx.lineTo(bx+(i-2)*2,p.y+p.h-2); ctx.stroke(); }
-  ctx.beginPath(); ctx.ellipse(p.x+p.w/2,p.y+7,p.w/2-3,5,0,0,Math.PI*2); ctx.fillStyle='#7a634b'; ctx.fill();
-  ctx.strokeStyle='rgba(50,36,22,0.5)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.ellipse(p.x+p.w/2,p.y+7,p.w*0.22,2.5,0,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(p.x+p.w/2,p.y+7,p.w/2-3,5,0,0,Math.PI*2); ctx.fillStyle='#6a5258'; ctx.fill();   // 切り口（月あかり）
+  ctx.strokeStyle='rgba(30,16,24,0.6)'; ctx.lineWidth=1;
+  for(const k of [0.12,0.22,0.32]){ ctx.beginPath(); ctx.ellipse(p.x+p.w/2,p.y+7,p.w*k,2.5*k/0.22,0,0,Math.PI*2); ctx.stroke(); }   // 年輪
+  ctx.strokeStyle='#26301e'; ctx.lineWidth=1.5; ctx.beginPath();                                                     // つた
+  for(let y=p.y+12;y<p.y+p.h;y+=4){ const x=p.x+p.w-10+Math.sin(y*0.15)*5; y===p.y+12?ctx.moveTo(x,y):ctx.lineTo(x,y); } ctx.stroke();
+  for(let y=p.y+20;y<p.y+p.h-4;y+=12) ell(p.x+p.w-10+Math.sin(y*0.15)*5+((y/12)%2<1?-5:5),y,4.5,2.2,'#34422a');
   ctx.restore();
 }
 
@@ -315,12 +280,7 @@ function drawMarks(){
     ctx.save(); ctx.globalAlpha=a; ctx.font="700 22px 'Zen Old Mincho',serif"; ctx.textAlign='center';
     ctx.fillStyle='#4a4e6d'; ctx.fillText('！', n.x+n.w/2, (n.g||1)>0 ? n.y-30-jump : n.y+n.h+44+jump); ctx.restore();
   }
-  if(GT.mode==='play' && !st.movedFar){
-    const a=0.55+0.25*Math.sin(performance.now()/300);
-    ctx.save(); ctx.globalAlpha=a; ctx.font="700 14px 'Zen Old Mincho',serif"; ctx.textAlign='left';
-    GT.roundRect(26,151,204,28,14); ctx.fillStyle='rgba(246,238,216,0.85)'; ctx.fill();
-    ctx.fillStyle='rgba(74,70,60,0.95)'; ctx.fillText(GT.ctl('← →  あるく　　↑  ジャンプ','◀ ▶  あるく　　▲  ジャンプ'), 38, 170); ctx.restore();
-  }
+  // 歩きかたの案内は、前のページ（目覚めの場面）の「→ 右へ進む」だけ
 }
 
 /* 本の絵（虫食いのページ） */
@@ -403,6 +363,7 @@ function drawBookView(){
 
 /* 目を覚ます：まぶたが2回ひらく */
 function drawWake(){
+  return;   // 目覚めは前のページ（stages/00a_wake.js）
   const t=secs(); if(t>3.2) return;
   const k=(a,b,x)=>Math.min(1,Math.max(0,(x-a)/(b-a)));
   let open;
@@ -421,12 +382,6 @@ function drawWake(){
 
 /* 3段の丘：森の小道①と同じ「苔むした岩」（stages/_decor.js の GTDecor.forest.rock）。
    段の形を変えたら、下の番号（platforms の何番目か）も合わせて直すこと。 */
-function drawHill(){
-  const P=i=>GT.STAGE_DEFS.opening.platforms[i];
-  GTDecor.forest.rock([P(0),P(1),P(2)],3);
-}
-
-/* ゴシックの森の描き方（この場面では使わない。狼の場面などが GT.goth として使う） */
 /* ---- ゴシックの森（タイトル画面の、霧の薔薇の森に合わせる） --------------------------
    ・奥の木：葉のない、ねじれた枯れ木。枝先にとげ、幹にいばらのつると薔薇。片がわに月あかりのふち
    ・上のすみ：いばらの枝が、画面のふちから伸びてくる（少年より手前）
@@ -570,7 +525,12 @@ const GOTH=(()=>{
 })();
 GT.goth=GOTH;   // ゴシックの森の描き方を、ほかのステージにも貸す
 
-GT.registerDraw(()=>{ if(!isOpening()) return; drawLightShafts(); }, 'back');
-GT.registerDraw(()=>{ if(!isOpening()) return; drawHill(); drawPages(); drawStump(); drawMariTree(); drawLeaves(); drawMarks(); }, 'world');
-GT.registerDraw(()=>{ if(!isOpening()) return; drawHiddenGlint(); drawScrapHint(); drawBookView(); drawWake(); }, 'overlay');
+function drawHill(){
+  const P=i=>GT.STAGE_DEFS.opening.platforms[i];
+  GTDecor.forest.rock([P(0),P(1),P(2)],3);
+}
+
+GT.registerDraw(()=>{ if(!isOpening()) return; drawLightShafts(); GOTH.back(); GOTH.props(); GOTH.fog(false); }, 'back');
+GT.registerDraw(()=>{ if(!isOpening()) return; drawHill(); drawPages(); drawStump(); GOTH.shrooms(); drawMariTree(); GOTH.lantern(); drawLeaves(); drawMarks(); }, 'world');
+GT.registerDraw(()=>{ if(!isOpening()) return; GOTH.fog(true); GOTH.top(); GOTH.wisps(); GTDecor.forest.air(); drawHiddenGlint(); drawScrapHint(); drawBookView(); drawWake(); }, 'overlay');
 })();

@@ -87,7 +87,7 @@ const PEEK=[
 GT.registerScene({
   id:'house_peek', type:'story', stage:'house_peek', label:'第一章 ── 赤ずきんの家',
   intro:[
-    {s:'',c:'narr',t:'―― 第一章「赤い頭巾」 ――'},   // ここから本編（序章はここまで）
+    // 章のとびら（第一章「赤い頭巾」）は、この前のシーン chapter1（stages/02b_chapter_card.js）で出す
     {s:'',c:'narr',t:'森の小道を抜けると森のはずれに小さな家が見えた。煙突から細い煙がのぼっている。'},
     {s:'',c:'narr',t:'窓には明かりがともり、中で人影が動いている。家のそばにマリが立っている。'},
     {s:'',c:'narr',t:'手の中の本がかすかに反応している。虫食いのページに文章が記されている。',act:'peek-book-guide'},   // 「本を開く」ボタンへ誘導（読み返してみよう）
@@ -112,6 +112,7 @@ GT.registerAct('peek-book-guide', ()=>{ if(GT.guideToBook) GT.guideToBook('本�
 const DOOR={x:800, y:372, w:52};
 const st={ briefed:false, peeked:false, busy:false, runT0:0 };
 const isHouse=()=>GT.scene&&GT.scene.id==='house_peek';
+GT.registerSceneReset(()=>{ if(isHouse() && GT.moodSnap) GT.moodSnap(); });   // 暗い序章から、一気に明るい絵本の雰囲気へ
 GT.registerSceneReset(()=>{ if(isHouse()){ st.briefed=false; st.peeked=false; st.busy=false; st.runT0=0; } });
 GT.registerAct('house-hood-run',()=>{ st.runT0=performance.now(); setTimeout(()=>{ if(st.runT0) GT.sfx&&GT.sfx('door'); },1300); GT.holdDialogue(()=>!st.runT0); });   // 赤ずきんが出ていって、戸が閉まる
 GT.registerAct('peek-off-run',()=>{ peek.on=false; st.runT0=performance.now(); setTimeout(()=>{ if(st.runT0) GT.sfx&&GT.sfx('door'); },1300);

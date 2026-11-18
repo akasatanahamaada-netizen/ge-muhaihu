@@ -177,7 +177,7 @@ function slotInner(slot){
 /* ページ（playlist.js の GT.definePages の key）と、そのページにふくまれるステージ（シーンの id。物語の順）。
    そのページのボタンから、どのステージへも行ける（一度来たステージだけ出る。近道・遠回りは、通ったほうだけ） */
 const PAGE_SCENES={
-  prologue:['opening'],
+  prologue:['wake','opening'],
   komichi: ['komichi1','komichi2'],
   window:  ['house_peek','path1'],
   meet:    ['meet_hood','cliff'],

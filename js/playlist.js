@@ -51,9 +51,11 @@ GT.flags = { playerName:null, mariNamed:false, bookmarkTip:false, warnedHood:fal
 
 // シーンの並び順（= ゲームの進行順）。id は各ステージファイルで登録したもの。
 GT.playlist = [
+  'wake',         // 序章 ── 暗い森で、ひとりで目覚める（play。空から落ちてくる・本を拾う・右へ）
   'opening',      // 序章 ── 森（マリと出会う / story）
   'komichi1',     // 森の小道①（play）
   'komichi2',     // 森の小道②（play）
+  'chapter1',     // 章のとびら：本がひらいて「第一章「赤い頭巾」」（ここから明るい絵本の雰囲気へ）
   'house_peek',   // 赤ずきんの家・窓のぞき（story）
   'path1',        // 森の道①（play）
   'meet_hood',    // 赤ずきんと道連れに（story）
@@ -68,7 +70,8 @@ GT.playlist = [
   'house_front',  // おばあさんの家の前（story・分岐：赤ずきんを止めるか）
   'arrive',       // おばあさんの家に到着（分岐→ボス戦 or QTE）
   'ending',       // 結末（戦いのあと・部屋の中）
-  'epilogue',     // 外に出て、マリたちと話す（夕暮れ／夜明け）→ エンディングの画面
+  'epilogue',     // 外に出て、赤ずきんたちと話す（夕暮れ／夜明け。マリはいない）
+  'afterword',    // はじめの暗い森にもどって、マリと話す → エンディングの画面
 ];
 
 // ステージの背景画像（キーは地形の id）。
@@ -89,8 +92,11 @@ const BG_TITLE='assets/background/タイトル背景_森.webp';   // 紫をぬ�
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
-  opening:S(BG_DAY),   // 狼が出てくるまでは、ゴシックにする前と同じ明るい森（前は暗い森 Object.assign({},DARK,{shade:0.2})）       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
-  komichi1:S(BG_DAY), komichi2:S(BG_DAY), path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
+  wake:Object.assign({},DARK,{shade:0.25}),          // 序章（ひとりで目覚める）：暗い森
+  opening:Object.assign({},DARK,{shade:0.2}),        // 序章（マリと出会う）：暗い森
+  afterword:Object.assign({},DARK,{shade:0.2}),      // 第一章のあと：はじめの暗い森にもどる
+  komichi1:DARK, komichi2:DARK,   // チュートリアルも、序章のゴシックの森
+  path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
   house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
   wolf_talk:G(BG_DAY,0.15),                           // 狼：ここから暗くなりはじめる（前は暗い森 DARK）
   crossroads:{src:BG_TITLE,page:'spread',wash:'rgba(244,240,230,0.08)'},   // 分かれ道（道のある、霧の薔薇の森）
@@ -105,7 +111,9 @@ GT.stageBackgrounds = {
 const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
   // 0 は、ゴシックにする前と同じ見た目（色合い・岩・ちょうちょ・案内の枠も）。狼が出てくるまでは 0
-  opening:0, komichi1:0, komichi2:0, house_peek:0, path1:0, meet_hood:0, cliff:0,
+  wake:0.6, opening:0.5, komichi1:0.5, komichi2:0.5,   // 序章：ゴシックの暗い森
+  house_peek:0, path1:0, meet_hood:0, cliff:0,         // 第一章のはじめ：明るい絵本（章のとびらのあと、一気に変わる）
+  afterword:0.5,                                        // 第一章のあと：暗い森にもどる
   wolf_talk:0.15,                                // 狼：ここから、少しずつ暗く
   crossroads:0.2,                                // 分かれ道：ちょっと暗いかな、くらい
   path2:0.55, path2b:0.7,                        // 近道（①暗い森 → ②いばらの森）：暗い
@@ -123,7 +131,9 @@ const BGM_ADVENTURE=M('小さな勇者の探検');   // 冒険（アクション
 const BGM_THORN=M('荊の庭');                 // 近道（いばらの道）
 const BGM_SAD=M('堕ちる');                    // 悲しい曲（おばあさんを助けられなかった結末）
 GT.sceneMusic = {
-  opening:  M('異世界へようこそ'),            // 最初の物語ステージ（本の中で目を覚まし、マリと出会う）
+  // wake（ひとりで目覚める）と chapter1（章のとびら）は、曲なし（静けさ）
+  opening:  M('異世界へようこそ'),            // マリと出会う
+  afterword: M('ふしぎな絵本'),              // 第一章のあと：はじめの暗い森で、マリと話す
   komichi1: BGM_ADVENTURE, komichi2: BGM_ADVENTURE,   // チュートリアルのステージ（森の小道①②）：前と同じ『小さな勇者の探検』（森の道①・崖まで続けて流れる）
   path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
   house_peek: M('魔法使いの箱庭'),             // 赤ずきんの家（窓のぞき）
