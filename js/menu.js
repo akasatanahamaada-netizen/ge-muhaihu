@@ -183,7 +183,7 @@ menu.innerHTML=`
       <button class="gtm-btn" data-act="resume">Resume</button>
       <button class="gtm-btn" data-act="new">New Game</button>
       <button class="gtm-btn" data-act="continue">Continue<small></small></button>
-      <button class="gtm-btn" data-act="book">Reread the Story</button>
+      <button class="gtm-btn" data-act="book">Book</button>
       <button class="gtm-btn" data-act="howto">How to Play</button>
       <button class="gtm-btn" data-act="settings">Settings</button>
     </div>
