@@ -83,7 +83,7 @@ const BG_DARK='assets/background/霧深き森のゴシック童話.webp';   // �
 const BG_ROSE='assets/background/薔薇咲く霧深きゴシックの森.webp';   // 霧の深い、薔薇の咲く森（近道②：いばらのトンネル）
 const S=src=>({src,page:'spread'});
 // ゴシック：明るい森の絵は、暗く・色を抜き・赤紫をかぶせて使う（タイトル画面の霧の薔薇の森に合わせる）
-const G=src=>({src,page:'spread',filter:'brightness(0.72) saturate(0.55) contrast(1.05) blur(0.8px)',tint:'rgb(196,150,176)',wash:'rgba(244,240,230,0.06)'});
+const G=src=>({src,page:'spread',filter:'brightness(0.72) saturate(0.55) contrast(1.05) blur(0.8px)',tint:'rgb(178,172,164)',wash:'rgba(244,240,230,0.06)'});
 const BG_TITLE='assets/background/タイトル背景.webp';   // タイトル画面の背景（道のある、霧の薔薇の森）
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};

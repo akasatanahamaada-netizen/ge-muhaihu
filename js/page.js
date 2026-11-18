@@ -87,15 +87,15 @@
   const COVER='M -52 -36 L 952 -36 Q 958 -36 958 -30 L 958 524 Q 958 530 952 530 L -52 530 Q -58 530 -58 524 L -58 -30 Q -58 -36 -52 -36 Z';
   cover.innerHTML=`
     <defs>
-      <linearGradient id="gtCoverG" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#4f2236"/><stop offset="0.5" stop-color="#3d1828"/><stop offset="1" stop-color="#2b0f1c"/></linearGradient>
+      <linearGradient id="gtCoverG" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#4a3226"/><stop offset="0.5" stop-color="#3a261c"/><stop offset="1" stop-color="#281912"/></linearGradient>
       <linearGradient id="gtSpineG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1e1611" stop-opacity="0"/><stop offset="0.3" stop-color="#1e1611" stop-opacity="0.5"/>
-        <stop offset="0.5" stop-color="#74405a" stop-opacity="0.55"/><stop offset="0.7" stop-color="#1e1611" stop-opacity="0.5"/><stop offset="1" stop-color="#1e1611" stop-opacity="0"/></linearGradient>
+        <stop offset="0.5" stop-color="#6e5040" stop-opacity="0.55"/><stop offset="0.7" stop-color="#1e1611" stop-opacity="0.5"/><stop offset="1" stop-color="#1e1611" stop-opacity="0"/></linearGradient>
       <filter id="gtShadow" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="9"/></filter>
       <filter id="gtLeather" x="0" y="0" width="100%" height="100%">
         <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="g"/>
         <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0 0.03  0 0 0 -1.6 1.15" result="grain"/>
         <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="8" result="m"/>
-        <feColorMatrix in="m" type="matrix" values="0 0 0 0 0.62  0 0 0 0 0.36  0 0 0 0 0.48  0 0 0 0.9 -0.32" result="mottle"/>
+        <feColorMatrix in="m" type="matrix" values="0 0 0 0 0.56  0 0 0 0 0.42  0 0 0 0 0.30  0 0 0 0.9 -0.32" result="mottle"/>
         <feMerge><feMergeNode in="mottle"/><feMergeNode in="grain"/></feMerge>
       </filter>
       <clipPath id="gtCoverClip"><path d="${COVER}"/></clipPath>

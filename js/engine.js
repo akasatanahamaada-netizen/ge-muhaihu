@@ -620,8 +620,8 @@ const flipLive=document.createElement('canvas'); flipLive.width=W; flipLive.heig
    ・めくりは、ゲーム画面より一回り大きい専用の層（flipCv。.gt-pages と同じ位置・大きさ。座標も同じ）に描く */
 /* ゴシックの色合い（タイトル画面の、霧の薔薇の森に合わせる）
    GRADE_MUL … ゲーム画面の最後に、全体へ「乗算」でかぶせる色。まわりのページの紙（js/page.js）にも同じ色をかけて、さかいを合わせる
-   GRADE_HUE … 世界（背景・地形・人物）を、赤紫の色みに寄せる強さ（0 で元の色）。GRADE_VIG … 四すみの暗さ */
-const GRADE_MUL=[214,188,190], GRADE_HUE=0.32, GRADE_VIG=0.5;
+   GRADE_HUE … 世界（背景・地形・人物）を、色みに寄せる強さ（0 で元の色）。GRADE_VIG … 四すみの暗さ */
+const GRADE_MUL=[212,205,196], GRADE_HUE=0, GRADE_VIG=0.5;
 GT.PAGE_TINT=GRADE_MUL;
 const tintHex=h=>{ const n=parseInt(h.slice(1),16); return '#'+[n>>16&255,n>>8&255,n&255].map((v,i)=>Math.round(v*GRADE_MUL[i]/255).toString(16).padStart(2,'0')).join(''); };
 GT.tintHex=tintHex;
@@ -1727,9 +1727,9 @@ function drawGothicWorld(){
   ctx.globalCompositeOperation='color'; ctx.globalAlpha=GRADE_HUE; ctx.fillStyle='#8a3d62'; ctx.fillRect(0,0,W,H);  // 赤紫の色みに寄せる（明るさはそのまま）
   ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
   const sp=stageBackgroundSpec();                                                     // 背景の shade（0〜1）… そのステージだけ、世界ぜんたいを暗くする（暗い森など）
-  if(sp&&sp.shade){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgba(40,14,30,${sp.shade})`; ctx.fillRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; }
+  if(sp&&sp.shade){ ctx.globalCompositeOperation='multiply'; ctx.fillStyle=`rgba(16,14,12,${sp.shade})`; ctx.fillRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; }
   if(!gothVig){ gothVig=ctx.createRadialGradient(W/2,H*0.5,H*0.35,W/2,H*0.5,W*0.62);
-    gothVig.addColorStop(0,'rgba(24,6,16,0)'); gothVig.addColorStop(1,`rgba(24,6,16,${GRADE_VIG})`); }
+    gothVig.addColorStop(0,'rgba(10,8,6,0)'); gothVig.addColorStop(1,`rgba(10,8,6,${GRADE_VIG})`); }
   ctx.fillStyle=gothVig; ctx.fillRect(0,0,W,H);
   ctx.restore();
 }
