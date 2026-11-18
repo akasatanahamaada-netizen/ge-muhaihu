@@ -736,7 +736,7 @@ function showNameAsk(){
   const decide=()=>{
     const v=input.value.trim().slice(0,8);
     if(!v){ input.focus(); input.classList.add('shake'); setTimeout(()=>input.classList.remove('shake'),400); return; }
-    GT.flags.playerName=v; choicesShown=false; GT.sfx&&GT.sfx('page'); nextLine();
+    GT.flags.playerName=v; choicesShown=false; nextLine();   // （名前を決めたときは、音を鳴らさない）
   };
   // 名前を打っているあいだは、ゲームのキー操作（R でやり直す・S でスキップなど）に渡さない
   input.addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter' && !e.isComposing && e.keyCode!==229){ e.preventDefault(); decide(); } });
