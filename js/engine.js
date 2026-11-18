@@ -298,6 +298,7 @@ GT.loadStageDef = function(def, opt){
   GT.goal = (def.goal && !exitWanted)?{...def.goal}:null;
   GT.swamps = (def.swamps||[]).map(s=>({...s}));
   curStageDef=def;
+  GT.missionHidden=!!def.missionHiddenUntilTalk;   // 人と話すまで、画面の上の「〜を集める」を出さない（ステージ側で false にする）
   const bp=def.bookPage && GT.pageRecord.find(p=>p.key===def.bookPage);
   if(bp && !bp.found) bp.found=[];
   // 前に拾ったかけらは、拾ったまま（やり直しても、もう一度は出てこない）
@@ -1825,7 +1826,7 @@ function render(){
   ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.drawImage(GT.paperArt.agedPaper,0,0); ctx.restore();   // 古い紙の色むら・しみ（表示類より奥）
   drawEdgeFade();                                                                                                   // ふちを、まわりのページの色へ ぼかす（ページのふくらみとのさかいを目立たせない）
   drawGradeMul();   // 全体の色合い（まわりのページと同じ色）
-  if(missionReq && !flipping && !gameOver && !GT.paused && !document.querySelector('.gtm.show')) drawMissionHud(); else missionEl.classList.remove('show');   // メニュー・ページめくりのあいだは出さない
+  if(missionReq && !flipping && !gameOver && !GT.paused && !GT.missionHidden && !document.querySelector('.gtm.show')) drawMissionHud(); else missionEl.classList.remove('show');   // メニュー・ページめくりのあいだは出さない
   if(GT.hurtFlash>0){ ctx.fillStyle=`rgba(139,20,20,${GT.hurtFlash*0.35})`; ctx.fillRect(0,0,W,H); }
   drawHearts();
   if(gameOver){ const st=gameOver.cause&&gameOverStyles[gameOver.cause]; if(st&&st.draw) st.draw(gameOver); else drawGameOver(); }

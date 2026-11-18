@@ -50,6 +50,7 @@ GT.defineStage('opening', {
     {page:'left',  x:22,  y:434, w:26, h:26},   // 倒れていた場所の葉の陰（手前の葉で隠れる）
   ],
   mission:['items'],
+  missionHiddenUntilTalk:true,   // 「お話のかけらを集める」は、マリと話したあとに出す
   bookPage:'prologue',   // ここのかけらは、本の序章「森での目覚め」のページのもの（このステージのかけらで完結。全部拾うと、欠けた文字・挿絵が埋まる）
   // 見た目：輪郭線なしのフラットな絵本ふう（背景は playlist.js で見開き全体に敷く）
   decor:[
@@ -129,7 +130,7 @@ GT.registerScene({
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:710, noLift:true,   // はじめは木の陰（出てくると update で false）
       lines:MARI_FIRST({items:0,itemsAll:3}),          // 実際は話しかける直前に作り直す（下の update）
-      onEnd:()=>{ st.talkedOnce=true;
+      onEnd:()=>{ st.talkedOnce=true; GT.missionHidden=false;
         GT.fillPage('prologue','――少年は、ところどころ欠けた本とともに森で目を覚ました。そして、木の陰にいた少女と出会った。少女は、マリと名乗った。');
         // マリとの会話が、このページの最後のピース。マリのところから本へ飛んでいき、「少女と出会った・マリと名乗った」が埋まる
         const n=mariNpc(); GT.addPagePiece('prologue','opening:mari', n?{x:n.x,y:n.y,w:n.w,h:n.h}:null); } }
