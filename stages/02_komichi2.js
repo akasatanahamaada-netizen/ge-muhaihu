@@ -100,8 +100,10 @@ GT.registerDraw(()=>{ if(!isHere()) return;
 GT.registerDraw(()=>{
   if(!isHere()) return;
   F.air();
-  if(GT.mode!=='play' || tut.step>=STEPS.length) return;
+}, 'overlay');
+GT.registerDraw(()=>{   // 説明は、暗さ・色合いがかからないよう、いちばん手前に
+  if(!isHere() || GT.mode!=='play' || tut.step>=STEPS.length) return;
   const s=STEPS[tut.step];
   GT.drawHint(s.at[0], s.at[1], typeof s.lines==='function'?s.lines():s.lines);
-}, 'overlay');
+}, 'speech');
 })();

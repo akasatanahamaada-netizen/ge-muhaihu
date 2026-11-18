@@ -98,7 +98,7 @@ GT.registerUpdate(()=>{
   if(!isHere() || GT.mode!=='play') return;
   const pl=GT.player;
   if(!mv.ask && pl.onGround && GT.gravity.left===1 && Math.abs(pl.y+pl.h-ROCK_L.y)<2){ mv.ask=true; mariSays([{s:'マリ',c:'mari',t:'本をひっくり返してみて。'}]); return; }
-  if(!mv.told && GT.gravity.left===-1 && pl.onGround){ mv.ask=true; mv.told=true; mariSays([{s:'マリ',c:'mari',t:'驚いた？　それは、重力を変えることができる本なの。'}]); }
+  if(!mv.told && GT.gravity.left===-1 && pl.onGround){ mv.ask=true; mv.told=true; mariSays([{s:'マリ',c:'mari',t:'驚いた？　その本は、重力を変えることができるの。'}]); }
 });
 GT.registerUpdate(()=>{
   if(!isHere()) return;
@@ -118,5 +118,6 @@ GT.registerDraw(()=>{ if(!isHere()) return;
   F.rock(GROUPS.rockL.map(P),3);
   F.rock(GROUPS.rockR.map(P),7);
 }, 'world');
-GT.registerDraw(()=>{ if(!isHere()) return; F.air(); drawTutorial(); }, 'overlay');
+GT.registerDraw(()=>{ if(!isHere()) return; F.air(); }, 'overlay');
+GT.registerDraw(()=>{ if(!isHere()) return; drawTutorial(); }, 'speech');   // 説明は、暗さ・色合いがかからないよう、いちばん手前に
 })();

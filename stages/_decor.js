@@ -505,7 +505,7 @@ function drawRockBright(rs,seed){
 }
 
 /* お話のはじめ（不気味さが小さいうち）は明るい絵本の岩・ちょうちょ、進むとゴシックに。最初の場面は、ゴシックのまま */
-const brightNow=()=>!!(window.GT && GT.moodTarget && GT.scene && GT.moodTarget()<0.45);
+const brightNow=()=>!!(window.GT && GT.moodTarget && GT.scene && GT.moodTarget()<0.05);   // 不気味さ 0 の場面だけ、明るい絵本の岩・ちょうちょ
 function drawRock(rs,seed){ return brightNow() ? drawRockBright(rs,seed) : drawRockGoth(rs,seed); }
 
 /* 苔むした岩（ゴシック：暗い紫がかった石。ひび・石の欠け・上のふちに月あかり・暗い苔・つたと小さな薔薇） */
@@ -531,10 +531,11 @@ function rockPath(rs,pad,seed){
 }
 function drawRockGoth(rs,seed){
   ctx.save();
-  rockPath(rs,2.2,seed); ctx.fillStyle='#140b12'; ctx.fill();                        // 輪郭
+  rockPath(rs,3.4,seed); ctx.fillStyle='rgba(225,210,235,0.55)'; ctx.fill();   // 外がわに うすい月あかりのふち（暗い背景から形が見えるように）
+  rockPath(rs,1.8,seed); ctx.fillStyle='#140b12'; ctx.fill();                        // 輪郭
   rockPath(rs,0,seed);
   const top=Math.min(...rs.map(p=>p.y)), bot=Math.max(...rs.map(p=>p.y+p.h));
-  const g=ctx.createLinearGradient(0,top,0,bot); g.addColorStop(0,'#6a5a68'); g.addColorStop(0.5,'#4a3c4a'); g.addColorStop(1,'#2a2030');
+  const g=ctx.createLinearGradient(0,top,0,bot); g.addColorStop(0,'#8a7a88'); g.addColorStop(0.5,'#64566a'); g.addColorStop(1,'#3e3446');   // 暗い場面でも見えるように、明るめ
   ctx.fillStyle=g; ctx.fill();
   ctx.save(); rockPath(rs,0,seed); ctx.clip();
   for(let i=0;i<46;i++){ const p=rs[i%rs.length], x=p.x+rnd(seed+i)*p.w, y=p.y+12+rnd(seed+i+50)*(p.h-12);   // 石のまだら
@@ -549,7 +550,7 @@ function drawRockGoth(rs,seed){
   for(let i=0;i<6;i++){ const p=rs[i%rs.length], x=p.x+10+rnd(seed+i*3)*(p.w-20), y=p.y+16+rnd(seed+i*5)*(p.h-30);
     ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+7,y+9); ctx.lineTo(x+3,y+18); ctx.moveTo(x+7,y+9); ctx.lineTo(x+14,y+13); ctx.stroke(); }
   // 上のふちの月あかり
-  for(const e of topEdges(rs)){ ctx.strokeStyle='rgba(225,205,240,0.35)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(e.x0+6,e.y+1.5); ctx.lineTo(e.x1-6,e.y+1.5); ctx.stroke(); }
+  for(const e of topEdges(rs)){ ctx.strokeStyle='rgba(235,220,245,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(e.x0+6,e.y+1.5); ctx.lineTo(e.x1-6,e.y+1.5); ctx.stroke(); }
   // 暗い苔（上の面からたれる）
   for(const e of topEdges(rs)){
     ctx.beginPath(); ctx.moveTo(e.x0-2,e.y-2);

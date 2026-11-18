@@ -95,12 +95,12 @@ const S=src=>({src,page:'spread'});
 // m … 不気味さ（0〜1）。大きいほど、絵を暗く・色を抜く（お話が進むほど大きくする）
 const G=(src,m=0.5)=>({src,page:'spread',filter:`brightness(${(0.95-0.45*m).toFixed(2)}) saturate(${(0.8-0.45*m).toFixed(2)}) contrast(1.05) blur(0.8px)`,tint:'rgb(178,172,164)',wash:'rgba(244,240,230,0.06)'});
 const BG_TITLE='assets/background/タイトル背景_森.webp';   // 紫をぬいた版（もとは タイトル背景.webp）   // タイトル画面の背景（道のある、霧の薔薇の森）
-const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
+const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)',filter:'brightness(1.45) saturate(0.8) blur(0.8px)'};   // 暗い森の絵は、明るめにして見やすく   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
-  wake:Object.assign({},DARK,{shade:0.25}),          // 序章（ひとりで目覚める）：暗い森
-  opening:Object.assign({},DARK,{shade:0.2}),        // 序章（マリと出会う）：暗い森
-  afterword:Object.assign({},DARK,{shade:0.2}),      // 第一章のあと：はじめの暗い森にもどる
+  wake:DARK,          // 序章（ひとりで目覚める）：暗い森
+  opening:DARK,        // 序章（マリと出会う）：暗い森
+  afterword:DARK,      // 第一章のあと：はじめの暗い森にもどる
   komichi1:DARK, komichi2:DARK,   // チュートリアルも、序章のゴシックの森
   path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
   house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
@@ -117,8 +117,8 @@ GT.stageBackgrounds = {
 const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
   // ゴシック（暗い森）は、序章（目覚め〜チュートリアル）と、赤ずきんのお話のあと（afterword）だけ
-  wake:0.6, opening:0.5, komichi1:0.5, komichi2:0.5,
-  afterword:0.5,
+  wake:0.3, opening:0.3, komichi1:0.3, komichi2:0.3,   // 暗すぎて見にくくならないように、ひかえめに
+  afterword:0.3,
   // 第一章（赤ずきんのお話）は 0：ゴシックにする前と同じ、明るい絵本の雰囲気（色合いをかけない）
   house_peek:0, path1:0, meet_hood:0, cliff:0, wolf_talk:0, crossroads:0, path2:0, path2b:0, flowers:0, path3:0, path4:0,
   house_front:0, arrive:0, '@boss':0, '@qte':0, ending:0, epilogue:0,

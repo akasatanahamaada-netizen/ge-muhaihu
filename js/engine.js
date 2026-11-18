@@ -1020,7 +1020,7 @@ GT.drawHint=function(cx,cy,lines){
   const pulse=0.5+0.5*Math.sin(performance.now()/420);
   // 枠：赤紫の黒（上ほど少し明るい）、影、くすんだ金の二重のふち、すみのいばら、上のまん中に薔薇
   ctx.save(); ctx.shadowColor='rgba(8,2,6,0.7)'; ctx.shadowBlur=14; ctx.shadowOffsetY=4;
-  roundRect(bx,by,bw,bh,6); const bg=ctx.createLinearGradient(0,by,0,by+bh); bg.addColorStop(0,'rgba(40,32,24,0.94)'); bg.addColorStop(1,'rgba(18,14,10,0.94)');
+  roundRect(bx,by,bw,bh,6); const bg=ctx.createLinearGradient(0,by,0,by+bh); bg.addColorStop(0,'rgba(43,36,24,0.9)'); bg.addColorStop(1,'rgba(43,36,24,0.9)');   // 地の色は、元の茶色（明るい場面の説明の枠と同じ）
   ctx.fillStyle=bg; ctx.fill(); ctx.restore();
   roundRect(bx,by,bw,bh,6); ctx.strokeStyle=`rgba(214,176,118,${0.7+0.25*pulse})`; ctx.lineWidth=1.4; ctx.stroke();
   roundRect(bx+4,by+4,bw-8,bh-8,3); ctx.strokeStyle='rgba(214,176,118,0.35)'; ctx.lineWidth=1; ctx.stroke();

@@ -561,5 +561,6 @@ function drawHill(){}   // 丘の岩は、なくした
 
 GT.registerDraw(()=>{ if(!isOpening()) return; drawLightShafts(); GOTH.back(); GOTH.props(); GOTH.fog(false); }, 'back');
 GT.registerDraw(()=>{ if(!isOpening()) return; drawHill(); drawPages(); drawStump(); GOTH.shrooms(); drawMariTree(); GOTH.lantern(); drawLeaves(); drawMarks(); }, 'world');
-GT.registerDraw(()=>{ if(!isOpening()) return; GOTH.fog(true); GOTH.top(); GOTH.wisps(); GTDecor.forest.air(); drawHiddenGlint(); drawScrapHint(); drawBookView(); drawWake(); }, 'overlay');
+GT.registerDraw(()=>{ if(!isOpening()) return; drawScrapHint(); }, 'speech');   // 説明は、いちばん手前に
+GT.registerDraw(()=>{ if(!isOpening()) return; GOTH.fog(true); GOTH.top(); GOTH.wisps(); GTDecor.forest.air(); drawHiddenGlint(); drawBookView(); drawWake(); }, 'overlay');
 })();
