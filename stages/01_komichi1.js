@@ -101,9 +101,9 @@ GT.registerUpdate(()=>{
   // 背表紙（まん中）に近づいたら：ページごとに重力がちがうことを、マリが説明する
   if(mv.told && !mv.spine && pl.onGround && pl.x+pl.w/2 > GT.SPINE-90 && GT.gravity.left!==GT.gravity.right){ mv.spine=true;
     mariSays([
-      {s:'マリ',c:'mari',t:'待って。左と右のページは別々なの。'},
-      {s:'マリ',c:'mari',t:'本を裏返すと、あなたが立っているページだけ上と下が入れかわる。'},
-      {s:'マリ',c:'mari',t:'まん中をこえたら右のページの重さにしたがうから……落ちないでね。'},
+      {s:'マリ',c:'mari',t:'その先は右のページ。'},
+      {s:'マリ',c:'mari',t:'右のページはまだ裏返してないから、入ると下に落ちるよ。'},
+      {s:'マリ',c:'mari',t:'天井に行きたいなら、右のページでもう一度裏返して。'},
     ]); }
 });
 GT.registerUpdate(()=>{
