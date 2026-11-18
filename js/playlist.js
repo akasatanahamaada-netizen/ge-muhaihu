@@ -136,7 +136,7 @@ const BGM_SAD=M('堕ちる');                    // 悲しい曲（おばあさ�
 GT.sceneMusic = {
   // wake（ひとりで目覚める）と chapter1（章のとびら）は、曲なし（静けさ）
   // opening（マリと出会う）も、曲なし
-  afterword: M('ふしぎな絵本'),              // 第一章のあと：はじめの暗い森で、マリと話す
+  // afterword（最後にマリと話す森の出口）も、曲なし
   // チュートリアル（森の小道①②）は、曲なし
   path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）
   house_peek: M('魔法使いの箱庭'),             // 赤ずきんの家（窓のぞき）
