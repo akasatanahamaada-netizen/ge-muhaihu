@@ -36,6 +36,7 @@ GT.registerScene({
   id:'flowers', type:'play', stage:'flowers', clear:'exit',
   label:'第一章 ── お花畑',
   dynamic:'detourOnly',     // 遠回りのときだけ遊ぶ（07_crossroads.js）
+  companion:'hood',         // 赤ずきんが、うしろからついてくる
   intro:[
     {s:'',c:'narr',t:'いつもの道を少し行くと、色とりどりの花が咲く野原に出た。'},
     {s:'赤ずきん',c:'hood',f:'smile',t:'わあ、きれい！　おばあちゃんに、お花を摘んでいってあげよう！'},
@@ -58,4 +59,26 @@ GT.registerDraw(()=>{ if(!isHere()) return;
 }, 'back');
 GT.registerDraw(()=>{ if(!isHere()) return; F.log(P(0),4); F.log(P(1),8); }, 'world');
 GT.registerDraw(()=>{ if(!isHere()) return; F.air(); }, 'overlay');
+
+/* 赤ずきんのひとこと（お花を摘むたび）。高いところ・天井の花は、ちがうことを言う */
+const SAY_FLOOR=['きれい！　いいにおい……','おばあちゃん、よろこぶかな','この色、すき！','あっちにも咲いてるよ！'];
+const SAY_HIGH=['そんな高いところの、よく取れたね！','わあ、さかさまで摘んでる……！','すごい、天井のお花まで！'];
+const fl={ got:0, n:0, done:false };
+GT.registerSceneReset(()=>{ if(isHere()){ fl.got=-1; fl.n=0; fl.done=false; } });   // 数は、ステージを読みこんだあとの最初の update で数える
+GT.registerUpdate(()=>{
+  if(!isHere()) return;
+  const c=GT.getCompanion&&GT.getCompanion(), got=GT.items.filter(i=>i.got);
+  if(fl.got<0){ fl.got=got.length; fl.done=GT.items.length>0 && got.length>=GT.items.length; return; }
+  if(got.length>fl.got){
+    const it=got.sort((a,b)=>a.gotT-b.gotT)[0], high=it.y<300;
+    fl.got=got.length;
+    if(c){ const all=got.length>=GT.items.length;
+      const text= all ? 'これで花束ができた！　ありがとう！' : (high?SAY_HIGH:SAY_FLOOR)[(fl.n++)%(high?SAY_HIGH.length:SAY_FLOOR.length)];
+      c.speech={text, t:2.8}; }
+  }
+  if(!fl.done && GT.items.length && got.length>=GT.items.length){   // お花をぜんぶ摘むと、お話のかけら（赤ずきんのところから本へ）
+    fl.done=true; const r=c||GT.player;
+    setTimeout(()=>GT.addPagePiece('wolf','wolf:road',{x:r.x,y:r.y,w:r.w,h:r.h}),700);
+  }
+});
 })();

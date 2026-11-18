@@ -6,6 +6,12 @@
    ========================================================================== */
 
 /* stages/XX_path2.js  ── ステージエディタで作成 */
+(function(){
+  const isP2=()=>GT.scene&&GT.scene.id==='path2'; let given=false;
+  GT.registerSceneReset(()=>{ if(isP2()) given=false; });
+  GT.registerUpdate(()=>{ if(!isP2()||given||!GT.enemies.length||GT.enemies.some(e=>e.alive)) return;
+    given=true; const e=GT.enemies[GT.enemies.length-1]; GT.addPagePiece('wolf','wolf:road',{x:e.x,y:e.y-10,w:e.w,h:e.h}); });   // 狼の手下を全部倒すと、お話のかけら（遠回りの「お花を全部摘む」と同じかけら）
+})();
 GT.defineStage('path2', {
   // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「wolf」のページが埋まっていく
   items:[

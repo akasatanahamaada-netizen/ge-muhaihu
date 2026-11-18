@@ -40,7 +40,7 @@ GT.definePages([
    extraPieces:[{id:'meet:story', reveal:'赤い頭巾の少女と出会い、道連れになった。'}]},   // 赤ずきんと話したあと
   {key:'wolf',     chapter:'第一章', title:'森で出会った狼',
    base:'――狼は、脇道へ消えていった。',
-   extraPieces:[{id:'wolf:story'}]},   // 狼と話したあと
+   extraPieces:[{id:'wolf:story'},{id:'wolf:road'}]},   // 狼と話したあと／近道で狼の手下を全部倒す・遠回りでお花を全部摘む（どちらでも同じかけら）
   {key:'front',    chapter:'第一章', title:'おばあさんの家の前',
    base:'――赤ずきんは掛け金を引き、おばあさんの家へ入っていった。',
    extraPieces:[{id:'front:story'}]},   // 家の前で、決めたあと

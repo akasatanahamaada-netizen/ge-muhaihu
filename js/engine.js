@@ -277,7 +277,9 @@ let missionFlash=0;                  // 「ミッション達成！」の表示�
 let flipping=false, flipT=0, flipSwapped=false;
 let pageNo=1;                        // 何ページ目まで進んだか
 let storyStage=false, npcs=[], activeNpc=null, storyTalking=false;
-let storyExitReady=false;            // 話し終えて、右端へ歩けば次へ進める状態か
+let storyExitReady=false;
+let companion=null;                  // いっしょに歩く人（play のステージで少年についてくる。scene.companion で決める）
+GT.getCompanion=()=>companion;            // 話し終えて、右端へ歩けば次へ進める状態か
 const flashPage={left:0,right:0};
 const keys={};
 
@@ -286,7 +288,7 @@ GT.loadStageDef = function(def, opt){
   opt=opt||{};
   def=def||{};
   exitWanted=!!opt.exit; stageExit=false;
-  storyStage=false; npcs=[]; activeNpc=null; storyTalking=false; storyExitReady=false;
+  storyStage=false; npcs=[]; activeNpc=null; storyTalking=false; storyExitReady=false; companion=null;
   GT.gravity={left:1,right:1};
   GT.platforms = edges.concat((def.platforms||[]).map(p=>({...p})));   // 右端の壁は updateExitGate が外す
   GT.boxes = (def.boxes||[]).map(b=>({x:b.x,y:b.y,w:b.w,h:b.h,vx:0,vy:0,onGround:false,squash:1}));
@@ -465,6 +467,8 @@ function startScene(idx){
     beginDialogue(scene.lines||[], scene.choices, ()=>{ if(scene.onEnd) scene.onEnd(); advanceScene(); });
   } else if(scene.type==='play'){
     GT.loadStageDef(GT.STAGE_DEFS[scene.stage], {exit: scene.clear==='exit'});
+    const cw=typeof scene.companion==='function'?scene.companion(GT.flags):scene.companion;
+    if(cw){ const pl=GT.player; companion={who:cw, name:cw==='hood'?'赤ずきん':cw, page:'left', x:Math.max(EDGE,pl.x-40), w:32, h:40, y:H-EDGE-40, vy:0, g:1, talkable:false, onGround:true}; }   // うしろから ついてくる
     setHudStage((scene.label||'')+'　·　p.'+pageNo);
     if(scene.intro){ GT.mode='idle'; beginDialogue(Array.isArray(scene.intro)?scene.intro:[scene.intro],null,()=>{ hideDialogue(); GT.mode='play'; }); }   // 何行でも書ける
     else { GT.mode='play'; }
@@ -1118,6 +1122,13 @@ function update(dt){
     const before=n.g; GT.fallBody(n,dt);
     if(before!==n.g && n.x>-100) GT.grumble(n,n.who);          // 逆さにされた（何回もされると怒る）
     if(n.speech){ n.speech.t-=dt; if(n.speech.t<=0) n.speech=null; } }
+  if(companion){ const c=companion, before=c.g; GT.fallBody(c,dt);
+    if(before!==c.g) { const sp=GT.grumble(c,c.who); }                  // 逆さにされた（何回もされると怒る）
+    if(c.speech){ c.speech.t-=dt; if(c.speech.t<=0) c.speech=null; }
+    if(GT.physicsModes.has(GT.mode) && !flipping){
+      const pl=player, back=pl.facing>=0?-38:38, target=pl.x+back;
+      if(Math.abs(c.x-pl.x)>380 && pl.onGround){ c.x=Math.max(EDGE,Math.min(W-EDGE-c.w,pl.x+back)); c.y=pl.y+pl.h-c.h; c.vy=0; }   // はなれすぎたら、そばへ
+      else if(Math.abs(target-c.x)>22) GT.npcStep(c,target,175,dt); } }
   if(modeUpdaters[GT.mode]){ modeUpdaters[GT.mode](dt); return; }
   if(!GT.physicsModes.has(GT.mode)) return;
   if(storyTalking) return;
@@ -1518,7 +1529,8 @@ function drawItem(it){
       if(it.gotT<0.35){ const k=it.gotT/0.35;                        // 拾った瞬間、ぱっと光の輪（かけらは本のボタンへ飛んでいく）
         ctx.save(); ctx.globalAlpha=1-k; ctx.strokeStyle='#ffe9a0'; ctx.lineWidth=2;
         ctx.beginPath(); ctx.arc(sx,sy,sw*0.5*(1+k*1.4),0,Math.PI*2); ctx.stroke(); ctx.restore(); }
-      const a=Math.min(1,(1.3-it.gotT)/0.4);                       // 拾った場所に「お話のかけら ＋1」
+      return;                                                       // 「お話のかけら ＋1」の文字は出さない
+      const a=Math.min(1,(1.3-it.gotT)/0.4);
       ctx.save(); ctx.globalAlpha=Math.max(0,a); ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.font="700 14px 'Zen Old Mincho',serif"; const txt=itemLabel+' ＋1', ty2=sy-62-it.gotT*24;   // 少年の頭より上に出す
       ctx.lineWidth=4; ctx.strokeStyle='rgba(43,36,24,0.75)'; ctx.strokeText(txt,sx,ty2);
@@ -1790,6 +1802,7 @@ function render(){
   for(const box of GT.boxes) drawBox(box);
   for(const en of GT.enemies) drawEnemy(en);
   if(storyStage) for(const n of npcs) drawNpc(n);
+  if(companion) drawNpc(companion);
   for(const it of GT.items) drawItem(it);
   if(missionReq && exitWanted && !stageExit) drawExitGate();
   if((storyStage||missionReq) && stageExit && !flipping && !storyTalking){
@@ -1870,6 +1883,7 @@ function liftCharacters(){
   if((gradeK==null || gradeK<0.02) && !(dimNow>0)) return;
   ctx.save(); ctx.globalAlpha=dimNow>0?1:Math.min(1,gradeK);
   if(storyStage) for(const n of npcs){ if(n.noLift || n.x<-100 || n.x>W+100) continue; drawNpc(n); }
+  if(companion) drawNpc(companion);
   const pl=GT.player, inSwamp=(GT.swamps||[]).some(s=>GT.rectsOverlap&&GT.rectsOverlap(pl,s));
   for(const en of GT.enemies) drawEnemy(en);   // 敵も、暗さに沈まないように
   if(!inSwamp && !gameOver) drawPlayer();
