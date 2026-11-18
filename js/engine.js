@@ -602,12 +602,13 @@ function setupNpcs(defs){
 }
 // 人物のほうから話しかけてくる（近づかなくても、その人との会話を始める）。話し終えたあとの扱いは tryTalk と同じ
 GT.talkTo=(n)=>{ if(!n) return; activeNpc=n; tryTalk(); };
+let talkCooldown=0;   // 会話が終わった直後は、同じキー・タップでまた話しかけないように、少し待つ
 function tryTalk(){
-  if(!storyStage || storyTalking || flipping) return;
+  if(!storyStage || storyTalking || flipping || performance.now()<talkCooldown) return;
   const n=activeNpc; if(!n || !n.lines) return;
   storyTalking=true; GT.player.vx=0;
   beginDialogue(n.lines, n.choices, ()=>{
-    storyTalking=false; hideDialogue();
+    storyTalking=false; hideDialogue(); talkCooldown=performance.now()+450;
     if(n.onEnd) n.onEnd();
     n.talked=true; n.talkedOnce=true;
     // 自動ではめくらない。右端まで自分で歩いたら次ページへ。（noExit の人と話しても、右端は開かない）

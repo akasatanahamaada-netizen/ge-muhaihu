@@ -130,7 +130,7 @@ GT.registerScene({
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:710, noLift:true,   // はじめは木の陰（出てくると update で false）
       lines:MARI_FIRST({items:0,itemsAll:3}),          // 実際は話しかける直前に作り直す（下の update）
-      onEnd:()=>{ st.talkedOnce=true; GT.missionHidden=false;
+      onEnd:()=>{ st.talkedOnce=true; GT.missionHidden=false; { const m=mariNpc(); if(m){ m.lines=MARI_AGAIN(GT.missionCount(), !GT.items[HIDDEN_ITEM].got); } }
         GT.fillPage('prologue','――少年は、ところどころ欠けた本とともに森で目を覚ました。そして、木の陰にいた少女と出会った。少女は、マリと名乗った。');
         // マリとの会話が、このページの最後のピース。マリのところから本へ飛んでいき、「少女と出会った・マリと名乗った」が埋まる
         const n=mariNpc(); GT.addPagePiece('prologue','opening:mari', n?{x:n.x,y:n.y,w:n.w,h:n.h}:null); } }
