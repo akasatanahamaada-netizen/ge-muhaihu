@@ -511,6 +511,7 @@ const GOTH=(()=>{
   let backCv=null, topCv=null, bigCv=null, propCv=null;
   const mk=()=>{ const cv=document.createElement('canvas'); cv.width=W; cv.height=H; return cv; };
   return {
+    paint:{R,branch,rose,vine,tree,farTrees,fence,stone,roseBush},   // ほかのステージでも使う（赤ずきんの家など）
     back(){ if(!backCv){ backCv=mk(); const c=backCv.getContext('2d');
         farTrees(c);
         tree(c,64,FLOOR+6,340,11,10); tree(c,252,FLOOR+6,300,23,-12); tree(c,468,FLOOR+6,286,37,14);
@@ -563,6 +564,7 @@ const GOTH=(()=>{
       ctx.restore(); },
   };
 })();
+GT.goth=GOTH;   // ゴシックの森の描き方を、ほかのステージにも貸す
 
 function drawHill(){
   const P=i=>GT.STAGE_DEFS.opening.platforms[i];
