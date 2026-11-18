@@ -121,7 +121,7 @@ function MARI_AGAIN(c, hiddenLeft){
   ];
   if(hiddenLeft) return [
     {s:'マリ',c:'mari',t:`あと ${rest}つ。`},
-    {s:'マリ',c:'mari',t:'あなたが倒れてたところ、ちゃんと見た？　葉っぱの陰とか。'},
+    {s:'マリ',c:'mari',t:'足もと、ちゃんと見た？　左のはしの、葉っぱの陰とか。'},
   ];
   return [
     {s:'マリ',c:'mari',t:`あと ${rest}つ。`},
