@@ -47,22 +47,44 @@ function drawCard(){
   ctx.globalAlpha=Math.min(1,t/0.6);                                   // 本が、暗やみから浮かびあがる
   ctx.translate(cx,cy); ctx.scale(zoom,zoom);
   const PW=230, PH=300, o=ease((t-T_OPEN0)/(T_OPEN1-T_OPEN0));
-  // 本の土台（ひらくほど、左がわが広がる）
-  const leftW=PW*o;
-  ctx.fillStyle='#2a170f'; roundRect(-leftW-8,-PH/2-8,leftW+PW+16,PH+16,6); ctx.fill();   // 革の表紙（うら）
-  ctx.strokeStyle='rgba(201,164,90,0.7)'; ctx.lineWidth=1.4; roundRect(-leftW-4,-PH/2-4,leftW+PW+8,PH+8,4); ctx.stroke();
-  // 右のページ（紙）
+  const c=Math.cos(Math.PI*o);                 // 表紙の向き（1：閉じている → -1：左へ開ききる）
+  const lw= c<0 ? PW*(-c) : 0;                 // 左がわに開いている幅
+  ctx.translate(-PW/2*(1-o),0);                // 閉じているあいだも、本がまん中に来るように（開くにつれて背がまん中へ）
+  // 本の土台（うらの革）：右はいつも、左は開いたぶんだけ
+  ctx.fillStyle='#2a170f'; roundRect(-lw-8,-PH/2-8,lw+PW+16,PH+16,6); ctx.fill();
+  ctx.strokeStyle='rgba(201,164,90,0.7)'; ctx.lineWidth=1.4; roundRect(-lw-4,-PH/2-4,lw+PW+8,PH+8,4); ctx.stroke();
+  // 右のページ（紙のたば。右のふちに、ページの重なり）
   paper(0,-PH/2,PW,PH,1);
-  // 左のページ（ひらいたぶんだけ）
-  if(o>0.5) paper(-PW*((o-0.5)*2),-PH/2,PW*((o-0.5)*2),PH,-1);
-  // めくれていく表紙：前半は右がわで細くなり、後半は左がわのページになる
-  if(o<1){ const c=Math.cos(Math.PI*o);
-    if(c>0){ const w=PW*c; ctx.fillStyle='#3a2116'; roundRect(0,-PH/2-6,w+6,PH+12,5); ctx.fill();
-      ctx.strokeStyle='rgba(201,164,90,0.85)'; ctx.lineWidth=1.2; roundRect(6,-PH/2+4,Math.max(0,w-8),PH-8,3); ctx.stroke();
-      if(w>60){ ctx.fillStyle='rgba(201,164,90,0.85)'; ctx.font="600 13px 'Cormorant Garamond',serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.save(); ctx.translate(w/2+3,0); ctx.scale(c,1); ctx.fillText('GRAVITY TALES',0,0); ctx.restore(); } } }
+  ctx.strokeStyle='rgba(150,120,80,0.35)'; ctx.lineWidth=0.8;
+  for(let k=1;k<=3;k++){ ctx.beginPath(); ctx.moveTo(PW+k*1.6,-PH/2+3); ctx.lineTo(PW+k*1.6,PH/2-3); ctx.stroke(); }
+  // 開きかけの表紙が、右のページに落とす影
+  if(o>0 && o<1){ const a=0.35*(1-Math.abs(c)), sw=40+60*(1-Math.abs(c));
+    const sg=ctx.createLinearGradient(0,0,sw,0); sg.addColorStop(0,`rgba(40,24,12,${a})`); sg.addColorStop(1,'rgba(40,24,12,0)');
+    ctx.fillStyle=sg; ctx.fillRect(0,-PH/2,sw,PH); }
+  // 左のページ（開ききったあと）
+  if(o>=1) paper(-PW,-PH/2,PW,PH,-1);
+  // めくれていく表紙（背を軸にまわる）：手前に来るほど、はしが少し大きく見える
+  if(o<1){ const w=PW*Math.abs(c), k=(1-Math.abs(c))*14, dir=c>=0?1:-1;
+    const x2=dir*w;
+    ctx.beginPath(); ctx.moveTo(0,-PH/2-6); ctx.lineTo(x2,-PH/2-6-k); ctx.lineTo(x2,PH/2+6+k); ctx.lineTo(0,PH/2+6); ctx.closePath();
+    if(c>=0){                                   // 表がわ：革の表紙
+      const g=ctx.createLinearGradient(0,0,x2,0); g.addColorStop(0,'#2e1a11'); g.addColorStop(1,'#4a2c1c');
+      ctx.fillStyle=g; ctx.fill();
+      ctx.save(); ctx.clip();
+      ctx.strokeStyle='rgba(201,164,90,0.85)'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(6,-PH/2+4); ctx.lineTo(x2-6*Math.sign(x2||1),-PH/2+4-k*0.8); ctx.lineTo(x2-6*Math.sign(x2||1),PH/2-4+k*0.8); ctx.lineTo(6,PH/2-4); ctx.closePath(); ctx.stroke();
+      if(w>70){ ctx.fillStyle='rgba(201,164,90,0.9)'; ctx.font="600 14px 'Cormorant Garamond',serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.save(); ctx.translate(w/2,0); ctx.scale(Math.abs(c),1+k/PH); ctx.fillText('GRAVITY TALES',0,0); ctx.restore(); }
+      ctx.restore();
+    } else {                                    // うらがわ：見返しの紙（左のページになっていく）
+      const g=ctx.createLinearGradient(0,0,x2,0); g.addColorStop(0,'#cdbf9f'); g.addColorStop(0.15,'#ece0c6'); g.addColorStop(1,'#f2e8d2');
+      ctx.fillStyle=g; ctx.fill();
+      ctx.fillStyle=`rgba(60,40,20,${0.25*(1-Math.abs(c))})`; ctx.fill();   // まだ立っているあいだは、少しかげる
+    }
+    ctx.strokeStyle='rgba(40,24,12,0.5)'; ctx.lineWidth=1; ctx.stroke();
+  }
   // のどの影
-  if(o>0.5){ g=ctx.createLinearGradient(-14,0,14,0); g.addColorStop(0,'rgba(60,40,20,0)'); g.addColorStop(0.5,'rgba(60,40,20,0.35)'); g.addColorStop(1,'rgba(60,40,20,0)');
+  if(o>=1){ g=ctx.createLinearGradient(-14,0,14,0); g.addColorStop(0,'rgba(60,40,20,0)'); g.addColorStop(0.5,'rgba(60,40,20,0.35)'); g.addColorStop(1,'rgba(60,40,20,0)');
     ctx.fillStyle=g; ctx.fillRect(-14,-PH/2,28,PH); }
   // 文字：インクがにじむように、ゆっくり出る
   const k1=ease((t-T_TEXT)/0.9), k2=ease((t-T_TEXT-0.6)/1.2);
