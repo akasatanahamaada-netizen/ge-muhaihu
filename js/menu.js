@@ -210,7 +210,7 @@ menu.innerHTML=`
       <button class="gtm-btn gtm-back" data-act="back">← Back</button>
     </div>
   </div>
-  <div class="gtm-foot">本を裏返すと、世界の重力が反転する</div>`;
+  <div class="gtm-foot"></div>`;   // （「本を裏返すと、世界の重力が反転する」は出さない）
 wrap.appendChild(menu);
 
 /* はじめの画面：タップかキーで はじめる（ブラウザは、操作があるまで音を出せないため。その操作でタイトルの曲が流れはじめる） */
