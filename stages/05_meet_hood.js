@@ -97,7 +97,7 @@ GT.registerScene({
     // 最後に話しかける相手。ふだんは画面の外にしまっておき、向こう岸で待っているときだけ出す。
     // （x は、エディタのクリア判定用に向こう岸の位置にしてある）
     { who:'hood', name:'赤ずきん', page:'right', x:800, lines:AFTER, choices:AFTER_CHOICES,
-      onEnd:()=>{ st.phase='done'; GT.fillPage('meet','――赤い頭巾の少女と出会い、道連れになった。少年が本を裏返すと、少女も一緒に、水たまりの上を越えた。'); } },
+      onEnd:()=>{ st.phase='done'; GT.storyPiece&&GT.storyPiece('meet','meet:story','hood'); GT.fillPage('meet','――赤い頭巾の少女と出会い、道連れになった。少年が本を裏返すと、少女も一緒に、水たまりの上を越えた。'); } },
   ],
 });
 

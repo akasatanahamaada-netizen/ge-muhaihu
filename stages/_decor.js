@@ -509,14 +509,34 @@ const brightNow=()=>!!(window.GT && GT.moodTarget && GT.scene && GT.moodTarget()
 function drawRock(rs,seed){ return brightNow() ? drawRockBright(rs,seed) : drawRockGoth(rs,seed); }
 
 /* 苔むした岩（ゴシック：暗い紫がかった石。ひび・石の欠け・上のふちに月あかり・暗い苔・つたと小さな薔薇） */
+/* 岩の形（ゴシック）：四角ではなく、角を大きく丸め、横と下のふちを でこぼこにした石の形。上の面は乗れるように、ほぼ平ら */
+function rockPath(rs,pad,seed){
+  ctx.beginPath();
+  for(const p of rs){
+    const x0=p.x-pad, y0=p.y-pad, x1=p.x+p.w+pad, y1=p.y+p.h+pad, rad=Math.min(24,p.w*0.38,p.h*0.42), pts=[];
+    const J=(k,a)=>(rnd(seed+k+p.x*0.37+p.y*0.11)-0.5)*a;
+    for(let x=x0+rad;x<x1-rad;x+=14) pts.push([x, y0+J(x,1.6)]);                                   // 上（ほぼ平ら）
+    for(let k=0;k<=4;k++){ const a=-Math.PI/2+k/4*Math.PI/2; pts.push([x1-rad+Math.cos(a)*rad+J(k+90,3), y0+rad+Math.sin(a)*rad+J(k+91,3)]); }   // 右上の角
+    for(let y=y0+rad+12;y<y1-rad;y+=13) pts.push([x1+J(y+7,7)+2, y]);                               // 右（でこぼこ）
+    for(let k=0;k<=4;k++){ const a=k/4*Math.PI/2; pts.push([x1-rad+Math.cos(a)*rad+J(k+50,4), y1-rad+Math.sin(a)*rad+J(k+51,4)]); }       // 右下
+    for(let x=x1-rad-12;x>x0+rad;x-=15) pts.push([x, y1+J(x+3,5)+1.5]);                            // 下
+    for(let k=0;k<=4;k++){ const a=Math.PI/2+k/4*Math.PI/2; pts.push([x0+rad+Math.cos(a)*rad+J(k+70,4), y1-rad+Math.sin(a)*rad+J(k+71,4)]); }  // 左下
+    for(let y=y1-rad-12;y>y0+rad;y-=13) pts.push([x0+J(y+11,7)-2, y]);                              // 左（でこぼこ）
+    for(let k=0;k<=4;k++){ const a=Math.PI+k/4*Math.PI/2; pts.push([x0+rad+Math.cos(a)*rad+J(k+30,3), y0+rad+Math.sin(a)*rad+J(k+31,3)]); }   // 左上
+    const n=pts.length, mid=i=>[(pts[i][0]+pts[(i+1)%n][0])/2,(pts[i][1]+pts[(i+1)%n][1])/2];
+    let m=mid(n-1); ctx.moveTo(m[0],m[1]);
+    for(let i=0;i<n;i++){ const q=mid(i); ctx.quadraticCurveTo(pts[i][0],pts[i][1],q[0],q[1]); }   // なめらかにつなぐ
+    ctx.closePath();
+  }
+}
 function drawRockGoth(rs,seed){
   ctx.save();
-  rectsPath(rs,1.8,12); ctx.fillStyle='#140b12'; ctx.fill();                        // 輪郭
-  rectsPath(rs,0,11);
+  rockPath(rs,2.2,seed); ctx.fillStyle='#140b12'; ctx.fill();                        // 輪郭
+  rockPath(rs,0,seed);
   const top=Math.min(...rs.map(p=>p.y)), bot=Math.max(...rs.map(p=>p.y+p.h));
   const g=ctx.createLinearGradient(0,top,0,bot); g.addColorStop(0,'#6a5a68'); g.addColorStop(0.5,'#4a3c4a'); g.addColorStop(1,'#2a2030');
   ctx.fillStyle=g; ctx.fill();
-  ctx.save(); rectsPath(rs,0,11); ctx.clip();
+  ctx.save(); rockPath(rs,0,seed); ctx.clip();
   for(let i=0;i<46;i++){ const p=rs[i%rs.length], x=p.x+rnd(seed+i)*p.w, y=p.y+12+rnd(seed+i+50)*(p.h-12);   // 石のまだら
     ell(x,y,3+rnd(seed+i+9)*7,2+rnd(seed+i+7)*3.5,i%3?'rgba(20,10,18,0.22)':'rgba(220,200,230,0.10)'); }
   for(const p of rs){ for(let i=0;i<Math.max(1,p.w/50);i++){                                                     // 石の欠け（角ばった明るい面）
@@ -548,7 +568,7 @@ function drawRockGoth(rs,seed){
   // 草（上の面の上）
   for(const e of topEdges(rs)) for(let x=e.x0+2;x<e.x1-14;x+=16+rnd(seed+x)*10){ const h=8+rnd(seed+x)*7, w=12+rnd(seed+x+2)*12;
     if(rnd(seed+x+5)<0.25) continue;
-    api.paint.grass(ctx, Math.round(x), Math.round(e.y-h+2), Math.round(Math.min(w,e.x1-x)), Math.round(h), Math.round(seed*31+x), {flowers:false}); }
+    ctx.save(); ctx.filter='saturate(0.45) brightness(0.6)'; api.paint.grass(ctx, Math.round(x), Math.round(e.y-h+2), Math.round(Math.min(w,e.x1-x)), Math.round(h), Math.round(seed*31+x), {flowers:false}); ctx.restore(); }   // 草も暗く
   ctx.restore();
 }
 
@@ -655,6 +675,7 @@ function drawVineBase(p){
 /* 床の花・きのこ・木漏れ日 */
 function drawGround(o){
   o=o||{};
+  if(!brightNow()) return drawGroundGoth(o);
   ctx.save();
   const t=performance.now()/1000;
   ctx.globalCompositeOperation='lighter';
@@ -668,6 +689,22 @@ function drawGround(o){
     ctx.fillStyle='#efe6d2'; ctx.fillRect(x-2*s,FLOOR-8*s,4*s,8*s);
     ctx.beginPath(); ctx.arc(x,FLOOR-8*s,7*s,Math.PI,0); ctx.fillStyle='#b8423f'; ctx.fill();
     ell(x-3*s,FLOOR-11*s,1.4*s,1.4*s,'#f6eed8'); ell(x+2*s,FLOOR-13*s,1.2*s,1.2*s,'#f6eed8'); }
+  ctx.restore();
+}
+
+function drawGroundGoth(o){
+  const t=performance.now()/1000;
+  ctx.save();
+  for(const [x,k] of (o.flowers||[])){                                            // 暗い草むら。ときどき小さな薔薇
+    ctx.save(); ctx.filter='saturate(0.4) brightness(0.55)'; api.paint.grass(ctx, x-10, FLOOR-13, 20, 13, x*13+k, {flowers:false}); ctx.restore();
+    if(k%2===0 && GT.goth) GT.goth.paint.rose(ctx, x+3, FLOOR-9, 3.2); }
+  for(const [x,s] of (o.mushrooms||[])){                                           // 青白く光る、小さなきのこ
+    const a=0.55+0.25*Math.sin(t*1.6+x);
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    const g=ctx.createRadialGradient(x,FLOOR-7*s,0,x,FLOOR-7*s,18*s); g.addColorStop(0,`rgba(170,220,255,${0.3*a})`); g.addColorStop(1,'rgba(170,220,255,0)');
+    ctx.fillStyle=g; ctx.fillRect(x-20*s,FLOOR-27*s,40*s,40*s); ctx.restore();
+    ctx.fillStyle='#cfd4e6'; ctx.fillRect(x-1.4*s,FLOOR-7*s,2.8*s,7*s);
+    ctx.beginPath(); ctx.ellipse(x,FLOOR-7*s,6*s,4*s,0,Math.PI,0); ctx.fillStyle=`rgba(190,225,255,${0.7+0.25*a})`; ctx.fill(); }
   ctx.restore();
 }
 
@@ -735,7 +772,10 @@ if(window.GT && GT.registerDraw){
   function drawLayer(layer){
     const sc=GT.scene; if(!sc||!sc.stage) return;
     const def=GT.STAGE_DEFS[sc.stage]; if(!def||!def.decor) return;
+    const dim = GT.isBright && !GT.isBright();                                  // ゴシックの場面では、草や葉の飾りを暗く・色をおさえる（ポップになりすぎないように）
+    if(dim){ GT.ctx.save(); GT.ctx.filter='saturate(0.4) brightness(0.55)'; }
     for(const d of def.decor){ if((d.layer||'back')===layer) api.draw(GT.ctx,d.kind,d.x,d.y,d.w,d.h); }
+    if(dim) GT.ctx.restore();
   }
   GT.registerDraw(()=>drawLayer('back'),  'back');     // 地形より奥
   GT.registerDraw(()=>drawLayer('front'), 'overlay');  // プレイヤーより手前

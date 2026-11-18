@@ -141,12 +141,12 @@ GT.registerScene({
   npcs:[
     // 遠回りのときだけ：赤ずきん（話しかけると戸を叩く）
     { who:'hood', name:'赤ずきん', page:'left', x:-300, lines:KNOCK, choices:KNOCK_CHOICES,
-      onEnd:()=>{ st.talked=true; GT.fillPage('front', GT.flags.stoppedAtDoor
+      onEnd:()=>{ st.talked=true; GT.storyPiece&&GT.storyPiece('front','front:story','hood'); GT.fillPage('front', GT.flags.stoppedAtDoor
         ? '――戸の向こうの声は、おばあさんのものではなかった。少年は、赤ずきんを止めた。'
         : '――赤ずきんは掛け金を引き、おばあさんの家へ入っていった。'); } },
     // 近道のときだけ：マリ
     { who:'mari', name:'マリ', page:'left', x:-300, lines:MARI_LINES,
-      onEnd:()=>{ st.talked=true; GT.fillPage('front','――少年は、ひとりでおばあさんの家にたどり着いた。戸の向こうから、物音がしていた。'); } },
+      onEnd:()=>{ st.talked=true; GT.storyPiece&&GT.storyPiece('front','front:story','hood'); GT.fillPage('front','――少年は、ひとりでおばあさんの家にたどり着いた。戸の向こうから、物音がしていた。'); } },
   ],
 });
 

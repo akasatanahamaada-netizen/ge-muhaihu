@@ -97,7 +97,7 @@ GT.registerScene({
     { who:'mari', name:'マリ', page:'right', x:596, lines:[   // 窓（667〜755）と薪の山（648〜）より左に立っている
       {s:'マリ',c:'mari',t:'見えた？　これがこのお話のはじまり。'},
       {s:'マリ',c:'mari',t:'あの子を追いかけて。……この先あなたの本に書かれることになるから。'},
-    ], onEnd:()=>{ GT.fillPage('window','――窓の向こうで、母親が赤ずきんにお使いを頼んでいた。カスタードとバターの小瓶を、おばあさんのもとへ。'); } },
+    ], onEnd:()=>{ GT.storyPiece&&GT.storyPiece('window','window:story','mari'); GT.fillPage('window','――窓の向こうで、母親が赤ずきんにお使いを頼んでいた。カスタードとバターの小瓶を、おばあさんのもとへ。'); } },
     // 戸口から駆けだしていく赤ずきん（はじめは画面の外。act:'house-hood-run' で動く）
     { who:'hood', name:'赤ずきん', page:'right', x:-300 },
   ],

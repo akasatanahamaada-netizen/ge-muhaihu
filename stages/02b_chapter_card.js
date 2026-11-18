@@ -31,7 +31,7 @@ function drawCard(){
   if(!isCard() || !card.t0) return;
   const t=(performance.now()-card.t0)/1000;
   if(t>=T_END && !card.flipped){ card.flipped=true; GT.startPageFlip(); }   // めくって、赤ずきんの家へ
-  if(t>=T_OPEN0 && !card.sfx){ card.sfx=true; GT.sfx&&GT.sfx('flip'); }
+  if(t>=T_OPEN0 && !card.sfx){ card.sfx=true; GT.sfx&&GT.sfx('page'); }   // 本がひらく音
   const chap=(GT.chapters||[])[card.ch]||{name:'第一章',sub:'赤い頭巾'};
   const cx=W/2, cy=H/2+6, zoom=1+0.1*ease((t-0.2)/5.5);
   ctx.save();

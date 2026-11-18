@@ -362,7 +362,7 @@ GT.registerDynamic('result', ()=>{
   ending.summary = hoodLine+'　／　'+grannyLine;
 
   const after = typeof AFTER[ending.kind]==='function' ? AFTER[ending.kind](flags) : AFTER[ending.kind];
-  GT.beginDialogue(after.concat([BOOK_GLOW[ending.kind]]),null,()=>{ GT.hideDialogue(); GT.startPageFlip(); });   // ページをめくって、外の場面へ
+  GT.beginDialogue(after.concat([BOOK_GLOW[ending.kind]]),null,()=>{ GT.hideDialogue(); GT.storyPiece&&GT.storyPiece('granny','granny:story'); setTimeout(()=>GT.startPageFlip(),1300); });   // かけらが本へ飛んでから、ページをめくって外の場面へ
 });
 
 /* ---- 外の場面（epilogue）：少年が歩いて、自分で話しかける ---- */

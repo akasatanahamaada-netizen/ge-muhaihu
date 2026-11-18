@@ -482,6 +482,8 @@ function startScene(idx){
 }
 function advanceScene(){ startScene(GT.sceneIndex+1); }
 function injectSceneAfterCurrent(sc){ GT.SCENES.splice(GT.sceneIndex+1,0,sc); }
+GT.storyPiece=(key,id,who)=>{ const n=who&&npcs.find(m=>m.who===who), ok=n&&n.x>-40&&n.x<W+40, r=ok?n:GT.player;
+  GT.addPagePiece(key,id,{x:r.x,y:r.y,w:r.w,h:r.h}); };   // 大事な会話のあと・敵を倒したあと：お話のかけらが光の玉になって本へ
 GT.openStoryExit=()=>{ exitWanted=true; storyExitReady=true; updateExitGate(); };   // 話しかけなくても、右の端を開く
 GT.startScene=startScene; GT.advanceScene=advanceScene; GT.injectSceneAfterCurrent=injectSceneAfterCurrent;
 GT.getPageNo=()=>pageNo;

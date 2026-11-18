@@ -117,7 +117,7 @@ GT.registerScene({
         {s:'',c:'narr',t:'少年は口をつぐんだ。赤ずきんは、鼻歌まじりに歩いていく。'},
         ...(clueCount()>0?[{s:'',c:'narr',t:'少年が見たものは、だれにも話されないまま、胸の奥に残った。'}]:[]),
       ]},
-    ], onEnd:()=>{ st.phase='done'; GT.fillPage('wolf', GT.flags.warnedHood
+    ], onEnd:()=>{ st.phase='done'; GT.storyPiece&&GT.storyPiece('wolf','wolf:story','hood'); GT.fillPage('wolf', GT.flags.warnedHood
         ?'――少年は違和感に気づき、赤ずきんに危険を告げた。'
         :'――狼は、脇道へ消えていった。'); } },
   ],
