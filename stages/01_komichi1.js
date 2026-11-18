@@ -81,8 +81,7 @@ const STEPS=[
   // （ジャンプの説明は、目覚めの場面の階段で出すので、ここではしない）
   { done:()=>GT.gravity.left===-1,
     at:[200,120], lines:[[['F','Space'],'本を裏返す（このページの重力が反転）'],'床・天井に立っているときだけ'] },
-  { done:()=>GT.currentPage()==='right',
-    at:[200,300], lines:['背表紙をこえると 右のページの重力'] },
+  // （「背表紙をこえると…」は、説明の枠ではなく、マリが話す）
   { done:()=>GT.gravity.right===-1,
     at:[640,200], lines:[[['F','Space'],'本を裏返す']] },
   { done:()=>{ const pl=GT.player; return GT.gravity.right===1 && pl.onGround && pl.x+pl.w/2>ROCK_R.x-20 && pl.y+pl.h<=ROCK_R.y+52; },
@@ -91,14 +90,21 @@ const STEPS=[
     at:[450,200], lines:()=>['のこり '+(GT.items.filter(i=>!i.got).length)+' つ'] },
 ];
 /* マリの声（姿は見えない）：大きな木の前で「本をひっくり返してみて」。はじめて裏返して着地すると「驚いた？…」 */
-const mv={ ask:false, told:false };
-GT.registerSceneReset(()=>{ if(isHere()){ mv.ask=false; mv.told=false; } });
+const mv={ ask:false, told:false, spine:false };
+GT.registerSceneReset(()=>{ if(isHere()){ mv.ask=false; mv.told=false; mv.spine=false; } });
 function mariSays(lines){ GT.mode='idle'; GT.player.vx=0; GT.beginDialogue(lines,null,()=>{ GT.hideDialogue(); GT.mode='play'; }); }
 GT.registerUpdate(()=>{
   if(!isHere() || GT.mode!=='play') return;
   const pl=GT.player;
   if(!mv.ask && pl.onGround && GT.gravity.left===1 && Math.abs(pl.y+pl.h-ROCK_L.y)<2){ mv.ask=true; mariSays([{s:'マリ',c:'mari',t:'本をひっくり返してみて。'}]); return; }
-  if(!mv.told && GT.gravity.left===-1 && pl.onGround){ mv.ask=true; mv.told=true; mariSays([{s:'マリ',c:'mari',t:'驚いた？　その本は、重力を変えることができるの。'}]); }
+  if(!mv.told && GT.gravity.left===-1 && pl.onGround){ mv.ask=true; mv.told=true; mariSays([{s:'マリ',c:'mari',t:'驚いた？　その本は、重力を変えることができるの。'}]); return; }
+  // 背表紙（まん中）に近づいたら：ページごとに重力がちがうことを、マリが説明する
+  if(mv.told && !mv.spine && pl.onGround && pl.x+pl.w/2 > GT.SPINE-90 && GT.gravity.left!==GT.gravity.right){ mv.spine=true;
+    mariSays([
+      {s:'マリ',c:'mari',t:'待って。左と右のページは、別々なの。'},
+      {s:'マリ',c:'mari',t:'本を裏返すと、あなたが立っているページだけ、上と下が入れかわる。'},
+      {s:'マリ',c:'mari',t:'まん中をこえたら、そこから先は、右のページの重さにしたがうから。……落ちないでね。'},
+    ]); }
 });
 GT.registerUpdate(()=>{
   if(!isHere()) return;
