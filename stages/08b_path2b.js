@@ -20,9 +20,9 @@
 GT.defineStage('path2b', {
   // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「front」のページが埋まっていく
   items:[
-    {page:'left', x:264, y:428, w:32, h:32},    // 岩Aといばらのあいだ（敵が歩いているところ）
-    {page:'right', x:704, y:428, w:32, h:32},   // 岩Dといばらのあいだ（敵が歩いているところ）
+    {page:'left', x:100, y:428, w:32, h:32},
     {page:'left', x:420, y:18, w:32, h:32},
+    {page:'left', x:199, y:262, w:32, h:32},
   ],
   itemsOptional:true,
   bookPage:'front',

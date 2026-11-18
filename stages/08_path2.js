@@ -15,9 +15,9 @@
 GT.defineStage('path2', {
   // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「wolf」のページが埋まっていく
   items:[
-    {page:'right', x:530, y:428, w:32, h:32},   // 敵が歩いている床の上（3つとも）
-    {page:'right', x:690, y:428, w:32, h:32},
-    {page:'right', x:800, y:428, w:32, h:32},
+    {page:'left', x:60, y:18, w:32, h:32},
+    {page:'right', x:470, y:428, w:32, h:32},
+    {page:'right', x:805, y:152, w:32, h:32},
   ],
   itemsOptional:true,
   bookPage:'wolf',
