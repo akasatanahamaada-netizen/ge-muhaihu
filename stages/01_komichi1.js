@@ -89,7 +89,7 @@ const STEPS=[
   { done:()=>{ const pl=GT.player; return GT.gravity.right===1 && pl.onGround && pl.x+pl.w/2>ROCK_R.x-20 && pl.y+pl.h<=ROCK_R.y+52; },
     at:[600,190], lines:['つるの手前で もう一度裏返すと','大岩の上に 降りられる'] },
   { done:()=>GT.missionDone(),
-    at:[450,200], lines:()=>['取りのがしたかけらが あと '+(GT.items.filter(i=>!i.got).length)+' つ','本を裏返して、取りに もどろう'] },
+    at:[450,200], lines:()=>['まだ '+(GT.items.filter(i=>!i.got).length)+' つ、光が残っている','本を裏返せば、届くはず'] },
 ];
 GT.registerUpdate(()=>{
   if(!isHere()) return;

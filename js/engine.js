@@ -1616,7 +1616,7 @@ function drawGameOver(){
   ctx.globalAlpha=k; ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillStyle='#f3ead0'; ctx.font="700 54px 'Caveat',cursive"; ctx.fillText('Game Over',W/2,H/2-18);
   ctx.globalAlpha=Math.min(1,Math.max(0,(t-0.5)/0.4));
-  ctx.fillStyle='#d9c79a'; ctx.font="600 15px 'Zen Old Mincho',serif"; ctx.fillText('ページを もどって、やりなおす……',W/2,H/2+26);
+  ctx.fillStyle='#d9c79a'; ctx.font="600 15px 'Zen Old Mincho',serif"; ctx.fillText('もう一度、このページから……',W/2,H/2+26);
   ctx.restore();
 }
 /* ミッションの表示（HTML）。文字がくっきり出る。位置はキャンバスの上から 48/480 */
@@ -1645,7 +1645,9 @@ function drawMissionHud(){
   if(missionReq.items) parts.push(verb ? `${itemLabel}${verb} ${c.items}/${c.itemsAll}` : `${itemLabel} ${c.items}/${c.itemsAll}`);
   if(missionReq.enemies) parts.push(`狼の手下を倒す ${c.enemies}/${c.enemiesAll}`);
   const done = (curStageDef&&curStageDef.itemsOptional) ? (c.items>=c.itemsAll && (!missionReq.enemies||c.enemies>=c.enemiesAll)) : missionDone();
-  const txt = done ? (verb&&!missionReq.enemies ? `${itemLabel}が そろった！` : missionReq.items ? 'ミッション達成！' : 'みんな倒した！') : ((verb||!missionReq.items) ? '' : 'ミッション　')+parts.join('　');
+  // そろったときの言葉（絵本の語りのように）
+  const doneTxt = itemLook==='flower' ? '花束が、できあがった' : missionReq.enemies && !missionReq.items ? '森が、しずかになった' : missionReq.enemies ? '道が、ひらけた' : 'ページが、光で満ちた';
+  const txt = done ? doneTxt : parts.join('　');
   // キャンバスに描くと、画面を大きくしたときに文字がぼやけるので、ゲーム画面の上に重ねた HTML（#gtMission）で出す
   missionDom(txt, page, done, hudPulse); return;
   ctx.save(); ctx.font="700 14px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
