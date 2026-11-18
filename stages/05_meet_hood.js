@@ -74,9 +74,9 @@ const AFTER_END=[
   {s:'赤ずきん',c:'hood',f:'smile',t:'行こう！　おばあちゃんのお家はこっちだよ！'},
 ];
 const AFTER_CHOICES=[
-  { label:'……ちがう、と思う。', after:[
-      {s:'少年',c:'boy',f:'disgust',t:'……ちがう、と思う。'},
-      {s:'赤ずきん',c:'hood',t:'そうなんだ……残念。'},
+  { label:'……わからない。', after:[
+      {s:'少年',c:'boy',t:'……わからない。'},
+      {s:'赤ずきん',c:'hood',f:'smile',t:'きっと、魔法使いだよ！'},
       ...AFTER_END ]},
   { label:'そうだよ。', after:[
       {s:'少年',c:'boy',t:'そうだよ。'},
