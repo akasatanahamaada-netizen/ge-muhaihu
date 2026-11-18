@@ -116,7 +116,6 @@ function MARI_AGAIN(c, hiddenLeft){
   ];
   return [
     {s:'マリ',c:'mari',t:`あと ${rest}つ。`},
-    {s:'マリ',c:'mari',t:'高いところも、見てみて。'},
   ];
 }
 
