@@ -159,6 +159,7 @@ GT.bookMusic  = null;   // 本を読み返す画面（Reread）では、本だ�
 
 // 走るときの足音（シーンの id ごとの地面）。'grass'=芝生 / 'leaves'=落ち葉 / 'dirt'=土。書いていないシーン（家の中など）は足音なし。
 GT.sceneFootsteps = {
+  wake:'leaves', mari_gate:'leaves', afterword:'leaves',   // 序章の暗い森（目覚め・森の出口・最後の森の出口）は落ち葉
   opening:'grass', komichi1:'grass', komichi2:'grass', house_peek:'grass', path1:'grass', meet_hood:'grass', cliff:'grass',
   wolf_talk:'leaves', path3:'leaves', path4:'leaves',          // 森の奥・遠回りの道（落ち葉）
   crossroads:'dirt', path2:'dirt', path2b:'dirt', house_front:'dirt', flowers:'grass',         // 分かれ道・近道・家の前（土の道）
