@@ -496,3 +496,15 @@ html,body, body.gt-full{ background:
 
 /* 栞（Reread・menu）は赤（青い絵の色を、深い赤に変えた絵。もとの青は shiori_plain.webp） */
 .gt-mark{ background-image:url('../assets/komono/shiori_plain_red.webp') !important; }
+
+/* 栞が光るとき（読み返す案内・かけらが吸いこまれたとき）：ひもは光らせず、栞の本体のふちの外だけ光る。
+   光の絵 shiori_glow.webp は、本体の形からつくった光の輪（栞の絵より上下左右に 24px 大きい → -12% / -3.45%） */
+.gt-mark::before{ content:''; position:absolute; left:-12%; right:-12%; top:-3.45%; bottom:-3.45%; pointer-events:none; opacity:0;
+  background:url('../assets/komono/shiori_glow.webp') center/100% 100% no-repeat; }
+.gt-mark.gt-guide{ animation:none !important; filter:none !important; }
+.gt-mark.gt-guide::before{ animation:gtMarkHalo 1s ease-in-out infinite alternate; }
+@keyframes gtMarkHalo{ from{ opacity:0.1; } to{ opacity:1; } }
+#openBook.gt-absorb{ animation:gtMarkPop .75s ease-out !important; box-shadow:none !important; }
+#openBook.gt-absorb::before{ animation:gtMarkFlash .75s ease-out; }
+@keyframes gtMarkPop{ 0%{ transform:scale(1); } 30%{ transform:scale(1.07); } 100%{ transform:scale(1); } }
+@keyframes gtMarkFlash{ 0%{ opacity:0; } 25%{ opacity:1; } 100%{ opacity:0; } }
