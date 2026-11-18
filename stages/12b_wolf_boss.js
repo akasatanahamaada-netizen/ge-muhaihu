@@ -70,7 +70,7 @@ function damageWolf(source){
 function defeatWolf(){
   wolf.alive=false; wolf.deathT=0; wolf.squash=0.2;
   const hollow=GT.scene&&GT.scene.hollow;
-  fx.banner={ text: hollow?'……':'狼を倒した！', t:0 };
+  if(hollow) fx.banner={ text:'……', t:0 };   // 「狼を倒した！」の文字は出さない
   setTimeout(()=>{ GT.flags.saved = hollow?false:true; GT.mode='idle'; GT.advanceScene(); },1700);
 }
 // 狼にぶつかられた：はじき飛ばされる（はじめの場所へは戻されない）
