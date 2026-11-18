@@ -27,7 +27,6 @@ GT.defineStage('komichi2', {
 
 GT.registerScene({
   id:'komichi2', type:'play', stage:'komichi2', clear:'exit', label:'序章 ── 森の小道 ②',
-  intro:{s:'',c:'narr',t:'道をふさぐ大きな岩。その先には敵が歩いている。'},
 });
 
 /* ============================================================================

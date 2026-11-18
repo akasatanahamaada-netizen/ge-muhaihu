@@ -39,7 +39,6 @@ platforms:[
 
 GT.registerScene({
   id:'komichi1', type:'play', stage:'komichi1', clear:'exit', label:'序章 ── 森の小道 ①',
-  intro:{s:'',c:'narr',t:'ページのいちばん右の端まで行くと、次のページへ進む。'},
 });
 
 /* ============================================================================

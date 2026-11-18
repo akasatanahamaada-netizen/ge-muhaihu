@@ -38,7 +38,6 @@ GT.registerScene({
   dynamic:'detourOnly',     // 遠回りのときだけ遊ぶ（07_crossroads.js）
   companion:'hood',         // 赤ずきんが、うしろからついてくる
   intro:[
-    {s:'',c:'narr',t:'いつもの道を少し行くと、色とりどりの花が咲く野原に出た。'},
     {s:'赤ずきん',c:'hood',f:'smile',t:'わあ、きれい！　おばあちゃんに、お花を摘んでいってあげよう！'},
     {s:'赤ずきん',c:'hood',t:'あっ、あんな高いところにも咲いてる……。'},
   ],

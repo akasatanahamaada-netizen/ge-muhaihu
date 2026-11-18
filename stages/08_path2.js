@@ -63,10 +63,6 @@ GT.registerScene({
   id:'path2', type:'play', stage:'path2', clear:'exit',
   label:'第一章 ── 近道',
   dynamic:'shortcutOnly',   // 近道のときだけ遊ぶ（07_crossroads.js）
-  intro:[
-    {s:'',c:'narr',t:'いばらの道に、狼の手下たちがうろついている。'},
-    {s:'',c:'narr',t:'……ぜんぶ やっつけないと、この先へは進めそうにない。'},
-  ],
 });
 
 /* ============================================================================

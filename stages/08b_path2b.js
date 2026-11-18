@@ -46,7 +46,6 @@ GT.registerScene({
   id:'path2b', type:'play', stage:'path2b', clear:'exit',
   label:'第一章 ── 近道 ②',
   dynamic:'shortcutOnly',   // 近道のときだけ遊ぶ（07_crossroads.js）
-  intro:{s:'',c:'narr',t:'いばらが、トンネルのように道をおおっている。'},
 });
 
 /* ============================================================================

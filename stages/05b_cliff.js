@@ -51,9 +51,7 @@ GT.defineStage('cliff', {
 GT.registerScene({
   id:'cliff', type:'play', stage:'cliff', clear:'exit', label:'第一章 ── 森の崖',
   intro:[
-    {s:'',c:'narr',t:'赤ずきんと並んで、森の奥へ進む。道の先は、切り立った崖でふさがれていた。'},
     {s:'赤ずきん',c:'hood',f:'surprise',t:'わあ、高い崖……。あなたの魔法で、なんとかならない？'},
-    {s:'',c:'narr',t:'見回すと、左の高い棚の上に、木箱がひとつ置いてある。'},
   ],
 });
 
