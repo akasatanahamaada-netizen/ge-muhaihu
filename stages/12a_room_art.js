@@ -403,46 +403,7 @@ function stampWithOutline(src,dx,dy){
   ctx.drawImage(src,dx,dy);
 }
 
-/* ---- 狼との戦いの夜（ゴシック）：灯りを消した部屋 ----------------------------------
-   部屋ぜんたいを暗くし、明るいのは 暖炉の火・ろうそく・窓の月あかり・少年のまわりだけ。
-   窓の外は夜空と赤みがかった月。rage（0〜1）… 狼が追いつめられて怒ると、部屋がうす赤く脈うつ */
-let darkCv=null;
-function drawNightFight(t,rage){
-  const c=ctx, X=262,Y=148,WW=84,HH=84;
-  // 窓の外：夜空・赤い月・木のかげ
-  c.save(); c.beginPath(); c.rect(X,Y,WW,HH); c.clip();
-  let g=c.createLinearGradient(0,Y,0,Y+HH); g.addColorStop(0,'#120a1e'); g.addColorStop(1,'#3a1830'); c.fillStyle=g; c.fillRect(X,Y,WW,HH);
-  c.shadowColor='rgba(230,120,135,0.8)'; c.shadowBlur=16; E(c,320,176,11,11,'#ecccc6'); c.shadowBlur=0;
-  E(c,316,173,3,2.4,'rgba(170,110,115,0.45)'); E(c,324,180,2.2,1.8,'rgba(170,110,115,0.4)');
-  c.fillStyle='#0c0610'; c.beginPath(); c.moveTo(X,Y+HH); c.lineTo(X,Y+HH-20); c.quadraticCurveTo(X+30,Y+HH-32,X+56,Y+HH-22); c.quadraticCurveTo(X+72,Y+HH-16,X+WW,Y+HH-24); c.lineTo(X+WW,Y+HH); c.fill();
-  for(let i=0;i<9;i++){ const tx=X+4+i*10, th=14+rnd(i+3)*14; c.beginPath(); c.moveTo(tx-5,Y+HH-8); c.lineTo(tx,Y+HH-8-th); c.lineTo(tx+5,Y+HH-8); c.fill(); }
-  c.restore();
-  c.fillStyle='#2a1a14'; c.fillRect(X+WW/2-2,Y,4,HH); c.fillRect(X,Y+HH/2-2,WW,4);
-  // 暗やみ（灯りのところだけ、くりぬく）
-  if(!darkCv){ darkCv=document.createElement('canvas'); darkCv.width=W; darkCv.height=H; }
-  const d=darkCv.getContext('2d'), fl=1+0.07*Math.sin(t*9)+0.04*Math.sin(t*23);
-  d.globalCompositeOperation='source-over'; d.clearRect(0,0,W,H); d.fillStyle='rgba(12,3,9,0.78)'; d.fillRect(0,0,W,H);
-  d.globalCompositeOperation='destination-out';
-  const hole=(x,y,r,a)=>{ const h=d.createRadialGradient(x,y,0,x,y,r); h.addColorStop(0,`rgba(0,0,0,${a})`); h.addColorStop(1,'rgba(0,0,0,0)'); d.fillStyle=h; d.fillRect(x-r,y-r,r*2,r*2); };
-  hole(818,420,250*fl,0.92);                                   // 暖炉
-  for(const cx of [774,862]) hole(cx,284,70*fl,0.7);           // ろうそく
-  hole(304,190,95,0.6);                                        // 窓
-  const p=GT.player; if(p) hole(p.x+p.w/2,p.y+p.h/2,120,0.55); // 少年のまわり
-  d.save(); d.beginPath(); d.moveTo(266,236); d.lineTo(342,236); d.lineTo(470,462); d.lineTo(380,462); d.closePath(); d.clip();   // 月あかりの筋
-  g=d.createLinearGradient(0,236,0,462); g.addColorStop(0,'rgba(0,0,0,0.5)'); g.addColorStop(1,'rgba(0,0,0,0.1)'); d.fillStyle=g; d.fillRect(260,230,220,240); d.restore();
-  c.drawImage(darkCv,0,0);
-  // 灯りの色：暖炉は赤いだいだい、月あかりは青白い
-  c.save(); c.globalCompositeOperation='screen';
-  g=c.createRadialGradient(818,430,6,818,430,210*fl); g.addColorStop(0,'rgba(255,120,60,0.30)'); g.addColorStop(1,'rgba(255,120,60,0)'); c.fillStyle=g; c.fillRect(560,200,W-560,H-200);
-  c.beginPath(); c.moveTo(266,236); c.lineTo(342,236); c.lineTo(470,462); c.lineTo(380,462); c.closePath();
-  g=c.createLinearGradient(0,236,0,462); g.addColorStop(0,'rgba(170,160,220,0.16)'); g.addColorStop(1,'rgba(170,160,220,0)'); c.fillStyle=g; c.fill();
-  c.restore();
-  // 狼が怒ると、部屋がうす赤く脈うつ
-  if(rage>0){ c.fillStyle=`rgba(150,12,32,${rage*(0.10+0.07*Math.sin(t*5))})`; c.fillRect(0,0,W,H); }
-}
-
 GT.grannyRoom={
-  drawNightFight,
   draw(t,noon,dim){
     ctx.save();
     ctx.globalAlpha=0.93; ctx.drawImage(roomLayer(noon,dim),0,0); ctx.globalAlpha=1;    // 紙の目がすこし透けるように

@@ -98,29 +98,24 @@ GT.stageBackgrounds = {
   komichi1:DARK, komichi2:DARK,   // チュートリアルも、序章のゴシックの森
   path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
   house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
-  wolf_talk:G(BG_DAY,0.15),                           // 狼：ここから暗くなりはじめる（前は暗い森 DARK）
-  crossroads:{src:BG_TITLE,page:'spread',wash:'rgba(244,240,230,0.08)'},   // 分かれ道（道のある、霧の薔薇の森）
+  wolf_talk:S(BG_DAY),                           // 狼：ここから暗くなりはじめる（前は暗い森 DARK）
+  crossroads:S(BG_DAY),   // 分かれ道（道のある、霧の薔薇の森）
   path2:DARK, path2b:ROSE,                           // 近道（①暗い森 ②いばらと薔薇の森）
-  flowers:ROSE,                                      // お花畑（遠回りの はじめ。薔薇の森）
-  path3:G(BG_DAY,0.25), path4:G(BG_EVENING,0.35),              // 遠回り：歩くうちに日が傾く
-  house_front:f=>G(f.route==='shortcut'?BG_DAY:BG_EVENING,0.9),
+  flowers:S(BG_DAY),                                      // お花畑（遠回りの はじめ。薔薇の森）
+  path3:S(BG_DAY), path4:S(BG_EVENING),              // 遠回り：歩くうちに日が傾く
+  house_front:f=>S(f.route==='shortcut'?BG_DAY:BG_EVENING),
 };
 
 /* 不気味さ（0〜1）：お話が進むほど、暗く・色が抜け・冷たい色になり、霧が出る（js/engine.js の drawGothicWorld）。
    書いていないシーンは 0.5。'@boss' のように、種類でも決められる */
 const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
-  // 0 は、ゴシックにする前と同じ見た目（色合い・岩・ちょうちょ・案内の枠も）。狼が出てくるまでは 0
-  wake:0.6, opening:0.5, komichi1:0.5, komichi2:0.5,   // 序章：ゴシックの暗い森
-  house_peek:0, path1:0, meet_hood:0, cliff:0,         // 第一章のはじめ：明るい絵本（章のとびらのあと、一気に変わる）
-  afterword:0.5,                                        // 第一章のあと：暗い森にもどる
-  wolf_talk:0.15,                                // 狼：ここから、少しずつ暗く
-  crossroads:0.2,                                // 分かれ道：ちょっと暗いかな、くらい
-  path2:0.55, path2b:0.7,                        // 近道（①暗い森 → ②いばらの森）：暗い
-  flowers:0.2, path3:0.25, path4:0.35,           // 遠回り（お花畑 → 日が傾く）：ちょっと暗いかな、くらい
-  house_front:0.82, arrive:0.9, '@boss':0.8, '@qte':0.8,   // おばあさんの家・戦い：いちばん暗い（戦いは部屋の暗さがあるので、少しひかえめに）
-  ending:f=>GOOD_END(f)?0.35:1,                  // 助けられたら、少し明るさが戻る
-  epilogue:f=>GOOD_END(f)?0.05:0.8,               // よい結末は、夜明けの明るさ
+  // ゴシック（暗い森）は、序章（目覚め〜チュートリアル）と、赤ずきんのお話のあと（afterword）だけ
+  wake:0.6, opening:0.5, komichi1:0.5, komichi2:0.5,
+  afterword:0.5,
+  // 第一章（赤ずきんのお話）は 0：ゴシックにする前と同じ、明るい絵本の雰囲気（色合いをかけない）
+  house_peek:0, path1:0, meet_hood:0, cliff:0, wolf_talk:0, crossroads:0, path2:0, path2b:0, flowers:0, path3:0, path4:0,
+  house_front:0, arrive:0, '@boss':0, '@qte':0, ending:0, epilogue:0,
 };
 
 // 音楽（BGM）：シーンの id ごとに流す曲（assets/music/ フォルダの mp3）。ループ再生する。

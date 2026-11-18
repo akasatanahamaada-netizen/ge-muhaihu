@@ -36,9 +36,21 @@ GT.defineStage('wolf_talk', {
   platforms:[ STUMP, BRANCH ],
   boxes:[], enemies:[],
   decor:[
-    // 奥の木は、ゴシックの枯れ木（drawBack で描く）
+    // 奥の木（小さめ・うしろに並ぶ）
+    {layer:'back',  kind:'tree',  x:-20, y:60,  w:100, h:360},
+    {layer:'back',  kind:'tree',  x:200, y:150, w:70,  h:270},
+    {layer:'back',  kind:'tree',  x:355, y:160, w:80,  h:260},
+    {layer:'back',  kind:'tree',  x:420, y:110, w:70,  h:310},
+    {layer:'back',  kind:'tree',  x:690, y:150, w:80,  h:270},
+    {layer:'back',  kind:'tree',  x:775, y:60,  w:110, h:360},
+    {layer:'back',  kind:'tree',  x:840, y:140, w:80,  h:280},
+    {layer:'back',  kind:'tree',  x:250, y:90,  w:110, h:330},
+    {layer:'back',  kind:'tree',  x:480, y:70,  w:120, h:350},
+    {layer:'back',  kind:'tree',  x:610, y:120, w:90,  h:300},
     {layer:'back',  kind:'rock',  x:420, y:430, w:40,  h:34},
     {layer:'front', kind:'fern',  x:-10, y:396, w:80,  h:72},
+    {layer:'front', kind:'grass', x:560, y:436, w:50,  h:28},
+    {layer:'front', kind:'grass', x:270, y:436, w:60,  h:28},
   ],
 });
 
@@ -65,7 +77,7 @@ const clueCount=()=>CLUES.filter(c=>st.found[c.key]).length;
 GT.registerScene({
   id:'wolf_talk', type:'story', stage:'wolf_talk', label:'第一章 ── 狼',
   intro:[
-    {s:'',c:'narr',t:'森の奥へ進むほどに、木々は高くなり、日の光は届かなくなっていく。',act:'wolf-setup'},
+    {s:'',c:'narr',t:'昼の日ざしの中、森の奥へ進むほどに木々は高くなっていく。',act:'wolf-setup'},
     {s:'',c:'narr',t:'どこかから、だれかに見られている気がした。'},
   ],
   npcs:[
@@ -193,18 +205,21 @@ function moveActors(){
 function drawBack(){
   const t=performance.now()/1000;
   ctx.save();
-  ctx.fillStyle='rgba(8,6,8,0.05)'; ctx.fillRect(0,0,W,H);                   // 森の奥は少し暗い（暗さは、狼に近づくほど FX.dark で増す）
-  const tg=ctx.createLinearGradient(0,0,0,H*0.5);
-  tg.addColorStop(0,'rgba(6,4,6,0.2)'); tg.addColorStop(1,'rgba(6,4,6,0)');
+  ctx.fillStyle='rgba(30,34,22,0.08)'; ctx.fillRect(0,0,W,H);                // 昼でも、木の多い森の中は少し暗い
+  const tg=ctx.createLinearGradient(0,0,0,H*0.5);                             // 上は葉が重なって、日ざしがさえぎられる
+  tg.addColorStop(0,'rgba(24,32,18,0.30)'); tg.addColorStop(1,'rgba(24,32,18,0)');
   ctx.fillStyle=tg; ctx.fillRect(0,0,W,H*0.5);
   const vg=ctx.createRadialGradient(W/2,H*0.6,H*0.25,W/2,H*0.6,H);
   vg.addColorStop(0,'rgba(20,16,12,0)'); vg.addColorStop(1,'rgba(20,16,12,0.26)');
   ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
   // 爪あとの木
   const tr=TRUNK;
-  ctx.drawImage(gothTrees(),0,0);
+  ctx.save(); ctx.filter='brightness(0.85) saturate(0.9)';                          // 森の奥なので、少し暗く
+  GTDecor.paint.trunk(ctx, tr.x, tr.top, FLOOR, tr.w, 17, { branches:[{y:tr.top+30,dir:-1,len:60},{y:tr.top+20,dir:1,len:62}] });
+  GTDecor.paint.canopy(ctx,[ {x:tr.x+tr.w/2,y:tr.top-4,rx:66,ry:46}, {x:tr.x-30,y:tr.top+30,rx:46,ry:34}, {x:tr.x+tr.w+30,y:tr.top+24,rx:48,ry:34} ], 19);
+  ctx.restore();
   FX.bigShadow();                                                             // 木に映る、大きな狼の影
-  ctx.strokeStyle='#d9c3b4'; ctx.lineWidth=2.4; ctx.lineCap='round';
+  ctx.strokeStyle='#e8dcc0'; ctx.lineWidth=2.4; ctx.lineCap='round';
   for(let i=0;i<3;i++){ const x=tr.x+10+i*9; ctx.beginPath(); ctx.moveTo(x,300); ctx.quadraticCurveTo(x+4,322,x+2,348); ctx.stroke(); }
   // 足あと（大きな獣の）
   for(let i=0;i<4;i++){ const x=PRINTS.x+12+i*24, y=FLOOR-3+(i%2)*1;

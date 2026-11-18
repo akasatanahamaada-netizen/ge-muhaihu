@@ -54,7 +54,7 @@ function spawnWolf(){
     hitFlash:0, alive:true, deathT:0, squash:1, lungeCD:1.4 };
   fx.pops=[]; fx.stars=[]; fx.banner=null; fx.hintOff=false;
 }
-function pop(text,x,y,color){ fx.pops.push({text,x,y,color:color||'#ff5a6a',t:0}); }
+function pop(text,x,y,color){ fx.pops.push({text,x,y,color:color||'#c9503f',t:0}); }
 function burst(x,y,n){ for(let i=0;i<(n||10);i++){ const a=Math.random()*Math.PI*2, s=120+Math.random()*160;
   fx.stars.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,t:0}); } }
 
@@ -76,7 +76,7 @@ function defeatWolf(){
 // 狼にぶつかられた：はじき飛ばされる（はじめの場所へは戻されない）
 function hurtPlayer(){                                    // ハートが減る（3回でゲームオーバー → ページがもどって、戦いをやり直す）
   const pl=GT.player;
-  if(GT.damagePlayer(wolf.x+wolf.w/2,'wolf') && !GT.isGameOver()) pop('いたっ',pl.x+pl.w/2,pl.y-6,'#d6d0f0');
+  if(GT.damagePlayer(wolf.x+wolf.w/2,'wolf') && !GT.isGameOver()) pop('いたっ',pl.x+pl.w/2,pl.y-6,'#4a4e6d');
 }
 function updateWolf(dt){
   const gravity=GT.gravity, player=GT.player;
@@ -85,7 +85,7 @@ function updateWolf(dt){
   if(!wolf.alive){ wolf.deathT+=dt; return; }
   // ページの重力が変わった（裏返された・ページをまたいだ）：立っていれば、しばらくしがみつく
   if(wg!==wolf.lastG){ wolf.lastG=wg;
-    if(wolf.onGround && wolf.dizzy<=0){ wolf.grip=GRIP; wolf.windup=0; wolf.vy=0; wolf.vx=0; pop('！？',wolf.x+wolf.w/2,wg===1?wolf.y+wolf.h+24:wolf.y-8,'#f0d9a8'); } }
+    if(wolf.onGround && wolf.dizzy<=0){ wolf.grip=GRIP; wolf.windup=0; wolf.vy=0; wolf.vx=0; pop('！？',wolf.x+wolf.w/2,wg===1?wolf.y+wolf.h+24:wolf.y-8,'#5a4630'); } }
   if(wolf.grip>0){ wolf.grip-=dt; wolf.squash+=(0.8-wolf.squash)*Math.min(1,dt*10); return; }
   const speed=GT.ENEMY_SPEED*(wolf.enraged?1.8:1.3);
   if(wolf.howl>0){ wolf.howl-=dt; if(wolf.howl<=0) pop('ウォォォン！',wolf.x+wolf.w/2,wolf.y-10,'#8b3a2f'); }
@@ -116,7 +116,7 @@ function updateWolf(dt){
   // 天井（床）に勢いよく打ちつけられたら、目を回す
   if(wolf.vy===0 && vyBefore*wg>DIZZY_SPEED){
     wolf.dizzy=DIZZY; wolf.windup=0; wolf.squash=0.5; wolf.vx=0; GT.sfx&&GT.sfx('dizzy');
-    pop('ドスン！',wolf.x+wolf.w/2,wolf.y+wolf.h/2,'#f0d9a8'); burst(wolf.x+wolf.w/2,wg===1?wolf.y+wolf.h:wolf.y,8);
+    pop('ドスン！',wolf.x+wolf.w/2,wolf.y+wolf.h/2,'#5a4630'); burst(wolf.x+wolf.w/2,wg===1?wolf.y+wolf.h:wolf.y,8);
   }
   wolf.squash+=(1-wolf.squash)*Math.min(1,dt*8);
   if(GT.invincible<=0&&wolf.alive&&wolf.stun<=0&&wolf.dizzy<=0&&wolf.grip<=0&&GT.rectsOverlap(player,wolf)){ hurtPlayer(); }
@@ -180,7 +180,6 @@ function drawWolfSprite(wg,t){
   ctx.scale(wolf.squash, 2-wolf.squash);
   if(wolf.hitFlash>0 && Math.floor(t*20)%2===0) ctx.filter='sepia(1) saturate(6) hue-rotate(-45deg) brightness(1.1)';   // 当たったら赤く点滅
   if(wolf.enraged){ ctx.shadowColor='rgba(255,60,40,0.85)'; ctx.shadowBlur=14; }
-  else { ctx.shadowColor='rgba(150,20,45,0.75)'; ctx.shadowBlur=12; }                          // 暗い部屋で、狼のまわりに赤黒いもや
   const running = Math.abs(wolf.vx||0)>30 && wolf.stun<=0 && wolf.dizzy<=0;
   const step = GT.wolfRunPose(running, dir, wg);                    // 走る絵と立ち絵を交互に（主人公の歩きと同じ）
   GT.drawCharSprite(step?'wolfRun':'wolf', 0, 0, WOLF_BOSS_H, dir, wg);
@@ -203,17 +202,16 @@ function drawBossHud(){
   ctx.save();
   // 体力バー
   const bw=220, bx=W/2-bw/2, by=34;
-  GT.roundRect(bx-10,by-6,bw+20,30,14); ctx.fillStyle='rgba(26,8,18,0.86)'; ctx.fill();
-  ctx.strokeStyle='rgba(201,160,112,0.7)'; ctx.lineWidth=1.2; ctx.stroke();                     // くすんだ金のふち
-  ctx.font="700 13px 'Zen Old Mincho',serif"; ctx.textBaseline='middle'; ctx.textAlign='left'; ctx.fillStyle='#e9c9cf';
+  GT.roundRect(bx-10,by-6,bw+20,30,14); ctx.fillStyle='rgba(43,36,24,0.82)'; ctx.fill();
+  ctx.font="700 13px 'Zen Old Mincho',serif"; ctx.textBaseline='middle'; ctx.textAlign='left'; ctx.fillStyle='#f3ead0';
   ctx.fillText('狼',bx+2,by+9);
   for(let i=0;i<wolf.maxhp;i++){ const x=bx+30+i*((bw-34)/wolf.maxhp);
-    GT.roundRect(x,by+3,(bw-34)/wolf.maxhp-6,12,6); ctx.fillStyle=i<wolf.hp?(wolf.enraged?'#e8344f':'#b3263f'):'rgba(233,201,207,0.14)'; ctx.fill(); }
+    GT.roundRect(x,by+3,(bw-34)/wolf.maxhp-6,12,6); ctx.fillStyle=i<wolf.hp?(wolf.enraged?'#e0563f':'#c9503f'):'rgba(232,220,192,0.18)'; ctx.fill(); }
   // ヒント（はじめて当てるまで）
   if(!fx.hintOff && GT.mode==='boss'){
     ctx.textAlign='center'; ctx.font="700 13px 'Zen Old Mincho',serif";
-    GT.roundRect(W/2-210,122,420,48,12); ctx.fillStyle='rgba(26,8,18,0.8)'; ctx.fill(); ctx.strokeStyle='rgba(201,160,112,0.5)'; ctx.lineWidth=1; ctx.stroke();
-    ctx.globalAlpha=0.8+0.2*Math.sin(now/300); ctx.fillStyle='#f1e3e6';
+    GT.roundRect(W/2-210,122,420,48,12); ctx.fillStyle='rgba(43,36,24,0.72)'; ctx.fill();
+    ctx.globalAlpha=0.8+0.2*Math.sin(now/300); ctx.fillStyle='#f3ead0';
     ctx.fillText('狼が家具と重なったら そのページを裏返し、着地したら すぐもう一度',W/2,137);
     ctx.fillText('しがみつく狼の頭に、飛んでいった家具が落ちてくる',W/2,157);
     ctx.globalAlpha=1;
@@ -221,8 +219,7 @@ function drawBossHud(){
   // ポップ文字
   ctx.textAlign='center'; ctx.font="700 18px 'Zen Old Mincho',serif";
   fx.pops=fx.pops.filter(p=>{ p.t+=dt; if(p.t>0.9) return false;
-    ctx.globalAlpha=1-p.t/0.9; ctx.lineWidth=4; ctx.strokeStyle='rgba(16,4,10,0.85)'; ctx.strokeText(p.text,p.x,p.y-p.t*30);   // 暗い部屋でも読めるように、黒いふち
-    ctx.fillStyle=p.color; ctx.fillText(p.text,p.x,p.y-p.t*30); return true; });
+    ctx.globalAlpha=1-p.t/0.9; ctx.fillStyle=p.color; ctx.fillText(p.text,p.x,p.y-p.t*30); return true; });
   // 星の粒
   ctx.fillStyle='#e8c35a';
   fx.stars=fx.stars.filter(s=>{ s.t+=dt; if(s.t>0.6) return false; s.x+=s.vx*dt; s.y+=s.vy*dt;
@@ -230,8 +227,8 @@ function drawBossHud(){
   // 勝利の文字
   if(fx.banner){ fx.banner.t+=dt; const k=fx.banner.t;
     ctx.globalAlpha=Math.min(1,k*3)*(k>1.4?Math.max(0,1-(k-1.4)*3):1);
-    ctx.font="700 40px 'Zen Old Mincho',serif"; ctx.fillStyle='rgba(16,4,10,0.9)';
-    ctx.fillText(fx.banner.text,W/2+2,H/2-18); ctx.shadowColor='rgba(200,40,70,0.8)'; ctx.shadowBlur=18; ctx.fillStyle='#f0d9a8'; ctx.fillText(fx.banner.text,W/2,H/2-20); ctx.shadowBlur=0; }
+    ctx.font="700 40px 'Zen Old Mincho',serif"; ctx.fillStyle='rgba(43,36,24,0.85)';
+    ctx.fillText(fx.banner.text,W/2+2,H/2-18); ctx.fillStyle='#f3ead0'; ctx.fillText(fx.banner.text,W/2,H/2-20); }
   ctx.restore();
 }
 GT.registerDraw(drawBossHud,'overlay');
@@ -365,7 +362,7 @@ function beginRise(){
   Object.assign(ambush,{ phase:'rise', t:0, x:80, y:BED.top-10, vy:-200, rot:-Math.PI/2 });   // ベッドから、ふわっと浮く
   ambush.cap={ x:62, y:BED.top-46, vy:-60, vx:-20, r:0 };                                     // ナイトキャップが脱げて、ひらひら
   if(ambush.opt.flipSfx) GT.sfx&&GT.sfx('flip');
-  GT.shake(4,0.25); pop('！？',100,BED.top-60,'#f0d9a8');
+  GT.shake(4,0.25); pop('！？',100,BED.top-60,'#5a4630');
 }
 // 本を裏返すと、奇襲
 GT.registerFlipIntercept(()=>{
@@ -382,7 +379,7 @@ GT.registerModeUpdate('ambush', dt=>{
     if(a.y<=CEIL){ a.y=CEIL; a.rot=Math.PI; a.x=AMB_X; a.phase='stuck'; a.t=0;
       GT.sfx&&GT.sfx('hit'); GT.shake(12,0.45);
       if(a.opt.damage) wolf.hp=wolf.maxhp-1;
-      pop('ドスン！',a.x,EDGE+WOLF_BOSS_H+22,'#f0d9a8'); pop('ギャン！',a.x+46,EDGE+WOLF_BOSS_H*0.6); burst(a.x,EDGE+4,16); }
+      pop('ドスン！',a.x,EDGE+WOLF_BOSS_H+22,'#5a4630'); pop('ギャン！',a.x+46,EDGE+WOLF_BOSS_H*0.6); burst(a.x,EDGE+4,16); }
   } else if(a.phase==='stuck'){                                           // 天井で、ひるむ
     if(a.t>1.1){ a.phase='fall'; a.t=0; a.vy=0; GT.sfx&&GT.sfx('flip'); }   // 本がもとにもどる
   } else if(a.phase==='fall'){                                            // 床へ落ちる（くるりと回って、足から）
@@ -402,7 +399,7 @@ GT.registerDraw(()=>{
   if(GT.mode!=='ambush') return; const a=ambush, t=performance.now()/1000;
   if(a.phase==='wait'){
     drawWolfInBed(Math.sin(t*2)*1.2);                                   // 寝息で、ふとんが すこし上下する
-    ctx.save(); ctx.font="700 16px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.fillStyle='rgba(233,201,207,0.85)';
+    ctx.save(); ctx.font="700 16px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.fillStyle='rgba(90,70,48,0.85)';
     for(let i=0;i<3;i++){ const k=(t*0.6+i/3)%1; ctx.globalAlpha=Math.sin(k*Math.PI); ctx.fillText('z',96+k*22+i*4,BED.top-62-k*40); }
     ctx.restore();
     GT.drawHint(W/2-20,150,['狼は、ベッドで寝たふりをしている……',[['F','Space'],'本を裏返して、狼を天井へたたきつけろ！']]);
