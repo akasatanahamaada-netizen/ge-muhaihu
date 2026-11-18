@@ -1758,7 +1758,7 @@ function sceneMood(){
   return Math.max(0,Math.min(1,+v||0));
 }
 GT.moodNow=()=>moodCur; GT.moodTarget=sceneMood;
-GT.isBright=()=>!!(GT.scene && GT.scene.id!=='opening' && sceneMood()===0);   // 不気味さ 0 の場面は、ゴシックにする前と同じ見た目
+GT.isBright=()=>!!(GT.scene && sceneMood()===0);   // 不気味さ 0 の場面は、ゴシックにする前と同じ見た目
 let gradeK=null;   // ゴシックの色合いのかかり具合（0＝前と同じ明るさ、1＝ゴシック）   // いまの不気味さ／このシーンの不気味さ
 function drawMoodFog(m){   // 地面をはう霧（不気味さが 0.45 をこえると出てくる）
   const a=(m-0.45)*0.3; if(a<=0) return; const t=performance.now()/1000;

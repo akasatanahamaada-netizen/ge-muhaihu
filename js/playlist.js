@@ -89,10 +89,9 @@ const BG_TITLE='assets/background/タイトル背景.webp';   // タイトル画
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)'};   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
-  opening:Object.assign({},DARK,{shade:0.2}),       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
-  komichi1:S(BG_DAY), komichi2:S(BG_DAY),   // チュートリアル：ゴシックにする前と同じ明るい森
-  path1:G(BG_DAY,0.3), meet_hood:G(BG_DAY,0.35), cliff:G(BG_DAY,0.5),   // だんだん暗く
-  house_peek:DARK,   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
+  opening:S(BG_DAY),   // 狼が出てくるまでは、ゴシックにする前と同じ明るい森（前は暗い森 Object.assign({},DARK,{shade:0.2})）       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
+  komichi1:S(BG_DAY), komichi2:S(BG_DAY), path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
+  house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
   wolf_talk:DARK,                                    // 狼（暗い森）
   crossroads:{src:BG_TITLE,page:'spread',wash:'rgba(244,240,230,0.08)'},   // 分かれ道（道のある、霧の薔薇の森）
   path2:DARK, path2b:ROSE,                           // 近道（①暗い森 ②いばらと薔薇の森）
@@ -105,9 +104,8 @@ GT.stageBackgrounds = {
    書いていないシーンは 0.5。'@boss' のように、種類でも決められる */
 const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
-  opening:0.3,                                   // 序章：ふしぎで、少し暗い
-  komichi1:0, komichi2:0,                        // チュートリアル：0 は、ゴシックにする前と同じ見た目（色合い・案内の枠も）
-  house_peek:0.15, path1:0.25, meet_hood:0.3, cliff:0.4,
+  // 0 は、ゴシックにする前と同じ見た目（色合い・岩・ちょうちょ・案内の枠も）。狼が出てくるまでは 0
+  opening:0, komichi1:0, komichi2:0, house_peek:0, path1:0, meet_hood:0, cliff:0,
   wolf_talk:0.6,                                 // 狼：ここから不気味に
   crossroads:0.6, path2:0.72, path2b:0.8, flowers:0.6, path3:0.7, path4:0.8,
   house_front:0.88, arrive:0.9, '@boss':0.8, '@qte':0.8,   // おばあさんの家・戦い：いちばん暗い（戦いは部屋の暗さがあるので、少しひかえめに）

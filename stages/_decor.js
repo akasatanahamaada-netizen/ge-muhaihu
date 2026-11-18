@@ -505,7 +505,7 @@ function drawRockBright(rs,seed){
 }
 
 /* お話のはじめ（不気味さが小さいうち）は明るい絵本の岩・ちょうちょ、進むとゴシックに。最初の場面は、ゴシックのまま */
-const brightNow=()=>!!(window.GT && GT.moodTarget && GT.scene && GT.scene.id!=='opening' && GT.moodTarget()<0.45);
+const brightNow=()=>!!(window.GT && GT.moodTarget && GT.scene && GT.moodTarget()<0.45);
 function drawRock(rs,seed){ return brightNow() ? drawRockBright(rs,seed) : drawRockGoth(rs,seed); }
 
 /* 苔むした岩（ゴシック：暗い紫がかった石。ひび・石の欠け・上のふちに月あかり・暗い苔・つたと小さな薔薇） */

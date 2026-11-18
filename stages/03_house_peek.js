@@ -46,7 +46,14 @@ GT.defineStage('house_peek', {
   platforms:[ WELL, WOOD ],
   boxes:[], enemies:[],
   decor:[
-    // 雲・丸い木・茂みは、ゴシックの枯れ木・薔薇の茂みにした（下の drawGothYard で描く）
+    {layer:'back',  kind:'cloud', x:120, y:60,  w:130, h:50},
+    {layer:'back',  kind:'cloud', x:300, y:120, w:100, h:40},
+    {layer:'back',  kind:'tree',  x:10,  y:110, w:110, h:300},
+    {layer:'back',  kind:'tree',  x:350, y:150, w:100, h:260},
+    {layer:'back',  kind:'bush',  x:210, y:420, w:76,  h:44},
+    {layer:'front', kind:'grass', x:130, y:432, w:70,  h:32},
+    {layer:'front', kind:'grass', x:380, y:434, w:60,  h:30},
+    {layer:'front', kind:'grass', x:462, y:434, w:50,  h:30},
   ],
 });
 
@@ -305,30 +312,30 @@ function hoodHouseStatic(){
 
   // ── れんがの煙突（屋根より先に描いて、根元を屋根で隠す） ──
   const CX=798, CW=30, CT=250;
-  c.fillStyle='#2e2022'; c.fillRect(CX,CT,CW,70);
+  c.fillStyle='#7a4a38'; c.fillRect(CX,CT,CW,70);
   for(let y=CT, row=0; y<CT+70; y+=7, row++) for(let x=CX-(row%2)*7; x<CX+CW; x+=14){
     const x0=Math.max(CX,x), w=Math.min(x+13,CX+CW)-x0; if(w<=2) continue;
-    c.fillStyle=['#4e3434','#58393a','#46302f','#5e403e'][Math.floor(R()*4)]; c.fillRect(x0+0.5,y+0.5,w-1,6); }
-  c.fillStyle='#2a2426'; rr(CX-4,CT-8,CW+8,9,2); c.fill();                     // 笠石
-  c.fillStyle='rgba(220,210,225,0.18)'; c.fillRect(CX-3,CT-8,CW+6,2);
-  c.fillStyle='#3a3234'; c.fillRect(CX+5,CT-15,8,8); c.fillRect(CX+17,CT-15,8,8);  // 煙突の筒（2本）
-  c.fillStyle='#120c0e'; c.fillRect(CX+6,CT-16,6,2); c.fillRect(CX+18,CT-16,6,2);
+    c.fillStyle=['#a45a44','#b2654c','#97503c','#bb7258'][Math.floor(R()*4)]; c.fillRect(x0+0.5,y+0.5,w-1,6); }
+  c.fillStyle='#5f5246'; rr(CX-4,CT-8,CW+8,9,2); c.fill();                     // 笠石
+  c.fillStyle='rgba(255,250,235,0.3)'; c.fillRect(CX-3,CT-8,CW+6,2);
+  c.fillStyle='#8a7766'; c.fillRect(CX+5,CT-15,8,8); c.fillRect(CX+17,CT-15,8,8);  // 煙突の筒（2本）
+  c.fillStyle='#3a2f28'; c.fillRect(CX+6,CT-16,6,2); c.fillRect(CX+18,CT-16,6,2);
 
   // ── しっくいの壁 ──
-  const wg=c.createLinearGradient(0,wy,0,FLOOR); wg.addColorStop(0,'#5a524e'); wg.addColorStop(1,'#46403e');
+  const wg=c.createLinearGradient(0,wy,0,FLOOR); wg.addColorStop(0,'#e6d4ae'); wg.addColorStop(1,'#d8c399');
   c.fillStyle=wg; c.fillRect(wx,wy,ww,FLOOR-wy);
   c.save(); c.beginPath(); c.rect(wx,wy,ww,FLOOR-wy); c.clip();
-  for(let i=0;i<160;i++) E(wx+R()*ww, wy+R()*(FLOOR-wy), 2+R()*7, 1+R()*3, R()<0.5?'rgba(210,200,200,0.08)':'rgba(16,10,12,0.18)');   // しっくいのむら
+  for(let i=0;i<160;i++) E(wx+R()*ww, wy+R()*(FLOOR-wy), 2+R()*7, 1+R()*3, R()<0.5?'rgba(255,248,226,0.25)':'rgba(170,140,96,0.12)');   // しっくいのむら
   for(let i=0;i<5;i++){ const x=wx+20+R()*(ww-40), y=wy+40+R()*60;                                   // はがれて下地が見えるところ
-    E(x,y,6+R()*6,3+R()*3,'rgba(40,26,24,0.45)'); for(let k=0;k<3;k++) c.fillStyle='rgba(70,40,36,0.5)', c.fillRect(x-4+k*4,y-1,3,2); }
-  const sh=c.createLinearGradient(0,wy,0,wy+34); sh.addColorStop(0,'rgba(8,4,6,0.6)'); sh.addColorStop(1,'rgba(8,4,6,0)');
+    E(x,y,6+R()*6,3+R()*3,'rgba(160,110,80,0.35)'); for(let k=0;k<3;k++) c.fillStyle='rgba(150,90,60,0.4)', c.fillRect(x-4+k*4,y-1,3,2); }
+  const sh=c.createLinearGradient(0,wy,0,wy+34); sh.addColorStop(0,'rgba(60,40,24,0.45)'); sh.addColorStop(1,'rgba(60,40,24,0)');
   c.fillStyle=sh; c.fillRect(wx,wy,ww,34);                                                            // 軒下の影
   c.restore();
 
   // ── 木の梁（ハーフティンバー） ──
   const beam=(x1,y1,x2,y2,wd)=>{ c.save(); c.lineCap='butt';
-    c.strokeStyle='#1e1416'; c.lineWidth=wd; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
-    c.strokeStyle='rgba(210,195,215,0.12)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(x1-wd/2+1.5,y1); c.lineTo(x2-wd/2+1.5,y2); c.stroke();
+    c.strokeStyle='#5e432c'; c.lineWidth=wd; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
+    c.strokeStyle='rgba(255,230,190,0.18)'; c.lineWidth=1.2; c.beginPath(); c.moveTo(x1-wd/2+1.5,y1); c.lineTo(x2-wd/2+1.5,y2); c.stroke();
     c.strokeStyle='rgba(30,18,10,0.35)'; c.lineWidth=0.8;                                            // 木目
     for(let k=0;k<2;k++){ const o=(k?1:-1)*wd*0.2; c.beginPath(); c.moveTo(x1+o,y1); c.lineTo(x2+o,y2); c.stroke(); }
     c.restore(); };
@@ -338,82 +345,71 @@ function hoodHouseStatic(){
   for(const x of POSTS) beam(x,wy,x,FLOOR-30,8);   // 柱（窓と戸をよけて立てる）
   beam(wx+8,FLOOR-34,618-4,wy+10,6);             // 斜めの筋かい（左はし）
   // 梁をとめる木の釘
-  for(const x of POSTS) for(const y of [wy+4,FLOOR-30]) E(x,y,1.8,1.8,'#7a6a5a');
+  for(const x of POSTS) for(const y of [wy+4,FLOOR-30]) E(x,y,1.6,1.6,'#2e2016');
 
   // ── 石の土台 ──
   for(let x=wx-4, i=0; x<wr+4; i++){ const w=16+R()*14, y=FLOOR-26;
-    rr(x+1,y+1,Math.min(w,wr+4-x)-2,24,4); c.fillStyle=['#4a4448','#3e393c','#554e50','#38333a'][i%4]; c.fill();
-    c.strokeStyle='rgba(10,6,8,0.7)'; c.lineWidth=1; c.stroke();
-    c.beginPath(); c.moveTo(x+4,y+3); c.lineTo(x+w-5,y+3); c.strokeStyle='rgba(220,205,230,0.2)'; c.stroke(); x+=w; }
-  for(let i=0;i<24;i++) E(wx+R()*ww, FLOOR-2-R()*5, 4+R()*7, 2+R()*2, 'rgba(40,56,34,0.6)');      // 苔
+    rr(x+1,y+1,Math.min(w,wr+4-x)-2,24,4); c.fillStyle=['#a49a88','#958b79','#b2a894','#8c8372'][i%4]; c.fill();
+    c.strokeStyle='rgba(50,44,36,0.5)'; c.lineWidth=1; c.stroke();
+    c.beginPath(); c.moveTo(x+4,y+3); c.lineTo(x+w-5,y+3); c.strokeStyle='rgba(255,250,235,0.35)'; c.stroke(); x+=w; }
+  for(let i=0;i<24;i++) E(wx+R()*ww, FLOOR-2-R()*5, 4+R()*7, 2+R()*2, 'rgba(100,118,56,0.5)');      // 苔
 
   // ── 赤い瓦屋根（うろこのように重ねた瓦） ──
   const L={x:532,y:EAVE+2}, Rr={x:890,y:EAVE+2};
   const roof=()=>{ c.beginPath(); c.moveTo(L.x,L.y); c.lineTo(APEX.x,APEX.y); c.lineTo(Rr.x,Rr.y); c.lineTo(Rr.x,Rr.y+8); c.lineTo(L.x,L.y+8); c.closePath(); };
-  roof(); c.fillStyle='#1c1418'; c.fill();
+  roof(); c.fillStyle='#7c3a30'; c.fill();
   c.save(); roof(); c.clip();
   const TW=16, TH=11;
   const rows=[]; for(let y=APEX.y-4, row=0; y<EAVE+12; y+=TH, row++) rows.push([y,row]);
   for(const [y,row] of rows.reverse()){                                          // 下の段から描いて、上の段の丸いふちを重ねる
     for(let x=L.x-TW+(row%2)*TW/2; x<Rr.x+TW; x+=TW){
-      const col=['#352a32','#3e3038','#2e242a','#46363e','#3a2c34'][Math.floor(R()*5)];
+      const col=['#a8503f','#b45a46','#9c4a3a','#bd6650','#a25440'][Math.floor(R()*5)];
       c.beginPath(); c.moveTo(x,y); c.lineTo(x,y+TH*0.55); c.arc(x+TW/2,y+TH*0.55,TW/2,Math.PI,0,true); c.lineTo(x+TW,y); c.closePath();
-      c.fillStyle=col; c.fill(); c.strokeStyle='rgba(8,4,6,0.7)'; c.lineWidth=0.9; c.stroke();
-      c.beginPath(); c.moveTo(x+3,y+2); c.lineTo(x+3,y+TH*0.5); c.strokeStyle='rgba(215,200,225,0.14)'; c.lineWidth=1.2; c.stroke();   // 瓦の光（月あかり）
+      c.fillStyle=col; c.fill(); c.strokeStyle='rgba(60,24,16,0.55)'; c.lineWidth=0.9; c.stroke();
+      c.beginPath(); c.moveTo(x+3,y+2); c.lineTo(x+3,y+TH*0.5); c.strokeStyle='rgba(255,220,190,0.25)'; c.lineWidth=1.2; c.stroke();   // 瓦の光
     }
   }
-  const rs=c.createLinearGradient(0,APEX.y,0,EAVE+10); rs.addColorStop(0,'rgba(210,200,225,0.10)'); rs.addColorStop(1,'rgba(6,3,5,0.35)');
+  const rs=c.createLinearGradient(0,APEX.y,0,EAVE+10); rs.addColorStop(0,'rgba(255,220,180,0.12)'); rs.addColorStop(1,'rgba(40,14,8,0.25)');
   c.fillStyle=rs; c.fillRect(L.x,APEX.y,Rr.x-L.x,EAVE-APEX.y+12);
-  for(let i=0;i<8;i++) E(L.x+60+R()*(Rr.x-L.x-120), APEX.y+40+R()*50, 8+R()*12, 3+R()*4, 'rgba(36,52,32,0.45)', (R()-0.5)*0.5);   // 苔
+  for(let i=0;i<8;i++) E(L.x+60+R()*(Rr.x-L.x-120), APEX.y+40+R()*50, 8+R()*12, 3+R()*4, 'rgba(110,120,58,0.3)', (R()-0.5)*0.5);   // 苔
   c.restore();
   // 破風板（屋根のふち）と、棟の飾り
   c.lineCap='round';
-  c.strokeStyle='#120a0e'; c.lineWidth=7; c.beginPath(); c.moveTo(L.x-4,L.y+6); c.lineTo(APEX.x,APEX.y-2); c.lineTo(Rr.x+4,Rr.y+6); c.stroke();
-  c.strokeStyle='#2e2228'; c.lineWidth=3; c.stroke();
-  c.strokeStyle='#120a0e'; c.lineWidth=2.4; c.beginPath(); c.moveTo(APEX.x,APEX.y-2); c.lineTo(APEX.x,APEX.y-40); c.moveTo(APEX.x-8,APEX.y-26); c.lineTo(APEX.x+8,APEX.y-26); c.stroke();   // てっぺんの鉄の飾り
-  c.fillStyle='#120a0e'; c.beginPath(); c.moveTo(APEX.x-4,APEX.y-38); c.lineTo(APEX.x,APEX.y-48); c.lineTo(APEX.x+4,APEX.y-38); c.closePath(); c.fill();
-  c.beginPath(); c.arc(APEX.x,APEX.y-26,5,0,Math.PI*2); c.lineWidth=1.4; c.stroke();
-  E(APEX.x,APEX.y-26,1.6,1.6,'#8a7240');
+  c.strokeStyle='#4e3626'; c.lineWidth=7; c.beginPath(); c.moveTo(L.x-4,L.y+6); c.lineTo(APEX.x,APEX.y-2); c.lineTo(Rr.x+4,Rr.y+6); c.stroke();
+  c.strokeStyle='#7a5a3e'; c.lineWidth=3; c.stroke();
+  c.fillStyle='#4e3626'; c.beginPath(); c.moveTo(APEX.x-6,APEX.y-2); c.lineTo(APEX.x,APEX.y-22); c.lineTo(APEX.x+6,APEX.y-2); c.closePath(); c.fill();   // てっぺんの飾り
+  E(APEX.x,APEX.y-24,3.5,3.5,'#c9a24a');
   // 軒先の木の板と、その影
-  c.fillStyle='#1e1416'; c.fillRect(L.x,EAVE+6,Rr.x-L.x,5);
-  for(let x=L.x+6;x<Rr.x;x+=14){ c.fillStyle='#120a0e'; c.beginPath(); c.moveTo(x,EAVE+11); c.lineTo(x+7,EAVE+11); c.lineTo(x+3.5,EAVE+16); c.closePath(); c.fill(); }   // 飾り板のぎざぎざ
+  c.fillStyle='#5e432c'; c.fillRect(L.x,EAVE+6,Rr.x-L.x,5);
+  for(let x=L.x+6;x<Rr.x;x+=14){ c.fillStyle='#4e3626'; c.beginPath(); c.moveTo(x,EAVE+11); c.lineTo(x+7,EAVE+11); c.lineTo(x+3.5,EAVE+16); c.closePath(); c.fill(); }   // 飾り板のぎざぎざ
 
   // ── 窓のまわり：よろい戸（赤） ──
   const w=WIN;
   for(const side of [-1,1]){
     const sx= side<0 ? w.x-32 : w.x+w.w+8, sw=24;
-    rr(sx,w.y-6,sw,w.h+12,2); c.fillStyle='#4a1820'; c.fill(); c.strokeStyle='#1e070b'; c.lineWidth=1.4; c.stroke();
-    for(let y=w.y;y<w.y+w.h+4;y+=6){ c.beginPath(); c.moveTo(sx+3,y); c.lineTo(sx+sw-3,y); c.strokeStyle='rgba(14,4,6,0.7)'; c.lineWidth=1; c.stroke(); }
-    c.strokeStyle='#1e070b'; c.lineWidth=1.4; c.beginPath(); c.moveTo(sx+4,w.y-2); c.lineTo(sx+sw-4,w.y+w.h+2); c.stroke();   // 戸板の斜めの桟
+    rr(sx,w.y-6,sw,w.h+12,2); c.fillStyle='#9a4a3e'; c.fill(); c.strokeStyle='#5e2a22'; c.lineWidth=1.4; c.stroke();
+    for(let y=w.y;y<w.y+w.h+4;y+=6){ c.beginPath(); c.moveTo(sx+3,y); c.lineTo(sx+sw-3,y); c.strokeStyle='rgba(70,24,18,0.6)'; c.lineWidth=1; c.stroke(); }
+    c.strokeStyle='#5e2a22'; c.lineWidth=1.4; c.beginPath(); c.moveTo(sx+4,w.y-2); c.lineTo(sx+sw-4,w.y+w.h+2); c.stroke();   // 戸板の斜めの桟
   }
-  c.fillStyle='#2e2428'; c.fillRect(w.x-10,w.y-12,w.w+20,5);                    // 窓の上のひさし板
+  c.fillStyle='#e8dcc0'; c.fillRect(w.x-10,w.y-12,w.w+20,5);                    // 窓の上のひさし板
   c.fillStyle='rgba(40,24,14,0.3)'; c.fillRect(w.x-10,w.y-7,w.w+20,2);
 
   // ── 戸のまわり：木の戸わく・ひさし・踏み段 ──
   const d=DOOR;
-  c.fillStyle='#120a0e'; c.beginPath(); c.moveTo(d.x-14,d.y-14); c.lineTo(d.x+d.w/2,d.y-30); c.lineTo(d.x+d.w+14,d.y-14); c.lineTo(d.x+d.w+14,d.y-9); c.lineTo(d.x-14,d.y-9); c.closePath(); c.fill();  // 戸の上の小さな屋根
-  c.fillStyle='#3a2c34'; c.beginPath(); c.moveTo(d.x-12,d.y-15); c.lineTo(d.x+d.w/2,d.y-28); c.lineTo(d.x+d.w+12,d.y-15); c.closePath(); c.fill();
-  c.strokeStyle='#1e1416'; c.lineWidth=3; c.beginPath(); c.moveTo(d.x-10,d.y-10); c.lineTo(d.x-10,d.y+10); c.moveTo(d.x+d.w+10,d.y-10); c.lineTo(d.x+d.w+10,d.y+10); c.stroke();   // 支え
-  rr(d.x-12,FLOOR-6,d.w+24,7,2); c.fillStyle='#4a4448'; c.fill(); c.strokeStyle='rgba(10,6,8,0.7)'; c.lineWidth=1; c.stroke();   // 踏み段
+  c.fillStyle='#4e3626'; c.beginPath(); c.moveTo(d.x-14,d.y-14); c.lineTo(d.x+d.w/2,d.y-30); c.lineTo(d.x+d.w+14,d.y-14); c.lineTo(d.x+d.w+14,d.y-9); c.lineTo(d.x-14,d.y-9); c.closePath(); c.fill();  // 戸の上の小さな屋根
+  c.fillStyle='#a8503f'; c.beginPath(); c.moveTo(d.x-12,d.y-15); c.lineTo(d.x+d.w/2,d.y-28); c.lineTo(d.x+d.w+12,d.y-15); c.closePath(); c.fill();
+  c.strokeStyle='#5e432c'; c.lineWidth=3; c.beginPath(); c.moveTo(d.x-10,d.y-10); c.lineTo(d.x-10,d.y+10); c.moveTo(d.x+d.w+10,d.y-10); c.lineTo(d.x+d.w+10,d.y+10); c.stroke();   // 支え
+  rr(d.x-12,FLOOR-6,d.w+24,7,2); c.fillStyle='#9a917f'; c.fill(); c.strokeStyle='rgba(50,44,36,0.6)'; c.lineWidth=1; c.stroke();   // 踏み段
   // 戸のわきの、つるバラ
-  c.strokeStyle='#1a1214'; c.lineWidth=1.6;
+  c.strokeStyle='#4a5a2a'; c.lineWidth=1.6;
   c.beginPath(); c.moveTo(d.x-8,FLOOR-6); c.bezierCurveTo(d.x-18,d.y+50,d.x-4,d.y+20,d.x-14,d.y-6); c.stroke();
   for(let i=0;i<9;i++){ const k=i/8, x=d.x-12+Math.sin(k*7)*5, y=FLOOR-14-k*(FLOOR-d.y);
-    E(x+(i%2?5:-5),y,4,2.6,'#1f2a1c',(i%2?0.5:-0.5));
-    if(i%2===0) GT.goth.paint.rose(c,x,y-2,3.6); }
+    E(x+(i%2?5:-5),y,4,2.6,'#5d7034',(i%2?0.5:-0.5));
+    if(i%2===0){ E(x,y-2,3.4,3.4,'#c9503f'); E(x,y-2,1.6,1.6,'#e88070'); } }
   // 壁ぎわの花だん
   for(let i=0;i<12;i++){ const x=wx+12+i*14; if(x>d.x-30 && x<d.x+d.w+16) continue; if(x>WOOD.x-4 && x<WOOD.x+WOOD.w+4) continue;
-    E(x,FLOOR-4,7,4,'#1f2a1c'); E(x+3,FLOOR-7,4,3,'#2a3624');
-    if(i%2===0) GT.goth.paint.rose(c,x,FLOOR-11,3.4); else { c.strokeStyle='#1a1214'; c.lineWidth=1; c.beginPath(); c.moveTo(x,FLOOR-4); c.lineTo(x+2,FLOOR-14); c.stroke(); } }
-  // 壁をはうつた（左のはしと、窓のよこ）。黒ずんだ葉
-  for(const [vx,top,sd] of [[wx+6,wy+8,3],[wx+40,wy+60,5],[wr-10,wy+20,9]]){ let q=sd;
-    const RR=()=>{ q=(q*9301+49297)%233280; return q/233280; };
-    c.strokeStyle='#161012'; c.lineWidth=1.4; c.beginPath(); c.moveTo(vx,FLOOR-24);
-    for(let y=FLOOR-24;y>top;y-=6) c.lineTo(vx+Math.sin(y*0.09+sd)*7,y); c.stroke();
-    for(let y=FLOOR-30;y>top;y-=7){ const lx=vx+Math.sin(y*0.09+sd)*7; E(lx+(RR()-0.5)*12,y,4+RR()*2.5,2.6+RR()*1.5,RR()<0.5?'#1c2619':'#26321f',RR()*3); }
-  }
-  // 壁のひび
-  c.strokeStyle='rgba(10,6,8,0.55)'; c.lineWidth=1; c.beginPath(); c.moveTo(wx+120,wy+14); c.lineTo(wx+112,wy+40); c.lineTo(wx+122,wy+62); c.lineTo(wx+116,wy+80); c.stroke();
+    E(x,FLOOR-4,7,4,'#5d7034'); E(x+3,FLOOR-7,4,3,'#7f9040');
+    const col=['#e2a3b6','#f2d27a','#ffffff','#c9503f'][i%4]; for(let p=0;p<5;p++){ const a=p/5*Math.PI*2; E(x+Math.cos(a)*2.4,FLOOR-11+Math.sin(a)*2.4,1.8,1.8,col); } E(x,FLOOR-11,1.2,1.2,'#d9a53a'); }
   return hoodHouseCanvas;
 }
 function drawHouse(){
@@ -422,7 +418,7 @@ function drawHouse(){
   // 煙（煙突の筒から）
   for(let i=0;i<6;i++){
     const k=((t*0.22)+i/6)%1, y=232-k*150, x=811+k*30+Math.sin(k*6+t+i)*8*k;
-    ctx.globalAlpha=0.3*(1-k); ell(x,y,6+k*16,5+k*13,'#8e888a');
+    ctx.globalAlpha=0.38*(1-k); ell(x,y,6+k*16,5+k*13,'#efe6d2');
   }
   ctx.globalAlpha=1;
   ctx.drawImage(hoodHouseStatic(),0,0);
@@ -430,7 +426,7 @@ function drawHouse(){
   drawDoor();
   // 戸口への飛び石
   for(let i=0;i<6;i++){ const x=486+i*48+(i%2)*6;
-    ell(x, FLOOR-2, 14, 4, 'rgba(58,52,56,0.8)'); ell(x-3, FLOOR-3.5, 8, 1.6, 'rgba(220,205,230,0.18)'); }
+    ell(x, FLOOR-2, 14, 4, 'rgba(120,110,95,0.65)'); ell(x-3, FLOOR-3.5, 8, 1.6, 'rgba(255,250,235,0.25)'); }
   ctx.restore();
 }
 /* 家の窓：明かりと、中で動く人影 */
@@ -441,7 +437,7 @@ function drawWindow(t){
   const g=ctx.createRadialGradient(w.x+w.w/2,w.y+w.h/2,10,w.x+w.w/2,w.y+w.h/2,90);
   g.addColorStop(0,`rgba(255,190,100,${0.22*fl})`); g.addColorStop(1,'rgba(255,190,100,0)');
   ctx.fillStyle=g; ctx.fillRect(w.x-90,w.y-90,w.w+180,w.h+180); ctx.restore();
-  ctx.fillStyle='#1e1416'; ctx.fillRect(w.x-6,w.y-6,w.w+12,w.h+12);
+  ctx.fillStyle='#5a4630'; ctx.fillRect(w.x-6,w.y-6,w.w+12,w.h+12);
   const gl=ctx.createLinearGradient(0,w.y,0,w.y+w.h);
   gl.addColorStop(0,`rgba(255,214,140,${fl})`); gl.addColorStop(1,`rgba(214,150,80,${fl})`);
   ctx.fillStyle=gl; ctx.fillRect(w.x,w.y,w.w,w.h);
@@ -451,45 +447,32 @@ function drawWindow(t){
   sil(w.x+16+Math.sin(t*0.6)*6, 34, 'rgba(70,50,35,0.55)');
   if(!st.peeked) sil(w.x+40+Math.sin(t*0.9+1)*4, 26, 'rgba(150,50,45,0.6)');
   ctx.restore();
-  ctx.fillStyle='#1e1416'; ctx.fillRect(w.x+w.w/2-2,w.y,4,w.h); ctx.fillRect(w.x,w.y+w.h/2-2,w.w,4);
-  // 窓の上のとがったアーチ（ゴシックの窓）
-  ctx.beginPath(); ctx.moveTo(w.x-6,w.y-6); ctx.quadraticCurveTo(w.x-2,w.y-26,w.x+w.w/2,w.y-34); ctx.quadraticCurveTo(w.x+w.w+2,w.y-26,w.x+w.w+6,w.y-6); ctx.closePath(); ctx.fillStyle='#1e1416'; ctx.fill();
-  ctx.beginPath(); ctx.moveTo(w.x+4,w.y-6); ctx.quadraticCurveTo(w.x+8,w.y-20,w.x+w.w/2,w.y-26); ctx.quadraticCurveTo(w.x+w.w-8,w.y-20,w.x+w.w-4,w.y-6); ctx.closePath();
-  ctx.fillStyle=`rgba(200,90,70,${0.55*fl})`; ctx.fill();   // 赤いステンドグラス
-  ctx.strokeStyle='#1e1416'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(w.x+w.w/2,w.y-26); ctx.lineTo(w.x+w.w/2,w.y-6); ctx.moveTo(w.x+16,w.y-13); ctx.lineTo(w.x+w.w-16,w.y-13); ctx.stroke();
+  ctx.fillStyle='#5a4630'; ctx.fillRect(w.x+w.w/2-2,w.y,4,w.h); ctx.fillRect(w.x,w.y+w.h/2-2,w.w,4);
   // 花の箱
-  GT.roundRect(w.x-10,w.y+w.h+6,w.w+20,11,2); ctx.fillStyle='#2a1e1e'; ctx.fill(); ctx.strokeStyle='#0e0809'; ctx.lineWidth=1.2; ctx.stroke();
+  GT.roundRect(w.x-10,w.y+w.h+6,w.w+20,11,2); ctx.fillStyle='#7a5434'; ctx.fill(); ctx.strokeStyle='#4a3220'; ctx.lineWidth=1.2; ctx.stroke();
   ctx.fillStyle='rgba(40,26,14,0.35)'; ctx.fillRect(w.x-8,w.y+w.h+11,w.w+16,1.5);
   for(let i=0;i<7;i++){ const fx=w.x-5+i*11, fy=w.y+w.h+1-(i%3)*2;
-    ell(fx,w.y+w.h+6,5,3,'#1f2a1c'); ell(fx+3,w.y+w.h+4,3,2,'#2a3624');
-    if(i%2===0) GT.goth.paint.rose(ctx,fx,fy,3.4); }
+    ell(fx,w.y+w.h+6,5,3,'#57644a'); ell(fx+3,w.y+w.h+4,3,2,'#7f9040');
+    const col=['#c9503f','#e8c35a','#e2a3b6','#ffffff'][i%4];
+    for(let p=0;p<5;p++){ const a=p/5*Math.PI*2; ell(fx+Math.cos(a)*2.3,fy+Math.sin(a)*2.3,1.7,1.7,col); } ell(fx,fy,1.2,1.2,'#d9a53a'); }
 }
 /* 戸（赤ずきんが出るときに開く） */
 function drawDoor(){
   const d=DOOR, open=hoodRun(), r=d.w/2, top=d.y+r;
   const arch=()=>{ ctx.beginPath(); ctx.moveTo(d.x,FLOOR); ctx.lineTo(d.x,top); ctx.arc(d.x+r,top,r,Math.PI,0); ctx.lineTo(d.x+d.w,FLOOR); ctx.closePath(); };
-  ctx.fillStyle='#1e1416'; ctx.fillRect(d.x-6,d.y-4,d.w+12,FLOOR-d.y+4);
+  ctx.fillStyle='#5a4630'; ctx.fillRect(d.x-6,d.y-4,d.w+12,FLOOR-d.y+4);
   arch(); ctx.fillStyle='#ffcf86'; ctx.fill();                       // 開くと見える部屋の明かり
   ctx.save(); arch(); ctx.clip();
   const pw=d.w*(1-open*0.8);                                          // 戸板（左の蝶番で開く）
-  ctx.fillStyle='#3a1e1e'; ctx.fillRect(d.x,d.y,pw,FLOOR-d.y);
+  ctx.fillStyle='#6b3f2c'; ctx.fillRect(d.x,d.y,pw,FLOOR-d.y);
   ctx.strokeStyle='rgba(30,18,10,0.4)'; ctx.lineWidth=1.5;
   for(let i=1;i<4;i++){ const x=d.x+pw*i/4; ctx.beginPath(); ctx.moveTo(x,d.y); ctx.lineTo(x,FLOOR); ctx.stroke(); }
-  ctx.strokeStyle='#120a0c'; ctx.lineWidth=2.4;                         // 鉄の帯（ちょうつがい）
-  for(const y of [d.y+r+8, FLOOR-20]){ ctx.beginPath(); ctx.moveTo(d.x,y); ctx.lineTo(d.x+pw*0.7,y); ctx.stroke(); ell(d.x+pw*0.7,y,2.2,2.2,'#120a0c'); }
-  ell(d.x+pw-8,d.y+52,2.8,2.8,'#120a0c'); ctx.strokeStyle='#8a7240'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(d.x+pw-8,d.y+56,4,0,Math.PI); ctx.stroke();   // 輪のとって
+  ell(d.x+pw-8,d.y+52,2.6,2.6,'#d9b877');
   ctx.restore();
   // 戸口のランプ
   const t=performance.now()/1000;
-  const lfl=0.8+0.15*Math.sin(t*6)+0.06*Math.sin(t*17), lx=d.x+d.w+16, ly=d.y+10;
-  ctx.save(); ctx.globalCompositeOperation='lighter';
-  const lg=ctx.createRadialGradient(lx,ly+12,2,lx,ly+12,80*lfl); lg.addColorStop(0,`rgba(255,170,90,${0.3*lfl})`); lg.addColorStop(1,'rgba(255,170,90,0)');
-  ctx.fillStyle=lg; ctx.fillRect(lx-90,ly-80,180,180); ctx.restore();
-  ctx.strokeStyle='#120a0c'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(lx-12,ly-6); ctx.lineTo(lx,ly-6); ctx.lineTo(lx,ly); ctx.stroke();   // 腕木
-  ctx.fillStyle='#120a0c'; ctx.beginPath(); ctx.moveTo(lx-6,ly); ctx.lineTo(lx+6,ly); ctx.lineTo(lx+8,ly+5); ctx.lineTo(lx-8,ly+5); ctx.closePath(); ctx.fill();
-  const lgl=ctx.createLinearGradient(0,ly+5,0,ly+21); lgl.addColorStop(0,`rgba(255,214,140,${0.9*lfl})`); lgl.addColorStop(1,`rgba(230,120,60,${0.85*lfl})`);
-  ctx.fillStyle=lgl; ctx.fillRect(lx-6,ly+5,12,16); ctx.strokeStyle='#120a0c'; ctx.lineWidth=1.4; ctx.strokeRect(lx-6,ly+5,12,16);
-  ctx.fillStyle='#120a0c'; ctx.fillRect(lx-7,ly+21,14,3);
+  ctx.fillStyle='#3e3223'; ctx.fillRect(d.x+d.w+5,d.y+6,3,10);
+  ell(d.x+d.w+6,d.y+22,5,7,`rgba(255,200,110,${0.75+0.15*Math.sin(t*6)})`);
 }
 
 /* 庭：柵・物干し・飛び石（地形より奥） */
@@ -497,27 +480,23 @@ function drawGarden(){
   const t=performance.now()/1000;
   ctx.save();
   // 柵
-  ctx.fillStyle=ctx.strokeStyle='#161013';                                         // 鉄の柵（やりの先）
-  ctx.fillRect(20,424,196,3); ctx.fillRect(20,450,196,3);
-  for(let x=24;x<=212;x+=12){ const top=x%36===0?404:412;
-    ctx.fillRect(x-1.2,top,2.4,FLOOR-top);
-    ctx.beginPath(); ctx.moveTo(x-3.5,top+2); ctx.lineTo(x,top-7); ctx.lineTo(x+3.5,top+2); ctx.closePath(); ctx.fill(); }
-  ctx.lineWidth=1.2; for(let x=30;x<212;x+=12){ ctx.beginPath(); ctx.arc(x,436,4,0,Math.PI*2); ctx.stroke(); }   // 輪の飾り
-  ctx.strokeStyle='rgba(215,200,225,0.22)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(20,424.5); ctx.lineTo(216,424.5); ctx.stroke();
+  ctx.fillStyle='#8b6a43';
+  for(let x=24;x<=208;x+=26){ ctx.beginPath(); ctx.moveTo(x,FLOOR); ctx.lineTo(x,422); ctx.lineTo(x+4,416); ctx.lineTo(x+8,422); ctx.lineTo(x+8,FLOOR); ctx.closePath(); ctx.fill(); }
+  ctx.fillRect(20,430,196,5); ctx.fillRect(20,448,196,5);
   // 柵ぎわの花
   GTDecor.paint.grass(ctx, 24, FLOOR-16, 190, 16, 5, {flowers:false});             // 柵ぎわの下草と花
-  for(let i=0;i<6;i++) GT.goth.paint.rose(ctx, 36+i*32+(i%2)*6, FLOOR-8-(i%3)*10, 4+(i%2));   // 柵にからむ薔薇
+  for(let i=0;i<8;i++) GTDecor.paint.flower(ctx, 34+i*24, FLOOR, 1+(i%3)*0.12, [1,0,2][i%3], i*5);
   // 物干し
-  ctx.fillStyle='#1e1416'; ctx.fillRect(98,290,5,FLOOR-290); ctx.fillRect(246,290,5,FLOOR-290);
+  ctx.fillStyle='#6b4f36'; ctx.fillRect(98,290,5,FLOOR-290); ctx.fillRect(246,290,5,FLOOR-290);
   ctx.strokeStyle='rgba(60,50,38,0.8)'; ctx.lineWidth=1.3;
   const sag=x=>292+Math.sin((x-100)/148*Math.PI)*14;
   ctx.beginPath(); ctx.moveTo(100,292); ctx.quadraticCurveTo(174,320,248,292); ctx.stroke();
   const cloth=(x,w,h,c,ph)=>{ const y=sag(x+w/2)-1, sw=Math.sin(t*1.6+ph)*4;
     ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+w,y); ctx.lineTo(x+w+sw,y+h); ctx.lineTo(x+sw,y+h); ctx.closePath(); ctx.fillStyle=c; ctx.fill();
-    ctx.fillStyle='#6a6064'; ctx.fillRect(x+3,y-3,3,6); ctx.fillRect(x+w-6,y-3,3,6); };
+    ctx.fillStyle='#e8dcc0'; ctx.fillRect(x+3,y-3,3,6); ctx.fillRect(x+w-6,y-3,3,6); };
   cloth(118,34,40,'#b8423f',0);       // 赤い頭巾のケープ
-  cloth(162,30,30,'#a8a0a2',1.3);
-  cloth(202,26,36,'#3a3236',2.1);     // エプロン
+  cloth(162,30,30,'#efe6d2',1.3);
+  cloth(202,26,36,'#e8dcc0',2.1);     // エプロン
   ctx.restore();
 }
 
@@ -526,29 +505,25 @@ function drawProps(){
   ctx.save();
   // 薪の山（切り口が並んでいる）
   const w=WOOD;
-  GT.roundRect(w.x,w.y,w.w,w.h,6); ctx.fillStyle='#1e1614'; ctx.fill();
+  GT.roundRect(w.x,w.y,w.w,w.h,6); ctx.fillStyle='#4a3a28'; ctx.fill();
   ctx.save(); GT.roundRect(w.x,w.y,w.w,w.h,6); ctx.clip();
   const R=11;
   for(let row=0;row*R*1.8<w.h;row++){ const y=w.y+R+row*R*1.8, off=(row%2)*R;
     for(let x=w.x+R-off;x<w.x+w.w+R;x+=R*2){
-      ell(x,y,R-1,R-1,'#6e5a48'); ctx.strokeStyle='rgba(30,20,16,0.8)'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.arc(x,y,R*0.55,0,Math.PI*2); ctx.stroke(); ell(x,y,1.6,1.6,'#2a1e18'); } }
+      ell(x,y,R-1,R-1,'#b8945f'); ctx.strokeStyle='rgba(107,79,54,0.8)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(x,y,R*0.55,0,Math.PI*2); ctx.stroke(); ell(x,y,1.6,1.6,'#6b4f36'); } }
   ctx.restore();
   // 井戸（石積み・屋根・つるべ）
   const e=WELL;
-  ctx.fillStyle='#1e1416'; ctx.fillRect(e.x+4,e.y-62,5,62); ctx.fillRect(e.x+e.w-9,e.y-62,5,62);
+  ctx.fillStyle='#6b4f36'; ctx.fillRect(e.x+4,e.y-62,5,62); ctx.fillRect(e.x+e.w-9,e.y-62,5,62);
   ctx.beginPath(); ctx.moveTo(e.x-8,e.y-56); ctx.lineTo(e.x+e.w/2,e.y-80); ctx.lineTo(e.x+e.w+8,e.y-56); ctx.closePath();
-  ctx.fillStyle='#2e242a'; ctx.fill();
-  ctx.strokeStyle='rgba(10,6,8,0.8)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(e.x+e.w/2,e.y-56); ctx.lineTo(e.x+e.w/2,e.y-26); ctx.stroke();
-  ctx.fillStyle='#2a1e1c'; ctx.fillRect(e.x+e.w/2-6,e.y-26,12,11);
-  GT.roundRect(e.x,e.y,e.w,e.h,6); ctx.fillStyle='#48424a'; ctx.fill();
-  ctx.strokeStyle='rgba(10,6,8,0.6)'; ctx.lineWidth=1.2;
+  ctx.fillStyle='#8b4a3f'; ctx.fill();
+  ctx.strokeStyle='rgba(60,50,38,0.8)'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(e.x+e.w/2,e.y-56); ctx.lineTo(e.x+e.w/2,e.y-26); ctx.stroke();
+  ctx.fillStyle='#7a5434'; ctx.fillRect(e.x+e.w/2-6,e.y-26,12,11);
+  GT.roundRect(e.x,e.y,e.w,e.h,6); ctx.fillStyle='#8a8070'; ctx.fill();
+  ctx.strokeStyle='rgba(50,44,36,0.45)'; ctx.lineWidth=1.2;
   for(let row=0;row<4;row++){ const y=e.y+row*15; ctx.beginPath(); ctx.moveTo(e.x,y); ctx.lineTo(e.x+e.w,y); ctx.stroke();
     for(let x=e.x+((row%2)?10:20);x<e.x+e.w;x+=20){ ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+15); ctx.stroke(); } }
-  ctx.strokeStyle='rgba(215,200,225,0.25)'; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(e.x+5,e.y+1); ctx.lineTo(e.x+e.w-5,e.y+1); ctx.stroke();   // 月あかりのふち
-  ctx.strokeStyle='#161012'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(e.x+e.w-4,e.y+e.h); ctx.bezierCurveTo(e.x+e.w+6,e.y+40,e.x+e.w-14,e.y+20,e.x+e.w-6,e.y+2); ctx.stroke();   // つた
-  for(let i=0;i<5;i++) ell(e.x+e.w-6+(i%2?5:-4),e.y+e.h-8-i*10,3.6,2.2,i%2?'#1c2619':'#26321f');
-  GT.goth.paint.rose(ctx,e.x+e.w-8,e.y+14,3.6);
   ctx.restore();
 }
 
@@ -557,28 +532,15 @@ function drawHint(){
   if(!st.briefed || st.peeked || st.busy) return;
   const p=0.5+0.5*Math.sin(performance.now()/260), w=WIN;
   ctx.save(); ctx.globalAlpha=0.5+0.5*p;
-  ctx.strokeStyle='#c9a45a'; ctx.lineWidth=1.6; ctx.strokeRect(w.x-10,w.y-10,w.w+20,w.h+20);
-  const label='薪の上から のぞく', cx=w.x+w.w/2, ly=w.y-50;
+  ctx.strokeStyle='#e8c35a'; ctx.lineWidth=2; ctx.strokeRect(w.x-10,w.y-10,w.w+20,w.h+20);
+  const label='薪の上から のぞく', cx=w.x+w.w/2, ly=w.y-28;
   ctx.font="700 13px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
-  const lw=ctx.measureText(label).width+28;
-  ctx.beginPath(); ctx.moveTo(cx-lw/2,ly); ctx.lineTo(cx-lw/2+8,ly-12); ctx.lineTo(cx+lw/2-8,ly-12); ctx.lineTo(cx+lw/2,ly); ctx.lineTo(cx+lw/2-8,ly+12); ctx.lineTo(cx-lw/2+8,ly+12); ctx.closePath();
-  ctx.fillStyle='rgba(20,12,14,0.9)'; ctx.fill(); ctx.strokeStyle='#c9a45a'; ctx.lineWidth=1.2; ctx.stroke();
-  ctx.fillStyle='#f1e3e6'; ctx.fillText(label, cx, ly+1);
+  const lw=ctx.measureText(label).width+20;
+  GT.roundRect(cx-lw/2,ly-11,lw,22,11); ctx.fillStyle='rgba(43,36,24,0.82)'; ctx.fill();
+  ctx.fillStyle='#f3ead0'; ctx.fillText(label, cx, ly+1);
   ctx.restore();
 }
 
-/* ゴシックの庭：遠くの木・ねじれた枯れ木・薔薇の茂み・墓石のような石（一度だけ描いて取っておく） */
-let yardCv=null;
-function drawGothYard(){
-  if(!GT.goth) return;
-  if(!yardCv){ yardCv=document.createElement('canvas'); yardCv.width=W; yardCv.height=H; const c=yardCv.getContext('2d'), P=GT.goth.paint;
-    P.farTrees(c);
-    P.tree(c,40,FLOOR+6,330,13,10);     // 左のはしの木
-    P.tree(c,470,FLOOR+6,300,41,-14);   // 庭と家のあいだの木
-    P.stone(c,268,26,34); P.roseBush(c,404,52,28,17); P.roseBush(c,876,40,26,19); }
-  ctx.drawImage(yardCv,0,0);
-}
-GT.registerDraw(()=>{ if(!isHouse()) return; drawGothYard(); if(GT.goth) GT.goth.fog(false); drawGarden(); drawHouse(); }, 'back');
-GT.registerDraw(()=>{ if(!isHouse()||!GT.goth) return; ctx.save(); ctx.globalAlpha=1-peek.alpha; GT.goth.fog(true); GT.goth.top(); GT.goth.wisps(); ctx.restore(); }, 'overlay');   // 窓のぞきの映像の上には出さない
+GT.registerDraw(()=>{ if(!isHouse()) return; drawGarden(); drawHouse(); }, 'back');
 GT.registerDraw(()=>{ if(!isHouse()) return; drawProps(); drawHint(); }, 'world');
 })();
