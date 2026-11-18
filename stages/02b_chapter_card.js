@@ -15,7 +15,7 @@ GT.registerScene({ id:'chapter1', type:'card', label:'第一章「赤い頭巾�
 
 const card={ t0:0, flipped:false, sfx:false, ch:1, pen:{} };   // pen … ペンの音を鳴らした字（一字に一回）
 const isCard=()=>GT.scene&&GT.scene.id==='chapter1';
-const T_OPEN0=0.9, T_OPEN1=2.1, T_TEXT=2.3, T_END=7.0;   // T_TEXT … 書きはじめる時間
+const T_OPEN0=0.9, T_OPEN1=2.1, T_TEXT=2.3, T_END=9.2;   // T_TEXT … 書きはじめる時間
 
 GT.registerDynamic('chapterCard', scene=>{
   GT.loadStageDef(GT.STAGE_DEFS['chapter1_card']); GT.mode='idle';
@@ -88,35 +88,28 @@ function drawCard(){
   // のどの影
   if(o>=1){ g=ctx.createLinearGradient(-14,0,14,0); g.addColorStop(0,'rgba(60,40,20,0)'); g.addColorStop(0.5,'rgba(60,40,20,0.35)'); g.addColorStop(1,'rgba(60,40,20,0)');
     ctx.fillStyle=g; ctx.fillRect(-14,-PH/2,28,PH); }
-  /* ひらいたページに、ペンで書いていくように、文字と絵があらわれる
-       「第 一 章」→ 罫線 → 「「赤い頭巾」」を一文字ずつ → 赤ずきんと狼のシルエットを下から描いていく */
-  const W1=T_TEXT, W2=W1+0.75, W3=W2+0.25, PER=0.2;                          // 書きはじめる時間（秒）
-  ctx.textAlign='left'; ctx.textBaseline='middle';
+  /* ひらいたページに、筆で書いていくように、文字と絵があらわれる
+       「第一章」→ 罫線 → 「赤い頭巾」（筆の書体で、一画ずつ）→ 英語の筆記体 → 赤ずきんと狼のシルエットを上から描いていく */
+  const W1=T_TEXT, W2=W1+0.9, W3=W2+0.3, PER=0.42;                          // 書きはじめる時間・一字にかける時間（秒）
+  const nT=[...chap.sub].length, W4=W3+PER*nT+0.15, S0=W4+1.0;
   const pen=key=>{ if(card.pen[key]) return; card.pen[key]=true; GT.sfx&&GT.sfx('write'); };   // ペンで書く音（一行・一枚の絵に一回）
-  const writeLine=(str,font,color,y,t0,per)=>{                              // 一文字ずつ、左から右へ書いていく（書いている字のはしに、インクのにじみ）
-    ctx.font=font; const chs=[...str], ws=chs.map(ch=>ctx.measureText(ch).width), total=ws.reduce((a,b)=>a+b,0);
-    let x=-total/2;
-    chs.forEach((ch,n)=>{ const p=Math.max(0,Math.min(1,(t-t0-n*per)/per)), w=ws[n];
-      if(p>0){ pen('line'+y); ctx.save(); ctx.beginPath(); ctx.rect(x-2,y-40,(w+4)*p,80); ctx.clip();
-        ctx.globalAlpha=Math.min(1,0.4+p); ctx.fillStyle=color; ctx.fillText(ch,x,y); ctx.restore();
-        if(p<1){ ctx.save(); ctx.globalAlpha=0.35*(1-p); ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x+w*p,y+4,3,0,Math.PI*2); ctx.fill(); ctx.restore(); } }
-      x+=w; }); };
   if(o>=1 && t>=W1){
     ctx.globalAlpha=1;
-    writeLine(spaced(chap.name),"700 24px 'Zen Old Mincho',serif",'#5a3a22',-112,W1,0.12);
-    const kl=ease((t-W2)/0.3);                                                // 罫線を、まん中から左右へ引く
-    if(kl>0){ ctx.strokeStyle='rgba(120,80,40,0.55)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-90*kl,-90); ctx.lineTo(90*kl,-90); ctx.stroke(); }
-    writeLine('「'+chap.sub+'」',"900 54px 'Zen Old Mincho',serif",'#2a160c',-50,W3,PER);
-    // シルエット：下から上へ、筆でぬっていくように（ぬっているふちは、ゆらゆら）
-    const S0=W3+PER*([...chap.sub].length+2)+0.1;
+    writeBrush('第一章', 22, '#5a3a22', -116, W1, 0.28, ()=>pen('l1'));
+    const kl=ease((t-W2)/0.35);                                               // 罫線を、まん中から左右へ（はしは細く）
+    if(kl>0){ ctx.strokeStyle='rgba(120,80,40,0.55)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-100*kl,-96); ctx.quadraticCurveTo(0,-92,100*kl,-96); ctx.stroke();
+      ctx.fillStyle='rgba(120,80,40,0.6)'; ctx.beginPath(); ctx.arc(0,-94,2.2*kl,0,Math.PI*2); ctx.fill(); }
+    writeBrush(chap.sub, 60, '#2a160c', -52, W3, PER, ()=>pen('l2'));
+    writeCursive(CH_EN[card.ch]||'', 24, '#6b4a2a', -6, W4, 1.0, ()=>pen('l3'));
+    // シルエット：上から下へ、筆で描いていくように（描いているふちは、ゆらゆら）
     ctx.save(); ctx.beginPath(); ctx.rect(-PW+6,-PH/2+6,PW*2-12,PH-12); ctx.clip();
-    const paint=(img,x,right,t0)=>{ if(!img.complete||!img.naturalWidth) return; const p=ease((t-t0)/1.1); if(p<=0) return; pen('sil'+t0);
-      const h=150, w=h*img.naturalWidth/img.naturalHeight, ix=right? x-w : x, iy=PH/2-6-h;
-      ctx.save(); ctx.beginPath(); ctx.moveTo(ix-4,iy+h+4);
-      for(let k=0;k<=12;k++){ const xx=ix-4+(w+8)*k/12, yy=iy+h-h*p*1.08+Math.sin(k*1.7+t*6)*6*(1-p); ctx.lineTo(xx,yy); }
-      ctx.lineTo(ix+w+4,iy+h+4); ctx.closePath(); ctx.clip();
+    const paint=(img,x,right,t0,key)=>{ if(!img.complete||!img.naturalWidth) return; const p=ease((t-t0)/1.3); if(p<=0) return; pen(key);
+      const h=140, w=h*img.naturalWidth/img.naturalHeight, ix=right? x-w : x, iy=PH/2-6-h;
+      ctx.save(); ctx.beginPath(); ctx.moveTo(ix-4,iy-4);
+      for(let k=0;k<=12;k++){ const xx=ix-4+(w+8)*k/12, yy=iy+h*p*1.08+Math.sin(k*1.7+t*6)*6*(1-p); ctx.lineTo(xx,yy); }
+      ctx.lineTo(ix+w+4,iy-4); ctx.closePath(); ctx.clip();
       ctx.globalAlpha=0.92; ctx.drawImage(img,ix,iy,w,h); ctx.restore(); };
-    paint(SIL.hood,-PW+18,false,S0); paint(SIL.wolf,PW-18,true,S0+0.45);
+    paint(SIL.hood,-PW+18,false,S0,'s1'); paint(SIL.wolf,PW-18,true,S0+0.5,'s2');
     ctx.restore();
   }
   ctx.restore();
@@ -134,5 +127,38 @@ function paper(x,y,w,h,side){
 }
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 const spaced=s=>s.split('').join(' ');
+const CH_EN=['','Little Red Riding Hood'];        // 章の名前の下に、英語の筆記体で添える
+/* 一画ずつ書いているように：字の形の上を、太い筆がいくつかの線（よこ・たて・はらい）でなぞったところだけ見せる */
+const STROKES=[[0.12,0.22,0.88,0.2],[0.5,0.06,0.48,0.94],[0.16,0.5,0.84,0.52],[0.86,0.12,0.9,0.92],[0.14,0.12,0.1,0.92],[0.12,0.86,0.9,0.84],[0.3,0.3,0.7,0.75],[0.72,0.3,0.28,0.78]];
+const maskCv=document.createElement('canvas'), mctx=maskCv.getContext('2d');
+function writeBrush(str,size,color,y,t0,per,onStart){
+  const chs=[...str]; ctx.font=`400 ${size}px 'Yuji Syuku','Zen Old Mincho',serif`;
+  const gap=size*0.08, ws=chs.map(ch=>ctx.measureText(ch).width), total=ws.reduce((a,b)=>a+b,0)+gap*(chs.length-1);
+  const t=(performance.now()-card.t0)/1000; let x=-total/2;
+  chs.forEach((ch,n)=>{ const w=ws[n], p=Math.max(0,Math.min(1,(t-t0-n*per)/per));
+    if(p>0){ if(onStart) onStart();
+      const S=Math.ceil(size*1.4); if(maskCv.width!==S){ maskCv.width=S; maskCv.height=S; }
+      mctx.clearRect(0,0,S,S); mctx.lineCap='round'; mctx.lineJoin='round'; mctx.lineWidth=size*0.42; mctx.strokeStyle='#000';
+      const ox=(S-w)/2, oy=(S-size)/2, k=p*STROKES.length;                     // 何画目まで書けたか
+      let tip=null;
+      STROKES.forEach((st,si)=>{ const q=Math.max(0,Math.min(1,k-si)); if(q<=0) return;
+        const x1=ox+st[0]*w, y1=oy+st[1]*size, x2=ox+(st[0]+(st[2]-st[0])*q)*w, y2=oy+(st[1]+(st[3]-st[1])*q)*size;
+        mctx.beginPath(); mctx.moveTo(x1,y1); mctx.lineTo(x2,y2); mctx.stroke(); if(q<1) tip=[x2,y2]; });
+      if(p>=1){ mctx.fillRect(0,0,S,S); tip=null; }
+      mctx.globalCompositeOperation='source-in'; mctx.fillStyle=color; mctx.font=ctx.font; mctx.textBaseline='middle'; mctx.textAlign='left';
+      mctx.fillText(ch,ox,S/2); mctx.globalCompositeOperation='source-over';
+      ctx.drawImage(maskCv,x-ox,y-S/2);
+      if(tip){ ctx.save(); ctx.globalAlpha=0.5; ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x-ox+tip[0],y-S/2+tip[1],size*0.07,0,Math.PI*2); ctx.fill(); ctx.restore(); }   // 筆先
+    }
+    x+=w+gap; });
+}
+/* 英語の筆記体：つづけ字なので、左から右へ、ペン先が進むように */
+function writeCursive(str,size,color,y,t0,dur,onStart){
+  if(!str) return; const t=(performance.now()-card.t0)/1000, p=ease((t-t0)/dur); if(p<=0) return; if(onStart) onStart();
+  ctx.save(); ctx.font=`400 ${size}px 'Great Vibes',cursive`; ctx.textAlign='left'; ctx.textBaseline='middle';
+  const w=ctx.measureText(str).width, x=-w/2;
+  ctx.beginPath(); ctx.rect(x-6,y-size,(w+12)*p,size*2); ctx.clip();
+  ctx.fillStyle=color; ctx.fillText(str,x,y); ctx.restore();
+}
 GT.registerDraw(drawCard,'speech');
 })();
