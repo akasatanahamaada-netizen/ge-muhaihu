@@ -22,7 +22,7 @@ GT.registerScene({
   ],
 });
 
-const isHere=()=>GT.scene&&GT.scene.id==='mari_gate';
+const isHere=()=>GT.scene&&(GT.scene.id==='mari_gate'||GT.scene.id==='afterword');   // 赤ずきんのお話のあと（afterword）も、同じ森の出口
 GT.registerDraw(()=>{ if(!isHere()||!GT.goth) return; GT.goth.back(); GT.goth.props(); GT.goth.fog(false); }, 'back');
 GT.registerDraw(()=>{ if(!isHere()||!GT.goth) return; GT.goth.shrooms(); GT.goth.big(690,72); GT.goth.lantern(); }, 'world');
 GT.registerDraw(()=>{ if(!isHere()||!GT.goth) return; GT.goth.fog(true); GT.goth.top(); GT.goth.wisps(); GTDecor.forest.air(); }, 'overlay');

@@ -474,17 +474,15 @@ GT.registerAct('after-setup',()=>{
   if(m){ m.lines=EPILOGUE[ending.kind].concat([{s:'',c:'narr',t:'第一章「赤い頭巾」　おわり',act:'end-card'}]); }
 });
 GT.registerScene({
-  id:'afterword', type:'story', stage:'afterword', label:'序章 ── 暗い森',
-  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年ははじめの暗い森に立っていた。',act:'after-setup'},
-          {s:'',c:'narr',t:'霧の向こう、大きな木の下にマリがいる。'} ],
+  id:'afterword', type:'story', stage:'mari_gate', label:'序章 ── 森の出口',   // マリが待っていた、森の出口と同じステージ（stages/02c_mari_gate.js が描く）
+  intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年は森の出口に立っていた。',act:'after-setup'},
+          {s:'',c:'narr',t:'大きな木の下で、マリが待っていた。'} ],
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:630, noExit:true, required:true,   // 話すとエンディング
       lines:[{s:'マリ',c:'mari',t:'おかえり。'}],
       onEnd:()=>{ GT.mode='idle'; showEndChoices(); } },
   ],
 });
-GT.registerDraw(()=>{ if(!isAfter()||!GT.goth) return; GT.goth.back(); GT.goth.props(); GT.goth.fog(false); }, 'back');
-GT.registerDraw(()=>{ if(!isAfter()||!GT.goth) return; GT.goth.shrooms(); GT.goth.big(690,72); GT.goth.lantern(); }, 'world');
-GT.registerDraw(()=>{ if(!isAfter()||!GT.goth) return; GT.goth.fog(true); GT.goth.top(); GT.goth.wisps(); GTDecor.forest.air(); }, 'overlay');
+
 
 })();
