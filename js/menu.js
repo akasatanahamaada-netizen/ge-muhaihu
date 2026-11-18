@@ -154,6 +154,13 @@ const css=`
 .gtm:not([data-view="main"]) .gtm-howto{ font-size:clamp(10px,1.5cqw,32px); line-height:1.45; }   /* How to Play が枠に入りきるように */
 .gtm:not([data-view="main"]) .gtm-card h3{ margin-bottom:0.35em; padding-bottom:0.3em; }
 @media (max-width:640px){ .gtm:not([data-view="main"]) .gtm-card{ left:6%; width:88%; top:5%; height:90%; } }
+/* メニューの英語は、つづけ字の筆記体（Great Vibes）。細い字なので、少し大きく・ふちに影 */
+.gtm-btn, .gtm-start span, .gtm-card h3, .gtm-vol span{ font-family:'Great Vibes',cursive !important; font-weight:400 !important; letter-spacing:0.01em !important; }
+.gtm[data-view="main"] .gtm-btn{ font-size:clamp(16px,2.55cqw,60px); white-space:nowrap; }
+.gtm[data-view="main"] .gtm-view{ flex-wrap:nowrap !important; gap:0.1em clamp(2px,0.9cqw,22px) !important; }
+.gtm-start span{ font-size:clamp(22px,3.6cqw,84px); }
+.gtm:not([data-view="main"]) .gtm-card h3{ font-size:clamp(22px,3.4cqw,78px); }
+.gtm:not([data-view="main"]) .gtm-btn, .gtm-vol span{ font-size:1.3em; }
 `;
 const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
 

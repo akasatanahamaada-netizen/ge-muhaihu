@@ -514,3 +514,7 @@ html,body, body.gt-full{ background:
 
 /* 地の文（名前なし）でも、名前の行の高さを残す（1行目が右上の Skip ボタンに重ならないように） */
 .speaker{ min-height:1.3em; padding-right:9cqw; }
+
+/* 栞（Reread・menu）の文字は、つづけ字の筆記体（Great Vibes）。Caveat より細いので、少し大きく */
+.gt-mark .word{ font-family:'Great Vibes',cursive !important; font-weight:400 !important; font-size:clamp(14px,2.6cqw,48px) !important; letter-spacing:0 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,0.45); }
