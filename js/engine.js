@@ -1559,6 +1559,26 @@ function drawGameOver(){
   ctx.fillStyle='#d9c79a'; ctx.font="600 15px 'Zen Old Mincho',serif"; ctx.fillText('ページを もどって、やりなおす……',W/2,H/2+26);
   ctx.restore();
 }
+/* ミッションの表示（HTML）。文字がくっきり出る。位置はキャンバスの上から 48/480 */
+const missionEl=document.createElement('div'); missionEl.id='gtMission';
+missionEl.innerHTML='<svg class="ic" viewBox="0 0 20 16" aria-hidden="true"><path d="M2 3 L7 1.5 L11 2.8 L18 1 L17 7 L18.6 13 L12 14.6 L7 13.4 L1.5 15 L2.6 9z" fill="#fbf3dc" stroke="#8a7a5a" stroke-width="0.8"/><path d="M5 6 H14 M5 9 H15 M5 12 H11" stroke="#b9a885" stroke-width="0.8"/></svg><span class="tx"></span>';
+canvas.parentElement.appendChild(missionEl);
+(function(){ const st=document.createElement('style'); st.textContent=`
+  #gtMission{ position:absolute; left:50%; top:${(48/480*100).toFixed(2)}%; transform:translate(-50%,-50%); z-index:1; display:none; align-items:center; gap:0.5em;
+    padding:0.28em 1.1em; border-radius:2em; background:rgba(43,36,24,0.78); color:#f3ead0; white-space:nowrap; pointer-events:none;
+    font-family:'Zen Old Mincho',serif; font-weight:700; font-size:clamp(11px,1.6cqw,38px); letter-spacing:0.04em; box-shadow:0 0 0 0 rgba(255,226,140,0); }
+  #gtMission.show{ display:flex; }
+  #gtMission.done{ background:rgba(176,141,87,0.92); }
+  #gtMission .ic{ width:1.4em; height:1.15em; transform:rotate(-7deg); flex:none; }
+  #gtMission.nopage .ic{ display:none; }`; document.head.appendChild(st); })();
+let missionTxt=null;
+function missionDom(txt,page,done,pulse){
+  if(txt!==missionTxt){ missionEl.querySelector('.tx').textContent=txt; missionTxt=txt; }
+  missionEl.classList.add('show'); missionEl.classList.toggle('done',done); missionEl.classList.toggle('nopage',!page);
+  missionEl.style.opacity = done ? Math.min(1,0.35+missionFlash) : 1;
+  missionEl.style.transform = `translate(-50%,-50%) scale(${(1+0.18*pulse).toFixed(3)})`;   // 拾った直後は、ぽんと大きくなる
+  missionEl.style.boxShadow = pulse>0 ? `0 0 0 2px rgba(255,226,140,${pulse.toFixed(2)})` : 'none';
+}
 function drawMissionHud(){
   const c=missionCount(), parts=[];
   const page=itemLook==='page', verb = page?'を集める':itemLook==='flower'?'を摘む':null;   // 見出しの言いかた
@@ -1566,6 +1586,8 @@ function drawMissionHud(){
   if(missionReq.enemies) parts.push(`狼の手下を倒す ${c.enemies}/${c.enemiesAll}`);
   const done=missionDone();
   const txt = done ? (verb&&!missionReq.enemies ? `${itemLabel}が そろった！` : missionReq.items ? 'ミッション達成！' : 'みんな倒した！') : ((verb||!missionReq.items) ? '' : 'ミッション　')+parts.join('　');
+  // キャンバスに描くと、画面を大きくしたときに文字がぼやけるので、ゲーム画面の上に重ねた HTML（#gtMission）で出す
+  missionDom(txt, page, done, hudPulse); return;
   ctx.save(); ctx.font="700 14px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
   const icon=page?26:0, w=ctx.measureText(txt).width+28+icon, y=48;
   ctx.globalAlpha = done ? Math.min(1,0.35+missionFlash) : 1;
@@ -1737,7 +1759,7 @@ function render(){
   ctx.save(); ctx.globalCompositeOperation='multiply'; ctx.drawImage(GT.paperArt.agedPaper,0,0); ctx.restore();   // 古い紙の色むら・しみ（表示類より奥）
   drawEdgeFade();                                                                                                   // ふちを、まわりのページの色へ ぼかす（ページのふくらみとのさかいを目立たせない）
   drawGradeMul();   // 全体の色合い（まわりのページと同じ色）
-  if(missionReq) drawMissionHud();
+  if(missionReq && !flipping && !gameOver && !GT.paused && !document.querySelector('.gtm.show')) drawMissionHud(); else missionEl.classList.remove('show');   // メニュー・ページめくりのあいだは出さない
   if(GT.hurtFlash>0){ ctx.fillStyle=`rgba(139,20,20,${GT.hurtFlash*0.35})`; ctx.fillRect(0,0,W,H); }
   drawHearts();
   if(gameOver){ const st=gameOver.cause&&gameOverStyles[gameOver.cause]; if(st&&st.draw) st.draw(gameOver); else drawGameOver(); }
