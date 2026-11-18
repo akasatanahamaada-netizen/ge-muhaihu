@@ -511,3 +511,6 @@ html,body, body.gt-full{ background:
 
 /* 栞の並びを入れかえた（左が menu、右が Reread）ので、案内の吹き出しは Reread の栞のすぐ右に */
 .gt-mark.gt-guide::after{ left:calc(100% + 1.2cqw) !important; }
+
+/* 地の文（名前なし）でも、名前の行の高さを残す（1行目が右上の Skip ボタンに重ならないように） */
+.speaker{ min-height:1.3em; padding-right:9cqw; }
