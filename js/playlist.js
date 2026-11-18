@@ -92,11 +92,11 @@ GT.stageBackgrounds = {
   opening:S(BG_DAY),   // 狼が出てくるまでは、ゴシックにする前と同じ明るい森（前は暗い森 Object.assign({},DARK,{shade:0.2})）       // 最初の場面（マリと出会う）：暗めの森（ステージの木も暗く。shade で暗さを変える）
   komichi1:S(BG_DAY), komichi2:S(BG_DAY), path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
   house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
-  wolf_talk:DARK,                                    // 狼（暗い森）
+  wolf_talk:G(BG_DAY,0.3),                           // 狼：ここから暗くなりはじめる（前は暗い森 DARK）
   crossroads:{src:BG_TITLE,page:'spread',wash:'rgba(244,240,230,0.08)'},   // 分かれ道（道のある、霧の薔薇の森）
   path2:DARK, path2b:ROSE,                           // 近道（①暗い森 ②いばらと薔薇の森）
   flowers:ROSE,                                      // お花畑（遠回りの はじめ。薔薇の森）
-  path3:G(BG_DAY,0.75), path4:G(BG_EVENING,0.85),              // 遠回り：歩くうちに日が傾く
+  path3:G(BG_DAY,0.6), path4:G(BG_EVENING,0.72),              // 遠回り：歩くうちに日が傾く
   house_front:f=>G(f.route==='shortcut'?BG_DAY:BG_EVENING,0.9),
 };
 
@@ -106,9 +106,11 @@ const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
   // 0 は、ゴシックにする前と同じ見た目（色合い・岩・ちょうちょ・案内の枠も）。狼が出てくるまでは 0
   opening:0, komichi1:0, komichi2:0, house_peek:0, path1:0, meet_hood:0, cliff:0,
-  wolf_talk:0.6,                                 // 狼：ここから不気味に
-  crossroads:0.6, path2:0.72, path2b:0.8, flowers:0.6, path3:0.7, path4:0.8,
-  house_front:0.88, arrive:0.9, '@boss':0.8, '@qte':0.8,   // おばあさんの家・戦い：いちばん暗い（戦いは部屋の暗さがあるので、少しひかえめに）
+  wolf_talk:0.3,                                 // 狼：ここから、だんだん暗く不気味に
+  crossroads:0.45,                               // 分かれ道
+  path2:0.55, path2b:0.7,                        // 近道（①暗い森 → ②いばらの森）
+  flowers:0.45, path3:0.6, path4:0.72,           // 遠回り（お花畑 → 日が傾く）
+  house_front:0.82, arrive:0.9, '@boss':0.8, '@qte':0.8,   // おばあさんの家・戦い：いちばん暗い（戦いは部屋の暗さがあるので、少しひかえめに）
   ending:f=>GOOD_END(f)?0.35:1,                  // 助けられたら、少し明るさが戻る
   epilogue:f=>GOOD_END(f)?0.05:0.8,               // よい結末は、夜明けの明るさ
 };

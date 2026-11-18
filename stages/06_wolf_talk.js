@@ -192,9 +192,9 @@ function moveActors(){
 function drawBack(){
   const t=performance.now()/1000;
   ctx.save();
-  ctx.fillStyle='rgba(8,6,8,0.12)'; ctx.fillRect(0,0,W,H);                   // 森の奥は暗い
+  ctx.fillStyle='rgba(8,6,8,0.05)'; ctx.fillRect(0,0,W,H);                   // 森の奥は少し暗い（暗さは、狼に近づくほど FX.dark で増す）
   const tg=ctx.createLinearGradient(0,0,0,H*0.5);
-  tg.addColorStop(0,'rgba(6,4,6,0.35)'); tg.addColorStop(1,'rgba(6,4,6,0)');
+  tg.addColorStop(0,'rgba(6,4,6,0.2)'); tg.addColorStop(1,'rgba(6,4,6,0)');
   ctx.fillStyle=tg; ctx.fillRect(0,0,W,H*0.5);
   const vg=ctx.createRadialGradient(W/2,H*0.6,H*0.25,W/2,H*0.6,H);
   vg.addColorStop(0,'rgba(20,16,12,0)'); vg.addColorStop(1,'rgba(20,16,12,0.26)');
