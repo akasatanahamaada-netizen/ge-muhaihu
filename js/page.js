@@ -156,8 +156,26 @@
   const marks=document.createElement('div'); marks.className='gt-marks'; wrap.appendChild(marks);
   const asMark=(el,word,label)=>{ if(!el) return; el.className='gt-mark'; el.innerHTML='<span class="word"></span>';
     el.querySelector('.word').textContent=word; el.title=label; el.setAttribute('aria-label',label); el.removeAttribute('style'); marks.appendChild(el); };
+  // 栞を引き出すときの「すっ」という音（紙がこすれる音を、その場で作る。効果音の音量にしたがう）
+  let swAC=null, swT=0;
+  const swish=()=>{ const now=performance.now(); if(now-swT<260) return; swT=now;
+    const vol=GT.volume?GT.volume.se:1; if(vol<=0) return;
+    try{ swAC=swAC||new (window.AudioContext||window.webkitAudioContext)(); if(swAC.state==='suspended') swAC.resume(); }catch(e){ return; }
+    const a=swAC, t=a.currentTime, dur=0.22;
+    const buf=a.createBuffer(1,Math.ceil(a.sampleRate*dur),a.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    const n=a.createBufferSource(); n.buffer=buf;
+    const bp=a.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=1.2;
+    bp.frequency.setValueAtTime(1800,t); bp.frequency.exponentialRampToValueAtTime(5200,t+dur);   // 音が上へ抜けていく（引き出す感じ）
+    const hp=a.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=700;
+    const g=a.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.35*vol,t+0.05); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    n.connect(bp).connect(hp).connect(g).connect(a.destination); n.start(t); n.stop(t+dur); };
+  GT.sfxSwish=swish;
   asMark(wrap.querySelector('.gtm-open'),'menu','メニュー');          // 左が menu、右が Reread
   asMark(document.getElementById('openBook'),'Reread','本を読み返す');
+  marks.querySelectorAll('.gt-mark').forEach(m=>{                      // カーソルを乗せて栞が引き出されるとき・タップしたとき
+    m.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse') swish(); });
+    m.addEventListener('pointerdown',swish); m.addEventListener('focus',swish); });
   const fs=document.getElementById('fsBtn'); if(fs) document.body.appendChild(fs);
   const under=document.querySelector('.under'); if(under) under.style.display='none';
 })();
