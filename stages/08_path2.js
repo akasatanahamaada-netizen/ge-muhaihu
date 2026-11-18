@@ -28,7 +28,7 @@ GT.defineStage('path2', {
     {page:'left', x:325, y:145, w:120, h:90, kind:'ledge'},
     {page:'left', x:360, y:110, w:65, h:50, kind:'ledge'},
     {page:'right', x:735, y:190, w:115, h:20, kind:'ledge'},
-    {page:'right', x:865, y:15, w:20, h:405, kind:'ledge'},
+    // （右のはしをふさいでいた、天井から下がるつるの棒は なくした）
   ],
   boxes:[
     {x:750, y:160, w:32, h:32},
@@ -88,7 +88,6 @@ GT.registerDraw(()=>{ if(!isHere()) return;
 GT.registerDraw(()=>{ if(!isHere()) return;
   F.trunk(P(0)); F.crown([P(3),P(2)],11);                                           // 木
   F.log(P(1),5); F.log(P(4),9);                                                     // 丸太
-  F.vine(P(5));                                                                     // つる
   for(const box of GT.boxes) F.crate(box);
 }, 'world');
 GT.registerDraw(()=>{ if(!isHere()) return;
