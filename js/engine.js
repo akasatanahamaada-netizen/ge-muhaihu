@@ -1477,10 +1477,17 @@ let chimeAC=null;
 function chime(){
   const vol=GT.volume?GT.volume.se:1; if(vol<=0) return;
   try{ chimeAC=chimeAC||new (window.AudioContext||window.webkitAudioContext)(); if(chimeAC.state==='suspended') chimeAC.resume(); }catch(e){ return; }
-  const a=chimeAC, t0=a.currentTime;
-  [1318.5,1760,2349.3].forEach((f,i)=>{ const o=a.createOscillator(), g=a.createGain(), t=t0+i*0.07;
-    o.type='sine'; o.frequency.value=f; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.16*vol,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+0.7);
-    o.connect(g).connect(a.destination); o.start(t); o.stop(t+0.75); });
+  // 「ぽわん」：低めのやわらかい音が、ふくらむように始まって、ゆっくり消える（音の高さが少しだけ上へすべる・かすかにゆれる）
+  const a=chimeAC, t=a.currentTime, dur=1.1;
+  const lp=a.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1600; lp.Q.value=0.7;
+  const g=a.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.22*vol,t+0.06); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  const lfo=a.createOscillator(), lg=a.createGain(); lfo.frequency.value=5.5; lg.gain.value=5;
+  [[523.25,'sine',1],[784,'sine',0.45],[261.6,'triangle',0.35]].forEach(([f,type,amp])=>{
+    const o=a.createOscillator(), og=a.createGain(); o.type=type; og.gain.value=amp;
+    o.frequency.setValueAtTime(f*0.82,t); o.frequency.exponentialRampToValueAtTime(f,t+0.14);   // ぽわっと、少し上へ
+    lfo.connect(lg).connect(o.frequency);
+    o.connect(og).connect(lp); o.start(t); o.stop(t+dur+0.05); });
+  lp.connect(g).connect(a.destination); lfo.start(t); lfo.stop(t+dur+0.05);
 }
 GT.chime=chime;
 GT.drawPageScrap=drawPageScrap;   // ステージ側からも使う（落ちてくるかけらなど）
