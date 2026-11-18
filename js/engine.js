@@ -1491,12 +1491,6 @@ function chime(){
     bp.frequency.setValueAtTime(700*k,t); bp.frequency.exponentialRampToValueAtTime(5200*k,t+0.38); bp.frequency.exponentialRampToValueAtTime(2600*k,t+D);
     n.connect(bp).connect(ng); });
   ng.connect(out); ng.connect(dl); n.start(t); n.stop(t+D);
-  // ② ーん：すきとおった音が、下から上へすべって、ゆれながら消える（2つの音を少しずらして、きらめかせる）
-  const tg=a.createGain(); tg.gain.setValueAtTime(0.0001,t); tg.gain.exponentialRampToValueAtTime(0.045,t+0.3); tg.gain.exponentialRampToValueAtTime(0.0001,t+D);
-  [880,886.5].forEach(f=>{ const o=a.createOscillator(); o.type='sine';
-    o.frequency.setValueAtTime(f*0.6,t); o.frequency.exponentialRampToValueAtTime(f*1.5,t+0.42); o.frequency.exponentialRampToValueAtTime(f*1.4,t+D);
-    o.connect(tg); o.start(t); o.stop(t+D); });
-  tg.connect(out); tg.connect(dl);
   // ③ 魔法のきらめき：小さな鈴（ベルの音色）が、しゅわーんの上で ちりちりと鳴る。上がっていく音の並びで、ところどころ ばらつかせる
   const NOTES=[1568,1760,2093,2349,2637,3136,3520,4186];
   for(let i=0;i<9;i++){ const f=NOTES[Math.min(NOTES.length-1,Math.floor(i*0.9+Math.random()*1.5))], tt=t+0.08+i*0.075+Math.random()*0.03, amp=0.05*(1-i*0.06);
