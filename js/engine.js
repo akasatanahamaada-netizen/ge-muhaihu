@@ -1010,7 +1010,41 @@ function drawHintBright(cx,cy,lines){   // 明るい絵本のころの案内の�
     ctx.font=FONT; ctx.textAlign='left'; ctx.fillStyle='#e8c35a'; ctx.fillText(l[1],x+4,y); });
   ctx.restore();
 }
-GT.drawHint=function(cx,cy,lines){
+/* 説明の枠（チュートリアル）：キャンバスではなく、ゲーム画面の上に重ねた HTML で出す。
+   ステージ側は、これまでどおり毎フレーム GT.drawHint(中心x, 中心y, 行) を呼ぶ。描いたフレームだけ表示される */
+const hintEl=document.createElement('div'); hintEl.id='gtHint'; canvas.parentElement.appendChild(hintEl);
+(function(){ const st=document.createElement('style'); st.textContent=`
+  #gtHint{ position:absolute; z-index:1; display:none; transform:translate(-50%,-50%); pointer-events:none; white-space:nowrap;
+    padding:0.55em 1.05em; border-radius:0.45em; background:rgba(43,36,24,0.9); color:#f1e8d6;
+    font-family:'Zen Old Mincho',serif; font-weight:700; font-size:clamp(10px,1.55cqw,36px); line-height:1.75; letter-spacing:0.02em;
+    box-shadow:0 0.25em 0.9em rgba(0,0,0,0.45), inset 0 0 0 1px rgba(214,176,118,0.85), inset 0 0 0 0.3em rgba(43,36,24,0.9), inset 0 0 0 calc(0.3em + 1px) rgba(214,176,118,0.35);
+    animation:gtHintPulse 1.6s ease-in-out infinite; }
+  #gtHint.show{ display:block; }
+  #gtHint .row{ display:flex; align-items:center; gap:0.35em; }
+  #gtHint kbd{ display:inline-block; min-width:1.5em; padding:0 0.4em; border-radius:0.25em; text-align:center; font:inherit; font-size:0.85em; line-height:1.55;
+    background:linear-gradient(#3e3226,#241c14); color:#f3dfb0; box-shadow:inset 0 0 0 1px rgba(214,176,118,0.85), 0 0.15em 0 #100c08; }
+  #gtHint .sl{ color:#b9a27a; font-size:0.85em; }
+  #gtHint .lb{ color:#e8c88a; margin-left:0.25em; }
+  #gtHint.bright{ background:rgba(43,36,24,0.82); color:#f3ead0; box-shadow:inset 0 0 0 1.5px rgba(232,195,90,0.7); border-radius:0.8em; }
+  #gtHint.bright kbd{ background:#f3ead0; color:#3a2f2a; box-shadow:inset 0 0 0 1px #8a7a5a; }
+  #gtHint.bright .lb{ color:#e8c35a; }
+  @keyframes gtHintPulse{ 0%,100%{ opacity:0.92; } 50%{ opacity:1; } }`; document.head.appendChild(st); })();
+let hintReq=null, hintKey='';
+const escH=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function flushHint(){
+  if(!hintReq || flipping || GT.paused){ hintEl.classList.remove('show'); hintReq=null; return; }
+  const {cx,cy,lines}=hintReq; hintReq=null;
+  const html=lines.map(l=>{ if(typeof l==='string') return `<div class="row">${escH(l)}</div>`;
+    const ks=touchKeys(l[0]).map(k=>`<kbd>${escH(k)}</kbd>`).join('<span class="sl">/</span>');
+    return `<div class="row">${ks}<span class="lb">${escH(l[1])}</span></div>`; }).join('');
+  const key=html+(GT.isBright&&GT.isBright()?'b':'g');
+  if(key!==hintKey){ hintEl.innerHTML=html; hintEl.classList.toggle('bright',!!(GT.isBright&&GT.isBright())); hintKey=key; }
+  hintEl.style.left=(Math.max(EDGE+60,Math.min(W-EDGE-60,cx))/W*100)+'%';
+  hintEl.style.top=(Math.max(EDGE+40,Math.min(H-EDGE-40,cy))/H*100)+'%';
+  hintEl.classList.add('show');
+}
+GT.drawHint=function(cx,cy,lines){ hintReq={cx,cy,lines}; return; };   // （下の、キャンバスに描くしくみは使わない）
+GT.drawHintCanvas=function(cx,cy,lines){
   if(GT.isBright&&GT.isBright()) return drawHintBright(cx,cy,lines);   // チュートリアル（明るい場面）は、前の枠のまま
   ctx.save(); ctx.textBaseline='middle';
   const FONT="700 14px 'Zen Old Mincho',serif";
@@ -1785,6 +1819,9 @@ function drawNpc(n){
 }
 
 function render(){
+  try{ renderBody(); } finally { flushHint(); }
+}
+function renderBody(){
   const gravity=GT.gravity;
   ctx.clearRect(0,0,W,H); ctx.drawImage(GT.paperArt.paper,0,0);
   drawStageBackground();
