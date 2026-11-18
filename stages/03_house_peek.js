@@ -46,8 +46,6 @@ GT.defineStage('house_peek', {
   platforms:[ WELL, WOOD ],
   boxes:[], enemies:[],
   decor:[
-    {layer:'back',  kind:'cloud', x:120, y:60,  w:130, h:50},
-    {layer:'back',  kind:'cloud', x:300, y:120, w:100, h:40},
     {layer:'back',  kind:'tree',  x:10,  y:110, w:110, h:300},
     {layer:'back',  kind:'tree',  x:350, y:150, w:100, h:260},
     {layer:'back',  kind:'bush',  x:210, y:420, w:76,  h:44},
