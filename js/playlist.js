@@ -127,7 +127,7 @@ const BGM_THORN=M('荊の庭');                 // 近道（いばらの道）
 const BGM_SAD=M('堕ちる');                    // 悲しい曲（おばあさんを助けられなかった結末）
 GT.sceneMusic = {
   // wake（ひとりで目覚める）と chapter1（章のとびら）は、曲なし（静けさ）
-  opening:  M('異世界へようこそ'),            // マリと出会う
+  // opening（マリと出会う）も、曲なし
   afterword: M('ふしぎな絵本'),              // 第一章のあと：はじめの暗い森で、マリと話す
   // チュートリアル（森の小道①②）は、曲なし
   path1: BGM_ADVENTURE, cliff: BGM_ADVENTURE,   // アクションのステージ（続けて流れる）

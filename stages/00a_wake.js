@@ -44,7 +44,7 @@ GT.registerAct('wake-fall',()=>{
   GT.holdDialogue(()=>st.landed && performance.now()-st.landT>900);   // 落ちて、しばらくしてから語りを出す
 });
 GT.registerAct('wake-pre',()=>{ const pl=GT.player; pl.x=START_X; pl.y=-300; pl.vx=0; pl.vy=0; });
-GT.registerAct('wake-pick',()=>{ st.picked=true; GT.sfx&&GT.sfx('page'); });
+GT.registerAct('wake-pick',()=>{ st.picked=true; });   // 本を拾う（音は鳴らさない）
 
 /* 落ちる動き（会話中は物理が止まっているので、ここで動かす） */
 function updateFall(){
