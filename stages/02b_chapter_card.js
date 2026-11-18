@@ -92,12 +92,12 @@ function drawCard(){
        「第 一 章」→ 罫線 → 「「赤い頭巾」」を一文字ずつ → 赤ずきんと狼のシルエットを下から描いていく */
   const W1=T_TEXT, W2=W1+0.75, W3=W2+0.25, PER=0.2;                          // 書きはじめる時間（秒）
   ctx.textAlign='left'; ctx.textBaseline='middle';
-  const pen=key=>{ if(card.pen[key]) return; card.pen[key]=true; GT.sfx&&GT.sfx('write'); };   // ペンで書く音
+  const pen=key=>{ if(card.pen[key]) return; card.pen[key]=true; GT.sfx&&GT.sfx('write'); };   // ペンで書く音（一行・一枚の絵に一回）
   const writeLine=(str,font,color,y,t0,per)=>{                              // 一文字ずつ、左から右へ書いていく（書いている字のはしに、インクのにじみ）
     ctx.font=font; const chs=[...str], ws=chs.map(ch=>ctx.measureText(ch).width), total=ws.reduce((a,b)=>a+b,0);
     let x=-total/2;
     chs.forEach((ch,n)=>{ const p=Math.max(0,Math.min(1,(t-t0-n*per)/per)), w=ws[n];
-      if(p>0){ if(ch.trim()) pen(y+':'+n); ctx.save(); ctx.beginPath(); ctx.rect(x-2,y-40,(w+4)*p,80); ctx.clip();
+      if(p>0){ pen('line'+y); ctx.save(); ctx.beginPath(); ctx.rect(x-2,y-40,(w+4)*p,80); ctx.clip();
         ctx.globalAlpha=Math.min(1,0.4+p); ctx.fillStyle=color; ctx.fillText(ch,x,y); ctx.restore();
         if(p<1){ ctx.save(); ctx.globalAlpha=0.35*(1-p); ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x+w*p,y+4,3,0,Math.PI*2); ctx.fill(); ctx.restore(); } }
       x+=w; }); };
