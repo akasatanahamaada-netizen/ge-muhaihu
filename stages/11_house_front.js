@@ -59,7 +59,6 @@ const OPEN={
   shortcut:[
     {s:'',c:'narr',t:'少年は、ひとりで駆けてきた。息が切れる。'},
     {s:'',c:'narr',t:'家の戸が、少しだけ開いている。中から、ガタン、と物音がした。'},
-    {s:'',c:'narr',t:'垣根のそばに、マリが立っている。'},
     {s:'',c:'narr',t:'（まわりに、何かがありそうだ）'},
   ],
   detour:()=>[
@@ -144,9 +143,7 @@ GT.registerScene({
       onEnd:()=>{ st.talked=true; GT.storyPiece&&GT.storyPiece('front','front:story','hood'); GT.fillPage('front', GT.flags.stoppedAtDoor
         ? '――戸の向こうの声は、おばあさんのものではなかった。少年は、赤ずきんを止めた。'
         : '――赤ずきんは掛け金を引き、おばあさんの家へ入っていった。'); } },
-    // 近道のときだけ：マリ
-    { who:'mari', name:'マリ', page:'left', x:-300, lines:MARI_LINES,
-      onEnd:()=>{ st.talked=true; GT.storyPiece&&GT.storyPiece('front','front:story','hood'); GT.fillPage('front','――少年は、ひとりでおばあさんの家にたどり着いた。戸の向こうから、物音がしていた。'); } },
+    // （近道のときも、マリは出てこない。着くと右の端（戸）が開く）
   ],
 });
 
@@ -161,7 +158,10 @@ GT.registerSceneReset(()=>{ if(!isFront()) return;
   st.talked=false; st.busy=false; st.opened=false; st.found={}; st.spot=null; st.hoodEnterT0=0; st.hoodInside=false; st.knockT0=0; st.runTo=null; GT.flags.houseClues=0; });
 GT.registerAct('front-setup',()=>{
   const h=npc('hood'), m=npc('mari');
-  if(shortcut()){ if(m) m.x=MARI_GATE; }
+  if(shortcut()){ st.talked=true;                                            // 近道：着いたら、そのまま戸から中へ入れる
+    GT.storyPiece&&GT.storyPiece('front','front:story');
+    GT.fillPage('front','――少年は、ひとりでおばあさんの家にたどり着いた。戸の向こうから、物音がした。');
+    GT.openStoryExit&&GT.openStoryExit(); }
   else { if(h) h.x=EDGE; GT.flags.stoppedAtDoor=false; }
 });
 GT.registerAct('front-knock',()=>{ st.knockT0=performance.now(); });

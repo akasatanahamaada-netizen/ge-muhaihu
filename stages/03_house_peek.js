@@ -1,6 +1,6 @@
 /* ============================================================================
    ステージ：第一章 ── 赤ずきんの家（窓からのぞく）  id = 'house_peek'
-   種類：story　家のそばのマリに会い、自分で窓をのぞきに行く
+   種類：story　自分で窓をのぞきに行く（マリは出てこない）
    担当：
    ----------------------------------------------------------------------------
    ◆ このステージの流れ
@@ -88,15 +88,11 @@ GT.registerScene({
   intro:[
     // 章のとびら（第一章「赤い頭巾」）は、この前のシーン chapter1（stages/02b_chapter_card.js）で出す
     {s:'',c:'narr',t:'森の小道を抜けると森のはずれに小さな家が見えた。煙突から細い煙がのぼっている。'},
-    {s:'',c:'narr',t:'窓には明かりがともり、中で人影が動いている。家のそばにマリが立っている。'},
+    {s:'',c:'narr',t:'窓には明かりがともり、中で人影が動いている。'},
     {s:'',c:'narr',t:'手の中の本がかすかに反応している。虫食いのページに文章が記されている。',act:'peek-book-guide'},   // 「本を開く」ボタンへ誘導（読み返してみよう）
   ],
   npcs:[
-    // 窓をのぞき終わると、マリのほうから話しかけてくる（GT.talkTo。自分からは話しかけられないよう update で talkable=false にしてある）
-    { who:'mari', name:'マリ', page:'right', x:596, lines:[   // 窓（667〜755）と薪の山（648〜）より左に立っている
-      {s:'マリ',c:'mari',t:'見えた？　これがこのお話のはじまり。'},
-      {s:'マリ',c:'mari',t:'あの子を追いかけて。……この先あなたの本に書かれることになるから。'},
-    ], onEnd:()=>{ GT.storyPiece&&GT.storyPiece('window','window:story','mari'); GT.fillPage('window','――窓の向こうで、母親が赤ずきんにお使いを頼んでいた。カスタードとバターの小瓶を、おばあさんのもとへ。'); } },
+    // （マリは、赤ずきんのお話の中には出てこない。森の出口で待っている）
     // 戸口から駆けだしていく赤ずきん（はじめは画面の外。act:'house-hood-run' で動く）
     { who:'hood', name:'赤ずきん', page:'right', x:-300 },
   ],
@@ -109,10 +105,10 @@ GT.registerAct('peek-book-guide', ()=>{ if(GT.guideToBook) GT.guideToBook('本�
 
 /* ---------- 自動で始まる会話（マリの声かけ・窓のぞき） ---------- */
 const DOOR={x:800, y:372, w:52};
-const st={ briefed:false, peeked:false, busy:false, runT0:0 };
+const st={ briefed:true, peeked:false, busy:false, runT0:0 };   // briefed：前はマリと話してから窓をのぞけた。今は、はじめからのぞける
 const isHouse=()=>GT.scene&&GT.scene.id==='house_peek';
 GT.registerSceneReset(()=>{ if(isHouse() && GT.moodSnap) GT.moodSnap(); });   // 暗い序章から、一気に明るい絵本の雰囲気へ
-GT.registerSceneReset(()=>{ if(isHouse()){ st.briefed=false; st.peeked=false; st.busy=false; st.runT0=0; } });
+GT.registerSceneReset(()=>{ if(isHouse()){ st.briefed=true; st.peeked=false; st.busy=false; st.runT0=0; } });
 GT.registerAct('house-hood-run',()=>{ st.runT0=performance.now(); setTimeout(()=>{ if(st.runT0) GT.sfx&&GT.sfx('door'); },1300); GT.holdDialogue(()=>!st.runT0); });   // 赤ずきんが出ていって、戸が閉まる
 GT.registerAct('peek-off-run',()=>{ peek.on=false; st.runT0=performance.now(); setTimeout(()=>{ if(st.runT0) GT.sfx&&GT.sfx('door'); },1300);
   GT.holdDialogue(()=>!st.runT0); });   // 赤ずきんが画面の外へ駆けていくまで、会話の枠を消して見せる   // 窓から離れる ＋ 赤ずきんが駆けだしていく
@@ -124,25 +120,14 @@ function autoTalk(lines, then){
 GT.registerUpdate(()=>{
   if(!isHouse()) return;
   const pl=GT.player, pcx=pl.x+pl.w/2;
-  /* マリ：窓をのぞく前は、自分から話しかけると BRIEF を話す（話し終えても右の端は開かない）。
-     のぞいたあとは、自分からは話しかけられない（マリのほうから話しかけてきて、npcs の lines を話す） */
-  const mari=GT.getNpcs().find(n=>n.who==='mari');
-  if(mari){
-    if(!st.briefed){
-      if(!mari._final){ mari._final={lines:mari.lines, onEnd:mari.onEnd, noExit:mari.noExit};
-        mari.lines=BRIEF; mari.noExit=true; mari.required=true; mari.onEnd=()=>{ st.briefed=true; }; }   // 話さないと先へ進めない（吹き出しは「！」）
-      mari.talkable=true;
-    } else {
-      if(mari._final){ Object.assign(mari,mari._final); mari._final=null; mari.talked=false; }   // のぞいたあとの会話にもどす
-      mari.talkable=false;
-    }
-  }
   if(st.busy) return;
   const onWood = pl.onGround && GT.gravity.right===1 && Math.abs(pl.y+pl.h-WOOD.y)<2
               && pcx>WOOD.x+4 && pcx<WOOD.x+WOOD.w-4;
-  // 窓をのぞけるのは、マリと話したあとだけ（先にのぞくと、のぞいたあとのマリの会話が始まらなくなるため）
   if(!st.peeked && st.briefed && onWood && !document.getElementById('dlg').classList.contains('show')){ st.peeked=true;
-    autoTalk(PEEK, ()=>{ if(isHouse()) GT.talkTo(GT.getNpcs().find(n=>n.who==='mari')); });   // のぞき終わったら、そのままマリが話しかけてくる
+    autoTalk(PEEK, ()=>{ if(!isHouse()) return;                                     // のぞき終わったら：お話のかけら・本のページ・右の端が開く
+      GT.storyPiece&&GT.storyPiece('window','window:story');
+      GT.fillPage('window','――窓の向こうで、母親が赤ずきんにお使いを頼んでいた。カスタードとバターの小瓶を、おばあさんのもとへ。');
+      GT.openStoryExit&&GT.openStoryExit(); });
   }
 });
 
