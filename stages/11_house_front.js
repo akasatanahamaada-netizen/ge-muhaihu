@@ -179,6 +179,8 @@ GT.registerUpdate(()=>{
   if(!isFront() || st.busy) return;
   const pl=GT.player, pcx=pl.x+pl.w/2;
   if(!st.opened){ st.opened=true; autoTalk(shortcut()?OPEN.shortcut:OPEN.detour()); return; }
+  // 遠回り：違和感を全部調べるまで、赤ずきんには話しかけられない
+  if(!shortcut()){ const h=npc('hood'); if(h && !st.talked) h.talkable = clueCount()>=CLUES.length; }
   // 気づいたこと
   const onFloor = pl.onGround && Math.abs(pl.y+pl.h-FLOOR)<2;
   const spots={
