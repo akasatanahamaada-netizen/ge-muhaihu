@@ -18,45 +18,6 @@ const SAVE_KEY='gravityTale.ep1.save';
 const BOOKMARK_MAX=5;                 // しおりは5枚まで（下の「しおり」）
 const TITLE_BG='assets/background/タイトル背景_森.webp';   // タイトル画面の背景（霧の薔薇の森。紫をぬいて、霧の深い緑がかった灰色に。もとは『ゴシックの森とタイトル背景png.png』）
 const TITLE_LOGO='assets/background/タイトルロゴ_金.webp'; // タイトルのロゴ（ふちが透明）。文字といばらを古びた金色にしたもの（もとの色は『タイトルロゴ.webp』）
-const LOGO_SVG=(()=>{   // タイトルのロゴ：昔の本の活字（IM Fell English）と、細い線で描いた いばら・薔薇の飾り（絵の画像は使わない）
-  // いばらの線（下）：ゆるい波線に、小さなとげと葉
-  let thorns='', leaves='';
-  for(let i=0;i<14;i++){ const x=150+i*36+(i%2)*8; if(x>365&&x<435) continue; const y=212+Math.sin(x*0.035)*7, up=i%2?-1:1;
-    thorns+=`M${x} ${y} l${up*3} ${-6*up}`; }
-  for(const [x,y,r] of [[250,213,-25],[330,206,20],[470,206,-20],[550,213,25]]) leaves+=`<path d="M0 0 q7 -6 15 0 q-7 6 -15 0z" transform="translate(${x} ${y}) rotate(${r})"/>`;
-  return `<svg class="gtm-logo" viewBox="0 0 800 260" role="img" aria-label="Gravity Tales">
-  <defs>
-    <linearGradient id="lgGold" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#f4e2a8"/><stop offset="0.45" stop-color="#d4ae5c"/><stop offset="0.55" stop-color="#b48a3c"/><stop offset="1" stop-color="#7c5a24"/></linearGradient>
-    <linearGradient id="lgGoldLine" gradientUnits="userSpaceOnUse" x1="0" y1="30" x2="0" y2="235"><stop offset="0" stop-color="#e9cf86"/><stop offset="1" stop-color="#b8903f"/></linearGradient>
-    <filter id="lgWorn" x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="4" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" result="d"/>
-      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="9" result="m"/>
-      <feColorMatrix in="m" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.35" result="mask"/>
-      <feComposite in="d" in2="mask" operator="in" result="worn"/>
-      <feMerge><feMergeNode in="d"/><feMergeNode in="worn"/></feMerge>
-    </filter>
-    <filter id="lgShadow" x="-10%" y="-20%" width="120%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#0a0604" flood-opacity="0.85"/></filter>
-  </defs>
-  <g filter="url(#lgShadow)">
-    <g fill="none" stroke="url(#lgGoldLine)" stroke-linecap="round" filter="url(#lgWorn)">
-      <path d="M190 52 H368 M432 52 H610" stroke-width="2"/><path d="M215 60 H372 M428 60 H585" stroke-width="1"/>
-      <path d="M400 40 l12 12 l-12 12 l-12 -12z" stroke-width="2"/>
-      <path d="M150 214 C220 196, 300 228, 370 208 M430 208 C500 228, 580 196, 650 214" stroke-width="2.2"/>
-      <path d="${thorns}" stroke-width="1.6"/>
-      <path d="M150 214 c-14 -2 -22 6 -16 14 c4 6 14 2 10 -4 M650 214 c14 -2 22 6 16 14 c-4 6 -14 2 -10 -4" stroke-width="1.8"/>
-    </g>
-    <g fill="#5d6a3a" opacity="0.95">${leaves}</g>
-    <g transform="translate(400 209)">
-      <circle r="15" fill="#7a1424"/><circle r="11" cx="-1" cy="-1" fill="#a3223a"/>
-      <path d="M-7 -1 a7 7 0 1 1 7 7 a5 5 0 1 1 -5 -5 a3 3 0 1 1 3 3" fill="none" stroke="#4a0a14" stroke-width="1.4"/>
-      <path d="M-24 4 q8 -7 14 0 q-8 6 -14 0z M24 4 q-8 -7 -14 0 q8 6 14 0z" fill="#5d6a3a"/>
-    </g>
-    <text x="400" y="168" text-anchor="middle" font-family="'IM Fell English',serif" font-style="italic" font-size="118" letter-spacing="1"
-      fill="url(#lgGold)" stroke="#2a1a0c" stroke-width="2.4" paint-order="stroke" filter="url(#lgWorn)">Gravity Tales</text>
-  </g>
-</svg>`; })();
 const NAMES={ arrive:'おばあさんの家', ending:'結末' };      // label の無いシーンの名前
 
 /* ---- セーブ（ブラウザの localStorage。使えないときはセーブなしで動く） ---- */
@@ -152,7 +113,7 @@ const css=`
    ・Settings・How to Play は、まん中に暗い半透明の枠で出す（薔薇の色と、くすんだ金のふち） */
 .gtm{ background:#10130f url("${encodeURI(TITLE_BG)}") 50% 50%/cover no-repeat; color:#efe6d2; }
 .gtm::before{ background:radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(4,6,4,0.55) 100%); }
-.gtm-logo{ position:absolute; left:50%; top:12%; width:52%; height:auto; overflow:visible; transform:translateX(-50%); pointer-events:none; user-select:none;
+.gtm-logo{ position:absolute; left:50%; top:12%; width:48%; transform:translateX(-50%); pointer-events:none; user-select:none;
   filter:drop-shadow(0 6px 14px rgba(4,6,4,0.75)); }
 .gtm-title{ left:0; right:0; top:50%; text-shadow:0 1px 6px rgba(4,6,4,0.95), 0 0 14px rgba(4,6,4,0.8); }
 .gtm-title h2{ position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }   /* ロゴの絵があるので、文字は見せない（読み上げ用に残す） */
@@ -206,7 +167,7 @@ const style=document.createElement('style'); style.textContent=css; document.hea
 const wrap=document.querySelector('.canvas-wrap');
 const menu=document.createElement('div'); menu.className='gtm'; menu.dataset.view='main'; menu.setAttribute('role','dialog'); menu.setAttribute('aria-label','メニュー');
 menu.innerHTML=`
-  ${LOGO_SVG}
+  <img class="gtm-logo" src="${encodeURI(TITLE_LOGO)}" alt="" draggable="false">
   <div class="gtm-title"><h2>Gravity Tales</h2><p>第一章「赤い頭巾」</p></div>
   <div class="gtm-card">
     <div class="gtm-view" data-view="main">
