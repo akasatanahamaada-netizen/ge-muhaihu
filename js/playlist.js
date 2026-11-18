@@ -61,6 +61,7 @@ GT.playlist = [
   'opening',      // 序章 ── 森（マリと出会う / story）
   'komichi1',     // 森の小道①（play）
   'komichi2',     // 森の小道②（play）
+  'mari_gate',    // チュートリアルのおわり：森の出口でマリと話す（この先は絵本の世界）
   'chapter1',     // 章のとびら：本がひらいて「第一章「赤い頭巾」」（ここから明るい絵本の雰囲気へ）
   'house_peek',   // 赤ずきんの家・窓のぞき（story）
   'path1',        // 森の道①（play）
@@ -100,7 +101,8 @@ const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 GT.stageBackgrounds = {
   wake:DARK,          // 序章（ひとりで目覚める）：暗い森
   opening:DARK,        // 序章（マリと出会う）：暗い森
-  afterword:DARK,      // 第一章のあと：はじめの暗い森にもどる
+  afterword:DARK,
+  mari_gate:DARK,                                    // チュートリアルのおわり：森の出口      // 第一章のあと：はじめの暗い森にもどる
   komichi1:DARK, komichi2:DARK,   // チュートリアルも、序章のゴシックの森
   path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
   house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
@@ -118,7 +120,7 @@ const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
   // ゴシック（暗い森）は、序章（目覚め〜チュートリアル）と、赤ずきんのお話のあと（afterword）だけ
   wake:0.3, opening:0.3, komichi1:0.3, komichi2:0.3,   // 暗すぎて見にくくならないように、ひかえめに
-  afterword:0.3,
+  afterword:0.3, mari_gate:0.3,
   // 第一章（赤ずきんのお話）は 0：ゴシックにする前と同じ、明るい絵本の雰囲気（色合いをかけない）
   house_peek:0, path1:0, meet_hood:0, cliff:0, wolf_talk:0, crossroads:0, path2:0, path2b:0, flowers:0, path3:0, path4:0,
   house_front:0, arrive:0, '@boss':0, '@qte':0, ending:0, epilogue:0,
