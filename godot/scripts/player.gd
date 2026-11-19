@@ -16,6 +16,7 @@ var game: Node                     # game.gd（ページの重力を持ってい
 var facing := 1
 var flip_fall := false             # 本を裏返して、落ちているところ
 var sprite: Sprite2D
+var shadow: Sprite2D                # うしろの背景に落ちる影
 var tex_stand: Texture2D
 var tex_walk: Texture2D
 var walk_t := 0.0
@@ -31,6 +32,13 @@ func _ready() -> void:
 	sprite = Sprite2D.new()
 	sprite.texture = tex_stand
 	add_child(sprite)
+	shadow = Sprite2D.new()
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://shaders/shadow.gdshader")
+	shadow.material = mat
+	shadow.z_as_relative = false
+	shadow.z_index = -20                  # 背景の上、足場の下（game.gd の Z_SHADOW）
+	add_child(shadow)
 	collision_layer = 0
 	floor_snap_length = 4.0
 
@@ -80,3 +88,13 @@ func _update_sprite(g: int, delta: float) -> void:
 	sprite.flip_v = g < 0               # 天井では、上下さかさま
 	# 足もとを、当たり判定の箱の床がわにそろえる
 	sprite.position = Vector2(0, (SIZE.y / 2.0 - DRAW_H / 2.0) * g)
+	# 影：同じ絵の形を、右下へずらして、ぼかしてぬる（手前にいるぶん、影は少し遠く）
+	var d: float = game.DEPTH_PLAYER
+	shadow.texture = sprite.texture
+	shadow.scale = sprite.scale
+	shadow.flip_h = sprite.flip_h
+	shadow.flip_v = sprite.flip_v
+	shadow.position = sprite.position + game.shadow_offset(d)
+	var m := shadow.material as ShaderMaterial
+	m.set_shader_parameter("blur", game.shadow_blur(d) / s)
+	m.set_shader_parameter("shadow_color", Color(0.12, 0.08, 0.05, game.shadow_alpha(d)))

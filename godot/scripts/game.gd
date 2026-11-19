@@ -13,6 +13,21 @@ const SPINE := 450.0
 const EDGE := 16.0
 const FLIP_BUFFER := 0.35
 
+## 影：光は左上から。物がうしろの背景に影を落とす。
+## depth … どれくらい手前にあるか（0＝背景のすぐ前 〜 1＝いちばん手前）。手前の物ほど、影は物から遠く・大きくぼける
+const DEPTH_PLATFORM := 0.4
+const DEPTH_PLAYER := 0.55
+static func shadow_offset(depth: float) -> Vector2:
+	return Vector2(4.0 + depth * 20.0, 3.0 + depth * 11.0)
+static func shadow_blur(depth: float) -> float:
+	return 2.0 + depth * 8.0
+static func shadow_alpha(depth: float) -> float:
+	return 0.82 - 0.2 * depth
+## 重ねる順番（小さいほど奥）
+const Z_BG := -30
+const Z_SHADOW := -20
+const Z_WORLD := -10
+
 var gravity := {"left": 1, "right": 1}
 var stage_id := "komichi1"
 var stage: Dictionary
@@ -25,6 +40,7 @@ var cleared := false
 var flash := {"left": 0.0, "right": 0.0}
 
 var world: Node2D
+var shadows: Node2D
 var hud: Label
 var hint: Label
 var font: SystemFont
@@ -54,9 +70,16 @@ func load_stage(id: String) -> void:
 	bg.centered = false
 	bg.scale = Vector2(W / bg.texture.get_width(), H / bg.texture.get_height())
 	bg.modulate = Color(1, 1, 1, 0.9)
+	bg.z_index = Z_BG
 	add_child(bg)
 
+	shadows = Node2D.new()                 # 足場の影（背景の上、足場の下）
+	shadows.z_index = Z_SHADOW
+	shadows.draw.connect(_draw_shadows)
+	add_child(shadows)
+
 	world = Node2D.new()
+	world.z_index = Z_WORLD
 	world.draw.connect(_draw_world)
 	add_child(world)
 
@@ -159,6 +182,20 @@ func _physics_process(delta: float) -> void:
 		load_stage(stage_id)
 		return
 	world.queue_redraw()
+	shadows.queue_redraw()
+
+## 足場の影：右下へずらした四角を、少しずつ広げて重ね、ふちをぼかす
+func _draw_shadows() -> void:
+	var off := shadow_offset(DEPTH_PLATFORM)
+	var blur := shadow_blur(DEPTH_PLATFORM)
+	var a := shadow_alpha(DEPTH_PLATFORM)
+	var steps := 6
+	for pl in stage["platforms"]:
+		var r := Rect2(pl["x"], pl["y"], pl["w"], pl["h"])
+		r.position += off
+		for k in range(steps):
+			var grow := blur * (1.0 - float(k) / steps)
+			shadows.draw_rect(r.grow(grow - blur * 0.5), Color(0.12, 0.08, 0.05, a / steps))
 
 ## 足場・ページの重力の矢印・お話のかけら・右の端の案内を描く
 func _draw_world() -> void:
