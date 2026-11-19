@@ -104,11 +104,11 @@ GT.registerScene({
    赤ずきんの動き
    phase: 'wait'（鼻歌を歌いながら先を歩いている）→ 'follow'（ついてくる）→ 'talk'（向こう岸で待つ）→ 'done'（またついてくる）
    ========================================================================== */
-const st={ phase:'wait', stopTold:false, busy:false, hood:null, bubble:null, waitT:0, splashes:[], last:performance.now() };
+const st={ phase:'wait', stopTold:false, busy:false, hood:null, bubble:null, waitT:0, splashes:[], talkTry:0, stuckT:0, last:performance.now() };
 const isMeet=()=>GT.scene&&GT.scene.id==='meet_hood';
 const engHood=()=>GT.getNpcs().find(n=>n.who==='hood');
 function reset(){
-  st.phase='wait'; st.stopTold=false; st.busy=false; st.bubble=null; st.waitT=0; st.splashes=[];
+  st.phase='wait'; st.stopTold=false; st.busy=false; st.bubble=null; st.waitT=0; st.splashes=[]; st.talkTry=0; st.stuckT=0;
   st.hood={x:HOOD_START, y:FLOOR, vy:0, g:1, face:1, settled:true, walking:false, blocked:false};
 }
 reset();
@@ -184,7 +184,11 @@ GT.registerUpdate(dt=>{
   if(st.phase==='follow' && across){ st.phase='talk'; st.bubble=null; return; }
   // 向こう岸で待っている赤ずきんが、そのまま話しかけてくる（自分から話しかけなくても始まる）
   if(st.phase==='talk' && n && n.talkable && !n.talked && GT.mode==='play'
-     && !document.getElementById('dlg').classList.contains('show')){ GT.player.vx=0; GT.talkTo(n); return; }
+     && !document.getElementById('dlg').classList.contains('show') && performance.now()>st.talkTry){ st.talkTry=performance.now()+500; GT.talkTo(n); return; }   // （始まらなかったときは、0.5秒おいてもう一度。そのあいだも少年は動ける）
+  // 赤ずきんが向こう岸に来られないまま（天井に残った など）、少年が向こう岸の床で待っていたら、6秒で追いつく
+  if(st.phase==='follow' && pcx>POND.x+POND.w && pl.onGround && GT.gravity.right===1 && !(h.g===1 && h.x>=rightBank()-0.5)){
+    st.stuckT+=dt; if(st.stuckT>6){ st.stuckT=0; h.g=1; h.x=rightBank(); h.y=FLOOR; h.vy=0; h.settled=true; say('……やっと、追いついた！',2); } }
+  else st.stuckT=0;
   // 置いていかれた
   if(st.phase==='follow' && h.g===1 && pondSide(h.x+HW/2)==='left' && pcx>POND.x+POND.w){
     st.waitT-=dt; if(st.waitT<=0){ say('待って……！'); st.waitT=3.2; } }
@@ -196,7 +200,15 @@ GT.registerUpdate(dt=>{
 function ell(x,y,rx,ry,c){ ctx.beginPath(); ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2); ctx.fillStyle=c; ctx.fill(); }
 
 /* 赤ずきん（engine の NPC と同じ形。重力が逆なら上下さかさま。かごを持っている） */
+let idleT=0;
+function watchStuck(){   // 会話の枠が出ていないのに、2秒たっても少年が動けないときは、動けるようにもどす
+  if(!isMeet() || GT.paused){ idleT=0; return; }
+  const dlgOn=document.getElementById('dlg').classList.contains('show'), d=GT.dbg?GT.dbg():{};
+  if(GT.mode==='idle' && !dlgOn && !d.flipping && !d.storyTalking){ idleT+=1/60; if(idleT>2){ idleT=0; GT.mode='play'; st.busy=false; } }
+  else idleT=0;
+}
 function drawHood(){
+  watchStuck();
   const h=st.hood, n=engHood(); if(n && n.x>-100) return;   // engine が描いているときは描かない
   const t=performance.now()/1000;
   // 会話中は動きが止まるので、歩く絵（足をバタバタ）にはしない。立ち止まって話す
