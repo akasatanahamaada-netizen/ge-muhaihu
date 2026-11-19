@@ -350,8 +350,7 @@ function drawBookView(){
   bookText(cx-pw+pad, top+40, pw-pad*2, BOOK_TEXT_L, 3, 0.35, 22);
   // 小さな飾り（つる草の文様）
   ctx.save(); ctx.strokeStyle='rgba(176,141,87,0.55)'; ctx.lineWidth=1.2; const oy=top+ph-46, ox=cx-pw/2;
-  ctx.beginPath(); ctx.moveTo(ox-46,oy); ctx.bezierCurveTo(ox-24,oy-12,ox-10,oy+10,ox,oy); ctx.bezierCurveTo(ox+10,oy-10,ox+24,oy+12,ox+46,oy); ctx.stroke();
-  ctx.fillStyle='rgba(176,141,87,0.6)'; ctx.beginPath(); ctx.arc(ox,oy,2.4,0,Math.PI*2); ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.moveTo(ox-46,oy); ctx.bezierCurveTo(ox-24,oy-12,ox-10,oy+10,ox,oy); ctx.bezierCurveTo(ox+10,oy-10,ox+24,oy+12,ox+46,oy); ctx.stroke(); ctx.restore();   // まん中の点は描かない
   // ---- 右ページ：挿絵（本物の挿絵を、うすく色あせさせて）と、その下の文章 ----
   const aw=pw-pad*2, ah=aw*330/600, ax=cx+pad, ay=top+24;
   if(GT.bookArt && GT.bookArt.has('prologue')){ GT.bookArt.mount(bookArtCv,'prologue');
