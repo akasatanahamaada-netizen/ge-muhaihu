@@ -669,7 +669,7 @@ function setFlipHide(on){ document.body.classList.toggle('gt-flipping',on); }
   st.textContent='.gt-flipping #dlg, .gt-flipping .dialogue, .gt-flipping #qte{ visibility:hidden !important; } .gt-flipping img[alt=""]:not(.gtm-logo){ visibility:hidden; }';
   document.head.appendChild(st); })();
 let flipFromId=null;
-GT.flipGlowFrom=new Set(['mari_gate']);   // この場面からめくるとき、めくれる紙の下から光がもれ出す
+GT.flipGlowFrom=new Set(['mari_gate','afterword']);   // この場面からめくるとき、めくれる紙の下から光がもれ出す
 let flipDir=1;                                          // 1=次のページへ / -1=前のページへもどる（ゲームオーバーのやり直し）
 function startPageFlip(dir,toScene){   // toScene … めくったうしろで始めるシーン（playlist の外のシーンなど）
   if(flipping) return;

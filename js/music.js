@@ -48,7 +48,7 @@ GT.onSceneStart(scene=>{
     if(next && players[next] && players[next].el.paused) players[next].restart=true; }
   sceneWant=next;
   // この場面に入ったら、曲を かならず頭から（タイトルと同じ曲でも、続きからにしない）。小さい音から、ふわっと入る
-  if(next && scene && scene.id!==prevSceneId && (GT.musicFromStart||[]).includes(scene.id)){ const p=player(next); p.el.currentTime=0; p.vol=0; p.el.volume=0; p.restart=false; }
+  if(next && scene && scene.id!==prevSceneId && (GT.musicFromStart||[]).includes(scene.id)){ const old=players[next]; if(old){ old.el.pause(); old.el.src=''; delete players[next]; } player(next); }   // 鳴っている最中だと、頭にもどせないことがあるので、新しく作りなおす
 });
 
 let last=performance.now();

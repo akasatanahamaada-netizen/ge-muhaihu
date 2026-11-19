@@ -376,7 +376,9 @@ window.addEventListener('keydown',e=>{
 }, true);
 
 GT.showMenu=showMenu; GT.hideMenu=hideMenu;
-GT.startNewGame=startNew;   // マリのところから、お話を最初から
+GT.startNewGame=startNew;
+// その場面に来たときの状態（分岐・本のページ）にもどす。なければ最初の状態。マリのところから、章をえらぶ画面へもどるときに使う
+GT.restoreStateOf=id=>{ applyState(save.scenes[id]||INIT); rebuildScenes(); };
 GT.startFrom=startFrom; GT.canStartFrom=id=>!!save.scenes[id]; GT.sceneName=sceneName;   // 本を読み返す画面の、各ページのステージのボタンで使う
 
 /* ---- しおり：メニューの「しおりを挟む」で、いまのステージにしおりを挟む。本の上に色ちがいのしおりが増え、

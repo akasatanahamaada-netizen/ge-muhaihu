@@ -501,7 +501,7 @@ GT.registerAct('after-setup',()=>{
 /* エンディングの画面のあと：画面を消して、マリがもう一度話す。お話を変えたいなら、次のページへ進むと最初から */
 const RESTART_TALK=[
   {s:'マリ',c:'mari',t:'……ねえ。もし、お話を変えたいなら。'},
-  {s:'マリ',c:'mari',t:'もう一度、次のページへ進んで。そうしたら、お話は最初から始まるよ。'},
+  {s:'マリ',c:'mari',t:'もう一度、次のページへ進んで。そうしたら、お話は、また章のはじまりから始まるよ。'},
   {s:'マリ',c:'mari',t:'今度は、ちがう道を選んでもいい。だれかに、ちがう言葉をかけてもいい。'},
   {s:'マリ',c:'mari',t:'このままでいいなら、本を開いて、読み返してもいいよ。……わたしは、ここで待ってる。'},
 ];
@@ -518,12 +518,16 @@ function afterEnd(){
 GT.registerUpdate(()=>{
   if(!isAfter() || !aft.restart || GT.mode!=='play') return;
   const pl=GT.player; if(pl.x+pl.w < W-EDGE-6) return;
-  aft.restart=false; if(GT.startNewGame) GT.startNewGame(); else location.reload();
+  aft.restart=false;
+  // 章をえらぶ画面から、もう一度（森の出口から めくったときと同じ、光がもれるめくり・曲は頭から・章の名前をペンで書く）
+  if(GT.restoreStateOf) GT.restoreStateOf('chapter_select');
+  GT.titleChapter=0; GT.mode='idle';
+  GT.startPageFlip(1, GT.sceneRegistry.chapter_select);
 });
 GT.registerDraw(()=>{ if(!isAfter() || !aft.restart || GT.mode!=='play') return;
   const p=0.5+0.5*Math.sin(performance.now()/1000*4);
   ctx.save(); ctx.textAlign='right'; ctx.globalAlpha=0.55+0.45*p; ctx.fillStyle='#d9b877'; ctx.font="700 22px 'Caveat',cursive";
-  ctx.fillText('Next page → start over', W-26, H/2); ctx.restore(); },'overlay');
+  ctx.fillText('Next page →', W-26, H/2); ctx.restore(); },'overlay');
 GT.registerScene({
   id:'afterword', type:'story', stage:'mari_gate', label:'序章 ── 森の出口',   // マリが待っている、森の出口にもどる（stages/02c_mari_gate.js が描く）
   intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年は森の出口に立っていた。',act:'after-setup'},
