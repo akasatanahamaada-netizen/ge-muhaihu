@@ -61,23 +61,24 @@ for(const k in SRC){
   try{ ctx=ctx||new AC(); }catch(e){ break; }
   fetch((window.GT_SFX_DATA||{})[k] || encodeURI(SRC[k])).then(r=>r.arrayBuffer()).then(d=>new Promise((ok,ng)=>ctx.decodeAudioData(d,ok,ng))).then(b=>{ buf[k]=b; }).catch(()=>{});
 }
-function playBoosted(name){
+function playBoosted(name,len){
   if(!ctx || !buf[name]) return false;
   if(ctx.state==='suspended') ctx.resume();
   const src=ctx.createBufferSource(), g=ctx.createGain();
   src.buffer=buf[name]; g.gain.value=SFX_VOLUME*(VOL[name]||1)*seVol();
   src.connect(g).connect(ctx.destination); src.start();
-  if(MAX_LEN[name]) src.stop(ctx.currentTime+MAX_LEN[name]);
+  const L=len||MAX_LEN[name];   // len … この秒数で、すっと小さくして止める
+  if(L){ g.gain.setValueAtTime(g.gain.value,ctx.currentTime+Math.max(0,L-0.12)); g.gain.linearRampToValueAtTime(0,ctx.currentTime+L); src.stop(ctx.currentTime+L+0.02); }
   return true;
 }
 
-GT.sfx=function(name){
+GT.sfx=function(name,len){   // len … 鳴らす長さ（秒。書かないときは MAX_LEN）
   const a=base[name]; if(!a || seVol()<=0) return;
   const now=performance.now(); if(lastT[name] && now-lastT[name]<90) return; lastT[name]=now;   // 同じ音の連打は間引く
-  if(playBoosted(name)) return;
+  if(playBoosted(name,len)) return;
   const s=a.cloneNode(); s.volume=Math.min(1,SFX_VOLUME*(VOL[name]||1)*seVol());
   s.play().catch(()=>{});
-  if(MAX_LEN[name]) setTimeout(()=>{ s.pause(); }, MAX_LEN[name]*1000);
+  if(len||MAX_LEN[name]) setTimeout(()=>{ s.pause(); }, (len||MAX_LEN[name])*1000);
 };
 
 /* 着地は、プレイヤーの状態の変わりめで鳴らす */

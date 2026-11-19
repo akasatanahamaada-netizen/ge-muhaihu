@@ -303,3 +303,9 @@ GTDecor.paint.flower(ctx, x, 地面のy, 大きさ, 色0〜3, 種);       // 花
 - 赤ずきん・マリ・狼・おばあさんも、いるページの重力の向きに落ちます（天井にいるときは上下さかさま）。しくみは `js/engine.js` の `GT.fallBody(b, dt)`。
 - 何回も逆さにすると、吹き出しで怒られます（1回目は何も言わない。回数が増えるほど怒る。しばらく反転しないとおさまる）。
   セリフは `js/engine.js` の `GT.GRUMBLE` で、キャラごとに5段階（だんだん怒る順）。ステージ独自の人物には `GT.grumble(b, 'hood')` を呼ぶと同じしくみが使えます。
+
+---
+
+## クレジット
+
+- 章のとびらの文字の書き順データ：[KanjiVG](https://kanjivg.tagaini.net)（Ulrich Apel ほか、CC BY-SA 3.0）。`stages/02b_chapter_card.js` の `KVG` に、使う字の分だけ入れています。
