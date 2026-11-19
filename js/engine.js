@@ -1831,6 +1831,23 @@ for(const c of [layerB,layerM,layerF]){ c.width=W; c.height=H; }
 const shadowSmall=[document.createElement('canvas'),document.createElement('canvas')];
 function grabLayer(L){ const g=L.getContext('2d'); g.clearRect(0,0,W,H); g.drawImage(canvas,0,0); ctx.clearRect(0,0,W,H); }
 GT.SHADOW={ dx:10, dy:6, alpha:0.82 };   // 影の基本の量（depth で、遠く・うすくなる）
+/* 影を、受ける物ごとに分けて落とす：
+   すぐうしろの物（奥の層 layerB の木や家）に映る影は、近く（nearDepth）に。そのさらに奥の背景に映る影は、遠く（depth）に */
+function castLayerSplit(L,depth,nearDepth){
+  const sc=shadowSmall[1]; if(sc.width!==W){ sc.width=W; sc.height=H; }
+  const s=sc.getContext('2d'), S=GT.SHADOW, dk=(gradeK||0)>0.02?0.25:0;
+  for(const [d,inside] of [[depth,false],[nearDepth,true]]){
+    s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,W,H);
+    s.drawImage(L, Math.round(S.dx+46*d), -Math.round(S.dy+30*d));
+    s.globalCompositeOperation='source-in';
+    s.fillStyle=`rgba(10,6,4,${Math.min(0.92,S.alpha-0.36*d+dk).toFixed(3)})`;
+    s.fillRect(0,0,W,H);
+    s.globalCompositeOperation = inside ? 'destination-in' : 'destination-out';   // 奥の物の上だけ／それ以外だけ
+    s.drawImage(layerB,0,0);
+    ctx.drawImage(sc,0,0);
+  }
+  s.globalCompositeOperation='source-over';
+}
 function castLayer(L,depth){
   // 影は、かたむけず、そのまま右上へずらす。ふちは、まっすぐ くっきり（画面と同じ大きさで写し、ぼかさない）
   const d=depth, sc=shadowSmall[0], S=GT.SHADOW;
@@ -1891,8 +1908,8 @@ function renderBody(){
     castLayer(layerB,0.25);
     ctx.save(); ctx.filter='saturate(0.8) brightness(1.04) contrast(0.9)'; ctx.drawImage(layerB,0,0); ctx.restore();
     drawPageEdges();
-    castLayer(layerM,0.6);
-    castLayer(layerF,1);                                              // 手前の草などの影は、少年や人物より うしろに落とす（少年にかぶらない）
+    castLayerSplit(layerM,0.6,0.12);                                  // 少年や足場の影：うしろの木や家には近く、背景には遠く
+    castLayerSplit(layerF,1,0.3);                                              // 手前の草などの影は、少年や人物より うしろに落とす（少年にかぶらない）
     ctx.drawImage(layerM,0,0);
     ctx.save(); ctx.filter='brightness(0.86) saturate(1.08) contrast(1.05)'; ctx.drawImage(layerF,0,0); ctx.restore();
     if(!(GT.scene&&(GT.scene.id==='title'||GT.scene.id==='chapter_select'))){ drawGravityIcon(SPINE/2,20,gravity.left,flashPage.left);
