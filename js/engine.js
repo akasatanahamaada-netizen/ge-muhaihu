@@ -1834,7 +1834,7 @@ function castLayer(L,depth){
   const s=sc.getContext('2d');
   s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,W,H);
   s.drawImage(L, Math.round(S.dx+30*d), -Math.round(S.dy+22*d));          // 手前の層ほど、遠くへ
-  s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.42*d).toFixed(3)})`;   // 奥の層ほど影は濃く、手前ほどうすい s.fillRect(0,0,W,H);
+  s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.42*d).toFixed(3)})`; s.fillRect(0,0,W,H);   // 奥の層ほど影は濃く、手前ほどうすい
   ctx.drawImage(sc,0,0);
 }
 function drawBookBase(gravity){
