@@ -144,7 +144,7 @@ GT.registerUpdate(dt=>{
   if(!h.settled){
     h.vy+=GT.GRAVITY*g*dt; h.y+=h.vy*dt;
     if(g===1 && h.y>=FLOOR){ h.y=FLOOR; h.vy=0; h.settled=true;
-      if(inPondX(h.x,HW)){ splash(h.x+HW/2); GT.sfx&&GT.sfx('splash'); h.x = pondSide(h.x+HW/2)==='left'?leftBank():rightBank(); say('きゃっ！ 冷たい！'); } }
+      if(inPondX(h.x,HW)){ splash(h.x+HW/2); GT.sfx&&GT.sfx('splash'); h.x=leftBank(); h.fellT=performance.now(); say('きゃっ！ 冷たい！'); } }   // 水たまりに落ちたら、いつも手前の岸へもどる（向こう岸で話す流れにはならない。やり直し）
     if(g===-1 && h.y<=EDGE){ h.y=EDGE; h.vy=0; h.settled=true; }
   }
 
@@ -186,7 +186,7 @@ GT.registerUpdate(dt=>{
   if(st.phase==='talk' && n && n.talkable && !n.talked && GT.mode==='play'
      && !document.getElementById('dlg').classList.contains('show') && performance.now()>st.talkTry){ st.talkTry=performance.now()+500; GT.talkTo(n); return; }   // （始まらなかったときは、0.5秒おいてもう一度。そのあいだも少年は動ける）
   // 赤ずきんが向こう岸に来られないまま（天井に残った など）、少年が向こう岸の床で待っていたら、6秒で追いつく
-  if(st.phase==='follow' && pcx>POND.x+POND.w && pl.onGround && GT.gravity.right===1 && !(h.g===1 && h.x>=rightBank()-0.5)){
+  if(st.phase==='follow' && pcx>POND.x+POND.w && pl.onGround && GT.gravity.right===1 && !(h.g===1 && h.x>=rightBank()-0.5) && !(h.g===1 && h.settled && h.x<=leftBank()+0.5)){   // （手前の岸の床にいるときは、追いつかない。水たまりに落ちたときなど）
     st.stuckT+=dt; if(st.stuckT>6){ st.stuckT=0; h.g=1; h.x=rightBank(); h.y=FLOOR; h.vy=0; h.settled=true; say('……やっと、追いついた！',2); } }
   else st.stuckT=0;
   // 置いていかれた
