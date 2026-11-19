@@ -97,7 +97,8 @@ function drawCard(){
     ctx.globalAlpha=1;
     writeBrush('第一章', 22, '#5a3a22', -116, W1, 0.28, ()=>pen('l1'));
     const kl=ease((t-W2)/0.35);                                               // 罫線を、まん中から左右へ（はしは細く）
-    if(kl>0){ ctx.strokeStyle='rgba(120,80,40,0.55)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-100*kl,-96); ctx.quadraticCurveTo(0,-92,100*kl,-96); ctx.stroke(); }
+    if(kl>0){ ctx.strokeStyle='rgba(120,80,40,0.55)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-100*kl,-96); ctx.quadraticCurveTo(0,-92,100*kl,-96); ctx.stroke();
+      ctx.fillStyle='rgba(120,80,40,0.6)'; ctx.beginPath(); ctx.arc(0,-94,2.2*kl,0,Math.PI*2); ctx.fill(); }
     writeBrush(chap.sub, 60, '#2a160c', -52, W3, PER, ()=>pen('l2'));
     writeCursive(CH_EN[card.ch]||'', 24, '#6b4a2a', -6, W4, 1.0, ()=>pen('l3'));
     // シルエット：上から下へ、筆で描いていくように（描いているふちは、ゆらゆら）
