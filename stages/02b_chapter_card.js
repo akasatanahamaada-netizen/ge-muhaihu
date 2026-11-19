@@ -42,6 +42,10 @@ function drawCard(){
   const glowA=0.15+0.35*ease((t-0.3)/2);
   let g=ctx.createRadialGradient(cx,cy,10,cx,cy,W*0.55); g.addColorStop(0,`rgba(255,214,150,${glowA})`); g.addColorStop(1,'rgba(255,214,150,0)');
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  // ただよう ちり
+  for(let i=0;i<26;i++){ const s=Math.sin(i*91.7)*43758.5, r=s-Math.floor(s), s2=Math.sin(i*37.3)*24634.6, r2=s2-Math.floor(s2);
+    const x=(r*W+t*8*(0.5+r2))%W, y=(r2*H-t*12*(0.4+r))%H+(r2*H-t*12*(0.4+r)<0?H:0);
+    ctx.globalAlpha=0.25+0.25*Math.sin(t*1.5+i); ctx.fillStyle='#f0dcb0'; ctx.beginPath(); ctx.arc(x,y,1.1,0,Math.PI*2); ctx.fill(); }
   ctx.globalAlpha=Math.min(1,t/0.6);                                   // 本が、暗やみから浮かびあがる
   ctx.translate(cx,cy); ctx.scale(zoom,zoom);
   const PW=230, PH=300, o=ease((t-T_OPEN0)/(T_OPEN1-T_OPEN0));
