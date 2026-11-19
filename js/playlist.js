@@ -98,20 +98,22 @@ const G=(src,m=0.5)=>({src,page:'spread',filter:`brightness(${(0.95-0.45*m).toFi
 const BG_TITLE='assets/background/タイトル背景_森.webp';   // 紫をぬいた版（もとは タイトル背景.webp）   // タイトル画面の背景（道のある、霧の薔薇の森）
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)',filter:'brightness(1.45) saturate(0.8) blur(0.8px)'};   // 暗い森の絵は、明るめにして見やすく   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
+// 赤ずきんのお話（明るい場面）の背景は、紙を切って重ねた森（stages/_paperforest.js）
+const PAPER_DAY={paper:'day'}, PAPER_EVE={paper:'evening'};
 GT.stageBackgrounds = {
   wake:DARK,          // 序章（ひとりで目覚める）：暗い森
   opening:DARK,        // 序章（マリと出会う）：暗い森
   afterword:DARK,
   mari_gate:DARK,                                    // チュートリアルのおわり：森の出口      // 第一章のあと：はじめの暗い森にもどる
   komichi1:DARK, komichi2:DARK,   // チュートリアルも、序章のゴシックの森
-  path1:S(BG_DAY), meet_hood:S(BG_DAY), cliff:S(BG_DAY),   // 狼が出てくるまで：前と同じ明るい森
-  house_peek:S(BG_DAY),   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
-  wolf_talk:S(BG_DAY),                           // 狼：昼の森
-  crossroads:S(BG_DAY),   // 分かれ道（道のある、霧の薔薇の森）
-  path2:{src:BG_DAY,page:'spread',dim:0.45}, path2b:{src:BG_DAY,page:'spread',dim:0.55},   // 近道：昼の森のまま、暗くするだけ（dim。①より②のほうが暗い）。人物は暗くしない
-  flowers:S(BG_DAY),                                      // お花畑（遠回りの はじめ。薔薇の森）
-  path3:S(BG_DAY), path4:S(BG_EVENING),              // 遠回り：歩くうちに日が傾く
-  house_front:f=>S(f.route==='shortcut'?BG_DAY:BG_EVENING),
+  path1:PAPER_DAY, meet_hood:PAPER_DAY, cliff:PAPER_DAY,   // 狼が出てくるまで：前と同じ明るい森
+  house_peek:PAPER_DAY,   // 前は暗い森（DARK）   // 赤ずきんの家：暗い森（窓の明かりが目立つように）
+  wolf_talk:PAPER_DAY,                           // 狼：昼の森
+  crossroads:PAPER_DAY,   // 分かれ道（道のある、霧の薔薇の森）
+  path2:{paper:'day',dim:0.45}, path2b:{paper:'day',dim:0.55},   // 近道：昼の森のまま、暗くするだけ（dim。①より②のほうが暗い）。人物は暗くしない
+  flowers:PAPER_DAY,                                      // お花畑（遠回りの はじめ。薔薇の森）
+  path3:PAPER_DAY, path4:PAPER_EVE,              // 遠回り：歩くうちに日が傾く
+  house_front:f=>f.route==='shortcut'?PAPER_DAY:PAPER_EVE,
 };
 
 /* 不気味さ（0〜1）：お話が進むほど、暗く・色が抜け・冷たい色になり、霧が出る（js/engine.js の drawGothicWorld）。

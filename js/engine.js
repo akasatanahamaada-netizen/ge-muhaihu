@@ -259,6 +259,7 @@ function bgSpread(spec,img){
 }
 function drawStageBackground(){
   const spec=stageBackgroundSpec(); if(!spec) return;
+  if(spec.paper && GT.paperBackdrop){ ctx.drawImage(GT.paperBackdrop(spec.paper),0,0); return; }   // 紙を切って重ねた森（stages/_paperforest.js）
   const img=loadBgImage(spec.src); if(!img) return;
   if(spec.page==='spread'){ ctx.drawImage(bgSpread(spec,img),0,0); return; }
   const v=bgVignette(spec,img);
