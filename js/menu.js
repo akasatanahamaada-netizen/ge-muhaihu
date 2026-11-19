@@ -249,7 +249,7 @@ menu.querySelectorAll('.gtm-orn').forEach(b=>b.addEventListener('pointerdown',e=
   const d=b.classList.contains('l')?-1:1;                  // 左の ❧ で前の章、右の ❧ で次の章
   chIdx=(chIdx+d+CH_NAMES.length)%CH_NAMES.length; ch.style.opacity='0';
   setTimeout(()=>{ ch.textContent=CH_NAMES[chIdx]; ch.style.opacity='1'; },180);
-  if(GT.titleFlip && menu.classList.contains('title-live')) GT.titleFlip(chIdx); else GT.sfx&&GT.sfx('page');   // タイトルの場面が、ぺらっとめくれる
+  if(GT.titleFlip && menu.classList.contains('title-live')) GT.titleFlip(chIdx,d); else GT.sfx&&GT.sfx('page');   // タイトルの場面が、ぺらっとめくれる
 }));
 window.addEventListener('keydown',e=>{ if(startCover.classList.contains('show') && menu.classList.contains('show')) dismissStart(e); }, true);
 

@@ -35,7 +35,7 @@ function refresh(){ const c=GT.titleChapter||0; nameEl.textContent=GT.CHAPTER_NA
 function step(d){
   if(!isSel()) return;
   GT.titleChapter=((GT.titleChapter||0)+d+GT.CHAPTER_NAMES.length)%GT.CHAPTER_NAMES.length;
-  refresh(); GT.startPageFlip(1, GT.sceneRegistry.chapter_select);   // 場面が、ぺらっとめくれる
+  refresh(); GT.startPageFlip(d<0?-1:1, GT.sceneRegistry.chapter_select);   // 前の章へは、ページも前へもどる   // 場面が、ぺらっとめくれる
 }
 box.querySelector('.orn.l').addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); step(-1); });
 box.querySelector('.orn.r').addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); step(1); });

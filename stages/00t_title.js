@@ -46,5 +46,5 @@ GT.registerDraw(()=>{
   sil(SIL.wolf, 610, 300, false);                        // 狼（右がわ・左向き）
 },'world');
 /* 章を選びなおしたとき：タイトルの場面ごと、ぺらっとページがめくれる（js/menu.js から呼ぶ） */
-GT.titleFlip=(ch)=>{ if(!isTitle()) return; GT.titleChapter=ch; GT.startPageFlip(1, GT.scene); };
+GT.titleFlip=(ch,dir)=>{ if(!isTitle()) return; GT.titleChapter=ch; GT.startPageFlip(dir<0?-1:1, GT.scene); };   // 前の章へは、ページも前へもどる
 })();
