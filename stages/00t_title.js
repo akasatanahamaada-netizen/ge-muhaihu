@@ -48,7 +48,7 @@ GT.registerDraw(()=>{
 GT.registerDraw(()=>{ if(!isTitle() || GT.titleChapter!==0) return; sil(SIL.wolf, 610, 300, false); },'speech');
 GT.extraShadow=(ctx)=>{
   if(!isTitle() || GT.titleChapter!==0 || !SIL.wolf.complete || !SIL.wolf.naturalWidth) return;
-  const img=SIL.wolf, h=300*1.75, w=h*img.naturalWidth/img.naturalHeight, foot=GT.H-GT.EDGE+4;
+  const img=SIL.wolf, foot=GT.H-GT.EDGE+4, h=Math.min(300*1.75, foot-10-22), w=h*img.naturalWidth/img.naturalHeight;   // 頭が ページの上で見切れない高さまで
   ctx.save(); ctx.globalAlpha=0.5; ctx.translate(610+70, foot-10);   // 右上へずらし、大きく
   ctx.drawImage(img,-w/2,-h,w,h); ctx.restore();
 };
