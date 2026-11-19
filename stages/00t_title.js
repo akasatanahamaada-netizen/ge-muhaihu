@@ -49,7 +49,7 @@ GT.registerDraw(()=>{ if(!isTitle() || GT.titleChapter!==0) return; sil(SIL.wolf
 GT.extraShadow=(ctx)=>{
   if(!isTitle() || GT.titleChapter!==0 || !SIL.wolf.complete || !SIL.wolf.naturalWidth) return;
   const img=SIL.wolf, h=300*1.4, w=h*img.naturalWidth/img.naturalHeight, foot=GT.H-GT.EDGE+4;
-  ctx.save(); ctx.globalAlpha=0.78; ctx.translate(610+55, foot-10);   // 右上へずらし、少し大きく
+  ctx.save(); ctx.globalAlpha=0.78; ctx.translate(610, foot); ctx.transform(1,0,0.55,1,0,0);   // 足もとから、赤ずきんのほう（左上）へ ななめに のびる（光は右から）
   ctx.drawImage(img,-w/2,-h,w,h); ctx.restore();
 };
 /* 章を選びなおしたとき：タイトルの場面ごと、ぺらっとページがめくれる（js/menu.js から呼ぶ） */
