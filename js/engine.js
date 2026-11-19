@@ -1879,10 +1879,14 @@ function renderBody(){
     for(const fn of drawOverlay) fn();
     grabLayer(layerF);                                                // 手前の層
     drawBookBase(gravity);
-    castLayer(layerB,0.25); castLayer(layerM,0.6); castLayer(layerF,1);   // 影（奥の層ほど近く・濃く、手前の層ほど遠く・うすく）
-    // 空気の遠近：奥の層は、少しかすんで色がうすく。手前の層は、少し暗く くっきり
+    // 影は、その層より奥にあるもの すべての上に落ちる（少年の影は、うしろの家や木の上にも映る）。
+    // 奥の層ほど影は近く・濃く、手前の層ほど遠く・うすく。空気の遠近：奥の層は少しかすみ、手前の層は少し暗く くっきり
+    castLayer(layerB,0.25);
     ctx.save(); ctx.filter='saturate(0.8) brightness(1.04) contrast(0.9)'; ctx.drawImage(layerB,0,0); ctx.restore();
-    drawPageEdges(); ctx.drawImage(layerM,0,0);
+    drawPageEdges();
+    castLayer(layerM,0.6);
+    ctx.drawImage(layerM,0,0);
+    castLayer(layerF,1);
     ctx.save(); ctx.filter='brightness(0.86) saturate(1.08) contrast(1.05)'; ctx.drawImage(layerF,0,0); ctx.restore();
     drawGravityIcon(SPINE/2,20,gravity.left,flashPage.left);
     drawGravityIcon(SPINE+SPINE/2,20,gravity.right,flashPage.right);
