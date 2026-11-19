@@ -458,7 +458,8 @@ GT.isGameOver=()=>!!gameOver;
 function startScene(idx){
   if(gameOver){ GT.hp=GT.MAX_HP; heartLost=0; }               // ゲームオーバーのあとだけ、ハートは 3つにもどる（ページを進んでもそのまま）
   gameOver=null;
-  GT.sceneIndex=idx; GT.scene=GT.SCENES[idx]; const scene=GT.scene; if(!scene) return;
+  const direct = idx && typeof idx==='object';                 // シーンそのものを渡したとき（タイトル画面のうしろの場面など。playlist の外）
+  GT.sceneIndex = direct ? -1 : idx; GT.scene = direct ? idx : GT.SCENES[idx]; const scene=GT.scene; if(!scene) return;
   for(const r of sceneResets) r();                      // 例：窓のぞき映像を閉じる
   for(const fn of sceneStartHooks) fn(scene, idx);
   if(scene.dynamic && dynamicHandlers[scene.dynamic]){ dynamicHandlers[scene.dynamic](scene); return; }
@@ -1892,8 +1893,8 @@ function renderBody(){
     castLayer(layerF,1);                                              // 手前の草などの影は、少年や人物より うしろに落とす（少年にかぶらない）
     ctx.drawImage(layerM,0,0);
     ctx.save(); ctx.filter='brightness(0.86) saturate(1.08) contrast(1.05)'; ctx.drawImage(layerF,0,0); ctx.restore();
-    drawGravityIcon(SPINE/2,20,gravity.left,flashPage.left);
-    drawGravityIcon(SPINE+SPINE/2,20,gravity.right,flashPage.right);
+    if(!(GT.scene&&GT.scene.id==='title')){ drawGravityIcon(SPINE/2,20,gravity.left,flashPage.left);
+    drawGravityIcon(SPINE+SPINE/2,20,gravity.right,flashPage.right); }   // タイトル画面では、重力の矢印を出さない
     for(const it of GT.items) drawItem(it);
     drawGoText();
   } else {
@@ -2122,6 +2123,7 @@ GT.boot=function(){
     if(!s) console.warn('[Gravity Tale] playlist のID「'+id+'」に対応するシーンが登録されていません');
     return s;
   }).filter(Boolean);
+  if(GT.sceneRegistry.title){ startScene(GT.sceneRegistry.title); GT.mode='idle'; }   // タイトル画面のうしろに映す場面（stages/00t_title.js）
   if(GT.showMenu) GT.showMenu();      // メニュー画面（menu.js）があれば、そこから始める
   else startScene(0);
   requestAnimationFrame(loop);

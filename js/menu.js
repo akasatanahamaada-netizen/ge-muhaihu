@@ -46,7 +46,7 @@ GT.onSceneStart(scene=>{
 });
 
 /* ---- 見た目 -------------------------------------------------------------- */
-const css=`
+let css=`
 .canvas-wrap{ container-type:inline-size; }
 .gtm{ position:absolute; inset:0; z-index:10; display:none; overflow:hidden; border-radius:3px;
   background:#d9c9a3 url("${encodeURI(TITLE_BG)}") 100% 50%/cover no-repeat; font-family:'Zen Old Mincho',serif; color:#2b2418; }
@@ -170,6 +170,13 @@ const css=`
 .gtm:not([data-view="main"]) .gtm-card h3{ font-size:clamp(22px,3.4cqw,78px); }
 .gtm:not([data-view="main"]) .gtm-btn, .gtm-vol span{ font-size:1.3em; }
 `;
+css+=`
+/* タイトル画面（ゲームを始める前）：背景の絵ではなく、うしろのゲーム画面（明るい森の場面・影つき）をすかして見せる。
+   ロゴと文字が読めるよう、上と下を少し暗く */
+.gtm.title-live{ background:transparent !important; }
+.gtm.title-live[data-view="main"] .gtm-card{ bottom:23% !important; }   /* メニューは、人物の頭より上に */
+.gtm.title-live::before{ background:linear-gradient(180deg, rgba(20,14,8,0.42) 0%, rgba(20,14,8,0) 34%, rgba(20,14,8,0) 62%, rgba(20,14,8,0.55) 100%) !important; }
+`;
 const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
 
 const wrap=document.querySelector('.canvas-wrap');
@@ -282,7 +289,7 @@ menu.querySelectorAll('.gtm-range').forEach(r=>{
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 const pageSound=()=>{ GT.sfx&&GT.sfx('page'); };   // メニューを開いたとき・メニューの中で何かを選んだときは、ページをめくる音
-function showMenu(sound){
+function showMenu(sound){ menu.classList.toggle('title-live', !inGame && !!(GT.scene&&GT.scene.id==='title'));
   if(sound) pageSound();
   GT.paused=true; refreshMain(); menu.classList.add('show'); openBtn.style.visibility='hidden'; setView('main');   // menu の栞は場所を残して隠す（となりの Reread の栞が動かないように）
 }

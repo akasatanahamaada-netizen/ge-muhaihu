@@ -100,6 +100,7 @@ const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)',filter:'brig
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 // 赤ずきんのお話（明るい場面）は、今までの背景の絵のまま。まわりに紙の劇場のふち取り（stages/_papertheater.js）
 GT.stageBackgrounds = {
+  title_view:S(BG_DAY),   // タイトル画面のうしろの場面
   wake:DARK,          // 序章（ひとりで目覚める）：暗い森
   opening:DARK,        // 序章（マリと出会う）：暗い森
   afterword:DARK,
@@ -120,6 +121,7 @@ GT.stageBackgrounds = {
 const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
   // ゴシック（暗い森）は、序章（目覚め〜チュートリアル）と、赤ずきんのお話のあと（afterword）だけ
+  title:0,   // タイトル画面のうしろの場面：明るい絵本（影あり）
   wake:0.3, opening:0.3, komichi1:0.3, komichi2:0.3,   // 暗すぎて見にくくならないように、ひかえめに
   afterword:0.3, mari_gate:0.3,
   // 第一章（赤ずきんのお話）は 0：ゴシックにする前と同じ、明るい絵本の雰囲気（色合いをかけない）
