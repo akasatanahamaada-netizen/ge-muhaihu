@@ -2109,7 +2109,7 @@ function drawFlip(){
     const rg=ctx.createRadialGradient(gx,gy,0,gx,gy,SPINE*1.1);
     rg.addColorStop(0,`rgba(255,242,200,${0.6*glow})`); rg.addColorStop(0.45,`rgba(255,220,160,${0.3*glow})`); rg.addColorStop(1,'rgba(255,200,120,0)');
     ctx.fillStyle=rg; ctx.fillRect(0,0,W,H);
-    const rk=glow*Math.max(0,Math.min(1,(0.7-p)/0.25));             // 光の筋は、ページが開ききるより前に消える（半分すぎから うすくなり、7割で消える）
+    const rq=(p-0.04)/0.22, rk = rq>0&&rq<1 ? Math.sin(rq*Math.PI) : 0;   // 光の筋は、めくりはじめに一瞬だけ（およそ0.5秒）。次のページが見えはじめる少し前に消える
     if(rk>0.01) for(let k=0;k<14;k++){                              // 光の筋（ゆっくりゆれる）
       const a=(k/14)*Math.PI*2+Math.sin(t*0.6+k)*0.08, len=SPINE*(0.7+0.3*Math.sin(t*1.3+k*2.1)), wd=0.006+0.004*Math.sin(k*1.7);   // とても細い筋
       const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,len);
