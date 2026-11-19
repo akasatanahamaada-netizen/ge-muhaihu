@@ -34,7 +34,8 @@ const ENEMY_SPEED=90;
 const SWAMP_SLOW=0.4;                // 沼の中の速さ（ふだんの何倍か）
 const SWAMP_JUMP=0.7;                // 沼の中のジャンプの勢い（0.7 で高さは約半分）
 const TALK_RANGE=74;                 // この距離まで近づくと「はなす」が出る
-const FLIP_DUR=1.2;                  // ページめくり演出の長さ(秒)
+const FLIP_DUR_BASE=1.2;
+let FLIP_DUR=FLIP_DUR_BASE;      // いまのめくりの長さ（光がもれるめくりは、ゆっくり）                  // ページめくり演出の長さ(秒)
 
 GT.canvas=canvas; GT.ctx=ctx; GT.W=W; GT.H=H; GT.SPINE=SPINE; GT.EDGE=EDGE;
 GT.GRAVITY=GRAVITY; GT.ENEMY_SPEED=ENEMY_SPEED;
@@ -671,6 +672,7 @@ function startPageFlip(dir,toScene){   // toScene … めくったうしろで�
   toPage(extOld);                                         // ページの大きさの紙にも写しておく（めくる紙の絵）
   flipDir = dir===-1 ? -1 : 1;
   flipFromId = GT.scene ? GT.scene.id : null;            // どの場面からめくったか（森の出口なら、光がもれる）
+  FLIP_DUR = (flipFromId && GT.flipGlowFrom.has(flipFromId)) ? 2.2 : FLIP_DUR_BASE;   // 光がもれるめくりは、ゆっくり
   flipping=true; flipT=0; flipSwapped=true; GT.sfx&&GT.sfx('page');
   GT.player.vx=0; GT.player.vy=0;
   setFlipHide(true);
@@ -2091,12 +2093,12 @@ function drawFlip(){
     const gx = d>0 ? SPINE+SPINE*0.35 : SPINE-SPINE*0.35, gy=H*0.5, t=performance.now()/1000;
     ctx.save(); ctx.globalCompositeOperation='lighter';
     const rg=ctx.createRadialGradient(gx,gy,0,gx,gy,SPINE*1.1);
-    rg.addColorStop(0,`rgba(255,240,190,${0.85*glow})`); rg.addColorStop(0.35,`rgba(255,214,140,${0.45*glow})`); rg.addColorStop(1,'rgba(255,200,120,0)');
+    rg.addColorStop(0,`rgba(255,242,200,${0.6*glow})`); rg.addColorStop(0.45,`rgba(255,220,160,${0.3*glow})`); rg.addColorStop(1,'rgba(255,200,120,0)');
     ctx.fillStyle=rg; ctx.fillRect(0,0,W,H);
     for(let k=0;k<14;k++){                                          // 光の筋（ゆっくりゆれる）
-      const a=(k/14)*Math.PI*2+Math.sin(t*0.6+k)*0.08, len=SPINE*(0.9+0.4*Math.sin(t*1.3+k*2.1)), wd=0.05+0.03*Math.sin(k*1.7);
+      const a=(k/14)*Math.PI*2+Math.sin(t*0.6+k)*0.08, len=SPINE*(0.7+0.3*Math.sin(t*1.3+k*2.1)), wd=0.006+0.004*Math.sin(k*1.7);   // とても細い筋
       const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,len);
-      lg.addColorStop(0,`rgba(255,246,210,${0.32*glow})`); lg.addColorStop(1,'rgba(255,230,170,0)');
+      lg.addColorStop(0,`rgba(255,246,210,${0.14*glow})`); lg.addColorStop(1,'rgba(255,230,170,0)');
       ctx.fillStyle=lg; ctx.beginPath(); ctx.moveTo(gx,gy); ctx.arc(gx,gy,len,a-wd,a+wd); ctx.closePath(); ctx.fill();
     }
     ctx.restore();
