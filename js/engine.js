@@ -1822,6 +1822,7 @@ function render(){
    奥の飾り・足場や人物・手前の飾りを、それぞれ別の層に描いてから、背景の上に「影→物」の順に重ねる。
    影は、層をそのまま小さな画面に写し（右上へずらし、上ほど右へかたむける）、影の色でぬって、大きくのばして重ねる（のばすと自然にぼける）。
    手前の層ほど、影は遠く・大きくかたむき・よくぼける（奥行き）。ぼかしの計算を物ごとにしないので、軽い */
+let layeredNow=false;   // このフレームを、層に分けて描いたか
 const layerB=document.createElement('canvas'), layerM=document.createElement('canvas'), layerF=document.createElement('canvas');
 for(const c of [layerB,layerM,layerF]){ c.width=W; c.height=H; }
 const shadowSmall=[document.createElement('canvas'),document.createElement('canvas')];
@@ -1861,7 +1862,8 @@ function drawGoText(){
 function renderBody(){
   const gravity=GT.gravity;
   ctx.clearRect(0,0,W,H);
-  if(GT.isBright && GT.isBright() && GT.shadowsOn!==false){
+  layeredNow = !!(GT.isBright && GT.isBright() && GT.shadowsOn!==false);
+  if(layeredNow){
     for(const fn of drawBack) fn();                                   // 奥の層
     grabLayer(layerB);
     for(const plat of GT.platforms){ if(plat.kind!=='ledge'&&plat.kind!=='ceilingLedge') continue; drawLedge(plat, gravity[plat.page]===-1); }
@@ -1981,6 +1983,14 @@ function liftCharacters(){
   if(!inSwamp && !gameOver) drawPlayer();
   ctx.restore();
   for(const fn of drawLiftFns) fn();
+  // 暗くした場面（近道）で人物を描きなおしたあと、手前の層（手前の木や岩）を、同じ暗さで上に重ねなおす（人物が手前の木より前に出ないように）
+  if(layeredNow && dimNow>0){
+    const sc=shadowSmall[1]; if(sc.width!==W){ sc.width=W; sc.height=H; }
+    const s=sc.getContext('2d'); s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,W,H);
+    s.filter='brightness(0.86) saturate(1.08) contrast(1.05)'; s.drawImage(layerF,0,0); s.filter='none';
+    s.globalCompositeOperation='source-atop'; s.fillStyle=`rgba(0,0,0,${(0.84*dimNow).toFixed(3)})`; s.fillRect(0,0,W,H);
+    ctx.drawImage(sc,0,0);
+  }
 }
 /* 全体の色合い（乗算）。明るい場面（gradeK＝0）では、まん中にはかけず、ふちだけにかける（まわりのページの紙の色と、さかいを合わせる） */
 function drawGradeMul(){
