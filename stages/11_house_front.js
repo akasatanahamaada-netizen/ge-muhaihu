@@ -276,7 +276,6 @@ function drawBack(){
   const t=performance.now()/1000;
   ctx.save();
   drawAmbient(t);
-  drawWatermill(t);
   // 垣根と門（左ページ）
   GTDecor.paint.bush(ctx, 316, FLOOR-48, 136, 48, 31, {berries:'#b8423f'});        // 垣根（赤い実）
   ctx.fillStyle='#6b4f36'; ctx.fillRect(312,392,8,FLOOR-392);
@@ -879,6 +878,7 @@ function drawHud(){
   ctx.restore();
 }
 
+GT.registerDraw(()=>{ if(!isFront()) return; drawWatermill(performance.now()/1000); }, 'backpre');   // 遠くの水車小屋と丘は、影を落とさない（木や茂みより奥）
 GT.registerDraw(()=>{ if(!isFront()) return; drawBack(); }, 'back');
 GT.registerDraw(()=>{ if(!isFront()) return; drawFront(); drawHud(); }, 'world');
 })();

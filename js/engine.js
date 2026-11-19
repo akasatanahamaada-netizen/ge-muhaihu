@@ -71,6 +71,7 @@ const updatePasses      = [];        // fn(dt) 物理モード中に毎フレー
 const modeUpdaters      = {};        // mode -> fn(dt) そのモード専用の更新
 const drawBack          = [];        // fn() 最背面に描く（地形より奥。判定なしの飾り用）
 const drawWorld         = [];        // fn() プレイヤーより後ろに描く
+const drawBackPre       = [];        // fn() いちばん奥の、影を落とさない物（遠くの水車小屋と丘など）。奥の飾りより うしろに描く
 const drawBackFlat      = [];        // fn() 奥の層のうち、影を落とさない物（地面の道など）。奥の飾りの上に描く
 const drawFlat          = [];        // fn() 影を落とさない物（水たまりなど）。奥の層の上・人物や足場の影より下に描く
 const drawOverlay       = [];        // fn() 画面の最前面に描く
@@ -106,7 +107,7 @@ GT.registerSceneType  = (t,fn)=>{ sceneTypeHandlers[t]=fn; };
 GT.registerDynamic    = (n,fn)=>{ dynamicHandlers[n]=fn; };
 GT.registerUpdate     = (fn)=>{ updatePasses.push(fn); };
 GT.registerModeUpdate = (m,fn)=>{ modeUpdaters[m]=fn; };
-GT.registerDraw       = (fn,phase)=>{ (phase==='back'?drawBack:phase==='overlay'?drawOverlay:phase==='speech'?drawSpeechFns:phase==='lift'?drawLiftFns:phase==='flat'?drawFlat:phase==='backflat'?drawBackFlat:drawWorld).push(fn); };   // 'speech' … 吹き出し（最前面）
+GT.registerDraw       = (fn,phase)=>{ (phase==='back'?drawBack:phase==='overlay'?drawOverlay:phase==='speech'?drawSpeechFns:phase==='lift'?drawLiftFns:phase==='flat'?drawFlat:phase==='backflat'?drawBackFlat:phase==='backpre'?drawBackPre:drawWorld).push(fn); };   // 'speech' … 吹き出し（最前面）
 GT.registerAct        = (n,fn)=>{ actHooks[n]=fn; };
 GT.registerLineHook   = (fn)=>{ lineHooks.push(fn); };
 GT.registerSceneReset = (fn)=>{ sceneResets.push(fn); };
@@ -1834,8 +1835,8 @@ function render(){
    影は、層をそのまま小さな画面に写し（右上へずらし、上ほど右へかたむける）、影の色でぬって、大きくのばして重ねる（のばすと自然にぼける）。
    手前の層ほど、影は遠く・大きくかたむき・よくぼける（奥行き）。ぼかしの計算を物ごとにしないので、軽い */
 let layeredNow=false;   // このフレームを、層に分けて描いたか
-const layerB=document.createElement('canvas'), layerM=document.createElement('canvas'), layerF=document.createElement('canvas'), layerB2=document.createElement('canvas');
-for(const c of [layerB,layerM,layerF,layerB2]){ c.width=W; c.height=H; }
+const layerB=document.createElement('canvas'), layerM=document.createElement('canvas'), layerF=document.createElement('canvas'), layerB2=document.createElement('canvas'), layerB0=document.createElement('canvas');
+for(const c of [layerB,layerM,layerF,layerB2,layerB0]){ c.width=W; c.height=H; }
 const shadowSmall=[document.createElement('canvas'),document.createElement('canvas')];
 function grabLayer(L){ const g=L.getContext('2d'); g.clearRect(0,0,W,H); g.drawImage(canvas,0,0); ctx.clearRect(0,0,W,H); }
 GT.SHADOW={ dx:10, dy:6, alpha:0.82 };   // 影の基本の量（depth で、遠く・うすくなる）
@@ -1896,6 +1897,7 @@ function renderBody(){
   ctx.clearRect(0,0,W,H);
   layeredNow = GT.shadowsOn!==false && !(GT.scene && GT.scene.id==='chapter1');   // 影は、序章の暗い森もふくめて、すべての場面で（章のとびらは除く）
   if(layeredNow){
+    const hasBP=drawBackPre.length>0; if(hasBP){ for(const fn of drawBackPre) fn(); grabLayer(layerB0); }   // いちばん奥の、影を落とさない物
     for(const fn of drawBack) fn();                                   // 奥の層
     grabLayer(layerB);
     const hasBF=drawBackFlat.length>0; if(hasBF){ for(const fn of drawBackFlat) fn(); grabLayer(layerB2); }   // 影を落とさない奥の物（地面の道など）
@@ -1913,6 +1915,7 @@ function renderBody(){
     drawBookBase(gravity);
     // 影は、その層より奥にあるもの すべての上に落ちる（少年の影は、うしろの家や木の上にも映る）。
     // 奥の層ほど影は近く・濃く、手前の層ほど遠く・うすく。空気の遠近：奥の層は少しかすみ、手前の層は少し暗く くっきり
+    if(hasBP){ ctx.save(); ctx.filter='saturate(0.8) brightness(1.04) contrast(0.9)'; ctx.drawImage(layerB0,0,0); ctx.restore(); }
     castLayer(layerB,0.25);
     ctx.save(); ctx.filter='saturate(0.8) brightness(1.04) contrast(0.9)'; ctx.drawImage(layerB,0,0); if(hasBF) ctx.drawImage(layerB2,0,0); ctx.restore();
     if(GT.extraShadow) GT.extraShadow(ctx);   // 場面ごとの特別な影（タイトルの狼の大きな影など）。うしろの木の上にも映る
@@ -1929,6 +1932,7 @@ function renderBody(){
     drawGoText();
   } else {
   drawBookBase(gravity);
+  for(const fn of drawBackPre) fn();
   for(const fn of drawBack) fn();           // 奥の飾り（地形より後ろ・判定なし）
   for(const fn of drawBackFlat) fn();
   drawPageEdges();
