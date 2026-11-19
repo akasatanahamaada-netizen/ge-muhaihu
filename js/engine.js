@@ -1599,7 +1599,7 @@ function drawItem(it){
    摘むと、花びらが舞って「お花 ＋1」 */
 const FLOWER_COLS=[['#e2738a','#f6c1cc'],['#e8c35a','#f8e7a8'],['#8f8be0','#d4d0f6'],['#f3ead0','#ffffff'],['#e88a5a','#f8c9a8']];
 function drawFlowerItem(it,cx,r){
-  const up = it.y < H/2;                                    // 天井がわの花は、さかさま
+  const up = it.ceil!=null ? !!it.ceil : it.y < EDGE+20;   // 天井に咲く花だけ、さかさま（高い崖や丸太の上の花は、上向き）
   const base = up ? it.y : it.y+it.h, d = up ? 1 : -1;      // 根もと（床か天井）と、のびる向き
   const [c1,c2]=FLOWER_COLS[Math.abs(Math.round(it.x/7+it.y/11))%FLOWER_COLS.length];
   const sway=Math.sin(goalPulse*2+it.x*0.05)*2.2;
