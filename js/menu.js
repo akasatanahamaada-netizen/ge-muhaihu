@@ -176,6 +176,31 @@ css+=`
 .gtm.title-live{ background:transparent !important; }
 .gtm.title-live[data-view="main"] .gtm-card{ bottom:23% !important; }   /* メニューは、人物の頭より上に */
 .gtm.title-live::before{ background:linear-gradient(180deg, rgba(20,14,8,0.42) 0%, rgba(20,14,8,0) 34%, rgba(20,14,8,0) 62%, rgba(20,14,8,0.55) 100%) !important; }
+/* ゲームの途中で開くメニュー：止まっている いまの場面を、セピアにくすませて うしろに見せる（絵本を閉じかけた夕暮れの色） */
+.gtm.game-live{ background:transparent !important; backdrop-filter:sepia(0.55) saturate(0.75) brightness(0.62) blur(1.5px); -webkit-backdrop-filter:sepia(0.55) saturate(0.75) brightness(0.62) blur(1.5px); }
+.gtm.game-live::before{ background:radial-gradient(ellipse at 50% 42%, rgba(30,20,10,0) 40%, rgba(24,16,8,0.6) 100%) !important; }
+.gtm.game-live[data-view="main"] .gtm-card{ bottom:16% !important; }
+/* Settings・How to Play：本の紙（古いページ）の枠。茶色のインクと、赤い栞のひも */
+.gtm.title-live:not([data-view="main"]) .gtm-card, .gtm.game-live:not([data-view="main"]) .gtm-card{
+  background:#efe3c6 linear-gradient(180deg, rgba(255,250,236,0.55), rgba(214,190,146,0.35));
+  box-shadow:0 12px 34px rgba(20,12,6,0.6), inset 0 0 0 1px rgba(120,86,48,0.55), inset 0 0 0 6px #efe3c6, inset 0 0 0 7px rgba(120,86,48,0.3), inset 0 0 40px rgba(150,110,60,0.35); }
+.gtm.title-live:not([data-view="main"]) .gtm-card::after, .gtm.game-live:not([data-view="main"]) .gtm-card::after{
+  content:''; position:absolute; top:-2%; right:7%; width:3.2%; height:16%; background:#9e2a32; clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%); box-shadow:0 2px 4px rgba(0,0,0,0.3); }
+.gtm.title-live:not([data-view="main"]) .gtm-card h3, .gtm.game-live:not([data-view="main"]) .gtm-card h3{ color:#5a3f1c; border-bottom-color:rgba(120,86,48,0.4); }
+.gtm.title-live:not([data-view="main"]) .gtm-btn, .gtm.game-live:not([data-view="main"]) .gtm-btn,
+.gtm.title-live .gtm-vol, .gtm.game-live .gtm-vol{ color:#3a2a18; }
+.gtm.title-live:not([data-view="main"]) .gtm-btn:hover, .gtm.game-live:not([data-view="main"]) .gtm-btn:hover,
+.gtm.title-live:not([data-view="main"]) .gtm-btn:focus, .gtm.game-live:not([data-view="main"]) .gtm-btn:focus{ background:rgba(158,42,50,0.1); color:#7a1f26; }
+.gtm.title-live:not([data-view="main"]) .gtm-btn::before, .gtm.game-live:not([data-view="main"]) .gtm-btn::before{ color:#9e2a32; }
+.gtm.title-live .gtm-back, .gtm.game-live .gtm-back{ color:#7a5a32 !important; }
+.gtm.title-live .gtm-howto, .gtm.game-live .gtm-howto{ color:#3a2a18; }
+.gtm.title-live .gtm-howto b, .gtm.game-live .gtm-howto b{ color:#7a1f26; }
+.gtm.title-live .gtm-howto li, .gtm.game-live .gtm-howto li{ border-bottom-color:rgba(120,86,48,0.3); }
+.gtm.title-live .gtm-vol output, .gtm.game-live .gtm-vol output{ color:#7a5a32; }
+.gtm.title-live .gtm-range, .gtm.game-live .gtm-range{ accent-color:#9e2a32; }
+.gtm.title-live .gtm-vol:focus-within, .gtm.game-live .gtm-vol:focus-within{ background:rgba(158,42,50,0.08); }
+/* メインのボタンの飾り：赤い薔薇 → 赤ずきんの赤 */
+.gtm.title-live[data-view="main"] .gtm-btn::before, .gtm.game-live[data-view="main"] .gtm-btn::before{ color:#c23a3a; }
 `;
 const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
 
@@ -290,7 +315,7 @@ menu.querySelectorAll('.gtm-range').forEach(r=>{
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 const pageSound=()=>{ GT.sfx&&GT.sfx('page'); };   // メニューを開いたとき・メニューの中で何かを選んだときは、ページをめくる音
-function showMenu(sound){ menu.classList.toggle('title-live', !inGame && !!(GT.scene&&GT.scene.id==='title'));
+function showMenu(sound){ menu.classList.toggle('title-live', !inGame && !!(GT.scene&&GT.scene.id==='title')); menu.classList.toggle('game-live', inGame && !!GT.scene);   // ゲームの途中：いまの場面をすかして見せる
   if(sound) pageSound();
   GT.paused=true; refreshMain(); menu.classList.add('show'); openBtn.style.visibility='hidden'; setView('main');   // menu の栞は場所を残して隠す（となりの Reread の栞が動かないように）
 }
