@@ -184,7 +184,7 @@ function resolveQTE(success){
     GT.flags.saved=false;
     GT.musicHush&&GT.musicHush(6.5); GT.sfx&&GT.sfx('gore');   // 赤ずきんが、目の前で食べられる
     GT.beginDialogue([
-      {s:'',c:'narr',t:'――間に合わなかった。'},
+      {s:'',c:'narr',t:'――赤ずきんは、狼に食べられてしまった。'},
       {s:'',c:'narr',t:'目の前が、暗くなる。音が、止む。'},
     ], null, ()=>{
       GT.injectSceneAfterCurrent({type:'boss',hollow:true,intro:[
