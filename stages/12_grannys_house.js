@@ -303,7 +303,7 @@ const AFTER={
     {s:'',c:'narr',t:'ベッドの上には、赤い頭巾だけが静かに残されていた。'},
     {s:'',c:'narr',t:'床に転がったかごの中で、カスタードとバターの小瓶が、手つかずのまま残っている。'},
     {s:'',c:'narr',t:'少年は、頭巾を手に取った。'},
-    {s:'',c:'narr',t:'――少年は、間に合わなかった。'},
+    {s:'',c:'narr',t:'――赤ずきんは、狼に食べられてしまった。'},
   ],
 };
 // 部屋の場面の終わり（このあとページがめくれて、外の場面へ）
@@ -366,7 +366,7 @@ GT.registerDynamic('result', ()=>{
   let resultText;
   if(hoodSaved && grannySaved) resultText = '――少年は、間に合った。赤ずきんも、おばあさんも、無事だった。';
   else if(hoodSaved && !grannySaved) resultText = '――少年は、赤ずきんを守った。でも、おばあさんには、間に合わなかった。';
-  else resultText = '――少年は、間に合わなかった。';
+  else resultText = '――赤ずきんは、狼に食べられてしまった。';
   GT.fillPage('result', resultText + '\n（' + hoodLine + '／' + grannyLine + '）');
   ending.summary = hoodLine+'　／　'+grannyLine;
 

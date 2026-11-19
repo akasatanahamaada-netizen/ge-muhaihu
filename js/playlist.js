@@ -55,7 +55,7 @@ GT.definePages([
    base:'――家に着いたとき、おばあさんの姿は、もうどこにもなかった。',
    extraPieces:[{id:'granny:story'}]},   // 戦いのあと（結末）
   {key:'result',   chapter:'第一章', title:'第一章の結末',
-   base:'――少年は、間に合わなかった。'},
+   base:'――赤ずきんは、狼に食べられてしまった。'},
 ]);
 
 // 分岐フラグの初期値（各ステージの choices が書き換える）
