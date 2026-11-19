@@ -474,7 +474,7 @@ function topEdges(rs){
 }
 
 /* 紙の影：重ねた紙のあいだにできる、やわらかい影 */
-function paperShadow(c){ if(GT.castShadow) return GT.castShadow(c,0.4); c.shadowColor='rgba(52,38,26,0.34)'; c.shadowBlur=7; c.shadowOffsetX=9; c.shadowOffsetY=6; }   // 奥に落ちる影
+function paperShadow(c){}   // （影はつけない）
 
 /* 苔むした岩（明るい絵本の岩。お話のはじめのほう） */
 function drawRockBright(rs,seed){
@@ -780,7 +780,7 @@ if(window.GT && GT.registerDraw){
     const def=GT.STAGE_DEFS[sc.stage]; if(!def||!def.decor) return;
     const dim = GT.isBright && !GT.isBright();                                  // ゴシックの場面では、草や葉の飾りを暗く・色をおさえる（ポップになりすぎないように）
     if(dim){ GT.ctx.save(); GT.ctx.filter='saturate(0.4) brightness(0.55)'; }
-    else { GT.ctx.save(); const c=GT.ctx; GT.castShadow&&GT.castShadow(c, layer==='front'?1:0.15); }   // 手前の飾りほど、影は遠く                               // 明るい場面：紙を切って重ねたような影
+    else GT.ctx.save();
     for(const d of def.decor){ if((d.layer||'back')===layer) api.draw(GT.ctx,d.kind,d.x,d.y,d.w,d.h); }
     GT.ctx.restore();
   }
