@@ -65,7 +65,7 @@ GT.registerDraw(()=>{ if(!isHere()) return; F.air(); }, 'overlay');
 
 /* 赤ずきんのひとこと（お花を摘むたび）。崖の上・丸太の上の花は、ちがうことを言う */
 const SAY_FLOOR=['きれい！　いいにおい……','おばあちゃん、よろこぶかな','この色、すき！','あっちにも咲いてるよ！'];
-const SAY_HIGH=['そんな高いところのお花、よく取れたね！','わあ、崖の上まで……！　どうやって登ったの？','すごい、あんな高いところのお花まで！'];
+const SAY_HIGH=['そんな高いところのお花、よく取れたね！','わあ、崖の上のお花！　ありがとう！','すごい、あんな高いところのお花まで！'];
 const fl={ got:0, n:0, done:false };
 GT.registerSceneReset(()=>{ if(isHere()){ fl.got=-1; fl.n=0; fl.done=false; } });   // 数は、ステージを読みこんだあとの最初の update で数える
 GT.registerUpdate(()=>{
