@@ -148,7 +148,6 @@ function writeBrush(str,size,color,y,t0,per,onStart){
       mctx.globalCompositeOperation='source-in'; mctx.fillStyle=color; mctx.font=ctx.font; mctx.textBaseline='middle'; mctx.textAlign='left';
       mctx.fillText(ch,ox,S/2); mctx.globalCompositeOperation='source-over';
       ctx.drawImage(maskCv,x-ox,y-S/2);
-      if(tip){ ctx.save(); ctx.globalAlpha=0.5; ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x-ox+tip[0],y-S/2+tip[1],size*0.07,0,Math.PI*2); ctx.fill(); ctx.restore(); }   // 筆先
     }
     x+=w+gap; });
 }
