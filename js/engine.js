@@ -1826,16 +1826,16 @@ const layerB=document.createElement('canvas'), layerM=document.createElement('ca
 for(const c of [layerB,layerM,layerF]){ c.width=W; c.height=H; }
 const shadowSmall=[document.createElement('canvas'),document.createElement('canvas')];
 function grabLayer(L){ const g=L.getContext('2d'); g.clearRect(0,0,W,H); g.drawImage(canvas,0,0); ctx.clearRect(0,0,W,H); }
-GT.SHADOW={ dx:12, dy:8, lean:0.06, alpha:0.5 };   // 影の基本の量（depth で大きくなる）
+GT.SHADOW={ dx:10, dy:6, alpha:0.42 };   // 影の基本の量（depth で、遠く・うすくなる）
 function castLayer(L,depth){
-  const d=depth, q=d>=0.9?1/7:d>=0.5?1/5:1/4, sc=shadowSmall[d>=0.9?1:0], sw=Math.ceil(W*q), shh=Math.ceil(H*q);
-  if(sc.width!==sw){ sc.width=sw; sc.height=shh; }
-  const s=sc.getContext('2d'), S=GT.SHADOW;
-  const ox=S.dx+30*d, oy=-(S.dy+22*d), lean=S.lean+0.12*d;          // 右へ・上へ・上ほど右へ
-  s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,sw,shh);
-  s.setTransform(q,0,-lean*q,q,(lean*H+ox)*q,oy*q); s.drawImage(L,0,0);
-  s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.1*d).toFixed(3)})`; s.fillRect(0,0,sw,shh);
-  ctx.save(); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high'; ctx.drawImage(sc,0,0,W,H); ctx.restore();
+  // 影は、かたむけず、そのまま右上へずらす。ふちは、まっすぐ くっきり（画面と同じ大きさで写し、ぼかさない）
+  const d=depth, sc=shadowSmall[0], S=GT.SHADOW;
+  if(sc.width!==W){ sc.width=W; sc.height=H; }
+  const s=sc.getContext('2d');
+  s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,W,H);
+  s.drawImage(L, Math.round(S.dx+30*d), -Math.round(S.dy+22*d));          // 手前の層ほど、遠くへ
+  s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.12*d).toFixed(3)})`; s.fillRect(0,0,W,H);
+  ctx.drawImage(sc,0,0);
 }
 function drawBookBase(gravity){
   ctx.drawImage(GT.paperArt.paper,0,0);
