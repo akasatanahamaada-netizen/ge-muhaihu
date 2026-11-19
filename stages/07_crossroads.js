@@ -219,14 +219,18 @@ function drawRoutes(){
   // 道ばたの花（日の当たる道のしるし）
   for(const [x,k] of [[560,0],[598,2],[640,1],[690,3],[734,0],[772,2]]) GTDecor.paint.flower(ctx, x, FLOOR-2, 0.8, k, x);
 
+  // 地面の獣の足あと：左から来て、いばらのしげみの下で途切れる（そこから先は、天井の足あとへ）
+  for(let i=0;i<7;i++) paw(330+i*34, FLOOR-3-(i%2)*1.5, 0.9, 'rgba(44,34,26,0.55)', false);
+  ctx.restore();
+}
+function drawThornTunnel(){  // いばらのトンネル（天井）は、影を落とす
+  ctx.save();
   // いばらの上：天井側の暗がり（右ページの上半分を、冷たく暗く）
   ctx.save(); ctx.translate(700,EDGE); ctx.scale(1.5,0.7);
   const dark=ctx.createRadialGradient(0,0,20,0,0,280);
   dark.addColorStop(0,'rgba(22,24,20,0.62)'); dark.addColorStop(1,'rgba(22,24,20,0)');
   ctx.fillStyle=dark; ctx.fillRect(-280,0,560,280); ctx.restore();
 
-  // 地面の獣の足あと：左から来て、いばらのしげみの下で途切れる（そこから先は、天井の足あとへ）
-  for(let i=0;i<7;i++) paw(330+i*34, FLOOR-3-(i%2)*1.5, 0.9, 'rgba(44,34,26,0.55)', false);
 
   // いばらのトンネル（天井）：からみあう枝・とげ・暗い実。中ほどが、獣の通れるすきま
   ctx.save();
@@ -302,7 +306,8 @@ function drawHoodBubble(){
   ctx.restore();
 }
 
-GT.registerDraw(()=>{ if(!isCross()) return; drawRoutes(); }, 'back');
+GT.registerDraw(()=>{ if(!isCross()) return; drawRoutes(); }, 'backflat');   // 地面（道・丘・水車小屋・花・足あと）は、影を落とさない
+GT.registerDraw(()=>{ if(!isCross()) return; drawThornTunnel(); }, 'back');
 GT.registerDraw(()=>{ if(!isCross()) return; moveHood(); drawThorns(); drawGuide(); }, 'world');
 GT.registerDraw(()=>{ if(!isCross()) return; drawHoodBubble(); }, 'speech');
 })();
