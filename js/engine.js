@@ -662,12 +662,15 @@ function setFlipHide(on){ document.body.classList.toggle('gt-flipping',on); }
 (function(){ const st=document.createElement('style');
   st.textContent='.gt-flipping #dlg, .gt-flipping .dialogue, .gt-flipping #qte{ visibility:hidden !important; } .gt-flipping img[alt=""]:not(.gtm-logo){ visibility:hidden; }';
   document.head.appendChild(st); })();
+let flipFromId=null;
+GT.flipGlowFrom=new Set(['mari_gate']);   // この場面からめくるとき、めくれる紙の下から光がもれ出す
 let flipDir=1;                                          // 1=次のページへ / -1=前のページへもどる（ゲームオーバーのやり直し）
 function startPageFlip(dir,toScene){   // toScene … めくったうしろで始めるシーン（playlist の外のシーンなど）
   if(flipping) return;
   flipOld.getContext('2d').drawImage(canvas,0,0);       // いまの見開きを写しとる
   toPage(extOld);                                         // ページの大きさの紙にも写しておく（めくる紙の絵）
   flipDir = dir===-1 ? -1 : 1;
+  flipFromId = GT.scene ? GT.scene.id : null;            // どの場面からめくったか（森の出口なら、光がもれる）
   flipping=true; flipT=0; flipSwapped=true; GT.sfx&&GT.sfx('page');
   GT.player.vx=0; GT.player.vy=0;
   setFlipHide(true);
@@ -2082,6 +2085,22 @@ function drawFlip(){
   sg.addColorStop(0,`rgba(30,22,12,${0.35*lift})`); sg.addColorStop(1,'rgba(30,22,12,0)');
   ctx.fillStyle=sg; ctx.fillRect(Math.min(tipX,tipX+(tipX>=SPINE?shW:-shW)),0,shW,H);
   ctx.restore();                                                      // （ページの形の切り抜き、ここまで）
+  // 光がもれ出す（森の出口から、次のページへ）：めくれる紙の下の、新しいページから光があふれる
+  const glow = flipFromId && GT.flipGlowFrom.has(flipFromId) ? Math.sin(Math.min(1,p*1.15)*Math.PI) : 0;
+  if(glow>0.01){
+    const gx = d>0 ? SPINE+SPINE*0.35 : SPINE-SPINE*0.35, gy=H*0.5, t=performance.now()/1000;
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    const rg=ctx.createRadialGradient(gx,gy,0,gx,gy,SPINE*1.1);
+    rg.addColorStop(0,`rgba(255,240,190,${0.85*glow})`); rg.addColorStop(0.35,`rgba(255,214,140,${0.45*glow})`); rg.addColorStop(1,'rgba(255,200,120,0)');
+    ctx.fillStyle=rg; ctx.fillRect(0,0,W,H);
+    for(let k=0;k<14;k++){                                          // 光の筋（ゆっくりゆれる）
+      const a=(k/14)*Math.PI*2+Math.sin(t*0.6+k)*0.08, len=SPINE*(0.9+0.4*Math.sin(t*1.3+k*2.1)), wd=0.05+0.03*Math.sin(k*1.7);
+      const lg=ctx.createRadialGradient(gx,gy,0,gx,gy,len);
+      lg.addColorStop(0,`rgba(255,246,210,${0.32*glow})`); lg.addColorStop(1,'rgba(255,230,170,0)');
+      ctx.fillStyle=lg; ctx.beginPath(); ctx.moveTo(gx,gy); ctx.arc(gx,gy,len,a-wd,a+wd); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
   // 紙（短冊を背表紙から順に。奥の短冊が先、手前の短冊があと）
   const order=[...Array(N).keys()];
   for(const i of order){
@@ -2110,6 +2129,20 @@ function drawFlip(){
   if(lift>0.02){ const sc=1+0.012*Math.sin(tip.a), hh=H*sc, top=(H-hh)/2;
     ctx.strokeStyle=`rgba(255,250,235,${0.5*lift})`; ctx.lineWidth=1.6;
     ctx.beginPath(); ctx.moveTo(tipX,top+2); ctx.lineTo(tipX,top+hh-2); ctx.stroke(); }
+  // 光がもれ出す：紙のふちからあふれる光と、舞う光の粒（紙の上にも重ねる）
+  if(glow>0.01){
+    const t=performance.now()/1000;
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    const eg=ctx.createLinearGradient(tipX-60*d,0,tipX+40*d,0);
+    eg.addColorStop(0,'rgba(255,236,180,0)'); eg.addColorStop(0.6,`rgba(255,240,200,${0.55*glow})`); eg.addColorStop(1,'rgba(255,236,180,0)');
+    ctx.fillStyle=eg; ctx.fillRect(Math.min(tipX-60*d,tipX+40*d),0,100,H);
+    for(let k=0;k<40;k++){
+      const r=(k*97.3)%1, q=(k*57.1)%1, life=((t*0.5+r)%1);
+      const px=tipX+d*(10+q*SPINE*0.6)*life, py=H*(0.1+0.8*((k*31.7)%1))-life*60;
+      ctx.fillStyle=`rgba(255,244,200,${0.8*glow*(1-life)})`; ctx.beginPath(); ctx.arc(px,py,1.2+2*(1-life),0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
   ctx.restore();
 }
 
