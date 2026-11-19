@@ -115,7 +115,7 @@ const css=`
 .bv-title .t2{ color:#5a3f1c; }
 .bv-title .orn{ color:#9e2a32; }
 .bv-pieces{ color:#9e2a32; }
-.bv-ribbon{ position:absolute; z-index:8; top:-2.4%; right:9%; width:2.4%; height:20%; background:linear-gradient(90deg,#86222a,#a8313a 50%,#86222a);
+.bv-ribbon{ position:absolute; z-index:6; top:-2.4%; right:9%; width:2.4%; height:20%; background:linear-gradient(90deg,#86222a,#a8313a 50%,#86222a);
   clip-path:polygon(0 0,100% 0,100% 100%,50% 84%,0 100%); box-shadow:0 2px 4px rgba(0,0,0,0.3); pointer-events:none; }   /* 赤いリボンの栞 */
 .bv-bar button{ background:#efe3c6 linear-gradient(180deg, rgba(255,250,236,0.55), rgba(214,190,146,0.35)); border:1px solid rgba(120,86,48,0.6); color:#3a2a18;
   font-family:'Great Vibes',cursive; font-size:22px; padding:3px 18px; box-shadow:0 3px 10px rgba(20,12,6,0.45); }
@@ -124,6 +124,12 @@ const css=`
 .bv-go{ background:#9e2a32; } .bv-go:hover{ background:#c23a3a; }
 .bv-gos .bv-go.armed{ background:#c23a3a; }
 .bv-gos-h{ font-family:'Great Vibes',cursive; color:#5a3f1c; }
+/* 「Play again」のボタンがあるページ：ボタンを文章の下に並べて、重ならないように（挿絵を少し小さく・行間を少しつめる） */
+.bv-page:has(.bv-gos), .bv-face:has(.bv-gos){ display:flex; flex-direction:column; }
+:is(.bv-page,.bv-face):has(.bv-gos) > .bv-h, :is(.bv-page,.bv-face):has(.bv-gos) > .bv-artwrap{ flex:none; }
+:is(.bv-page,.bv-face):has(.bv-gos) > .bv-artwrap{ width:62%; }
+:is(.bv-page,.bv-face):has(.bv-gos) > .bv-body{ flex:1 1 auto; min-height:0; overflow:hidden; line-height:1.8; }
+:is(.bv-page,.bv-face) > .bv-gos{ position:static; flex:none; margin-top:0.35em; padding-bottom:0.2em; }
 `;
 const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
 
