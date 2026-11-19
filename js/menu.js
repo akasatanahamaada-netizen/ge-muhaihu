@@ -199,6 +199,9 @@ css+=`
 .gtm.title-live .gtm-vol output, .gtm.game-live .gtm-vol output{ color:#7a5a32; }
 .gtm.title-live .gtm-range, .gtm.game-live .gtm-range{ accent-color:#9e2a32; }
 .gtm.title-live .gtm-vol:focus-within, .gtm.game-live .gtm-vol:focus-within{ background:rgba(158,42,50,0.08); }
+/* タイトル画面（始める前）では、Book（本を読み返す）は出さない：メニューのボタンも、上の栞も */
+.gtm.title-live [data-act="book"]{ display:none !important; }
+body:has(.gtm.title-live.show) #openBook{ display:none !important; }
 /* メインのボタンの飾り：赤い薔薇 → 赤ずきんの赤 */
 .gtm.title-live[data-view="main"] .gtm-btn::before, .gtm.game-live[data-view="main"] .gtm-btn::before{ color:#c23a3a; }
 `;
