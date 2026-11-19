@@ -46,45 +46,11 @@ GT.registerDraw(()=>{
 },'world');
 // 狼：本体はそのままの大きさ。影だけ、うしろの森に大きく映す（ふつうの影は落とさないよう、影を作る層のあとに描く）
 GT.registerDraw(()=>{ if(!isTitle() || GT.titleChapter!==0) return; sil(SIL.wolf, 610, 300, false); },'speech');
-/* 狼の影：今までと同じ右上へ。足もとはふつうの大きさで、上半身から上へいくほど だんだん大きく（頭の影がいちばん大きい）。
-   横に細く切った帯を、上へいくほど大きくして積み上げる。一度作ったら取っておく */
-let wolfShadowCv=null;
-function buildWolfShadow(){
-  const iw=SIL.wolf.naturalWidth, ih=SIL.wolf.naturalHeight, H0=300*1.15, W0=H0*iw/ih, N=60;
-  // 口を開ける：口の線（鼻先からあごのつけねへ）より上の上あごを、つけねを中心に持ちあげ、下あごは少し下げる。すきまに牙
-  const img=document.createElement('canvas'); img.width=iw; img.height=ih; const m=img.getContext('2d');
-  m.drawImage(SIL.wolf,0,0);
-  const hx=iw*0.22, hy=ih*0.365, ty=ih*0.385;                   // あごのつけね・鼻先の口の高さ
-  const part=(path,rot)=>{ const t=document.createElement('canvas'); t.width=iw; t.height=ih; const g=t.getContext('2d');
-    g.save(); path(g); g.clip(); g.drawImage(SIL.wolf,0,0); g.restore();
-    m.save(); m.globalCompositeOperation='destination-out'; path(m); m.fill(); m.restore();
-    m.save(); m.translate(hx,hy); m.rotate(rot); m.translate(-hx,-hy); m.drawImage(t,0,0); m.restore(); };
-  const upper=g=>{ g.beginPath(); g.moveTo(-10,ty); g.lineTo(hx,hy); g.lineTo(hx,ih*0.28); g.lineTo(-10,ih*0.28); g.closePath(); };
-  const lower=g=>{ g.beginPath(); g.moveTo(-10,ty); g.lineTo(hx,hy); g.lineTo(hx,ih*0.43); g.lineTo(-10,ih*0.43); g.closePath(); };
-  const UP=0.32, DN=0.14;
-  part(upper, UP);        // 上あごを上へ（絵は左向き：時計まわりで鼻先が上がる）
-  part(lower,-DN);        // 下あごを少し下へ
-  m.fillStyle='#000';     // 牙：上あごから下へ、下あごから上へ
-  const tooth=(x,y,dy)=>{ m.beginPath(); m.moveTo(x-iw*0.012,y); m.lineTo(x,y+dy); m.lineTo(x+iw*0.012,y); m.fill(); };
-  for(const f of [0.35,0.6,0.82]){
-    const x0=f*hx, base=hy+(ty-hy)*(1-f);
-    tooth(x0, base-(hx-x0)*Math.sin(UP), ih*0.028);
-    tooth(x0, base+(hx-x0)*Math.sin(DN), -ih*0.024); }
-  const scaleAt=f=> f<0.4 ? 1 : 1+0.85*Math.pow((f-0.4)/0.6,1.4);   // f … 足もと0 〜 頭1
-  let total=0; for(let i=0;i<N;i++) total+=H0/N*scaleAt((i+0.5)/N);
-  const maxW=W0*scaleAt(1)+20, cv=document.createElement('canvas'); cv.width=Math.ceil(maxW); cv.height=Math.ceil(total)+4;
-  const c=cv.getContext('2d'), cx=cv.width/2; let y=cv.height;
-  for(let i=0;i<N;i++){
-    const s=scaleAt((i+0.5)/N), sh=H0/N*s, sw=W0*s, sy=ih*(1-(i+1)/N);
-    c.drawImage(img, 0, sy, iw, ih/N, cx-sw/2, y-sh-0.5, sw, sh+1); y-=sh;
-  }
-  c.globalCompositeOperation='source-in'; c.fillStyle='#000'; c.fillRect(0,0,cv.width,cv.height);   // つなぎ目に線が出ないよう、ひとつの影の色にそろえる
-  return cv;
-}
 GT.extraShadow=(ctx)=>{
   if(!isTitle() || GT.titleChapter!==0 || !SIL.wolf.complete || !SIL.wolf.naturalWidth) return;
-  const cv=wolfShadowCv||(wolfShadowCv=buildWolfShadow()), foot=GT.H-GT.EDGE+4;
-  ctx.save(); ctx.globalAlpha=0.78; ctx.drawImage(cv, 610+175-cv.width/2, foot-75-cv.height); ctx.restore();   // 右上へずらす（今までの角度）
+  const img=SIL.wolf, h=300*1.75, w=h*img.naturalWidth/img.naturalHeight, foot=GT.H-GT.EDGE+4;
+  ctx.save(); ctx.globalAlpha=0.5; ctx.translate(610+70, foot-10);   // 右上へずらし、大きく
+  ctx.drawImage(img,-w/2,-h,w,h); ctx.restore();
 };
 /* 章を選びなおしたとき：タイトルの場面ごと、ぺらっとページがめくれる（js/menu.js から呼ぶ） */
 GT.titleFlip=(ch,dir)=>{ if(!isTitle()) return; GT.titleChapter=ch; GT.startPageFlip(dir<0?-1:1, GT.scene); };   // 前の章へは、ページも前へもどる
