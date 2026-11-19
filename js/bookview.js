@@ -194,7 +194,6 @@ function slotInner(slot){
   if(!en || en.type!=='page') return `<div class="bv-blank">❧</div>`;
   const p=en.p, pno=en.no;
   const pc=pieces(p), missing=pc.total-pc.found;
-  const worm=Math.round(7*lackOf(p,pc));                                                         // 虫食いの穴の数（かけらを拾うと、へっていく）
   const note=(missing>0) ? `　<span class="bv-pieces">お話のかけら ${pc.found} / ${pc.total}</span>` : '';
   const head=`<div class="bv-h"><small>${esc(info(p).chapter)}　第 ${pno} 頁${note}</small>${esc(info(p).title)}</div>`;
   let art='';                                                                                     // 挿絵（bookart.js）。挿絵には穴をあけない（かけらが足りなくても、絵はそのまま見せる）
@@ -204,7 +203,7 @@ function slotInner(slot){
   // どちらも虫食いで、かけらを集めるほど読めるようになる
   const base=(GT.pageBases&&GT.pageBases[p.key]) || p.base || '';
   const text=(p.filled && p.text) ? p.text : base;
-  const body=(p.filled ? art : '') + `<div class="bv-body">${damagedText(text, pc, slot, !p.filled)}</div>` + (worm>0 ? holes(slot,worm) : '');
+  const body=(p.filled ? art : '') + `<div class="bv-body">${damagedText(text, pc, slot, !p.filled)}</div>`;   // 虫食いの穴は あけない（ページのふちの よれだけ）
   // このページのステージへ行くボタン（このページにふくまれるステージのうち、一度来たことのあるものだけ。menu.js の GT.canStartFrom / GT.startFrom）
   const ids=(PAGE_SCENES[p.key]||[]).filter(id=>GT.canStartFrom && GT.canStartFrom(id));
   const go = ids.length ? `<div class="bv-gos"><span class="bv-gos-h">Play again</span>${ids.map(id=>
