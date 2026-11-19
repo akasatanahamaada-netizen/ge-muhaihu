@@ -316,6 +316,7 @@ function drawHint(){
 }
 
 GT.registerDraw(()=>{ if(!isMeet()) return; drawBack(); }, 'back');
-GT.registerDraw(()=>{ if(!isMeet()) return; drawPond(); drawHood(); drawSplashes(); drawHint(); }, 'world');
+GT.registerDraw(()=>{ if(!isMeet()) return; drawPond(); }, 'flat');   // 水たまりは、影を落とさない
+GT.registerDraw(()=>{ if(!isMeet()) return; drawHood(); drawSplashes(); drawHint(); }, 'world');
 GT.registerDraw(()=>{ if(!isMeet()) return; drawBubble(); }, 'speech');   // ふきだしは最前面
 })();

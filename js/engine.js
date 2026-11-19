@@ -71,6 +71,7 @@ const updatePasses      = [];        // fn(dt) 物理モード中に毎フレー
 const modeUpdaters      = {};        // mode -> fn(dt) そのモード専用の更新
 const drawBack          = [];        // fn() 最背面に描く（地形より奥。判定なしの飾り用）
 const drawWorld         = [];        // fn() プレイヤーより後ろに描く
+const drawFlat          = [];        // fn() 影を落とさない物（水たまりなど）。奥の層の上・人物や足場の影より下に描く
 const drawOverlay       = [];        // fn() 画面の最前面に描く
 const drawLiftFns      = [];        // fn() 人物を色合いの上に描きなおしたあと（人物に重ねる印など）
 const drawSpeechFns     = [];        // fn() 吹き出し（overlay よりさらに前。木や手前の飾りに隠れない）
@@ -104,7 +105,7 @@ GT.registerSceneType  = (t,fn)=>{ sceneTypeHandlers[t]=fn; };
 GT.registerDynamic    = (n,fn)=>{ dynamicHandlers[n]=fn; };
 GT.registerUpdate     = (fn)=>{ updatePasses.push(fn); };
 GT.registerModeUpdate = (m,fn)=>{ modeUpdaters[m]=fn; };
-GT.registerDraw       = (fn,phase)=>{ (phase==='back'?drawBack:phase==='overlay'?drawOverlay:phase==='speech'?drawSpeechFns:phase==='lift'?drawLiftFns:drawWorld).push(fn); };   // 'speech' … 吹き出し（最前面）
+GT.registerDraw       = (fn,phase)=>{ (phase==='back'?drawBack:phase==='overlay'?drawOverlay:phase==='speech'?drawSpeechFns:phase==='lift'?drawLiftFns:phase==='flat'?drawFlat:drawWorld).push(fn); };   // 'speech' … 吹き出し（最前面）
 GT.registerAct        = (n,fn)=>{ actHooks[n]=fn; };
 GT.registerLineHook   = (fn)=>{ lineHooks.push(fn); };
 GT.registerSceneReset = (fn)=>{ sceneResets.push(fn); };
@@ -1914,6 +1915,7 @@ function renderBody(){
     ctx.save(); ctx.filter='saturate(0.8) brightness(1.04) contrast(0.9)'; ctx.drawImage(layerB,0,0); ctx.restore();
     if(GT.extraShadow) GT.extraShadow(ctx);   // 場面ごとの特別な影（タイトルの狼の大きな影など）。うしろの木の上にも映る
     drawPageEdges();
+    for(const fn of drawFlat) fn();                                   // 影を落とさない物（水たまりなど）。少年や人物の影は、この上に落ちる
     castLayerSplit(layerM,0.6,0.12);                                  // 少年や足場の影：うしろの木や家には近く、背景には遠く
     castLayerSplit(layerF,1,0.3);                                              // 手前の草などの影は、少年や人物より うしろに落とす（少年にかぶらない）
     ctx.drawImage(layerM,0,0);
@@ -1939,6 +1941,7 @@ function renderBody(){
   if(companion) drawNpc(companion);
   for(const it of GT.items) drawItem(it);
   drawGoText();
+  for(const fn of drawFlat) fn();
   for(const fn of drawWorld) fn();          // ボスなど（プレイヤーより後ろ）
   drawPlayer();
   for(const sw of GT.swamps) drawSwamp(sw);   // 沼はプレイヤーの足元を隠すよう手前に描く
