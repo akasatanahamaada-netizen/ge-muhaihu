@@ -91,7 +91,7 @@ function drawCard(){
   /* ひらいたページに、筆で書いていくように、文字と絵があらわれる
        「第一章」→ 罫線 → 「赤い頭巾」（筆の書体で、一画ずつ）→ 英語の筆記体 → 赤ずきんと狼のシルエットを上から描いていく */
   const W1=T_TEXT, W2=W1+0.9, W3=W2+0.3, PER=0.42;                          // 書きはじめる時間・一字にかける時間（秒）
-  const nT=[...chap.sub].length, W4=W3+PER*nT+0.15, S0=W4+1.0;
+  const nT=[...chap.sub].length, W4=W3+PER*nT+0.15, S0=W1;   // S0 … 絵（シルエット）も、文字を書きはじめると同時に描きはじめる
   const pen=key=>{ if(card.pen[key]) return; card.pen[key]=true; GT.sfx&&GT.sfx('write'); };   // ペンで書く音（一行・一枚の絵に一回）
   if(o>=1 && t>=W1){
     ctx.globalAlpha=1;

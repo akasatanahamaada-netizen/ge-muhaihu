@@ -149,7 +149,7 @@ GT.sceneMusic = {
   house_front:M('時を刻む森'), arrive:M('時を刻む森'),   // おばあさんの家の前・家に到着
   // 戦いのあと（部屋の中）：おばあさんも助かった結末は『抒情歌「二つの草」』、助けられなかった結末は悲しい『堕ちる』
   //   （結末の決まり方は 12_grannys_house.js の 'result'：おばあさんが助かるのは、近道で、赤ずきんも助けたときだけ）
-  ending: f=> (f.route==='shortcut' && f.saved!==false) ? M('抒情歌「二つの草」') : BGM_SAD,
+  // ending（狼を倒したあと・部屋の中）は、曲なし（前は 結末ごとに『抒情歌「二つの草」』／『堕ちる』）
   epilogue: M('世界の最果てで、自由を謳う'),   // 外に出た場面（夕暮れ／夜明け）〜エンディングの画面
 };
 // 最終戦闘（おばあさんの家で差しこまれるボス戦・QTE。id が無いので、シーンの種類で決める）
@@ -159,7 +159,7 @@ GT.bookMusic  = null;   // 本を読み返す画面（Reread）では、本だ�
 
 // 走るときの足音（シーンの id ごとの地面）。'grass'=芝生 / 'leaves'=落ち葉 / 'dirt'=土。書いていないシーン（家の中など）は足音なし。
 GT.sceneFootsteps = {
-  wake:'leaves', mari_gate:'leaves', afterword:'leaves',   // 序章の暗い森（目覚め・森の出口・最後の森の出口）は落ち葉
+  wake:'leaves', mari_gate:'grass', afterword:'grass',   // 目覚めは落ち葉、森の出口（チュートリアルのおわり・最後）は芝生
   opening:'grass', komichi1:'grass', komichi2:'grass', house_peek:'grass', path1:'grass', meet_hood:'grass', cliff:'grass',
   wolf_talk:'leaves', path3:'leaves', path4:'leaves',          // 森の奥・遠回りの道（落ち葉）
   crossroads:'dirt', path2:'dirt', path2b:'dirt', house_front:'dirt', flowers:'grass',         // 分かれ道・近道・家の前（土の道）
