@@ -1889,8 +1889,8 @@ function renderBody(){
     ctx.save(); ctx.filter='saturate(0.8) brightness(1.04) contrast(0.9)'; ctx.drawImage(layerB,0,0); ctx.restore();
     drawPageEdges();
     castLayer(layerM,0.6);
+    castLayer(layerF,1);                                              // 手前の草などの影は、少年や人物より うしろに落とす（少年にかぶらない）
     ctx.drawImage(layerM,0,0);
-    castLayer(layerF,1);
     ctx.save(); ctx.filter='brightness(0.86) saturate(1.08) contrast(1.05)'; ctx.drawImage(layerF,0,0); ctx.restore();
     drawGravityIcon(SPINE/2,20,gravity.left,flashPage.left);
     drawGravityIcon(SPINE+SPINE/2,20,gravity.right,flashPage.right);
