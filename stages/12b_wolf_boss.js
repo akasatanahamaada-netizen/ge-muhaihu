@@ -71,7 +71,7 @@ function defeatWolf(){
   wolf.alive=false; wolf.deathT=0; wolf.squash=0.2;
   const hollow=GT.scene&&GT.scene.hollow;
   if(hollow) fx.banner={ text:'……', t:0 };   // 「狼を倒した！」の文字は出さない
-  setTimeout(()=>{ GT.flags.saved = hollow?false:true; GT.mode='play'; GT.openExit&&GT.openExit(); },1700);   // 無理やり場面を変えず、自分で右の端へ歩いて、次のページへ
+  setTimeout(()=>{ GT.flags.saved = hollow?false:true; GT.mode='idle'; GT.advanceScene(); },1700);   // 倒したら、そのまま部屋の場面の会話へ（部屋の会話のあとは、自分で右の端へ歩いて外へ）
 }
 // 狼にぶつかられた：はじき飛ばされる（はじめの場所へは戻されない）
 function hurtPlayer(){                                    // ハートが減る（3回でゲームオーバー → ページがもどって、戦いをやり直す）
