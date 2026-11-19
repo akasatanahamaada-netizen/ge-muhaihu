@@ -422,12 +422,14 @@ document.addEventListener('fullscreenchange',refit); document.addEventListener('
    GT.clearBookGuide()  … 誘導を消す（ページが変わると自動で消える） */
 const guideBtn=document.getElementById('openBook');
 let guiding=false;
-GT.guideToBook=function(text){
-  if(!guideBtn) return; guiding=true;
+let guidePage=null;   // 誘導中に本を開いたとき、開くページ（key）。無ければ、いちばん新しく書かれたページ
+GT.guideToBook=function(text,pageKey){
+  if(!guideBtn) return; guiding=true; guidePage=pageKey||null;
   guideBtn.dataset.guide=text||'本を開いてみよう'; guideBtn.classList.add('gt-guide');
 };
-GT.clearBookGuide=function(){ guiding=false; if(guideBtn){ guideBtn.classList.remove('gt-guide'); delete guideBtn.dataset.guide; } };
+GT.clearBookGuide=function(){ guiding=false; guidePage=null; if(guideBtn){ guideBtn.classList.remove('gt-guide'); delete guideBtn.dataset.guide; } };
 GT.registerSceneReset(()=>GT.clearBookGuide());
+function spreadOf(key){ const i=entries().findIndex(en=>en.type==='page' && en.p.key===key); return i<0?latestSpread():Math.floor(i/2); }
 function latestSpread(){                                      // いちばん新しく書かれたページがある見開き
   const list=entries(); let slot=0;
   list.forEach((en,i)=>{ if(en.type==='page' && en.p.filled) slot=i; });
@@ -436,7 +438,7 @@ function latestSpread(){                                      // いちばん新
 function open(){
   if(modal.classList.contains('show')) return;
   fitBook();
-  spread = guiding ? latestSpread() : 0; GT.clearBookGuide(); show();
+  spread = guiding ? (guidePage ? spreadOf(guidePage) : latestSpread()) : 0; GT.clearBookGuide(); show();
   wasPaused=!!GT.paused; GT.paused=true;
   if(reduced()){ modal.style.opacity=''; modal.classList.add('show'); GT.sfx&&GT.sfx('page'); return; }
   // 閉じた本を、ふわっと出してから開く
@@ -471,6 +473,7 @@ modal.addEventListener('click',e=>{ const g=e.target.closest('.bv-go'); if(!g) r
   if(!(g._armT>performance.now())){ g._armT=performance.now()+2500; g.textContent='Tap again'; g.classList.add('armed');
     setTimeout(()=>{ if(!(g._armT>performance.now())){ g.textContent=g.dataset.name; g.classList.remove('armed'); } },2600); return; }
   const id=g.dataset.scene; modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=false;
+  if(GT.bookJump && GT.bookJump(id)) return;   // お話を読み終えたあとの「森の出口」など（12_grannys_house.js）
   if(GT.startFrom) GT.startFrom(id); }, true);
 modal.addEventListener('click',e=>{ if(e.target===modal) close(); });
 // スワイプ

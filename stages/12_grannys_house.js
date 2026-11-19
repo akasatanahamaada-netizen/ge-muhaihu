@@ -371,7 +371,7 @@ GT.registerDynamic('result', ()=>{
   ending.summary = hoodLine+'　／　'+grannyLine;
 
   const after = typeof AFTER[ending.kind]==='function' ? AFTER[ending.kind](flags) : AFTER[ending.kind];
-  GT.beginDialogue(after.concat([BOOK_GLOW[ending.kind]]),null,()=>{ GT.hideDialogue(); GT.storyPiece&&GT.storyPiece('granny','granny:story'); setTimeout(()=>GT.startPageFlip(),1300); });   // かけらが本へ飛んでから、ページをめくって外の場面へ
+  GT.beginDialogue(after.concat([BOOK_GLOW[ending.kind]]),null,()=>{ GT.hideDialogue(); GT.storyPiece&&GT.storyPiece('granny','granny:story'); GT.mode='play'; GT.openExit&&GT.openExit(); });   // かけらが本へ飛んだら、自分で右の端へ（外の場面へ）   // かけらが本へ飛んでから、ページをめくって外の場面へ
 });
 
 /* ---- 外の場面（epilogue）：少年が歩いて、自分で話しかける ---- */
@@ -407,19 +407,10 @@ GT.registerAct('epi-setup',()=>{
   GT.setHudStage(epilogueDusk()?'第一章 ── 夕暮れ':'第一章 ── 夜明け');
   const h=get('hood'), g=get('granny'), m=get('mari');
   if(h){ if(kind==='bad'){ h.x=-300; } else { h.x=kind==='true'?400:330; h.lines=OUT_TALK.hood[kind](f);
-    h.onEnd=()=>{ setTimeout(()=>{ GT.mode='idle'; GT.beginDialogue([{s:'少年',c:'boy',t:'……マリが待っているページに戻ろう。'}],null,()=>{ GT.hideDialogue(); GT.mode='play'; }); },60); }; } }   // 話し終えたら、少年がひとこと
+    h.onEnd=()=>{ setTimeout(backToMari,60); }; } }   // 話し終えたら、少年がひとこと
   if(g){ if(kind==='true'){ g.x=300; g.lines=OUT_TALK.granny.true(f); } else g.x=-300; }
-  if(kind==='bad' && GT.openStoryExit) GT.openStoryExit();   // だれもいないので、そのまま右の端へ
 });
 GT.registerSceneReset(()=>{ if(isEpi()){ ending.epilogue=true; ending.card=false; } else if(GT.scene&&GT.scene.type!=='end'){ ending.epilogue=false; ending.card=false; } });
-// 最後の選択肢（本を開いたあとも、ここに戻ってくる）
-function showEndChoices(){
-  GT.beginDialogue([], [
-    { label:'本を開いて、読み返す', set:()=>GT.openBookModal(), after:[] },
-    { label:'はじめから読む', set:()=>location.reload(), after:[] },
-  ], showEndChoices);
-}
-
 /* 外（マリと話す場面）：近道なら夕暮れ、遠回りなら夜明け。地形より奥 */
 function drawEpilogue(){
   if(!isEpi()) return;
@@ -470,7 +461,7 @@ GT.registerScene({
           {s:'',c:'narr',get t(){ return ending.kind==='bad' ? '……そこには、もう誰もいなかった。' : '外には、見知った顔があった。'; }},],
   npcs:[
     { who:'granny', name:'おばあさん', page:'left', x:-300, noExit:true, lines:[{s:'おばあさん',c:'granny',t:'……。'}] },   // セリフは epi-setup で入れる
-    { who:'hood',   name:'赤ずきん',   page:'left', x:-300, required:true, lines:[{s:'赤ずきん',c:'hood',t:'……。'}] },   // 話すと右の端が開く
+    { who:'hood',   name:'赤ずきん',   page:'left', x:-300, noExit:true, required:true, lines:[{s:'赤ずきん',c:'hood',t:'……。'}] },   // 話しかけてほしい人（！）。右の端は開かない（マリのページへは、本を開いてもどる）
     // マリは、ここにはいない（次のページ＝はじめの暗い森で待っている）
   ],
 });
@@ -483,15 +474,56 @@ const isAfter=()=>GT.scene&&GT.scene.id==='afterword';
 const epiSay={ said:false };
 GT.registerSceneReset(()=>{ if(isEpi()) epiSay.said=false; });
 GT.registerUpdate(()=>{ if(!isEpi() || ending.kind!=='bad' || epiSay.said || GT.mode!=='play') return; epiSay.said=true;
-  GT.mode='idle'; GT.beginDialogue([{s:'少年',c:'boy',t:'……マリが待っているページに戻ろう。'}],null,()=>{ GT.hideDialogue(); GT.mode='play'; }); });
-const aft={ talked:false };
-GT.registerSceneReset(()=>{ if(GT.scene&&GT.scene.id==='afterword') aft.talked=false; });
+  backToMari(); });
+/* マリのページ（森の出口）へは、本を開いてもどる。本の「森の小道」のページの「森の出口」から */
+function backToMari(){
+  GT.mode='idle';
+  GT.beginDialogue([{s:'少年',c:'boy',t:'……マリが待っているページに戻ろう。本を開いて、「森の出口」のページへ。'}],null,()=>{ GT.hideDialogue(); GT.mode='play';
+    GT.guideToBook&&GT.guideToBook('本を開いて、「森の出口」へ','komichi'); });
+}
+/* 本から「森の出口」へもどるとき：お話を読み終えていれば、マリが待っている森の出口（afterword）へ。いまの分岐のまま */
+GT.bookJump=id=>{
+  if(id!=='mari_gate' || !GT.flags.ending) return false;
+  let idx=GT.SCENES.findIndex(s=>s.id==='afterword');
+  if(idx<0){ GT.SCENES=GT.playlist.map(i=>GT.sceneRegistry[i]).filter(Boolean); idx=GT.SCENES.findIndex(s=>s.id==='afterword'); }
+  if(idx<0) return false;
+  if(GT.hideMenu) GT.hideMenu();
+  GT.jumpToScene(idx); return true;
+};
+const aft={ talked:false, restart:false };
+GT.registerSceneReset(()=>{ if(GT.scene&&GT.scene.id==='afterword'){ aft.talked=false; aft.restart=false; } });
 GT.registerUpdate(()=>{ if(!(GT.scene&&GT.scene.id==='afterword') || aft.talked || GT.mode!=='play') return;
   const m=GT.getNpcs().find(n=>n.who==='mari'); if(!m) return; aft.talked=true; GT.talkTo(m); });   // 語りが終わったら、マリのほうから話しかけてくる（エンディングのあとのセリフ）
 GT.registerAct('after-setup',()=>{
   const m=GT.getNpcs().find(n=>n.who==='mari');
   if(m){ m.lines=EPILOGUE[ending.kind].concat([{s:'',c:'narr',t:'第一章「赤い頭巾」　おわり',act:'end-card'}]); }
 });
+/* エンディングの画面のあと：画面を消して、マリがもう一度話す。お話を変えたいなら、次のページへ進むと最初から */
+const RESTART_TALK=[
+  {s:'マリ',c:'mari',t:'……ねえ。もし、お話を変えたいなら。'},
+  {s:'マリ',c:'mari',t:'もう一度、次のページへ進んで。そうしたら、お話は最初から始まるよ。'},
+  {s:'マリ',c:'mari',t:'今度は、ちがう道を選んでもいい。だれかに、ちがう言葉をかけてもいい。'},
+  {s:'マリ',c:'mari',t:'このままでいいなら、本を開いて、読み返してもいいよ。……わたしは、ここで待ってる。'},
+];
+function afterEnd(){
+  GT.mode='idle';
+  setTimeout(()=>{
+    ending.card=false;
+    const m=GT.getNpcs().find(n=>n.who==='mari');
+    if(m){ m.lines=RESTART_TALK.slice(); m.talked=false; m.talkable=true; m.onEnd=()=>{ GT.mode='play'; setTimeout(()=>{ m.talked=false; },0); }; }   // 何度でも話しかけられて、同じ説明
+    GT.beginDialogue(RESTART_TALK.slice(),null,()=>{ GT.hideDialogue(); GT.mode='play'; aft.restart=true; });
+  },3200);
+}
+// 次のページ（右の端）へ進むと、お話は最初から
+GT.registerUpdate(()=>{
+  if(!isAfter() || !aft.restart || GT.mode!=='play') return;
+  const pl=GT.player; if(pl.x+pl.w < W-EDGE-6) return;
+  aft.restart=false; if(GT.startNewGame) GT.startNewGame(); else location.reload();
+});
+GT.registerDraw(()=>{ if(!isAfter() || !aft.restart || GT.mode!=='play') return;
+  const p=0.5+0.5*Math.sin(performance.now()/1000*4);
+  ctx.save(); ctx.textAlign='right'; ctx.globalAlpha=0.55+0.45*p; ctx.fillStyle='#d9b877'; ctx.font="700 22px 'Caveat',cursive";
+  ctx.fillText('Next page → start over', W-26, H/2); ctx.restore(); },'overlay');
 GT.registerScene({
   id:'afterword', type:'story', stage:'mari_gate', label:'序章 ── 森の出口',   // マリが待っている、森の出口にもどる（stages/02c_mari_gate.js が描く）
   intro:[ {s:'',c:'narr',t:'ページがめくれる。……気がつくと、少年は森の出口に立っていた。',act:'after-setup'},
@@ -499,7 +531,7 @@ GT.registerScene({
   npcs:[
     { who:'mari', name:'マリ', page:'right', x:630, noExit:true, required:true,   // 話すとエンディング
       lines:[{s:'マリ',c:'mari',t:'おかえり。'}],
-      onEnd:()=>{ GT.mode='idle'; showEndChoices(); } },
+      onEnd:afterEnd },
   ],
 });
 

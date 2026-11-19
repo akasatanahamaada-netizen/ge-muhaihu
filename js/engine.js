@@ -273,6 +273,7 @@ function drawStageBackground(){
 
 /* ---- エンジン内部の状態 -------------------------------------------------- */
 let goalPulse=0;
+let goHint=false;                    // GT.openExit で開けたとき、「右の端へ」の案内を出す
 let stageExit=false;                 // 右端が開いていて、歩いて抜けるとクリアになる状態か
 let exitWanted=false;                // ミッションさえ終われば右端が開くステージか（play の exit / story の話したあと）
 let curStageDef=null;                // いまのステージの定義（拾ったかけらを、本のページに記録するため）
@@ -292,7 +293,7 @@ const keys={};
 GT.loadStageDef = function(def, opt){
   opt=opt||{};
   def=def||{};
-  exitWanted=!!opt.exit; stageExit=false;
+  exitWanted=!!opt.exit; stageExit=false; goHint=false;
   storyStage=false; npcs=[]; activeNpc=null; storyTalking=false; storyExitReady=false; companion=null;
   GT.gravity={left:1,right:1};
   GT.platforms = edges.concat((def.platforms||[]).map(p=>({...p})));   // 右端の壁は updateExitGate が外す
@@ -496,6 +497,7 @@ function advanceScene(){ startScene(GT.sceneIndex+1); }
 function injectSceneAfterCurrent(sc){ GT.SCENES.splice(GT.sceneIndex+1,0,sc); }
 GT.storyPiece=(key,id,who)=>{ const n=who&&npcs.find(m=>m.who===who), ok=n&&n.x>-40&&n.x<W+40, r=ok?n:GT.player;
   GT.addPagePiece(key,id,{x:r.x,y:r.y,w:r.w,h:r.h}); };   // 大事な会話のあと・敵を倒したあと：お話のかけらが光の玉になって本へ
+GT.openExit=()=>{ exitWanted=true; stageExit=true; goHint=true; GT.platforms=GT.platforms.filter(p=>!(p.page==='right'&&p.kind==='wallEdge')); };   // 右の端を開く（自分で歩いて、次のページへ）
 GT.openStoryExit=()=>{ exitWanted=true; storyExitReady=true; updateExitGate(); };   // 話しかけなくても、右の端を開く
 GT.startScene=startScene; GT.advanceScene=advanceScene; GT.injectSceneAfterCurrent=injectSceneAfterCurrent;
 GT.getPageNo=()=>pageNo;
@@ -1885,7 +1887,7 @@ function drawBookBase(gravity){
 }
 function drawGoText(){
   if(missionReq && exitWanted && !stageExit) drawExitGate();
-  if((storyStage||missionReq) && stageExit && !flipping && !storyTalking){
+  if((storyStage||missionReq||goHint) && stageExit && !flipping && !storyTalking){
     const p=0.5+0.5*Math.sin(goalPulse*4);
     ctx.save(); ctx.textAlign='right'; ctx.globalAlpha=0.55+0.45*p;
     ctx.fillStyle='#b08d57'; ctx.font="700 22px 'Caveat',cursive";
