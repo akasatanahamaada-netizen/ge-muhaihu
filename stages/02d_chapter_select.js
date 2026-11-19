@@ -12,7 +12,7 @@ const isSel=()=>GT.scene && GT.scene.id==='chapter_select';
 GT.CHAPTER_NAMES=['第一章「赤い頭巾」','第二章「？？？」','第三章「？？？」','第四章「？？？」','第五章「？？？」','？？？'];
 
 const box=document.createElement('div'); box.id='gtChSel';
-box.innerHTML=`<div class="row"><button class="orn l" type="button" aria-label="前の章">❧</button><span class="name"></span><button class="orn r" type="button" aria-label="次の章">❧</button></div>
+box.innerHTML=`<div class="row"><button class="orn l" type="button" aria-label="前の章">❧</button><canvas class="name" role="img"></canvas><button class="orn r" type="button" aria-label="次の章">❧</button></div>
   <button class="begin" type="button">Begin</button><div class="note"></div>`;
 GT.canvas.parentElement.appendChild(box);
 const st=document.createElement('style'); st.textContent=`
@@ -20,7 +20,7 @@ const st=document.createElement('style'); st.textContent=`
     text-shadow:0 1px 6px rgba(4,6,4,0.95), 0 0 14px rgba(4,6,4,0.8); }
   #gtChSel.show{ display:flex; }
   #gtChSel .row{ display:flex; align-items:center; gap:0.6em; font-family:'Zen Old Mincho',serif; font-size:clamp(14px,2.6cqw,60px); letter-spacing:0.25em; color:#f1e8d4; }
-  #gtChSel .name{ transition:opacity .2s; }
+  #gtChSel .name{ display:block; }
   #gtChSel button{ pointer-events:auto; background:none; border:none; cursor:pointer; color:#e3c58a; font:inherit; text-shadow:inherit; }
   #gtChSel .orn{ font-size:1.1em; letter-spacing:0; padding:0.1em 0.3em; } #gtChSel .orn.l{ transform:scaleX(-1); }
   #gtChSel .orn:hover{ color:#fff1d0; }
@@ -30,7 +30,37 @@ const st=document.createElement('style'); st.textContent=`
   .gt-flipping #gtChSel{ visibility:hidden; }`;
 document.head.appendChild(st);
 const nameEl=box.querySelector('.name'), beginEl=box.querySelector('.begin'), noteEl=box.querySelector('.note');
-function refresh(){ const c=GT.titleChapter||0; nameEl.textContent=GT.CHAPTER_NAMES[c];
+/* 章の名前は、ペンで書き順どおりに一画ずつ書く（js/inkwrite.js の GT.ink）。一字ごとにペンの音。
+   ページがめくれているあいだは待って、めくり終わってから書きはじめる */
+const SPD=0.5, nctx=nameEl.getContext('2d');
+const wr={ str:'', t0:null, pen:{}, raf:0 };
+function drawName(){
+  wr.raf=0;
+  if(!isSel() || !box.classList.contains('show')) return;
+  const now=performance.now()/1000;
+  if(document.body.classList.contains('gt-flipping')) wr.t0=null;               // めくっているあいだは、書かない
+  else if(wr.t0===null) wr.t0=now+0.25;
+  const dpr=Math.min(3,window.devicePixelRatio||1), row=nameEl.parentElement;
+  const size=parseFloat(getComputedStyle(row).fontSize)*dpr, font=`400 ${size}px 'Zen Old Mincho',serif`;
+  const chs=[...wr.str], gap=size*0.25, pad=Math.ceil(size*0.6);
+  nctx.font=font; const ws=chs.map(ch=>nctx.measureText(ch).width), total=ws.reduce((a,b)=>a+b,0)+gap*Math.max(0,chs.length-1);
+  const cw=Math.ceil(total+pad*2), chh=Math.ceil(size*1.6);
+  if(nameEl.width!==cw||nameEl.height!==chh){ nameEl.width=cw; nameEl.height=chh; nameEl.style.width=cw/dpr+'px'; nameEl.style.height=chh/dpr+'px'; }
+  nctx.clearRect(0,0,cw,chh);
+  nctx.shadowColor='rgba(4,6,4,0.95)'; nctx.shadowBlur=8*dpr; nctx.shadowOffsetY=1*dpr;   // 字のまわりの、うすい影（背景の森の上でも読めるように）
+  const lt0=wr.t0===null? -1 : now-wr.t0; let x=pad, c0=0, done=wr.t0!==null;
+  chs.forEach((ch,n)=>{ const cp=GT.ink.charPlan(ch,SPD), lt=lt0-c0; c0+=cp.dur;
+    if(lt>0 && cp.dur>0 && !wr.pen[n]){ wr.pen[n]=true; GT.sfx&&GT.sfx('write',cp.dur); }   // ペンの音（その字を書いているあいだだけ）
+    if(lt<cp.dur) done=false;
+    GT.ink.drawChar(nctx,ch,x,chh/2,size,font,'#f1e8d4',ws[n],lt,cp);
+    x+=ws[n]+gap; });
+  nctx.shadowColor='transparent';
+  if(!done) wr.raf=requestAnimationFrame(drawName);
+}
+function writeName(str){ wr.str=str; wr.t0=null; wr.pen={}; nameEl.setAttribute('aria-label',str); if(!wr.raf) wr.raf=requestAnimationFrame(drawName); }
+window.addEventListener('resize',()=>{ if(isSel() && !wr.raf) wr.raf=requestAnimationFrame(drawName); });
+document.fonts && document.fonts.load("400 40px 'Zen Old Mincho'").catch(()=>{});
+function refresh(){ const c=GT.titleChapter||0; writeName(GT.CHAPTER_NAMES[c]);
   const ok=c===0; beginEl.disabled=!ok; noteEl.textContent=ok?'':'このお話は、まだ書かれていない'; }
 function step(d){
   if(!isSel()) return;

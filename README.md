@@ -308,4 +308,4 @@ GTDecor.paint.flower(ctx, x, 地面のy, 大きさ, 色0〜3, 種);       // 花
 
 ## クレジット
 
-- 章のとびらの文字の書き順データ：[KanjiVG](https://kanjivg.tagaini.net)（Ulrich Apel ほか、CC BY-SA 3.0）。`stages/02b_chapter_card.js` の `KVG` に、使う字の分だけ入れています。
+- 章のとびらの文字の書き順データ：[KanjiVG](https://kanjivg.tagaini.net)（Ulrich Apel ほか、CC BY-SA 3.0）。`js/inkwrite.js` の `KVG` に、使う字の分だけ入れています（章をえらぶ画面・章のとびらで使う）。
