@@ -46,11 +46,26 @@ GT.registerDraw(()=>{
 },'world');
 // 狼：本体はそのままの大きさ。影だけ、うしろの森に大きく映す（ふつうの影は落とさないよう、影を作る層のあとに描く）
 GT.registerDraw(()=>{ if(!isTitle() || GT.titleChapter!==0) return; sil(SIL.wolf, 610, 300, false); },'speech');
+/* 狼の影：今までと同じ右上へ。足もとはふつうの大きさで、上半身から上へいくほど だんだん大きく（頭の影がいちばん大きい）。
+   横に細く切った帯を、上へいくほど大きくして積み上げる。一度作ったら取っておく */
+let wolfShadowCv=null;
+function buildWolfShadow(){
+  const img=SIL.wolf, iw=img.naturalWidth, ih=img.naturalHeight, H0=300*1.15, W0=H0*iw/ih, N=60;
+  const scaleAt=f=> f<0.4 ? 1 : 1+0.85*Math.pow((f-0.4)/0.6,1.4);   // f … 足もと0 〜 頭1
+  let total=0; for(let i=0;i<N;i++) total+=H0/N*scaleAt((i+0.5)/N);
+  const maxW=W0*scaleAt(1)+20, cv=document.createElement('canvas'); cv.width=Math.ceil(maxW); cv.height=Math.ceil(total)+4;
+  const c=cv.getContext('2d'), cx=cv.width/2; let y=cv.height;
+  for(let i=0;i<N;i++){
+    const s=scaleAt((i+0.5)/N), sh=H0/N*s, sw=W0*s, sy=ih*(1-(i+1)/N);
+    c.drawImage(img, 0, sy, iw, ih/N, cx-sw/2, y-sh-0.5, sw, sh+1); y-=sh;
+  }
+  c.globalCompositeOperation='source-in'; c.fillStyle='#000'; c.fillRect(0,0,cv.width,cv.height);   // つなぎ目に線が出ないよう、ひとつの影の色にそろえる
+  return cv;
+}
 GT.extraShadow=(ctx)=>{
   if(!isTitle() || GT.titleChapter!==0 || !SIL.wolf.complete || !SIL.wolf.naturalWidth) return;
-  const img=SIL.wolf, h=300*1.4, w=h*img.naturalWidth/img.naturalHeight, foot=GT.H-GT.EDGE+4;
-  ctx.save(); ctx.globalAlpha=0.78; ctx.translate(610, foot); ctx.transform(1,0,0.55,1,0,0);   // 足もとから、赤ずきんのほう（左上）へ ななめに のびる（光は右から）
-  ctx.drawImage(img,-w/2,-h,w,h); ctx.restore();
+  const cv=wolfShadowCv||(wolfShadowCv=buildWolfShadow()), foot=GT.H-GT.EDGE+4;
+  ctx.save(); ctx.globalAlpha=0.78; ctx.drawImage(cv, 610+55-cv.width/2, foot-10-cv.height); ctx.restore();   // 右上へずらす（今までの角度）
 };
 /* 章を選びなおしたとき：タイトルの場面ごと、ぺらっとページがめくれる（js/menu.js から呼ぶ） */
 GT.titleFlip=(ch,dir)=>{ if(!isTitle()) return; GT.titleChapter=ch; GT.startPageFlip(dir<0?-1:1, GT.scene); };   // 前の章へは、ページも前へもどる
