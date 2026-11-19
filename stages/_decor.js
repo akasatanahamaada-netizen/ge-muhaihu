@@ -775,13 +775,18 @@ api.forest={ butterfly:drawButterfly, rock:paperWrap(drawRock), trunk:paperWrap(
 
 /* ===== ゲーム本体に組み込む（engine.js があるときだけ動く） =============== */
 if(window.GT && GT.registerDraw){
+  const FRONT_DROP=16;   // 手前の飾りを、床より何px下に置くか
   function drawLayer(layer){
     const sc=GT.scene; if(!sc||!sc.stage) return;
     const def=GT.STAGE_DEFS[sc.stage]; if(!def||!def.decor) return;
     const dim = GT.isBright && !GT.isBright();                                  // ゴシックの場面では、草や葉の飾りを暗く・色をおさえる（ポップになりすぎないように）
     if(dim){ GT.ctx.save(); GT.ctx.filter='saturate(0.4) brightness(0.55)'; }
     else GT.ctx.save();
-    for(const d of def.decor){ if((d.layer||'back')===layer) api.draw(GT.ctx,d.kind,d.x,d.y,d.w,d.h); }
+    // 明るい場面：少年より手前の飾りは、少年より少し下に置く（手前にあるほど、画面では下に見える）。少し大きく
+    const near = layer==='front' && !dim;
+    for(const d of def.decor){ if((d.layer||'back')!==layer) continue;
+      if(near){ const c=GT.ctx, bx=d.x+d.w/2, by=d.y+d.h; c.save(); c.translate(bx,by+FRONT_DROP); c.scale(1.15,1.15); c.translate(-bx,-by); api.draw(c,d.kind,d.x,d.y,d.w,d.h); c.restore(); }
+      else api.draw(GT.ctx,d.kind,d.x,d.y,d.w,d.h); }
     GT.ctx.restore();
   }
   GT.registerDraw(()=>drawLayer('back'),  'back');     // 地形より奥
