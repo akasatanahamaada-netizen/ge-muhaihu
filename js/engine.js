@@ -1826,7 +1826,7 @@ const layerB=document.createElement('canvas'), layerM=document.createElement('ca
 for(const c of [layerB,layerM,layerF]){ c.width=W; c.height=H; }
 const shadowSmall=[document.createElement('canvas'),document.createElement('canvas')];
 function grabLayer(L){ const g=L.getContext('2d'); g.clearRect(0,0,W,H); g.drawImage(canvas,0,0); ctx.clearRect(0,0,W,H); }
-GT.SHADOW={ dx:10, dy:6, alpha:0.42 };   // 影の基本の量（depth で、遠く・うすくなる）
+GT.SHADOW={ dx:10, dy:6, alpha:0.62 };   // 影の基本の量（depth で、遠く・うすくなる）
 function castLayer(L,depth){
   // 影は、かたむけず、そのまま右上へずらす。ふちは、まっすぐ くっきり（画面と同じ大きさで写し、ぼかさない）
   const d=depth, sc=shadowSmall[0], S=GT.SHADOW;
@@ -1834,7 +1834,7 @@ function castLayer(L,depth){
   const s=sc.getContext('2d');
   s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,W,H);
   s.drawImage(L, Math.round(S.dx+30*d), -Math.round(S.dy+22*d));          // 手前の層ほど、遠くへ
-  s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.12*d).toFixed(3)})`; s.fillRect(0,0,W,H);
+  s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.42*d).toFixed(3)})`;   // 奥の層ほど影は濃く、手前ほどうすい s.fillRect(0,0,W,H);
   ctx.drawImage(sc,0,0);
 }
 function drawBookBase(gravity){

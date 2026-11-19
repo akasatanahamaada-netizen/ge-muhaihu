@@ -7,17 +7,10 @@
    ========================================================================== */
 (function(){
 const W=GT.W, H=GT.H;
-const FG={   // シーンの id → 手前の木 {x：幹のまん中, w：幹の太さ, lean：上ほど どちらへ曲がるか}
-  house_peek:{x:28,  w:46, lean:10},
-  path1:     {x:874, w:40, lean:-10},
-  meet_hood: {x:26,  w:44, lean:12},
-  cliff:     {x:870, w:38, lean:-8},
-  wolf_talk: {x:24,  w:48, lean:10},
-  crossroads:{x:872, w:44, lean:-12},
-  flowers:   {x:26,  w:42, lean:10},
-  path3:     {x:872, w:40, lean:-10},
-  path4:     {x:26,  w:42, lean:8},
-  house_front:{x:24, w:46, lean:10},
+const FG={   // シーンの id → 手前の木 {x：幹のまん中, w：幹の太さ}。全部の場面には置かない（見せ場の場面だけ）
+  house_peek:{x:28,  w:46},
+  wolf_talk: {x:24,  w:48},
+  house_front:{x:24, w:46},
 };
 const cache={};
 let sd=1; const R=()=>{ sd=(sd*16807)%2147483647; return sd/2147483647; };
