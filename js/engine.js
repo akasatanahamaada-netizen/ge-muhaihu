@@ -1877,7 +1877,7 @@ function renderBody(){
     for(const fn of drawOverlay) fn();
     grabLayer(layerF);                                                // 手前の層
     drawBookBase(gravity);
-    castLayer(layerB,0.25); castLayer(layerM,0.6); castLayer(layerF,1);   // 影（奥の層ほど近く、手前の層ほど遠く）
+    castLayer(layerM,0.6); castLayer(layerF,1);   // 影（少年より うしろの層＝奥の木・家などは、影を入れない。手前の層ほど遠く）
     // 空気の遠近：奥の層は、少しかすんで色がうすく。手前の層は、少し暗く くっきり
     ctx.save(); ctx.filter='saturate(0.8) brightness(1.04) contrast(0.9)'; ctx.drawImage(layerB,0,0); ctx.restore();
     drawPageEdges(); ctx.drawImage(layerM,0,0);

@@ -783,9 +783,9 @@ if(window.GT && GT.registerDraw){
     if(dim){ GT.ctx.save(); GT.ctx.filter='saturate(0.4) brightness(0.55)'; }
     else GT.ctx.save();
     // 明るい場面：少年より手前の飾りは、少年より少し下に置く（手前にあるほど、画面では下に見える）。少し大きく
-    const near = layer==='front' && !dim;
+    const near = layer==='front' && !dim;   // （岩の足場の見た目 ledgeFront / ledgeBack は、足場と重ねているので動かさない）
     for(const d of def.decor){ if((d.layer||'back')!==layer) continue;
-      if(near){ const c=GT.ctx, bx=d.x+d.w/2, by=d.y+d.h; c.save(); c.translate(bx,by+FRONT_DROP); c.scale(1.15,1.15); c.translate(-bx,-by); api.draw(c,d.kind,d.x,d.y,d.w,d.h); c.restore(); }
+      if(near && !/^ledge/.test(d.kind)){ const c=GT.ctx, bx=d.x+d.w/2, by=d.y+d.h; c.save(); c.translate(bx,by+FRONT_DROP); c.scale(1.15,1.15); c.translate(-bx,-by); api.draw(c,d.kind,d.x,d.y,d.w,d.h); c.restore(); }
       else api.draw(GT.ctx,d.kind,d.x,d.y,d.w,d.h); }
     GT.ctx.restore();
   }
