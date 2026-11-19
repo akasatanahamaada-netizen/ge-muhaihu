@@ -124,6 +124,9 @@ const css=`
 .bv-go{ background:#9e2a32; } .bv-go:hover{ background:#c23a3a; }
 .bv-gos .bv-go.armed{ background:#c23a3a; }
 .bv-gos-h{ font-family:'Great Vibes',cursive; color:#5a3f1c; }
+.bv-sils{ display:flex; justify-content:center; align-items:flex-end; gap:12%; height:30%; margin-top:0.6em; }
+.bv-sils img{ height:100%; width:auto; filter:drop-shadow(6px -4px 0 rgba(40,26,14,0.22)); }
+.bv-sils img.hood{ height:80%; transform:scaleX(-1); filter:drop-shadow(-6px -4px 0 rgba(40,26,14,0.22)); }   /* 元の絵は左向き → 右向きに（影は右上へ） */
 /* 「Play again」のボタンがあるページ：ボタンを文章の下に並べて、重ならないように（挿絵を少し小さく・行間を少しつめる） */
 .bv-page:has(.bv-gos), .bv-face:has(.bv-gos){ display:flex; flex-direction:column; }
 :is(.bv-page,.bv-face):has(.bv-gos) > .bv-h, :is(.bv-page,.bv-face):has(.bv-gos) > .bv-artwrap{ flex:none; }
@@ -170,6 +173,10 @@ function entries(){
     list.push({type:'page', p, no:++no}); }
   return list;
 }
+// 章のとびらの絵：第一章は、赤ずきん（赤いシルエット・右向き）と狼（黒いシルエット・左向き）が向かい合う
+const CHAP_SILS={
+  '第一章':`<div class="bv-sils"><img class="hood" alt="" src="${encodeURI('assets/character/赤いシルエットの赤ずきん少女.webp')}"><img class="wolf" alt="" src="${encodeURI('assets/character/黒い狼獣のシルエット.webp')}"></div>`,
+};
 // どのページにも、同じ「はしの よれ」をつける（よれのないページだけ大きく見えないように、左右のページの大きさをそろえる）
 function slotHTML(slot){ const h=slotInner(slot); return h.includes('bv-worm') ? h : h+holes(slot,0); }
 function slotInner(slot){
@@ -180,7 +187,7 @@ function slotInner(slot){
     const done=pages.filter(p=>{ const pc=pieces(p); return p.filled && pc.found>=pc.total; }).length;
     return `<div class="bv-title"><div class="orn">❦</div><div class="t1 bv-chap">${esc(c.name)}</div>
       ${c.sub?`<div class="t2">「${esc(c.sub)}」</div>`:''}<div class="orn">· · ·</div>
-      <div class="t3">埋まったページ　${done} / ${pages.length}</div></div>`;
+      <div class="t3">埋まったページ　${done} / ${pages.length}</div>${CHAP_SILS[en.name]||''}</div>`;
   }
   if(!en || en.type!=='page') return `<div class="bv-blank">❧</div>`;
   const p=en.p, pno=en.no;
