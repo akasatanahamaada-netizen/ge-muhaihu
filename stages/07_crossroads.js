@@ -188,10 +188,6 @@ function drawRoutes(){
   ctx.fillStyle='rgba(120,140,100,0.35)';
   ctx.beginPath(); ctx.moveTo(SPINE,FLOOR); ctx.quadraticCurveTo(640,330,W,360); ctx.lineTo(W,FLOOR); ctx.closePath(); ctx.fill();
   GTDecor.paint.watermill(ctx, 812, 420, 1.15, t, {body:'rgba(110,92,72,0.75)', wheel:'rgba(92,72,54,0.8)', water:'rgba(150,185,200,0.5)'});
-  ctx.restore();
-}
-function drawRoad(){                               // 道と足あと（影を落とさない）
-  ctx.save();
 
   // いつもの道：土の道。左ページからまっすぐ来て、右ページで丘をのぼり、水車小屋の前で細くなって消える
   ctx.save();
@@ -220,13 +216,12 @@ function drawRoad(){                               // 道と足あと（影を�
   for(let i=0;i<9;i++){ const x=40+i*46, y=FLOOR-5+(i%2)*2.5; shoe(x,y,'rgba(120,88,60,0.45)'); }   // 小さな靴の足あと（いつもの道へ）
   for(let i=0;i<4;i++) shoe(600+i*40,FLOOR-14-i*3,'rgba(120,88,60,0.4)');
   ctx.restore();
+  // 道ばたの花（日の当たる道のしるし）
+  for(const [x,k] of [[560,0],[598,2],[640,1],[690,3],[734,0],[772,2]]) GTDecor.paint.flower(ctx, x, FLOOR-2, 0.8, k, x);
 
   // 地面の獣の足あと：左から来て、いばらのしげみの下で途切れる（そこから先は、天井の足あとへ）
   for(let i=0;i<7;i++) paw(330+i*34, FLOOR-3-(i%2)*1.5, 0.9, 'rgba(44,34,26,0.55)', false);
   ctx.restore();
-}
-function drawFlowers(){                            // 道ばたの花（日の当たる道のしるし）。影を落とす
-  for(const [x,k] of [[560,0],[598,2],[640,1],[690,3],[734,0],[772,2]]) GTDecor.paint.flower(ctx, x, FLOOR-2, 0.8, k, x);
 }
 function drawThornTunnel(){  // いばらのトンネル（天井）は、影を落とす
   ctx.save();
@@ -311,8 +306,8 @@ function drawHoodBubble(){
   ctx.restore();
 }
 
-GT.registerDraw(()=>{ if(!isCross()) return; drawRoutes(); drawThornTunnel(); }, 'back');   // 日ざし・丘・水車小屋・いばらのトンネル（影を落とす）
-GT.registerDraw(()=>{ if(!isCross()) return; drawRoad(); }, 'backflat');   // 道と足あとは、影を落とさない（丘や水車小屋の上に描く）
-GT.registerDraw(()=>{ if(!isCross()) return; drawFlowers(); moveHood(); drawThorns(); drawGuide(); }, 'world');   // 花は、道の上に（影を落とす）
+GT.registerDraw(()=>{ if(!isCross()) return; drawRoutes(); }, 'backflat');   // 地面（道・丘・水車小屋・花・足あと）は、影を落とさない
+GT.registerDraw(()=>{ if(!isCross()) return; drawThornTunnel(); }, 'back');
+GT.registerDraw(()=>{ if(!isCross()) return; moveHood(); drawThorns(); drawGuide(); }, 'world');
 GT.registerDraw(()=>{ if(!isCross()) return; drawHoodBubble(); }, 'speech');
 })();
