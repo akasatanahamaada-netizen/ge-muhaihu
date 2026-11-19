@@ -279,10 +279,13 @@ function drawGuide(){
   const t=performance.now()/1000;
   ctx.save(); ctx.font="700 14px 'Zen Old Mincho',serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
   if(st.talked && !GT.flags.route && !st.busy){
-    ctx.globalAlpha=0.6+0.3*Math.sin(t*3.5);
-    ctx.fillStyle='#e8dcc0'; ctx.fillText('↑ 本を裏返して　いばらの上へ', 660, 120);
-    ctx.fillStyle='rgba(74,70,60,0.95)'; ctx.fillText('→ そのまま　いつもの道', 660, 400);
-    ctx.globalAlpha=1;
+    const tag=(txt,x,y)=>{ const w=ctx.measureText(txt).width+28;     // 読みやすいよう、こい色の札の上に、明るい字で
+      ctx.globalAlpha=0.88+0.12*Math.sin(t*3.5);
+      GT.roundRect(x-w/2,y-13,w,26,13); ctx.fillStyle='rgba(43,36,24,0.82)'; ctx.fill();
+      ctx.strokeStyle='rgba(227,197,138,0.7)'; ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle='#f6ecd2'; ctx.fillText(txt,x,y+1); ctx.globalAlpha=1; };
+    tag('↑ 本を裏返して　いばらの上へ', 660, 120);
+    tag('→ そのまま　いつもの道', 660, 400);
   }
   if(GT.flags.route){
     const txt='進む道：'+(GT.flags.route==='shortcut'?'近道（ひとりで）':'遠回り（赤ずきんと）');
@@ -308,6 +311,6 @@ function drawHoodBubble(){
 
 GT.registerDraw(()=>{ if(!isCross()) return; drawRoutes(); }, 'backflat');   // 地面（道・丘・水車小屋・花・足あと）は、影を落とさない
 GT.registerDraw(()=>{ if(!isCross()) return; drawThornTunnel(); }, 'back');
-GT.registerDraw(()=>{ if(!isCross()) return; moveHood(); drawThorns(); drawGuide(); }, 'world');
-GT.registerDraw(()=>{ if(!isCross()) return; drawHoodBubble(); }, 'speech');
+GT.registerDraw(()=>{ if(!isCross()) return; moveHood(); drawThorns(); }, 'world');
+GT.registerDraw(()=>{ if(!isCross()) return; drawGuide(); drawHoodBubble(); }, 'speech');   // 案内の字は最前面に（影も落とさず、暗くもならない）
 })();
