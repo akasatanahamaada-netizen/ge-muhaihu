@@ -31,8 +31,8 @@ GT.registerScene({
 GT.titleChapter=0;
 const SIL={ hood:new Image(), wolf:new Image() };
 SIL.hood.src='assets/character/赤いシルエットの赤ずきん少女.webp'; SIL.wolf.src='assets/character/黒い狼獣のシルエット.webp';
-const isTitle=()=>GT.scene && GT.scene.id==='title';
-GT.registerSceneReset(()=>{ if(isTitle()){ const p=GT.player; p.x=-600; p.vx=0; GT.mode='idle'; } });   // 少年は見せない
+const isTitle=()=>GT.scene && (GT.scene.id==='title'||GT.scene.id==='chapter_select');   // 章をえらぶ画面（02d_chapter_select.js）も同じ場面
+GT.registerDraw(()=>{ if(isTitle()){ const p=GT.player; p.x=-600; p.y=GT.H-GT.EDGE-p.h; p.vx=0; p.vy=0; } },'back');   // 少年は見せない（ステージを読みこんだあとも、毎回 画面の外へ）
 function sil(img,cx,h,mirror){
   if(!img.complete||!img.naturalWidth) return;
   const w=h*img.naturalWidth/img.naturalHeight, ctx=GT.ctx, foot=GT.H-GT.EDGE+4;
@@ -46,5 +46,5 @@ GT.registerDraw(()=>{
   sil(SIL.wolf, 610, 300, false);                        // 狼（右がわ・左向き）
 },'world');
 /* 章を選びなおしたとき：タイトルの場面ごと、ぺらっとページがめくれる（js/menu.js から呼ぶ） */
-GT.titleFlip=(ch)=>{ if(!isTitle()) return; GT.titleChapter=ch; GT.startPageFlip(1, GT.sceneRegistry.title); };
+GT.titleFlip=(ch)=>{ if(!isTitle()) return; GT.titleChapter=ch; GT.startPageFlip(1, GT.scene); };
 })();

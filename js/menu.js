@@ -246,7 +246,8 @@ let chIdx=0;
 menu.querySelectorAll('.gtm-orn').forEach(b=>b.addEventListener('pointerdown',e=>{
   e.preventDefault(); e.stopPropagation();                 // はじめの画面を閉じない・メニューのボタンも押さない
   const ch=menu.querySelector('.gtm-ch'); if(!ch) return;
-  chIdx=(chIdx+1)%CH_NAMES.length; ch.style.opacity='0';
+  const d=b.classList.contains('l')?-1:1;                  // 左の ❧ で前の章、右の ❧ で次の章
+  chIdx=(chIdx+d+CH_NAMES.length)%CH_NAMES.length; ch.style.opacity='0';
   setTimeout(()=>{ ch.textContent=CH_NAMES[chIdx]; ch.style.opacity='1'; },180);
   if(GT.titleFlip && menu.classList.contains('title-live')) GT.titleFlip(chIdx); else GT.sfx&&GT.sfx('page');   // タイトルの場面が、ぺらっとめくれる
 }));

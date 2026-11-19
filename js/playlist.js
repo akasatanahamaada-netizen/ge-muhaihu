@@ -62,7 +62,7 @@ GT.playlist = [
   'komichi1',     // 森の小道①（play）
   'komichi2',     // 森の小道②（play）
   'mari_gate',    // チュートリアルのおわり：森の出口でマリと話す（この先は絵本の世界）
-  'chapter1',     // 章のとびら：本がひらいて「第一章「赤い頭巾」」（ここから明るい絵本の雰囲気へ）
+  'chapter_select', // 章をえらぶ画面（赤ずきんと狼のシルエット。Begin で第一章へ）。本がひらく章のとびら 'chapter1' は、いったん保留
   'house_peek',   // 赤ずきんの家・窓のぞき（story）
   'path1',        // 森の道①（play）
   'meet_hood',    // 赤ずきんと道連れに（story）
@@ -121,7 +121,7 @@ GT.stageBackgrounds = {
 const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
   // ゴシック（暗い森）は、序章（目覚め〜チュートリアル）と、赤ずきんのお話のあと（afterword）だけ
-  title:0,   // タイトル画面のうしろの場面：明るい絵本（影あり）
+  title:0, chapter_select:0,   // タイトル画面のうしろの場面：明るい絵本（影あり）
   wake:0.3, opening:0.3, komichi1:0.3, komichi2:0.3,   // 暗すぎて見にくくならないように、ひかえめに
   afterword:0.3, mari_gate:0.3,
   // 第一章（赤ずきんのお話）は 0：ゴシックにする前と同じ、明るい絵本の雰囲気（色合いをかけない）
