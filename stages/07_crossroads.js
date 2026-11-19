@@ -64,11 +64,18 @@ function HOOD_LINES(){
     {s:'',c:'narr',t:'（本を裏返していばらの上を行くか、赤ずきんと下の道を行くか）'},
   ];
 }
+/* 道を決めたら、本の「分かれ道」のページに書きこむ（ピースは、赤ずきんのところから本へ） */
+function crossPage(){
+  GT.fillPage('crossroads', GT.flags.route==='shortcut'
+    ? '――分かれ道で、少年は、いばらにおおわれた近道を選んだ。赤ずきんとは、おばあさんの家で会う約束をして別れた。'
+    : '――分かれ道で、少年は、赤ずきんと一緒に、水車小屋をまわる遠回りの道を選んだ。');
+  GT.storyPiece&&GT.storyPiece('crossroads','crossroads:story','hood');
+}
 const ROUTES={
   shortcut:{
     ask:[ {s:'',c:'narr',t:'いばらの奥へ、獣の足あとが続いている。かごを抱えた赤ずきんには、通れそうにない。この先は、少年ひとりの道だ。'} ],
     choices:[
-      { label:'近道を行く（狼を追う）', set:()=>{ GT.flags.route='shortcut'; }, after:[
+      { label:'近道を行く（狼を追う）', set:()=>{ GT.flags.route='shortcut'; crossPage(); }, after:[
         {s:'赤ずきん',c:'hood',f:'surprise',t:'えっ、そこを通るの！？　……かごがあるから、わたしはいつもの道で行くね。気をつけてね！　おばあちゃんのお家で、会おうね！'},
         {s:'',c:'narr',t:'少年は赤ずきんと別れ、近道を駆けた。狼より先に、おばあさんの家へ。'} ]},
       { label:'引き返す', after:[] },
@@ -76,7 +83,7 @@ const ROUTES={
   detour:{
     ask:[ {s:'',c:'narr',t:'道は、水車小屋のほうへ大きくまわっている。赤ずきんが、となりで待っている。'} ],
     choices:[
-      { label:'遠回りを行く（赤ずきんと一緒に）', set:()=>{ GT.flags.route='detour'; }, after:[
+      { label:'遠回りを行く（赤ずきんと一緒に）', set:()=>{ GT.flags.route='detour'; crossPage(); }, after:[
         {s:'赤ずきん',c:'hood',f:'smile',t:'うん、一緒に行こう。'},
         {s:'',c:'narr',t:'二人は安全な遠回りを選んだ。だが、その分だけ時間がかかる。'} ]},
       { label:'引き返す', after:[] },

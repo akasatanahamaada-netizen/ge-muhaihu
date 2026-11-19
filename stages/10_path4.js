@@ -5,14 +5,14 @@
    ========================================================================== */
 
 GT.defineStage('path4', {
-  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「front」のページが埋まっていく
+  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「おばあさんの家への道」のページが埋まっていく
   items:[
     {page:'left', x:200, y:122, w:32, h:32},
     {page:'right', x:500, y:18, w:32, h:32},
     {page:'right', x:740, y:282, w:32, h:32},
   ],
   itemsOptional:true,
-  bookPage:'front',
+  bookPage:'road',   // 本の「おばあさんの家への道」のページ
   pieceKey:'wolfroad2',   // 近道と遠回りで、同じかけらを数える（どちらの道を通っても、ページを埋められる）
   mission:['items'],
    platforms:[
@@ -49,6 +49,7 @@ GT.defineStage('path4', {
 
 GT.registerScene({
   id:'path4', type:'play', stage:'path4', clear:'exit',
+  onClear:()=>GT.fillPage('road','――赤ずきんは、高い崖の上に咲いたお花まで摘んで、おばあさんへの花束を作った。少年と赤ずきんは、水車小屋をまわる長い道を、ゆっくりと歩いた。'),
   companion:'hood',         // 遠回り：赤ずきんが、うしろからついてくる
   label:'第一章 ── 遠回りの道 ②',
   dynamic:'detourOnly',     // 遠回りのときだけ遊ぶ（07_crossroads.js）

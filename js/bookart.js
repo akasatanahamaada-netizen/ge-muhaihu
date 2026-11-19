@@ -258,6 +258,47 @@ function flowers(c,list){ const fc=['#e8c35a','#c98bb0','#f3ead0','#d98a90'];
   for(const [x,y,k] of list){ c.strokeStyle='#5e7d44'; c.lineWidth=1.4; c.beginPath(); c.moveTo(x,y); c.lineTo(x,y-12); c.stroke();
     for(let a=0;a<5;a++) ell(c,x+Math.cos(a*1.26)*3.4,y-12+Math.sin(a*1.26)*3.4,2.6,2.6,fc[k%4]); ell(c,x,y-12,1.8,1.8,'#8a6a2a'); } }
 
+/* ---- 物の影（ゲームと同じ：光は左下から、影は右上へ。ふちはくっきり） ----
+   人物・木・家・丸太・木箱・花などは、描いたあと、その形の影を右上へずらして、うしろに落とす。
+   背景の絵の上に影が落ちるので、奥行きが出る。水にうつった姿など、うすく描くもの（globalAlpha が小さいとき）は影を落とさない */
+const SH={ dx:13, dy:-9, a:0.55 };
+const LAY=[0,1].map(()=>{ const cv=document.createElement('canvas'); cv.width=AW; cv.height=AH; return cv; });
+function shadowed(fn){ return function(c,...args){
+  if(c._inShadow || c.globalAlpha<0.9) return fn.call(this,c,...args);
+  const L=LAY[0], g=L.getContext('2d'), S=LAY[1], sg=S.getContext('2d');
+  g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,AW,AH); g._inShadow=true;
+  g.setTransform(c.getTransform()); g.filter=c.filter;
+  fn.call(this,g,...args);
+  g.setTransform(1,0,0,1,0,0); g.filter='none';
+  sg.setTransform(1,0,0,1,0,0); sg.clearRect(0,0,AW,AH); sg.globalCompositeOperation='source-over'; sg.drawImage(L,0,0);
+  sg.globalCompositeOperation='source-in'; sg.fillStyle=`rgba(10,6,4,${SH.a})`; sg.fillRect(0,0,AW,AH); sg.globalCompositeOperation='source-over';
+  c.save(); c.setTransform(1,0,0,1,0,0); c.filter='none'; c.drawImage(S,SH.dx,SH.dy); c.drawImage(L,0,0); c.restore();
+}; }
+figure=shadowed(figure); boy=shadowed(boy); mari=shadowed(mari); wolf=shadowed(wolf); cottage=shadowed(cottage);
+tree=shadowed(tree); log=shadowed(log); crate=shadowed(crate); bed=shadowed(bed);   // 花は小さいので、影を落とさない（影のほうが目立ってしまう）
+
+/* 高い崖（苔むした岩。上に草）。x … 左, top … 上の面, w … 幅, bot … 下のはし */
+const cliffRock=shadowed(function(c,x,top,w,bot,seed){
+  let sd=seed||5; const R=()=>{ sd=(sd*9301+49297)%233280; return sd/233280; };
+  c.beginPath(); c.moveTo(x+4,bot); c.lineTo(x,top+14); c.quadraticCurveTo(x+2,top,x+16,top); c.lineTo(x+w-14,top); c.quadraticCurveTo(x+w,top+2,x+w-2,top+16); c.lineTo(x+w+4,bot); c.closePath();
+  const g=c.createLinearGradient(x,0,x+w,0); g.addColorStop(0,'#cbbd98'); g.addColorStop(0.6,'#b3a47e'); g.addColorStop(1,'#8f8262');
+  c.fillStyle=g; c.fill(); c.strokeStyle=INK; c.lineWidth=1.8; c.stroke();
+  c.strokeStyle='rgba(70,58,40,0.55)'; c.lineWidth=1.3;                                    // 岩のひび
+  for(let i=0;i<5;i++){ const yy=top+30+R()*(bot-top-50), xx=x+10+R()*(w-30); c.beginPath(); c.moveTo(xx,yy); c.lineTo(xx+6,yy+8); c.lineTo(xx+2,yy+16); c.stroke(); }
+  c.fillStyle='#8aa25a'; rr(c,x-2,top-4,w+4,12,6); c.fill();                               // 上の苔
+  c.fillStyle='#6f8a46'; for(let i=0;i<8;i++) ell(c,x+6+i*(w-12)/7,top+7,6,3.5,'#6f8a46');  // 垂れた苔
+});
+/* 天井から垂れさがる、いばらのしげみ（近道） */
+const thornCeil=shadowed(function(c,x0,x1,depth){
+  c.fillStyle='rgba(34,40,28,0.95)';
+  for(let x=x0;x<=x1;x+=26){ const r=18+((x*13)%17); c.beginPath(); c.ellipse(x,0,r*1.1,r+depth*0.3,0,0,Math.PI); c.fill(); }
+  c.strokeStyle='rgba(50,58,36,0.95)'; c.lineWidth=2;
+  for(let i=0;i<12;i++){ const x=x0+((i*61)%(x1-x0)), len=30+((i*37)%depth); c.beginPath(); c.moveTo(x,10); c.quadraticCurveTo(x+8,len*0.6,x-4,len); c.stroke();
+    c.fillStyle='rgba(50,58,36,0.95)'; c.beginPath(); c.moveTo(x-1,len*0.5); c.lineTo(x-7,len*0.5+2); c.lineTo(x,len*0.5+4); c.fill(); }
+  for(let i=0;i<7;i++){ const x=x0+20+((i*83)%(x1-x0-40)), y=12+((i*29)%26); ell(c,x,y,2.4,2.4,'rgba(120,30,36,0.9)'); }   // 暗い実
+});
+const mill=shadowed(function(c,x,y,s){ if(window.GTDecor&&GTDecor.paint.watermill) GTDecor.paint.watermill(c,x,y,s,0,{body:'rgba(110,92,72,0.85)',wheel:'rgba(92,72,54,0.9)',water:'rgba(150,185,200,0.6)'}); });
+
 /* ---- 場面ごとの挿絵 ---------------------------------------------------- */
 const SCENES={
   // 序：森で目を覚ます少年と、木の陰からのぞくマリ
@@ -309,6 +350,19 @@ const SCENES={
     boy(c,200,286,1.85,{face:1});                                                                            // 赤ずきんと同じくらいの高さ
     c.save(); c.globalAlpha=0.35; c.translate(0,572); c.scale(1,-1); boy(c,200,286,1.85,{face:1}); c.restore();   // 水にうつる
   },
+  // 森の崖：木箱を踏み台にして、崖をのぼる。赤ずきんは下で見守る
+  cliff(c){
+    bg(c,IMG.day,0.55,0.7,1.1); wash(c,'rgba(244,236,214,0.14)');
+    rays(c,[[120,50],[380,40]],'rgba(255,236,170,0.18)');
+    c.fillStyle='rgba(150,120,80,0.3)'; c.beginPath(); c.moveTo(0,AH); c.quadraticCurveTo(300,300,AW,306); c.lineTo(AW,AH); c.closePath(); c.fill();   // 地面
+    tree(c,40,40,AH-10,40,[[62,48,62,46],[24,82,40,30],[104,78,40,30]],5);
+    cliffRock(c,360,150,200,AH+6,9);                                                                     // 高い崖
+    flowers(c,[[390,148,0],[440,147,2],[520,148,1]]);
+    crate(c,290,252,66,62);                                                                               // 踏み台の木箱
+    boy(c,326,252,1.3,{face:1});                                                                          // 木箱の上の少年（崖の上へ）
+    figure(c,IMG.hoodR,150,318,170);                                                                      // 下で見守る赤ずきん
+    flowers(c,[[40,322,1],[90,326,3],[230,324,0]]);
+  },
   // 森で出会った狼：告げたか、黙ったか
   wolf(c,f){
     bg(c,IMG.day,0.35,0.6,1.1); wash(c,'rgba(40,24,30,0.08)');   // 昼の森
@@ -322,6 +376,46 @@ const SCENES={
       wolf(c,505,312,1.1,1,true);                                                                        // 脇道へ走り去っていく
       figure(c,IMG.hoodR,200,318,190,{filter:'brightness(0.92)'});
       boy(c,340,300,1.7,{face:1});
+    }
+  },
+  // 分かれ道：天井のいばらの近道と、水車小屋へつづく明るい道
+  crossroads(c,f){
+    bg(c,IMG.day,0.7,0.6,1.1); wash(c,'rgba(244,236,214,0.12)');
+    const sun=c.createRadialGradient(520,280,20,520,280,320); sun.addColorStop(0,'rgba(255,226,150,0.45)'); sun.addColorStop(1,'rgba(255,226,150,0)');
+    c.fillStyle=sun; c.fillRect(0,0,AW,AH);
+    c.fillStyle='rgba(120,140,100,0.35)'; c.beginPath(); c.moveTo(250,AH); c.quadraticCurveTo(420,200,AW,230); c.lineTo(AW,AH); c.closePath(); c.fill();   // 丘
+    mill(c,520,262,2.0);
+    c.fillStyle='rgba(176,136,86,0.75)'; c.beginPath(); c.moveTo(0,AH); c.lineTo(0,306); c.bezierCurveTo(260,300,420,280,500,262); c.lineTo(512,266); c.bezierCurveTo(440,300,330,320,AW,AH); c.closePath(); c.fill();   // いつもの道（丘をのぼる）
+    const dk=c.createRadialGradient(380,0,10,380,0,260); dk.addColorStop(0,'rgba(22,24,20,0.55)'); dk.addColorStop(1,'rgba(22,24,20,0)'); c.fillStyle=dk; c.fillRect(120,0,480,200);
+    thornCeil(c,240,AW,70);                                                                               // 天井のいばら（近道）
+    if(f.route==='shortcut'){
+      figure(c,IMG.hoodWalkR,250,318,160);                                                                // 赤ずきんは、いつもの道へ
+      c.save(); c.translate(0,2*96); c.scale(1,-1); boy(c,360,96,1.25,{face:1}); c.restore();            // 少年は、本を裏返して天井のいばらへ
+    } else {
+      figure(c,IMG.hoodWalkR,250,318,160);
+      boy(c,170,318,1.45,{face:1});                                                                       // 二人で、いつもの道へ
+    }
+    flowers(c,[[420,316,0],[456,320,2],[560,312,1]]);
+  },
+  // おばあさんの家への道：近道（いばらのトンネルを、ひとりで）／遠回り（崖の上のお花を摘んで、花束に）
+  road(c,f){
+    if(f.route==='shortcut'){
+      bg(c,IMG.day,0.3,0.5,1.15); wash(c,'rgba(30,34,26,0.32)');
+      thornCeil(c,-20,AW+20,120);
+      c.fillStyle='rgba(60,52,40,0.85)'; c.beginPath(); c.moveTo(380,AH); c.lineTo(392,190); c.quadraticCurveTo(420,170,452,186); c.lineTo(470,AH); c.closePath(); c.fill();   // 床からのびる岩
+      wolf(c,520,320,0.75,-1);                                                                            // 狼の手下
+      boy(c,200,316,1.4,{face:1});
+      for(let i=0;i<5;i++){ const x=90+i*40; ell(c,x,322,5,2,'rgba(40,30,22,0.55)'); }                     // 少年の足あと
+    } else {
+      bg(c,IMG.day,0.5,0.7,1.1); wash(c,'rgba(244,236,214,0.14)');
+      c.fillStyle='rgba(120,140,100,0.3)'; c.beginPath(); c.moveTo(0,AH); c.quadraticCurveTo(300,250,AW,280); c.lineTo(AW,AH); c.closePath(); c.fill();
+      mill(c,110,262,1.7);                                                                                // 遠くの水車小屋
+      cliffRock(c,330,130,130,AH+6,21);                                                                   // 高い崖
+      flowers(c,[[350,128,1],[440,127,3]]);
+      boy(c,396,130,1.15,{face:-1});                                                                      // 崖の上で、お花を摘む少年
+      figure(c,IMG.hoodR,230,318,170);                                                                    // 花束をかかえて見上げる赤ずきん
+      flowers(c,[[200,268,0],[214,264,2],[226,270,1],[240,266,3]]);                                       // 花束
+      const fl=[]; for(let x=20;x<AW;x+=28) fl.push([x+((x*7)%9),322+((x*3)%6),(x/28|0)%4]); flowers(c,fl);   // お花畑
     }
   },
   // おばあさんの家の前

@@ -26,14 +26,14 @@
    ========================================================================== */
 
 GT.defineStage('cliff', {
-  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「meet」のページが埋まっていく
+  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「森の崖」のページが埋まっていく
   items:[
     {page:'left', x:300, y:428, w:32, h:32},
     {page:'right', x:600, y:18, w:32, h:32},
     {page:'right', x:744, y:302, w:32, h:32},
   ],
   itemsOptional:true,
-  bookPage:'meet',
+  bookPage:'cliff',
   mission:['items'],
   platforms:[
     {page:'left',  x:60,  y:150, w:110, h:24,  kind:'ledge'},   // 0 高い棚（丸太）。木箱がのっている
@@ -50,6 +50,7 @@ GT.defineStage('cliff', {
 
 GT.registerScene({
   id:'cliff', type:'play', stage:'cliff', clear:'exit', label:'第一章 ── 森の崖',
+  onClear:()=>GT.fillPage('cliff','――道の先に、高い崖があった。少年は、左右で重さの向きがちがうページを使って木箱を天井と床へ運び、踏み台にして崖をのぼった。'),   // 崖を越えたら、本の「森の崖」のページに書きこまれる
   intro:[
     {s:'赤ずきん',c:'hood',f:'surprise',t:'わあ、高い崖……。その本で、なんとかならない？'},
   ],

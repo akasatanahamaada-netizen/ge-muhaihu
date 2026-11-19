@@ -674,6 +674,7 @@ function startPageFlip(dir,toScene){   // toScene … めくったうしろで�
   flipOld.getContext('2d').drawImage(canvas,0,0);       // いまの見開きを写しとる
   toPage(extOld);                                         // ページの大きさの紙にも写しておく（めくる紙の絵）
   flipDir = dir===-1 ? -1 : 1;
+  if(flipDir===1 && !toScene && GT.scene && GT.scene.onClear){ try{ GT.scene.onClear(); }catch(e){ console.error(e); } }   // ステージを抜けたとき（本のページに書きこむ など）
   flipFromId = GT.scene ? GT.scene.id : null;            // どの場面からめくったか（森の出口なら、光がもれる）
   FLIP_DUR = (flipFromId && GT.flipGlowFrom.has(flipFromId)) ? 2.2 : FLIP_DUR_BASE;   // 光がもれるめくりは、ゆっくり
   flipping=true; flipT=0; flipSwapped=true; GT.sfx&&GT.sfx('page');

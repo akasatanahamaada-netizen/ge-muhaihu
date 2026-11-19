@@ -18,14 +18,14 @@
    ========================================================================== */
 
 GT.defineStage('path2b', {
-  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「front」のページが埋まっていく
+  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「おばあさんの家への道」のページが埋まっていく
   items:[
     {page:'left', x:100, y:428, w:32, h:32},
     {page:'left', x:420, y:18, w:32, h:32},
     {page:'left', x:199, y:262, w:32, h:32},
   ],
   itemsOptional:true,
-  bookPage:'front',
+  bookPage:'road',   // 本の「おばあさんの家への道」のページ
   pieceKey:'wolfroad2',   // 近道と遠回りで、同じかけらを数える（どちらの道を通っても、ページを埋められる）
   mission:['items'],
   platforms:[
@@ -44,6 +44,7 @@ GT.defineStage('path2b', {
 
 GT.registerScene({
   id:'path2b', type:'play', stage:'path2b', clear:'exit',
+  onClear:()=>GT.fillPage('road','――少年は、ひとりで近道を駆けた。行く手をふさぐ狼の手下をかわし、いばらのトンネルをくぐりぬけて、おばあさんの家へ急いだ。'),
   label:'第一章 ── 近道 ②',
   dynamic:'shortcutOnly',   // 近道のときだけ遊ぶ（07_crossroads.js）
 });

@@ -13,14 +13,14 @@
     given=true; const e=GT.enemies[GT.enemies.length-1]; GT.addPagePiece('wolf','wolf:road',{x:e.x,y:e.y-10,w:e.w,h:e.h}); });   // 狼の手下を全部倒すと、お話のかけら（遠回りの「お花を全部摘む」と同じかけら）
 })();
 GT.defineStage('path2', {
-  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「wolf」のページが埋まっていく
+  // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「おばあさんの家への道」のページが埋まっていく
   items:[
     {page:'left', x:60, y:18, w:32, h:32},
     {page:'right', x:470, y:428, w:32, h:32},
     {page:'right', x:805, y:152, w:32, h:32},
   ],
   itemsOptional:true,
-  bookPage:'wolf',
+  bookPage:'road',   // 本の「おばあさんの家への道」のページ
   pieceKey:'wolfroad1',   // 近道と遠回りで、同じかけらを数える（どちらの道を通っても、ページを埋められる）
   platforms:[
     {page:'left', x:375, y:185, w:20, h:280, kind:'ledge'},

@@ -97,6 +97,33 @@ const css=`
 .bv-lid-deco .orn{ color:#b08d57; font-size:clamp(12px,2.2cqw,50px); }
 .bv-lid-back{ transform:rotateY(180deg); border-radius:10px 0 0 10px; }
 .bv-lid-shade{ position:absolute; inset:0; background:#140e08; opacity:0; pointer-events:none; }
+
+/* ---- 新しい見た目：メニュー画面とそろえる（すけた背景・羊皮紙・茶色のインク・赤いリボンの栞） ---- */
+#bookModal.bv{ background:transparent !important; backdrop-filter:sepia(0.55) saturate(0.75) brightness(0.5) blur(2px); -webkit-backdrop-filter:sepia(0.55) saturate(0.75) brightness(0.5) blur(2px); }
+#bookModal.bv::before{ content:''; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background:radial-gradient(ellipse at 50% 45%, rgba(30,20,10,0) 35%, rgba(20,12,6,0.7) 100%); }
+.bv-page, .bv-face{ box-shadow:inset 0 0 0 1px rgba(120,86,48,0.0); }
+.bv-page::after, .bv-face::after{ content:''; position:absolute; inset:2.2% 3%; border:1px solid rgba(120,86,48,0.35); pointer-events:none;
+  box-shadow:inset 0 0 0 4px rgba(239,227,198,0.0), inset 0 0 0 5px rgba(120,86,48,0.16); border-radius:2px; }   /* ページのふちの、細い二重の罫 */
+.bv-page.l, .bv-face.l{ background:#efe3c6 linear-gradient(90deg, rgba(255,250,236,0.5) 0%, rgba(255,250,236,0.25) 70%, rgba(190,160,110,0.35) 96%, rgba(150,118,72,0.5) 100%); }
+.bv-page.r, .bv-face.r{ background:#efe3c6 linear-gradient(90deg, rgba(150,118,72,0.5) 0%, rgba(190,160,110,0.35) 4%, rgba(255,250,236,0.25) 30%, rgba(255,250,236,0.5) 100%); }
+.bv-h{ color:#5a3f1c; border-bottom-color:rgba(120,86,48,0.4); }
+.bv-h small{ color:#8a7350; }
+.bv-body{ color:#3a2a18; }
+.bv-no{ color:#8a7350; font-family:'Cormorant Garamond',serif; }
+.bv-title .t1{ color:#3a2a18; }
+.bv-title .t2{ color:#5a3f1c; }
+.bv-title .orn{ color:#9e2a32; }
+.bv-pieces{ color:#9e2a32; }
+.bv-ribbon{ position:absolute; z-index:8; top:-2.4%; right:9%; width:2.4%; height:20%; background:linear-gradient(90deg,#86222a,#a8313a 50%,#86222a);
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 84%,0 100%); box-shadow:0 2px 4px rgba(0,0,0,0.3); pointer-events:none; }   /* 赤いリボンの栞 */
+.bv-bar button{ background:#efe3c6 linear-gradient(180deg, rgba(255,250,236,0.55), rgba(214,190,146,0.35)); border:1px solid rgba(120,86,48,0.6); color:#3a2a18;
+  font-family:'Great Vibes',cursive; font-size:22px; padding:3px 18px; box-shadow:0 3px 10px rgba(20,12,6,0.45); }
+.bv-bar button:hover:not([disabled]){ background:#f6ecd4; color:#7a1f26; }
+.bv-bar .bv-count{ color:#efe3c6; text-shadow:0 1px 4px rgba(0,0,0,0.8); }
+.bv-go{ background:#9e2a32; } .bv-go:hover{ background:#c23a3a; }
+.bv-gos .bv-go.armed{ background:#c23a3a; }
+.bv-gos-h{ font-family:'Great Vibes',cursive; color:#5a3f1c; }
 `;
 const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
 
@@ -108,6 +135,7 @@ modal.innerHTML=`
     <div class="bv-page l"></div>
     <div class="bv-page r"></div>
     <div class="bv-spine"></div>
+    <div class="bv-ribbon"></div>
     <button class="bv-hit l" aria-label="前のページ"></button>
     <button class="bv-hit r" aria-label="次のページ"></button>
   </div>
@@ -178,10 +206,13 @@ function slotInner(slot){
    そのページのボタンから、どのステージへも行ける（一度来たステージだけ出る。近道・遠回りは、通ったほうだけ） */
 const PAGE_SCENES={
   prologue:['wake','opening'],
-  komichi: ['komichi1','komichi2'],
+  komichi: ['komichi1','komichi2','mari_gate'],
   window:  ['house_peek','path1'],
-  meet:    ['meet_hood','cliff'],
-  wolf:    ['wolf_talk','crossroads','path2','path2b','flowers','path3','path4'],
+  meet:    ['meet_hood'],
+  cliff:   ['cliff'],
+  wolf:    ['wolf_talk'],
+  crossroads:['crossroads'],
+  road:    ['path2','path2b','flowers','path3','path4'],
   front:   ['house_front'],
   granny:  ['arrive'],
 };
