@@ -37,8 +37,9 @@ GT.musicMute=on=>{ muted=!!on; };
 // 操作する前でも鳴らせるブラウザなら、すぐに鳴らす（たいていは、最初のクリックやキーまで待たされる）
 setTimeout(()=>{ const w=wantNow(); if(w){ const p=player(w); p.el.play().then(()=>{ unlocked=true; }).catch(()=>{}); } },0);
 
+let lastSceneId=null;
 GT.onSceneStart(scene=>{
-  muted=false;
+  muted=false; const prevSceneId=lastSceneId; lastSceneId=scene&&scene.id;   // 同じ場面のまま（章をえらびなおしてページがめくれたときなど）は、頭からにしない
   // id で決める（GT.sceneMusic）。id の無い差しこみシーン（ボス戦・QTE）は、種類で決める（GT.sceneTypeMusic）
   let next=(GT.sceneMusic||{})[scene && scene.id]||(GT.sceneTypeMusic||{})[scene && scene.type]||null;
   if(typeof next==='function') next=next(GT.flags)||null;      // 分岐で曲を変えるとき（例：結末の種類）
@@ -46,6 +47,8 @@ GT.onSceneStart(scene=>{
     if(sceneWant && players[sceneWant]) players[sceneWant].restart=true;
     if(next && players[next] && players[next].el.paused) players[next].restart=true; }
   sceneWant=next;
+  // この場面に入ったら、曲を かならず頭から（タイトルと同じ曲でも、続きからにしない）。小さい音から、ふわっと入る
+  if(next && scene && scene.id!==prevSceneId && (GT.musicFromStart||[]).includes(scene.id)){ const p=player(next); p.el.currentTime=0; p.vol=0; p.el.volume=0; p.restart=false; }
 });
 
 let last=performance.now();
