@@ -1835,7 +1835,7 @@ function castLayer(L,depth){
   const s=sc.getContext('2d');
   s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,W,H);
   s.drawImage(L, Math.round(S.dx+46*d), -Math.round(S.dy+30*d));          // 手前の層ほど、遠くへ（差を大きく）
-  s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.42*d).toFixed(3)})`; s.fillRect(0,0,W,H);   // 奥の層ほど影は濃く、手前ほどうすい
+  s.globalCompositeOperation='source-in'; const dk=(gradeK||0)>0.02?0.25:0; s.fillStyle=`rgba(10,6,4,${Math.min(0.9,S.alpha-0.42*d+dk).toFixed(3)})`;   // 暗い森では、影を濃く（見えるように） s.fillRect(0,0,W,H);   // 奥の層ほど影は濃く、手前ほどうすい
   ctx.drawImage(sc,0,0);
 }
 function drawBookBase(gravity){
@@ -1862,7 +1862,7 @@ function drawGoText(){
 function renderBody(){
   const gravity=GT.gravity;
   ctx.clearRect(0,0,W,H);
-  layeredNow = !!(GT.isBright && GT.isBright() && GT.shadowsOn!==false);
+  layeredNow = GT.shadowsOn!==false && !(GT.scene && GT.scene.id==='chapter1');   // 影は、序章の暗い森もふくめて、すべての場面で（章のとびらは除く）
   if(layeredNow){
     for(const fn of drawBack) fn();                                   // 奥の層
     grabLayer(layerB);
