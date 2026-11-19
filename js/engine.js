@@ -1818,9 +1818,27 @@ function drawNpc(n){
 function render(){
   try{ renderBody(); } finally { flushHint(); }
 }
-function renderBody(){
-  const gravity=GT.gravity;
-  ctx.clearRect(0,0,W,H); ctx.drawImage(GT.paperArt.paper,0,0);
+/* ---- 影（明るい場面）：光は左下から。物の影は、うしろの背景の右上へのびる ----
+   奥の飾り・足場や人物・手前の飾りを、それぞれ別の層に描いてから、背景の上に「影→物」の順に重ねる。
+   影は、層をそのまま小さな画面に写し（右上へずらし、上ほど右へかたむける）、影の色でぬって、大きくのばして重ねる（のばすと自然にぼける）。
+   手前の層ほど、影は遠く・大きくかたむき・よくぼける（奥行き）。ぼかしの計算を物ごとにしないので、軽い */
+const layerB=document.createElement('canvas'), layerM=document.createElement('canvas'), layerF=document.createElement('canvas');
+for(const c of [layerB,layerM,layerF]){ c.width=W; c.height=H; }
+const shadowSmall=[document.createElement('canvas'),document.createElement('canvas')];
+function grabLayer(L){ const g=L.getContext('2d'); g.clearRect(0,0,W,H); g.drawImage(canvas,0,0); ctx.clearRect(0,0,W,H); }
+GT.SHADOW={ dx:12, dy:8, lean:0.06, alpha:0.5 };   // 影の基本の量（depth で大きくなる）
+function castLayer(L,depth){
+  const d=depth, q=d>=0.9?1/7:d>=0.5?1/5:1/4, sc=shadowSmall[d>=0.9?1:0], sw=Math.ceil(W*q), shh=Math.ceil(H*q);
+  if(sc.width!==sw){ sc.width=sw; sc.height=shh; }
+  const s=sc.getContext('2d'), S=GT.SHADOW;
+  const ox=S.dx+30*d, oy=-(S.dy+22*d), lean=S.lean+0.12*d;          // 右へ・上へ・上ほど右へ
+  s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,sw,shh);
+  s.setTransform(q,0,-lean*q,q,(lean*H+ox)*q,oy*q); s.drawImage(L,0,0);
+  s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.1*d).toFixed(3)})`; s.fillRect(0,0,sw,shh);
+  ctx.save(); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high'; ctx.drawImage(sc,0,0,W,H); ctx.restore();
+}
+function drawBookBase(gravity){
+  ctx.drawImage(GT.paperArt.paper,0,0);
   drawStageBackground();
   ctx.fillStyle='rgba(87,100,74,0.05)'; ctx.fillRect(0,0,SPINE,H);
   ctx.fillStyle='rgba(139,94,99,0.05)'; ctx.fillRect(SPINE,0,SPINE,H);
@@ -1829,6 +1847,44 @@ function renderBody(){
   const sg=ctx.createLinearGradient(SPINE-16,0,SPINE+16,0);
   sg.addColorStop(0,'rgba(58,50,38,0)'); sg.addColorStop(0.5,'rgba(58,50,38,0.35)'); sg.addColorStop(1,'rgba(58,50,38,0)');
   ctx.fillStyle=sg; ctx.fillRect(SPINE-16,0,32,H);
+}
+function drawGoText(){
+  if(missionReq && exitWanted && !stageExit) drawExitGate();
+  if((storyStage||missionReq) && stageExit && !flipping && !storyTalking){
+    const p=0.5+0.5*Math.sin(goalPulse*4);
+    ctx.save(); ctx.textAlign='right'; ctx.globalAlpha=0.55+0.45*p;
+    ctx.fillStyle='#b08d57'; ctx.font="700 22px 'Caveat',cursive";
+    ctx.fillText('Go to the right edge →', W-26, H/2);
+    ctx.restore();
+  }
+}
+function renderBody(){
+  const gravity=GT.gravity;
+  ctx.clearRect(0,0,W,H);
+  if(GT.isBright && GT.isBright() && GT.shadowsOn!==false){
+    for(const fn of drawBack) fn();                                   // 奥の層
+    grabLayer(layerB);
+    for(const plat of GT.platforms){ if(plat.kind!=='ledge'&&plat.kind!=='ceilingLedge') continue; drawLedge(plat, gravity[plat.page]===-1); }
+    drawGoal();
+    for(const box of GT.boxes) drawBox(box);
+    for(const en of GT.enemies) drawEnemy(en);
+    if(storyStage) for(const n of npcs) drawNpc(n);
+    if(companion) drawNpc(companion);
+    for(const fn of drawWorld) fn();
+    drawPlayer();
+    for(const sw of GT.swamps) drawSwamp(sw);
+    grabLayer(layerM);                                                // 足場・人物・少年の層
+    for(const fn of drawOverlay) fn();
+    grabLayer(layerF);                                                // 手前の層
+    drawBookBase(gravity);
+    castLayer(layerB,0.25); castLayer(layerM,0.6); castLayer(layerF,1);   // 影（奥の層ほど近く、手前の層ほど遠く）
+    ctx.drawImage(layerB,0,0); drawPageEdges(); ctx.drawImage(layerM,0,0); ctx.drawImage(layerF,0,0);
+    drawGravityIcon(SPINE/2,20,gravity.left,flashPage.left);
+    drawGravityIcon(SPINE+SPINE/2,20,gravity.right,flashPage.right);
+    for(const it of GT.items) drawItem(it);
+    drawGoText();
+  } else {
+  drawBookBase(gravity);
   for(const fn of drawBack) fn();           // 奥の飾り（地形より後ろ・判定なし）
   drawPageEdges();
   for(const plat of GT.platforms){
@@ -1843,18 +1899,12 @@ function renderBody(){
   if(storyStage) for(const n of npcs) drawNpc(n);
   if(companion) drawNpc(companion);
   for(const it of GT.items) drawItem(it);
-  if(missionReq && exitWanted && !stageExit) drawExitGate();
-  if((storyStage||missionReq) && stageExit && !flipping && !storyTalking){
-    const p=0.5+0.5*Math.sin(goalPulse*4);
-    ctx.save(); ctx.textAlign='right'; ctx.globalAlpha=0.55+0.45*p;
-    ctx.fillStyle='#b08d57'; ctx.font="700 22px 'Caveat',cursive";
-    ctx.fillText('Go to the right edge →', W-26, H/2);
-    ctx.restore();
-  }
+  drawGoText();
   for(const fn of drawWorld) fn();          // ボスなど（プレイヤーより後ろ）
   drawPlayer();
   for(const sw of GT.swamps) drawSwamp(sw);   // 沼はプレイヤーの足元を隠すよう手前に描く
   for(const fn of drawOverlay) fn();         // 手前の木・窓のぞきなど（ゴシックの色合いをかけるため、色合いより先に描く）
+  }
   drawGothicWorld();                                                                                                // 世界を暗く・色を抜く（不気味さに合わせて）
   liftCharacters();                                                                                                 // 少年と人物は、暗くしない（色合いの上に描きなおす）
   if(itemLook==='page') for(const it of GT.items) if(!it.got&&!it.hidden) drawItem(it);                            // 光の玉（お話のかけら）は、色合いの上にも重ねて、くっきり光らせる
