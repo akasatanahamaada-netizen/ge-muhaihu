@@ -42,10 +42,6 @@ function drawCard(){
   const glowA=0.15+0.35*ease((t-0.3)/2);
   let g=ctx.createRadialGradient(cx,cy,10,cx,cy,W*0.55); g.addColorStop(0,`rgba(255,214,150,${glowA})`); g.addColorStop(1,'rgba(255,214,150,0)');
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-  // ただよう ちり
-  for(let i=0;i<26;i++){ const s=Math.sin(i*91.7)*43758.5, r=s-Math.floor(s), s2=Math.sin(i*37.3)*24634.6, r2=s2-Math.floor(s2);
-    const x=(r*W+t*8*(0.5+r2))%W, y=(r2*H-t*12*(0.4+r))%H+(r2*H-t*12*(0.4+r)<0?H:0);
-    ctx.globalAlpha=0.25+0.25*Math.sin(t*1.5+i); ctx.fillStyle='#f0dcb0'; ctx.beginPath(); ctx.arc(x,y,1.1,0,Math.PI*2); ctx.fill(); }
   ctx.globalAlpha=Math.min(1,t/0.6);                                   // 本が、暗やみから浮かびあがる
   ctx.translate(cx,cy); ctx.scale(zoom,zoom);
   const PW=230, PH=300, o=ease((t-T_OPEN0)/(T_OPEN1-T_OPEN0));
@@ -97,8 +93,7 @@ function drawCard(){
     ctx.globalAlpha=1;
     writeBrush('第一章', 22, '#5a3a22', -116, W1, 0.28, ()=>pen('l1'));
     const kl=ease((t-W2)/0.35);                                               // 罫線を、まん中から左右へ（はしは細く）
-    if(kl>0){ ctx.strokeStyle='rgba(120,80,40,0.55)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-100*kl,-96); ctx.quadraticCurveTo(0,-92,100*kl,-96); ctx.stroke();
-      ctx.fillStyle='rgba(120,80,40,0.6)'; ctx.beginPath(); ctx.arc(0,-94,2.2*kl,0,Math.PI*2); ctx.fill(); }
+    if(kl>0){ ctx.strokeStyle='rgba(120,80,40,0.55)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-100*kl,-96); ctx.quadraticCurveTo(0,-92,100*kl,-96); ctx.stroke(); }
     writeBrush(chap.sub, 60, '#2a160c', -52, W3, PER, ()=>pen('l2'));
     writeCursive(CH_EN[card.ch]||'', 24, '#6b4a2a', -6, W4, 1.0, ()=>pen('l3'));
     // シルエット：上から下へ、筆で描いていくように（描いているふちは、ゆらゆら）
@@ -128,8 +123,7 @@ function paper(x,y,w,h,side){
 function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 const spaced=s=>s.split('').join(' ');
 const CH_EN=['','Little Red Riding Hood'];        // 章の名前の下に、英語の筆記体で添える
-/* 一画ずつ書いているように：字の形の上を、太い筆がいくつかの線（よこ・たて・はらい）でなぞったところだけ見せる */
-const STROKES=[[0.12,0.22,0.88,0.2],[0.5,0.06,0.48,0.94],[0.16,0.5,0.84,0.52],[0.86,0.12,0.9,0.92],[0.14,0.12,0.1,0.92],[0.12,0.86,0.9,0.84],[0.3,0.3,0.7,0.75],[0.72,0.3,0.28,0.78]];
+/* 一字ずつ書いているように：字が、左上から右下へ、インクがしみるようにあらわれる（文字だけ。点は出さない） */
 const maskCv=document.createElement('canvas'), mctx=maskCv.getContext('2d');
 function writeBrush(str,size,color,y,t0,per,onStart){
   const chs=[...str]; ctx.font=`400 ${size}px 'Yuji Syuku','Zen Old Mincho',serif`;
@@ -138,13 +132,11 @@ function writeBrush(str,size,color,y,t0,per,onStart){
   chs.forEach((ch,n)=>{ const w=ws[n], p=Math.max(0,Math.min(1,(t-t0-n*per)/per));
     if(p>0){ if(onStart) onStart();
       const S=Math.ceil(size*1.4); if(maskCv.width!==S){ maskCv.width=S; maskCv.height=S; }
-      mctx.clearRect(0,0,S,S); mctx.lineCap='round'; mctx.lineJoin='round'; mctx.lineWidth=size*0.42; mctx.strokeStyle='#000';
-      const ox=(S-w)/2, oy=(S-size)/2, k=p*STROKES.length;                     // 何画目まで書けたか
-      let tip=null;
-      STROKES.forEach((st,si)=>{ const q=Math.max(0,Math.min(1,k-si)); if(q<=0) return;
-        const x1=ox+st[0]*w, y1=oy+st[1]*size, x2=ox+(st[0]+(st[2]-st[0])*q)*w, y2=oy+(st[1]+(st[3]-st[1])*q)*size;
-        mctx.beginPath(); mctx.moveTo(x1,y1); mctx.lineTo(x2,y2); mctx.stroke(); if(q<1) tip=[x2,y2]; });
-      if(p>=1){ mctx.fillRect(0,0,S,S); tip=null; }
+      mctx.clearRect(0,0,S,S);
+      const ox=(S-w)/2, oy=(S-size)/2, soft=0.35, e=-soft+p*(1+soft);             // 左上から右下へ、インクがしみるように字があらわれる（点や筆先は出さない）
+      const gr=mctx.createLinearGradient(ox,oy,ox+w,oy+size);
+      gr.addColorStop(0,'#000'); gr.addColorStop(Math.max(0,Math.min(1,e)),'#000'); gr.addColorStop(Math.max(0,Math.min(1,e+soft)),'rgba(0,0,0,0)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+      mctx.fillStyle=p>=1?'#000':gr; mctx.fillRect(0,0,S,S);
       mctx.globalCompositeOperation='source-in'; mctx.fillStyle=color; mctx.font=ctx.font; mctx.textBaseline='middle'; mctx.textAlign='left';
       mctx.fillText(ch,ox,S/2); mctx.globalCompositeOperation='source-over';
       ctx.drawImage(maskCv,x-ox,y-S/2);
