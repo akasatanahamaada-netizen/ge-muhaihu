@@ -1833,7 +1833,7 @@ function castLayer(L,depth){
   if(sc.width!==W){ sc.width=W; sc.height=H; }
   const s=sc.getContext('2d');
   s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,W,H);
-  s.drawImage(L, Math.round(S.dx+30*d), -Math.round(S.dy+22*d));          // 手前の層ほど、遠くへ
+  s.drawImage(L, Math.round(S.dx+46*d), -Math.round(S.dy+30*d));          // 手前の層ほど、遠くへ（差を大きく）
   s.globalCompositeOperation='source-in'; s.fillStyle=`rgba(32,22,14,${(S.alpha-0.42*d).toFixed(3)})`; s.fillRect(0,0,W,H);   // 奥の層ほど影は濃く、手前ほどうすい
   ctx.drawImage(sc,0,0);
 }
@@ -1878,7 +1878,10 @@ function renderBody(){
     grabLayer(layerF);                                                // 手前の層
     drawBookBase(gravity);
     castLayer(layerB,0.25); castLayer(layerM,0.6); castLayer(layerF,1);   // 影（奥の層ほど近く、手前の層ほど遠く）
-    ctx.drawImage(layerB,0,0); drawPageEdges(); ctx.drawImage(layerM,0,0); ctx.drawImage(layerF,0,0);
+    // 空気の遠近：奥の層は、少しかすんで色がうすく。手前の層は、少し暗く くっきり
+    ctx.save(); ctx.filter='saturate(0.8) brightness(1.04) contrast(0.9)'; ctx.drawImage(layerB,0,0); ctx.restore();
+    drawPageEdges(); ctx.drawImage(layerM,0,0);
+    ctx.save(); ctx.filter='brightness(0.86) saturate(1.08) contrast(1.05)'; ctx.drawImage(layerF,0,0); ctx.restore();
     drawGravityIcon(SPINE/2,20,gravity.left,flashPage.left);
     drawGravityIcon(SPINE+SPINE/2,20,gravity.right,flashPage.right);
     for(const it of GT.items) drawItem(it);
