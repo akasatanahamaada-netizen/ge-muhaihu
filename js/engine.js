@@ -1821,7 +1821,7 @@ function render(){
 /* 奥に落ちる影：右下へずらした、やわらかい影（光は左上から。物のうしろの背景に映る） */
 /* depth … どれくらい手前にあるか（0＝背景のすぐ前 〜 1＝いちばん手前）。手前の物ほど、背景から遠いので、影は物から遠く・大きくぼけて・うすく落ちる */
 GT.castShadow=(c,depth)=>{ const d=depth==null?0.5:depth;
-  c.shadowColor=`rgba(52,38,26,${(0.38-0.14*d).toFixed(3)})`; c.shadowBlur=3+d*13; c.shadowOffsetX=3+d*17; c.shadowOffsetY=2+d*10; };
+  c.shadowColor=`rgba(30,20,12,${(0.82-0.2*d).toFixed(3)})`; c.shadowBlur=2+d*8; c.shadowOffsetX=4+d*20; c.shadowOffsetY=3+d*11; };   // 影は濃いめ
 function renderBody(){
   const gravity=GT.gravity;
   ctx.clearRect(0,0,W,H); ctx.drawImage(GT.paperArt.paper,0,0);
@@ -1929,6 +1929,7 @@ function drawGothicWorld(){
 function liftCharacters(){
   if((gradeK==null || gradeK<0.02) && !(dimNow>0)) return;
   ctx.save(); ctx.globalAlpha=dimNow>0?1:Math.min(1,gradeK);
+  if(GT.isBright&&GT.isBright()) GT.castShadow(ctx,0.55);   // 暗くした明るい場面（近道）でも、人物と少年の影を落とす
   if(storyStage) for(const n of npcs){ if(n.noLift || n.x<-100 || n.x>W+100) continue; drawNpc(n); }
   if(companion) drawNpc(companion);
   const pl=GT.player, inSwamp=(GT.swamps||[]).some(s=>GT.rectsOverlap&&GT.rectsOverlap(pl,s));
