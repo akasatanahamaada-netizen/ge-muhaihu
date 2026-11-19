@@ -764,7 +764,7 @@ function showChoices(choices){
     dlgChoices.appendChild(b);
   });
 }
-function finishDialogue(){ const cb=dOnComplete; dOnComplete=null; if(cb) cb(); }
+function finishDialogue(){ showPortrait(null); const cb=dOnComplete; dOnComplete=null; if(cb) cb(); }   // 会話が終わったら、立ち絵はかならず消す（飛ばしたときに残らないように）
 function hideDialogue(){ dlg.classList.remove('show'); }
 function tryAdvanceDialogue(){
   if(!dlg.classList.contains('show')) return false;
@@ -825,7 +825,7 @@ GT.preloadPortraits=list=>{ for(const s of list||[]) portraitImage(s); };
 function showPortrait(c, line){
   let src = c ? GT.portraits[c] : null;
   if(typeof src==='function') src=src(line||{});  // 向きやセリフの中身で絵を変えるとき（playlist.js の mari・narr など）
-  if(!src || !dlg.classList.contains('show')){ portrait.style.opacity='0'; portraitKey=null; portraitToken++; return; }
+  if(!src || !dlg.classList.contains('show')){ portrait.style.transition='none'; portrait.style.opacity='0'; portraitKey=null; portraitToken++; return; }   // すぐに消す（うすく残らないように）
   // 右向きに描かれた絵は、左右反転して左向きにする（GT.portraitMirror に入っている絵。playlist.js）
   const flip = (GT.portraitMirror||[]).includes(src) ? 'scaleX(-1)' : '';
   if(portraitKey===src){ portrait.style.transform=flip; portrait.style.opacity='1'; return; }
