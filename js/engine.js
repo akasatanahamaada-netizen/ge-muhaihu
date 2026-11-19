@@ -1704,7 +1704,8 @@ function drawMissionHud(){
   ctx.fillStyle='#f3ead0'; ctx.fillText(txt,W/2+icon/2,y+1);
   ctx.restore();
 }
-function drawSwamp(sw){
+function drawSwamp(sw0){
+  const SINK=7, sw={...sw0, y:sw0.y+(sw0.y+sw0.h/2<H/2?-SINK:SINK)};   // 見た目は、地面より少し下に沈める（天井がわの沼は上へ）。当たりはそのまま
   ctx.save(); roundRect(sw.x,sw.y,sw.w,sw.h,Math.min(10,sw.h/2));
   ctx.fillStyle='rgba(63,72,46,0.82)'; ctx.fill();
   ctx.clip();
