@@ -14,6 +14,7 @@
 "use strict";
 const AW=600, AH=330;                    // 挿絵の大きさ
 const SRC={
+  dark:'assets/background/霧深き森のゴシック童話.webp',   // 序章の、霧の深い暗い森（ゲームと同じ絵）
   day:'assets/background/ohiru no mori.webp', eve:'assets/background/yuugata no mori.webp', castle:'assets/background/水彩で描く静かな森と遠い城.webp',
   boy:{src:'assets/character/syuzinkou1.webp', box:[3,15,282,402]},   // 主人公（ちびキャラ・立ち姿。box はゲームと同じ、余白を切った範囲）
   // ゲームの中と同じ二頭身の絵（マリミニ (1)〜(5)）。box＝使う範囲、flip＝左右反転（元の絵はどれも少し左向き）
@@ -299,29 +300,36 @@ const thornCeil=shadowed(function(c,x0,x1,depth){
 });
 const mill=shadowed(function(c,x,y,s){ if(window.GTDecor&&GTDecor.paint.watermill) GTDecor.paint.watermill(c,x,y,s,0,{body:'rgba(110,92,72,0.85)',wheel:'rgba(92,72,54,0.9)',water:'rgba(150,185,200,0.6)'}); });
 
+/* ---- 序章のゴシックの森（暗い霧の森の絵・暗い木・月の光・足もとの霧） ---- */
+function gothBg(c,fx,fy){ c.save(); c.filter='brightness(1.35) saturate(0.85)'; bg(c,IMG.dark,fx,fy,1.12); c.restore();
+  const v=c.createRadialGradient(AW/2,AH*0.55,AH*0.25,AW/2,AH*0.55,AW*0.7); v.addColorStop(0,'rgba(20,12,18,0)'); v.addColorStop(1,'rgba(14,8,14,0.55)');
+  c.fillStyle=v; c.fillRect(0,0,AW,AH); }
+function moon(c,list){ rays(c,list,'rgba(200,190,230,0.12)'); }                                     // 青白い、うすい月の光
+function mist(c){ c.save(); for(let i=0;i<5;i++){ const g=c.createLinearGradient(0,AH-90,0,AH); g.addColorStop(0,'rgba(200,180,200,0)'); g.addColorStop(1,'rgba(200,180,200,0.10)');
+  c.fillStyle=g; c.beginPath(); c.ellipse(60+i*130,AH-20,140,40,0,0,Math.PI*2); c.fill(); } c.restore(); }   // 足もとに たなびく霧
+function darkTree(c,...a){ c.save(); c.filter='brightness(0.42) saturate(0.45) hue-rotate(-20deg)'; tree(c,...a); c.restore(); }   // 暗い森の木（ゲームの序章の木の色に）
+
 /* ---- 場面ごとの挿絵 ---------------------------------------------------- */
 const SCENES={
-  // 序：森で目を覚ます少年と、木の陰からのぞくマリ
+  // 序：暗い森で目を覚ます少年と、木の陰からのぞくマリ（ゲームの序章と同じ、霧の深いゴシックの森）
   prologue(c){
-    bg(c,IMG.day,0.25,0.75,1.1); wash(c,'rgba(244,236,214,0.15)');
-    rays(c,[[150,60],[330,40]],'rgba(255,236,170,0.22)');
+    gothBg(c,0.5,0.62);
+    moon(c,[[170,70],[360,50]]);
     pages(c,[[120,300,-0.3],[260,312,0.2],[340,296,0.5],[90,270,0.1]]);
     boy(c,210,272,1.25,{lying:true,book:true});
     // マリ（木の幹のうしろに立っていて、体の半分が幹にかくれている＝木のかげからのぞいている）
     if(ok(IMG.mari)) figure(c,IMG.mari,482,306,150); else mari(c,482,300,1.5);
-    // 木の幹（マリより手前）
-    tree(c,486,30,AH-14,64,[[515,40,80,64],[440,74,56,44],[592,62,56,44]],7);                             // ゲームと同じ描き方の木
+    darkTree(c,486,30,AH-14,64,[[515,40,80,64],[440,74,56,44],[592,62,56,44]],7);                          // 木の幹（マリより手前）
+    mist(c);
   },
-  // 森の小道：本を裏返して、天井を歩く少年（ひとりだけ）。道をふさぐ大木と、押して動かす木箱
+  // 森の小道：本を裏返して、天井を歩く少年（ひとりだけ）。道をふさぐ大木と、押して動かす木箱（暗い森）
   komichi(c){
-    bg(c,IMG.day,0.45,0.7,1.1); wash(c,'rgba(244,236,214,0.15)');
-    rays(c,[[220,50],[430,40]],'rgba(255,236,170,0.2)');
-    c.fillStyle='rgba(150,120,80,0.32)'; c.beginPath(); c.moveTo(0,AH); c.quadraticCurveTo(300,282,AW,300); c.lineTo(AW,AH); c.closePath(); c.fill();   // 小道
-    tree(c,218,90,AH-12,48,[[242,96,66,50],[192,128,44,33],[294,122,46,34]],3);                           // 道をふさぐ大木
-    log(c,350,74,190,22);                                                                                           // 天井からさがる丸太の足場（本を裏返すと、ここが床になる）
+    gothBg(c,0.42,0.62);
+    moon(c,[[240,60],[450,40]]);
+    darkTree(c,218,90,AH-12,48,[[242,96,66,50],[192,128,44,33],[294,122,46,34]],3);                       // 道をふさぐ大木
+    c.save(); c.filter='brightness(0.62) saturate(0.6)'; log(c,350,74,190,22); crate(c,470,262,48,46); c.restore();   // 天井からさがる丸太の足場・木箱（暗い森の色に）
     c.save(); c.translate(0,2*96); c.scale(1,-1); boy(c,440,96,1.3,{face:1}); c.restore();                        // 天井を歩く少年（さかさま）
-    crate(c,470,262,48,46);                                                                                         // 木箱
-    flowers(c,[[40,318,0],[86,324,1],[560,320,2],[590,316,3]]);
+    mist(c);
   },
   // 窓の向こう：お母さんが、赤ずきんにお使いを頼む
   window(c){
