@@ -2,7 +2,7 @@
    Gravity Tale ── 本を読みかえす画面 (bookview.js)
    ----------------------------------------------------------------------------
    本の見開きで、1枚ずつページをめくって読む。
-     ・いちばん最初の左ページは とびら（題名と、埋まったページの数）
+     ・いちばん最初は、序章の章のとびら（題名だけのとびらのページは入れない）
      ・そのあとは GT.pageRecord（playlist.js の GT.definePages）の順に 1ページずつ
      ・どのページにも、最初から文章が書いてある（playlist.js の base。ステージで書き込まれる文章と同じ）。虫食いでところどころ読めない
    ・分岐のあるページは、たどり着くと、選んだ道の文章になる
@@ -161,10 +161,10 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const rnd=i=>{ const s=Math.sin(i*127.1+311.7)*43758.5453; return s-Math.floor(s); };
 // 虫食い（GT.wormEaten でキャンバスに描く。穴の向こうは次のページ。外側のふちは劣化でよれる）
 function holes(seed,count){ return `<canvas class="bv-worm" width="450" height="600" data-seed="${seed}" data-count="${count}"></canvas>`; }
-// 本の並び：とびら → 章のとびら（序章）→ 序章のページ → 章のとびら（第一章）→ 第一章のページ …（それより後ろ = 白紙）
+// 本の並び：章のとびら（序章）→ 序章のページ → 章のとびら（第一章）→ 第一章のページ …（それより後ろ = 白紙）
 const info=p=>(GT.pageInfo&&GT.pageInfo[p.key])||{title:p.title,chapter:''};
 function entries(){
-  const list=[{type:'title'}]; let ch=null, no=0;
+  const list=[]; let ch=null, no=0;   // 最初の とびら（Gravity Tales の題名のページ）は入れない。章のとびらから始まる
   for(const p of GT.pageRecord){ const c=info(p).chapter;
     if(c && c!==ch){ ch=c; list.push({type:'chap', name:c}); }
     list.push({type:'page', p, no:++no}); }
@@ -181,12 +181,6 @@ function slotInner(slot){
     return `<div class="bv-title"><div class="orn">❦</div><div class="t1 bv-chap">${esc(c.name)}</div>
       ${c.sub?`<div class="t2">「${esc(c.sub)}」</div>`:''}<div class="orn">· · ·</div>
       <div class="t3">埋まったページ　${done} / ${pages.length}</div></div>`;
-  }
-  if(slot===0){
-    const filled=rec.filter(p=>{ const pc=pieces(p); return p.filled && pc.found>=pc.total; }).length;   // 欠けのない、完全なページの数
-    return `<div class="bv-title"><div class="orn">❦</div><div class="t1">Gravity<br>Tales</div>
-      <div class="t2">${(GT.chapters||[]).map(c=>c.name==='序章'?'序章':`${esc(c.name)}「${esc(c.sub)}」`).join('　・　')}</div><div class="orn">· · ·</div>
-      <div class="t3">埋まったページ　${filled} / ${rec.length}</div></div>`;
   }
   if(!en || en.type!=='page') return `<div class="bv-blank">❧</div>`;
   const p=en.p, pno=en.no;
