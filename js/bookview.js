@@ -124,9 +124,9 @@ const css=`
 .bv-go{ background:#9e2a32; } .bv-go:hover{ background:#c23a3a; }
 .bv-gos .bv-go.armed{ background:#c23a3a; }
 .bv-gos-h{ font-family:'Great Vibes',cursive; color:#5a3f1c; }
-.bv-sil{ position:absolute; bottom:3%; width:auto; pointer-events:none; filter:drop-shadow(6px -4px 0 rgba(40,26,14,0.2)); }   /* ページの下の角（下のふちで切れる上半身） */
-.bv-sil.hood{ left:4%; height:34%; }
-.bv-sil.wolf{ right:4%; height:28%; }
+.bv-sil{ position:absolute; bottom:0; width:auto; pointer-events:none; filter:drop-shadow(6px -4px 0 rgba(40,26,14,0.2)); }   /* ページの下の角いっぱいに（ページのふちで切れる） */
+.bv-sil.hood{ left:-14%; height:45%; }    /* 左半身は、ページの左のふちで見切れる */
+.bv-sil.wolf{ right:-16%; height:41%; }   /* 右半身（しっぽ）は、ページの右のふちで見切れる */
 .bv-title:has(.bv-sil){ justify-content:flex-start; padding-top:9%; box-sizing:border-box; }   /* 絵があるとびらは、文字を上へ */
 /* 「Play again」のボタンがあるページ：ボタンを文章の下に並べて、重ならないように（挿絵を少し小さく・行間を少しつめる） */
 .bv-page:has(.bv-gos), .bv-face:has(.bv-gos){ display:flex; flex-direction:column; }
