@@ -248,7 +248,7 @@ menu.querySelectorAll('.gtm-orn').forEach(b=>b.addEventListener('pointerdown',e=
   const ch=menu.querySelector('.gtm-ch'); if(!ch) return;
   chIdx=(chIdx+1)%CH_NAMES.length; ch.style.opacity='0';
   setTimeout(()=>{ ch.textContent=CH_NAMES[chIdx]; ch.style.opacity='1'; },180);
-  GT.sfx&&GT.sfx('page');
+  if(GT.titleFlip && menu.classList.contains('title-live')) GT.titleFlip(chIdx); else GT.sfx&&GT.sfx('page');   // タイトルの場面が、ぺらっとめくれる
 }));
 window.addEventListener('keydown',e=>{ if(startCover.classList.contains('show') && menu.classList.contains('show')) dismissStart(e); }, true);
 

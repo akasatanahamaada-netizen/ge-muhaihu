@@ -25,11 +25,26 @@ GT.defineStage('title_view', {
 });
 GT.registerScene({
   id:'title', type:'story', stage:'title_view', label:'Gravity Tales',
-  npcs:[
-    { who:'hood', name:'', page:'left',  x:360 },
-    { who:'wolf', name:'', page:'right', x:690, noLift:true },
-  ],
+  npcs:[],
 });
-// 少年の位置と向き（赤ずきんを見ている）
-GT.registerSceneReset(()=>{ if(GT.scene && GT.scene.id==='title'){ const p=GT.player; p.x=250; p.facing=1; p.vx=0; GT.mode='idle'; } });
+/* 章ごとの見せかた：第一章は、赤ずきん（左・右向き）と狼（右・左向き）のシルエットが向かい合う。まだ書かれていない章は、なにもいない森 */
+GT.titleChapter=0;
+const SIL={ hood:new Image(), wolf:new Image() };
+SIL.hood.src='assets/character/赤いシルエットの赤ずきん少女.webp'; SIL.wolf.src='assets/character/黒い狼獣のシルエット.webp';
+const isTitle=()=>GT.scene && GT.scene.id==='title';
+GT.registerSceneReset(()=>{ if(isTitle()){ const p=GT.player; p.x=-600; p.vx=0; GT.mode='idle'; } });   // 少年は見せない
+function sil(img,cx,h,mirror){
+  if(!img.complete||!img.naturalWidth) return;
+  const w=h*img.naturalWidth/img.naturalHeight, ctx=GT.ctx, foot=GT.H-GT.EDGE+4;
+  ctx.save(); ctx.translate(cx,foot); if(mirror) ctx.scale(-1,1);
+  ctx.drawImage(img,-w/2,-h,w,h); ctx.restore();
+}
+GT.registerDraw(()=>{
+  if(!isTitle() || GT.titleChapter!==0) return;
+  const t=performance.now()/1000;
+  sil(SIL.hood, 300, 236+Math.sin(t*1.6)*1.5, true);    // 赤ずきん（左がわ・右向き）
+  sil(SIL.wolf, 610, 300, false);                        // 狼（右がわ・左向き）
+},'world');
+/* 章を選びなおしたとき：タイトルの場面ごと、ぺらっとページがめくれる（js/menu.js から呼ぶ） */
+GT.titleFlip=(ch)=>{ if(!isTitle()) return; GT.titleChapter=ch; GT.startPageFlip(1, GT.sceneRegistry.title); };
 })();

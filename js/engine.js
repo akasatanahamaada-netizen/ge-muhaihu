@@ -659,10 +659,10 @@ const fctx=flipCv.getContext('2d');
 let flipCvDirty=false;
 function setFlipHide(on){ document.body.classList.toggle('gt-flipping',on); }
 (function(){ const st=document.createElement('style');
-  st.textContent='.gt-flipping #dlg, .gt-flipping .dialogue, .gt-flipping #qte{ visibility:hidden !important; } .gt-flipping img[alt=""]{ visibility:hidden; }';
+  st.textContent='.gt-flipping #dlg, .gt-flipping .dialogue, .gt-flipping #qte{ visibility:hidden !important; } .gt-flipping img[alt=""]:not(.gtm-logo){ visibility:hidden; }';
   document.head.appendChild(st); })();
 let flipDir=1;                                          // 1=次のページへ / -1=前のページへもどる（ゲームオーバーのやり直し）
-function startPageFlip(dir){
+function startPageFlip(dir,toScene){   // toScene … めくったうしろで始めるシーン（playlist の外のシーンなど）
   if(flipping) return;
   flipOld.getContext('2d').drawImage(canvas,0,0);       // いまの見開きを写しとる
   toPage(extOld);                                         // ページの大きさの紙にも写しておく（めくる紙の絵）
@@ -670,7 +670,8 @@ function startPageFlip(dir){
   flipping=true; flipT=0; flipSwapped=true; GT.sfx&&GT.sfx('page');
   GT.player.vx=0; GT.player.vy=0;
   setFlipHide(true);
-  if(flipDir>0){ pageNo++; advanceScene(); }             // 次のシーンは、めくった紙のうしろで始まっている
+  if(toScene){ startScene(toScene); }
+  else if(flipDir>0){ pageNo++; advanceScene(); }             // 次のシーンは、めくった紙のうしろで始まっている
   else { startScene(GT.sceneIndex); }                    // 前へもどる：同じステージを、最初から
 }
 GT.startPageFlip=startPageFlip;
@@ -1129,7 +1130,7 @@ function typeLoop(now){ const dt=(now-ttLast)/1000; ttLast=now; if(holdWait) hol
 /* ========================================================================== */
 let lastTime=performance.now();
 GT.paused=false;                     // true のあいだ、ゲームは止まる（メニューを開いているときなど）
-function loop(now){ let dt=(now-lastTime)/1000; dt=Math.min(dt,1/30); lastTime=now; if(!GT.paused){ update(dt); updateFlipBuffer(dt); } applyShake(dt); render(); requestAnimationFrame(loop); }
+function loop(now){ let dt=(now-lastTime)/1000; dt=Math.min(dt,1/30); lastTime=now; if(!GT.paused){ update(dt); updateFlipBuffer(dt); } else if(flipping){ flipT+=dt; if(flipT>=FLIP_DUR){ flipping=false; setFlipHide(false); } } applyShake(dt); render(); requestAnimationFrame(loop); }   // メニューを開いたまま めくるとき（タイトルの章えらび）も、めくりを進める
 
 function update(dt){
   const player=GT.player, gravity=GT.gravity, boxes=GT.boxes, enemies=GT.enemies;
