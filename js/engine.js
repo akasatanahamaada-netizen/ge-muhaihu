@@ -1818,6 +1818,8 @@ function drawNpc(n){
 function render(){
   try{ renderBody(); } finally { flushHint(); }
 }
+/* 奥に落ちる影：右下へずらした、やわらかい影（光は左上から。物のうしろの背景に映る） */
+GT.castShadow=c=>{ c.shadowColor='rgba(52,38,26,0.34)'; c.shadowBlur=7; c.shadowOffsetX=9; c.shadowOffsetY=6; };
 function renderBody(){
   const gravity=GT.gravity;
   ctx.clearRect(0,0,W,H); ctx.drawImage(GT.paperArt.paper,0,0);
@@ -1829,19 +1831,20 @@ function renderBody(){
   const sg=ctx.createLinearGradient(SPINE-16,0,SPINE+16,0);
   sg.addColorStop(0,'rgba(58,50,38,0)'); sg.addColorStop(0.5,'rgba(58,50,38,0.35)'); sg.addColorStop(1,'rgba(58,50,38,0)');
   ctx.fillStyle=sg; ctx.fillRect(SPINE-16,0,32,H);
-  for(const fn of drawBack) fn();           // 奥の飾り（地形より後ろ・判定なし）
+  const castOn = GT.isBright && GT.isBright();                // 明るい場面：ひとつひとつの物が、うしろの背景に影を落とす（奥行き）
+  const cast=(fn)=>{ if(!castOn) return fn(); ctx.save(); GT.castShadow(ctx); fn(); ctx.restore(); };
+  cast(()=>{ for(const fn of drawBack) fn(); });   // 奥の飾り（地形より後ろ・判定なし）。家や木も、うしろへ影を落とす
   drawPageEdges();
-  for(const plat of GT.platforms){
+  cast(()=>{ for(const plat of GT.platforms){
     if(plat.kind!=='ledge'&&plat.kind!=='ceilingLedge') continue;
     drawLedge(plat, gravity[plat.page]===-1);
-  }
+  } });
   drawGravityIcon(SPINE/2,20,gravity.left,flashPage.left);
   drawGravityIcon(SPINE+SPINE/2,20,gravity.right,flashPage.right);
   drawGoal();
-  for(const box of GT.boxes) drawBox(box);
-  for(const en of GT.enemies) drawEnemy(en);
+  cast(()=>{ for(const box of GT.boxes) drawBox(box); for(const en of GT.enemies) drawEnemy(en); });
   const paperFig = GT.isBright && GT.isBright();                // 明るい場面：人物は、紙の人形のように うしろへ影を落とす
-  if(paperFig){ ctx.save(); ctx.shadowColor='rgba(70,48,36,0.28)'; ctx.shadowBlur=8; ctx.shadowOffsetX=7; ctx.shadowOffsetY=3; }
+  if(paperFig){ ctx.save(); GT.castShadow(ctx); }
   if(storyStage) for(const n of npcs) drawNpc(n);
   if(companion) drawNpc(companion);
   if(paperFig) ctx.restore();
@@ -1854,11 +1857,10 @@ function renderBody(){
     ctx.fillText('Go to the right edge →', W-26, H/2);
     ctx.restore();
   }
-  for(const fn of drawWorld) fn();          // ボスなど（プレイヤーより後ろ）
-  if(GT.isBright && GT.isBright()){ ctx.save(); ctx.shadowColor='rgba(70,48,36,0.28)'; ctx.shadowBlur=8; ctx.shadowOffsetX=7; ctx.shadowOffsetY=3; drawPlayer(); ctx.restore(); } else drawPlayer();
+  cast(()=>{ for(const fn of drawWorld) fn(); });   // ボスなど（プレイヤーより後ろ）
+  if(castOn){ ctx.save(); GT.castShadow(ctx); drawPlayer(); ctx.restore(); } else drawPlayer();
   for(const sw of GT.swamps) drawSwamp(sw);   // 沼はプレイヤーの足元を隠すよう手前に描く
   for(const fn of drawOverlay) fn();         // 手前の木・窓のぞきなど（ゴシックの色合いをかけるため、色合いより先に描く）
-  if(GT.drawPaperTheater) GT.drawPaperTheater();   // 明るい場面：まわりに紙の劇場のふち取り（stages/_papertheater.js）
   drawGothicWorld();                                                                                                // 世界を暗く・色を抜く（不気味さに合わせて）
   liftCharacters();                                                                                                 // 少年と人物は、暗くしない（色合いの上に描きなおす）
   if(itemLook==='page') for(const it of GT.items) if(!it.got&&!it.hidden) drawItem(it);                            // 光の玉（お話のかけら）は、色合いの上にも重ねて、くっきり光らせる
