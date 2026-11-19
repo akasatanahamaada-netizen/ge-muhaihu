@@ -42,9 +42,16 @@ function sil(img,cx,h,mirror){
 GT.registerDraw(()=>{
   if(!isTitle() || GT.titleChapter!==0) return;
   const t=performance.now()/1000;
-  sil(SIL.hood, 300, 236+Math.sin(t*1.6)*1.5, true);    // 赤ずきん（左がわ・右向き）
-  sil(SIL.wolf, 610, 300, false);                        // 狼（右がわ・左向き）
+  sil(SIL.hood, 300, 236+Math.sin(t*1.6)*1.5, true);    // 赤ずきん（左がわ・右向き）。影は、ほかの物と同じ
 },'world');
+// 狼：本体はそのままの大きさ。影だけ、うしろの森に大きく映す（ふつうの影は落とさないよう、影を作る層のあとに描く）
+GT.registerDraw(()=>{ if(!isTitle() || GT.titleChapter!==0) return; sil(SIL.wolf, 610, 300, false); },'speech');
+GT.extraShadow=(ctx)=>{
+  if(!isTitle() || GT.titleChapter!==0 || !SIL.wolf.complete || !SIL.wolf.naturalWidth) return;
+  const img=SIL.wolf, h=300*1.75, w=h*img.naturalWidth/img.naturalHeight, foot=GT.H-GT.EDGE+4;
+  ctx.save(); ctx.globalAlpha=0.5; ctx.translate(610+70, foot-10);   // 右上へずらし、大きく
+  ctx.drawImage(img,-w/2,-h,w,h); ctx.restore();
+};
 /* 章を選びなおしたとき：タイトルの場面ごと、ぺらっとページがめくれる（js/menu.js から呼ぶ） */
 GT.titleFlip=(ch,dir)=>{ if(!isTitle()) return; GT.titleChapter=ch; GT.startPageFlip(dir<0?-1:1, GT.scene); };   // 前の章へは、ページも前へもどる
 })();

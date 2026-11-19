@@ -1903,6 +1903,7 @@ function renderBody(){
     for(const fn of drawOverlay) fn();
     grabLayer(layerF);                                                // 手前の層
     drawBookBase(gravity);
+    if(GT.extraShadow) GT.extraShadow(ctx);   // 場面ごとの特別な影（タイトルの狼の大きな影など）
     // 影は、その層より奥にあるもの すべての上に落ちる（少年の影は、うしろの家や木の上にも映る）。
     // 奥の層ほど影は近く・濃く、手前の層ほど遠く・うすく。空気の遠近：奥の層は少しかすみ、手前の層は少し暗く くっきり
     castLayer(layerB,0.25);
