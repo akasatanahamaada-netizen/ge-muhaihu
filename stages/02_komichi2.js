@@ -44,11 +44,11 @@ const onTop=(p)=>{ const pl=GT.player, cx=pl.x+pl.w/2;
   return pl.onGround && GT.gravity[p.page]===1 && Math.abs(pl.y+pl.h-p.y)<2 && cx>p.x-4 && cx<p.x+p.w+4; };
 const tut={ step:0 };
 GT.registerSceneReset(()=>{ if(isHere()) tut.step=0; });
-// 狼の手下を倒すと、お話のかけら（光の玉）が、倒した場所から本へ飛んでいく
+// 敵を倒すと、お話のかけら（光の玉）が、倒した場所から本へ飛んでいく
 GT.registerUpdate(()=>{
   if(!isHere() || !GT.enemies.length || GT.enemies.some(e=>e.alive)) return;
   const pc=GT.pagePieces&&GT.pagePieces('komichi'); if(pc && pc.foundIds.includes('komichi:foe')) return;
-  const e=GT.enemies[GT.enemies.length-1]; GT.addPagePiece('komichi','komichi:foe',{x:e.x,y:e.y-10,w:e.w,h:e.h});
+  const e=GT.enemies[GT.enemies.length-1]; GT.addPagePiece('komichi2','komichi:foe',{x:e.x,y:e.y-10,w:e.w,h:e.h});
 });
 const STEPS=[
   { done:()=>GT.boxes[0].x>=165 || onTop(STEP_L) || onTop(TOP_L),

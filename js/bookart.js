@@ -411,7 +411,7 @@ const SCENES={
       bg(c,IMG.day,0.3,0.5,1.15); wash(c,'rgba(30,34,26,0.32)');
       thornCeil(c,-20,AW+20,120);
       c.fillStyle='rgba(60,52,40,0.85)'; c.beginPath(); c.moveTo(380,AH); c.lineTo(392,190); c.quadraticCurveTo(420,170,452,186); c.lineTo(470,AH); c.closePath(); c.fill();   // 床からのびる岩
-      wolf(c,520,320,0.75,-1);                                                                            // 狼の手下
+      wolf(c,520,320,0.75,-1);                                                                            // 敵
       boy(c,200,316,1.4,{face:1});
       for(let i=0;i<5;i++){ const x=90+i*40; ell(c,x,322,5,2,'rgba(40,30,22,0.55)'); }                     // 少年の足あと
     } else {
@@ -461,6 +461,74 @@ const SCENES={
       figure(c,IMG.mari,450,314,150,{filter:'brightness(0.9)'});
     }
   },
+};
+// あとから分けたページは、もとのページと同じ挿絵を使う（森の小道② → 森の小道、家の近くまで → おばあさんの家への道）
+SCENES.komichi2=SCENES.komichi; SCENES.road2=SCENES.road;
+
+/* 敵（ゲームと同じ姿：黒っぽい丸い体・とがった耳・赤い目・白いふち）。(x, 足もと y)、s=大きさ、face=1 で右向き */
+const foe=shadowed(function(c,x,y,s,face){
+  c.save(); c.translate(x,y-13*s); c.scale((face||1)*s,s);
+  const shape=()=>{ c.beginPath(); rr(c,-15,-13,30,26,7); c.moveTo(9,-12); c.lineTo(13,-21); c.lineTo(17,-12); c.closePath(); };
+  shape(); c.strokeStyle='rgba(255,255,255,0.95)'; c.lineWidth=4; c.lineJoin='round'; c.stroke();
+  c.beginPath(); rr(c,-15,-13,30,26,7); c.fillStyle='#3a2f2a'; c.fill();
+  c.beginPath(); c.moveTo(9,-13); c.lineTo(13,-21); c.lineTo(17,-13); c.closePath(); c.fill();
+  ell(c,7,-2,2.4,2.4,'#c9503f');
+  c.restore();
+});
+/* 本（閉じかけて、くるくる落ちていく）。(x,y) 中心・r 回転 */
+function fallingBook(c,x,y,r){
+  c.save(); c.translate(x,y); c.rotate(r);
+  rr(c,-22,-14,44,28,3); inked(c,'#6a4a33',2);
+  c.beginPath(); c.moveTo(0,-14); c.lineTo(0,14); c.strokeStyle='#d6b26e'; c.lineWidth=1.4; c.stroke();
+  rr(c,-19,-11,17,22,2); c.fillStyle='#f3ead3'; c.fill(); rr(c,2,-11,17,22,2); c.fill();
+  c.restore();
+}
+// 空から落ちて：空からさしこむ光の筋の中を、少年がくるりと回りながら暗い森へ落ちてくる。本とページも舞う
+SCENES.wake=function(c){
+  gothBg(c,0.55,0.35);
+  c.save(); c.globalCompositeOperation='lighter';                                                   // 空からさしこむ光の筋（少年が落ちてきたところ）
+  const tr=c.createLinearGradient(0,0,0,AH); tr.addColorStop(0,'rgba(255,244,220,0.32)'); tr.addColorStop(1,'rgba(255,244,220,0)');
+  c.fillStyle=tr; c.beginPath(); c.moveTo(250,0); c.lineTo(350,0); c.lineTo(400,AH); c.lineTo(250,AH); c.closePath(); c.fill(); c.restore();
+  moon(c,[[150,40],[470,36]]);
+  darkTree(c,24,40,AH-10,46,[[48,48,76,56],[10,92,44,34],[100,86,46,34]],11);                       // 左右の暗い木（ページのふちを囲む）
+  darkTree(c,520,20,AH-10,52,[[548,36,80,60],[486,80,48,36],[598,74,44,34]],13);
+  for(let i=0;i<14;i++){ const a=i*2.3, d=26+(i*17)%40; ell(c,322+Math.cos(a)*d,150+Math.sin(a)*d*0.8,1.6,1.6,'rgba(255,240,200,0.8)'); }   // 少年のまわりの光の粒
+  c.save(); c.translate(318,128); c.rotate(-0.65); boy(c,0,66,1.25,{}); c.restore();              // くるりと回りながら落ちてくる少年
+  fallingBook(c,420,92,0.5);
+  pages(c,[[200,110,0.7],[452,170,-0.5],[380,40,0.25],[262,214,1.1],[150,250,-0.3]]);
+  mist(c);
+};
+// 森の出口：暗い森の木々のあいだが明るく開け、その向こうに絵本の世界（昼の森）。出口でマリが待ち、少年が本を手に向かう
+SCENES.forest_exit=function(c){
+  gothBg(c,0.5,0.55);
+  const L=document.createElement('canvas'); L.width=AW; L.height=AH; const g=L.getContext('2d');   // 出口の向こうの明るい森（まわりはやわらかく消える）
+  bg(g,IMG.day,0.6,0.55,1.05); g.fillStyle='rgba(255,240,205,0.22)'; g.fillRect(0,0,AW,AH);
+  g.globalCompositeOperation='destination-in';
+  const m=g.createRadialGradient(410,190,40,410,190,175); m.addColorStop(0,'rgba(0,0,0,1)'); m.addColorStop(0.65,'rgba(0,0,0,0.9)'); m.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=m; g.fillRect(0,0,AW,AH); c.drawImage(L,0,0);
+  c.save(); c.globalCompositeOperation='lighter';                                                   // 出口からこぼれる光
+  const gl=c.createRadialGradient(410,200,60,410,200,300); gl.addColorStop(0,'rgba(255,230,170,0.28)'); gl.addColorStop(1,'rgba(255,230,170,0)'); c.fillStyle=gl; c.fillRect(0,0,AW,AH);
+  c.fillStyle='rgba(255,236,190,0.10)'; for(const [a,b] of [[300,230],[350,300],[420,380]]){ c.beginPath(); c.moveTo(a,120); c.lineTo(b,120); c.lineTo(b-150,AH); c.lineTo(a-260,AH); c.closePath(); c.fill(); }
+  c.restore();
+  c.fillStyle='rgba(200,170,120,0.28)'; c.beginPath(); c.moveTo(60,AH); c.bezierCurveTo(220,300,330,282,392,270); c.lineTo(430,272); c.bezierCurveTo(400,290,340,312,330,AH); c.closePath(); c.fill();   // 出口へつづく小道
+  darkTree(c,10,0,AH-10,54,[[36,18,92,62],[0,70,50,38],[96,64,48,36]],21);                         // 出口を囲む、暗い森の木
+  darkTree(c,548,0,AH-10,56,[[574,20,90,64],[514,66,50,38],[620,64,44,34]],23);
+  darkTree(c,182,40,AH-26,30,[[198,48,60,44],[160,80,36,26],[236,78,34,26]],25);
+  if(ok(IMG.mari)) figure(c,IMG.mari,452,292,138); else mari(c,452,288,1.4);                       // 出口で待つマリ
+  boy(c,262,310,1.35,{face:1,book:true});                                                            // 本を手に、出口へ向かう少年
+  mist(c);
+};
+// 森の道：本を裏返して、梢の下をさかさまに歩く少年。床では敵がうろついている（ゲームの森の道①）
+SCENES.forest_path=function(c){
+  bg(c,IMG.day,0.3,0.6,1.12); wash(c,'rgba(244,236,214,0.14)');
+  rays(c,[[150,46],[420,40]],'rgba(255,236,170,0.16)');
+  c.fillStyle='rgba(150,120,80,0.32)'; c.beginPath(); c.moveTo(0,AH); c.lineTo(0,300); c.quadraticCurveTo(300,288,AW,300); c.lineTo(AW,AH); c.closePath(); c.fill();   // 森の道
+  tree(c,40,-90,40,26,[[54,40,96,46],[0,58,56,30],[120,56,56,30]],31);                              // 梢（ページの上にならぶ葉の茂み。少年はこの下を歩く）
+  tree(c,262,-90,36,26,[[276,36,104,48],[210,54,58,30],[344,52,58,30]],33);
+  tree(c,486,-90,40,26,[[500,40,100,46],[442,56,56,30],[566,56,56,30]],35);
+  c.save(); c.translate(0,2*80); c.scale(1,-1); boy(c,300,80,1.2,{face:1}); c.restore();             // 梢の下を、さかさまに歩く少年
+  foe(c,170,312,1.5,1); foe(c,452,314,1.5,-1);                                                       // 床をうろつく敵
+  flowers(c,[[40,322,0],[90,326,2],[300,320,1],[560,324,3]]);
 };
 
 /* ---- 仕上げ：紙の色をかぶせ、ふちを刷毛のようにぼかす ---- */

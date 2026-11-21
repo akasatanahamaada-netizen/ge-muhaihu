@@ -33,7 +33,7 @@ GT.defineStage('path1', {
     {page:'right', x:610, y:18, w:32, h:32},
   ],
   itemsOptional:true,
-  bookPage:'window',
+  bookPage:'forest_path',   // 本の「森の道」のページ
   mission:['items'],
   platforms:[
     {page:'left', x:120, y:360, w:140, h:20, kind:'ledge'},

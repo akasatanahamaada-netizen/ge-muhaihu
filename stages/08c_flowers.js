@@ -81,7 +81,7 @@ GT.registerUpdate(()=>{
   }
   if(!fl.done && GT.items.length && got.length>=GT.items.length){   // お花をぜんぶ摘むと、お話のかけら（赤ずきんのところから本へ）
     fl.done=true; const r=c||GT.player;
-    setTimeout(()=>GT.addPagePiece('wolf','wolf:road',{x:r.x,y:r.y,w:r.w,h:r.h}),700);
+    setTimeout(()=>GT.addPagePiece('road','wolf:road',{x:r.x,y:r.y,w:r.w,h:r.h}),700);
   }
 });
 })();

@@ -98,8 +98,7 @@ function drawCast(t,c){
   if(c.hood==='door') hoodAt(330);
   if(c.hood==='near') hoodAt(212);                    // ベッドのそば（QTE のとき）                    // 戸口のそば（奇襲のとき）
   if(c.hood==='bedside') hoodAt(176,Math.min(1,(performance.now()-ending.hoodInT)/600));
-  if(c.hood==='shawl') hoodAt(176,1,()=>{           // おばあさんの肩掛けを抱いている
-    ctx.fillStyle='#8a7fa0'; ctx.beginPath(); ctx.ellipse(186,-14,10,7,0.3,0,Math.PI*2); ctx.fill(); });
+  if(c.hood==='shawl') hoodAt(176);                 // おばあさんの肩掛けを抱いている（肩掛けの紫の楕円は、点に見えるので描かない）
   for(const k of ['granny','hood']){ const b=castBody[k];                          // 怒った吹き出し
     if(b.speech && b.y!=null && (k==='granny'?c.granny:c.hood)) GT.drawSpeech(b.x+b.w/2, b.g>0?b.y-6:b.y+b.h+6, b.speech.text, b.speech.t/0.4, b.g<0, b.speech.angry); }
   if(c.wolfDown && GT.hasSprite && GT.hasSprite('wolfLeft')){   // 倒れた狼（ミニの絵を横たえる）
@@ -247,6 +246,7 @@ const ENDINGS={
   normal:{ mark:'B', title:'残された肩掛け' },
   bad:   { mark:'C', title:'ベッドの上の赤い頭巾' },
 };
+GT.ENDINGS=ENDINGS;   // 本の第一章のとびらで、見たエンディングの名前を出すのに使う
 const ending={ kind:'true', hoodIn:false, hoodInT:0, epilogue:false, card:false, cardT:0 };
 GT.defineStage('ending_room', { label:'第一章 ── おばあさんの家', platforms:[], boxes:[], enemies:[] });
 GT.registerAct('end-hood-in', ()=>{ ending.hoodIn=true; ending.hoodInT=performance.now(); GT.holdDialogue(()=>performance.now()-ending.hoodInT>700); });   // 赤ずきんが入ってくるまで、会話の枠を消して見せる
@@ -355,6 +355,7 @@ GT.registerDynamic('result', ()=>{
   flags.grannyAlive = grannySaved;
   Object.assign(ending,{ kind: grannySaved?'true':hoodSaved?'normal':'bad', hoodIn:false, hoodInT:0, epilogue:false, card:false, cardT:0 });
   flags.ending=ending.kind;
+  GT.recordEnding&&GT.recordEnding(ending.kind);   // 見たエンディングとして記録（本の第一章のとびらに出る）
 
   GT.fillPage('granny', grannySaved
     ? '――おばあさんは無事だった。少年が、狼より先に家へ着いたから。'
@@ -367,7 +368,7 @@ GT.registerDynamic('result', ()=>{
   if(hoodSaved && grannySaved) resultText = '――少年は、間に合った。赤ずきんも、おばあさんも、無事だった。';
   else if(hoodSaved && !grannySaved) resultText = '――少年は、赤ずきんを守った。でも、おばあさんには、間に合わなかった。';
   else resultText = '――赤ずきんは、狼に食べられてしまった。';
-  GT.fillPage('result', resultText + '\n（' + hoodLine + '／' + grannyLine + '）');
+  GT.fillPage('result', resultText);   // （「赤ずきん：救えた」などの行は、本には書かない。文字を少なく）
   ending.summary = hoodLine+'　／　'+grannyLine;
 
   const after = typeof AFTER[ending.kind]==='function' ? AFTER[ending.kind](flags) : AFTER[ending.kind];
@@ -399,7 +400,22 @@ const OUT_TALK={
     ],
   },
 };
-GT.defineStage('epilogue_out', { label:'第一章 ── 外', platforms:[], boxes:[], enemies:[] });
+// 外の場面の地形：両はしに木、手前に草や葉（ほかのステージと同じく、影を落とす）。人物（x 300〜430）にはかからない
+// 奥の木・茂みは、手前の丘の上に立つので、丘といっしょに drawEpilogueNear が描く（decor の 'back' だと丘より先に描かれ、根元が丘に隠れる）
+const EPI_BACK_DECOR=[
+  {kind:'tree',  x:-34, y:150, w:120, h:316},
+  {kind:'tree',  x:772, y:120, w:140, h:346},
+  {kind:'tree',  x:690, y:250, w:84,  h:216},
+  {kind:'bush',  x:548, y:424, w:92,  h:44},
+  {kind:'bush',  x:66,  y:428, w:70,  h:38},
+];
+GT.defineStage('epilogue_out', { label:'第一章 ── 外', platforms:[], boxes:[], enemies:[],
+  decor:[
+    {layer:'front', kind:'fern',  x:-14, y:392, w:96,  h:78},
+    {layer:'front', kind:'grass', x:200, y:436, w:64,  h:30},
+    {layer:'front', kind:'grass', x:604, y:436, w:70,  h:30},
+    {layer:'front', kind:'fern',  x:828, y:396, w:90,  h:74},
+  ] });
 // 外の場面で、だれがどこにいるか（いない人は x=-300 で隠す）
 GT.registerAct('epi-setup',()=>{
   const f=GT.flags, kind=ending.kind, npcs=GT.getNpcs(), get=w=>npcs.find(n=>n.who===w);
@@ -411,29 +427,183 @@ GT.registerAct('epi-setup',()=>{
   if(g){ if(kind==='true'){ g.x=300; g.lines=OUT_TALK.granny.true(f); } else g.x=-300; }
 });
 GT.registerSceneReset(()=>{ if(isEpi()){ ending.epilogue=true; ending.card=false; } else if(GT.scene&&GT.scene.type!=='end'){ ending.epilogue=false; ending.card=false; } });
-/* 外（マリと話す場面）：近道なら夕暮れ、遠回りなら夜明け。地形より奥 */
-function drawEpilogue(){
-  if(!isEpi()) return;
-  const t=performance.now()/1000, FLOOR=H-EDGE;
-  ctx.save();
-  const sky=ctx.createLinearGradient(0,0,0,FLOOR);
-  if(epilogueDusk()){ sky.addColorStop(0,'#7a5c78'); sky.addColorStop(0.55,'#e08a5a'); sky.addColorStop(1,'#f2b878'); }   // 夕焼け
-  else { sky.addColorStop(0,'#5a6488'); sky.addColorStop(0.55,'#d9a27a'); sky.addColorStop(1,'#efd2a0'); }                  // 夜明け
-  ctx.globalAlpha=0.85; ctx.fillStyle=sky; ctx.fillRect(0,0,W,H); ctx.globalAlpha=1;
-  ell(700,FLOOR-40,60,60,epilogueDusk()?'rgba(255,170,100,0.8)':'rgba(255,230,170,0.75)');   // しずむ夕日／のぼる朝日
-  ctx.fillStyle='rgba(70,64,60,0.55)';
-  ctx.beginPath(); ctx.moveTo(0,FLOOR); ctx.quadraticCurveTo(300,330,600,380); ctx.quadraticCurveTo(780,410,W,350); ctx.lineTo(W,FLOOR); ctx.closePath(); ctx.fill();
-  // 遠くのおばあさんの家（窓に明かり）
-  ctx.fillStyle='rgba(60,52,44,0.9)'; ctx.fillRect(150,372,70,46);
-  ctx.beginPath(); ctx.moveTo(142,374); ctx.lineTo(185,346); ctx.lineTo(228,374); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = ending.kind==='bad' ? 'rgba(120,110,90,0.6)' : `rgba(255,200,110,${0.8+0.1*Math.sin(t*4)})`; ctx.fillRect(172,388,12,12);
-  // 木々のシルエット
-  [[40,300,50],[300,320,44],[820,290,56]].forEach(([x,y,r])=>{ ctx.fillStyle='rgba(50,56,44,0.7)'; ctx.fillRect(x-4,y,8,FLOOR-y); ell(x,y,r*0.7,r,'rgba(50,56,44,0.7)'); });
+/* ---- 外の景色（epilogue）：絵本の一枚絵のように ----
+   夕暮れ（二人とも助けた結末）／夜明け（おばあさんを救えなかった）／沈んだ夜明け（赤ずきんも救えなかった）で、色と動くものが変わる。
+   奥から：空 → 星 → 太陽（光の輪と、ゆっくり回る光の筋）→ 雲 → 遠い丘・丘の上の森 → おばあさんの家（煙突の煙・窓の明かり）
+          → 家から手前へのびる道・草地と花 → 鳥・ホタル（夕暮れ）／朝もや（夜明け）
+   動かない部分（空・丘・家・道・草地）は、結末ごとに一度だけ描いて取っておく（毎フレーム描かない） */
+const EPI_PAL={
+  true:  { sky:[[0,'#3b3263'],[0.32,'#7c5a8c'],[0.6,'#d7806a'],[0.8,'#f2ad66'],[1,'#f9d892']],
+           sun:'#ffd27a', glow:'255,196,110', meadow:['#6d7a44','#4e5a32'], rim:'255,200,120',
+           cloud:'#c98a9a', cloudLit:'255,214,150', path:'#d9b07a', wall:'#e2c9a0', roof:'#8a3f36', light:true, birds:true, stars:0.5, fly:true },
+  normal:{ sky:[[0,'#283561'],[0.35,'#5e6896'],[0.62,'#c995a2'],[0.82,'#efc59e'],[1,'#f7e3b9']],
+           sun:'#fff0c0', glow:'255,226,170', meadow:['#5b7350','#405440'], rim:'255,230,180',
+           cloud:'#a99ab4', cloudLit:'255,226,190', path:'#cdb38c', wall:'#d6c6aa', roof:'#7a4a44', light:true, birds:true, stars:0.8, mist:true },
+  bad:   { sky:[[0,'#252a3e'],[0.4,'#4c5268'],[0.7,'#8c8592'],[1,'#c4b7a6']],
+           sun:'#e6dccb', glow:'225,215,200', meadow:['#4f584a','#3c4438'], rim:'220,214,200',
+           cloud:'#8a8696', cloudLit:'220,212,200', path:'#a89c88', wall:'#b9ae9c', roof:'#5e4a46', light:false, birds:false, stars:0.6, mist:true },
+};
+const EPI_SUN={x:575, y:390, r:32}, EPI_HORIZON=406,   // 太陽は、手前の丘（家のある草地）のうしろに半分しずむ
+      EPI_HOUSE={x:122, base:380};
+const epiCache={};   // 結末ごとの、動かない部分の絵 {sky, land}
+const eRnd=i=>{ const v=Math.sin(i*91.7+17.3)*43758.5453; return v-Math.floor(v); };
+function epiSky(P){
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const c=cv.getContext('2d');
+  const g=c.createLinearGradient(0,0,0,EPI_HORIZON); for(const [o,col] of P.sky) g.addColorStop(o,col);
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+  const h=c.createRadialGradient(EPI_SUN.x,EPI_HORIZON,10,EPI_SUN.x,EPI_HORIZON,520);       // 地平線の、太陽のまわりの明るみ
+  h.addColorStop(0,`rgba(${P.glow},0.55)`); h.addColorStop(1,`rgba(${P.glow},0)`); c.fillStyle=h; c.fillRect(0,0,W,H);
+  return cv;
+}
+// 手前の丘（家・道・草地・花）
+function epiNear(P,kind){
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const c=cv.getContext('2d'), FL=H-EDGE;
+  // 手前の丘（家が建っている、なだらかな丘）
+  c.beginPath(); c.moveTo(0,H); c.lineTo(0,EPI_HOUSE.base-8);
+  c.bezierCurveTo(140,EPI_HOUSE.base-16, 300,EPI_HOUSE.base+6, 470,EPI_HOUSE.base+22);
+  c.bezierCurveTo(640,EPI_HOUSE.base+36, 780,EPI_HOUSE.base+26, W,EPI_HOUSE.base+30); c.lineTo(W,H); c.closePath();
+  const mg=c.createLinearGradient(0,EPI_HOUSE.base-16,0,FL); mg.addColorStop(0,P.meadow[0]); mg.addColorStop(1,P.meadow[1]); c.fillStyle=mg; c.fill();
+  c.strokeStyle=`rgba(${P.rim},0.4)`; c.lineWidth=1.2; c.beginPath(); c.moveTo(0,EPI_HOUSE.base-8);
+  c.bezierCurveTo(140,EPI_HOUSE.base-16, 300,EPI_HOUSE.base+6, 470,EPI_HOUSE.base+22); c.bezierCurveTo(640,EPI_HOUSE.base+36, 780,EPI_HOUSE.base+26, W,EPI_HOUSE.base+30); c.stroke();
+  // 家の戸口から、手前へのびる道（遠くは細く、手前は広く）
+  const dx=EPI_HOUSE.x+44, dy=EPI_HOUSE.base;
+  c.beginPath(); c.moveTo(dx-5,dy); c.bezierCurveTo(dx+30,dy+30, 330,FL-40, 470,FL);
+  c.lineTo(600,FL); c.bezierCurveTo(400,FL-44, dx+40,dy+26, dx+5,dy); c.closePath();
+  const pg=c.createLinearGradient(0,dy,0,FL); pg.addColorStop(0,P.path); pg.addColorStop(1,P.path); c.globalAlpha=0.75; c.fillStyle=pg; c.fill(); c.globalAlpha=1;
+  c.strokeStyle='rgba(90,66,40,0.35)'; c.lineWidth=1; c.stroke();
+  for(let i=0;i<24;i++){ const u=eRnd(i+40), x=dx+(500-dx)*u+(eRnd(i+70)-0.5)*40*u, y=dy+(FL-dy)*u;   // 道の小石
+    c.beginPath(); c.ellipse(x,y,1+u*2.4,0.6+u*1.2,0,0,Math.PI*2); c.fillStyle='rgba(110,90,64,0.45)'; c.fill(); }
+  // 草地の、草の筆あと
+  for(let i=0;i<160;i++){ const x=eRnd(i)*W, y=EPI_HOUSE.base+10+eRnd(i+300)*(FL-EPI_HOUSE.base-10), s=0.5+(y-EPI_HOUSE.base)/(FL-EPI_HOUSE.base);
+    c.strokeStyle=eRnd(i+5)<0.5?'rgba(40,52,26,0.35)':`rgba(${P.rim},0.18)`; c.lineWidth=0.9;
+    c.beginPath(); c.moveTo(x,y); c.lineTo(x+(eRnd(i+8)-0.5)*4*s,y-6*s); c.stroke(); }
+  // 小さな花（遠くは小さく）
+  const fc = kind==='bad' ? ['#cfc6b4','#a9a294'] : ['#f3ead0','#e8c35a','#d98aa8','#c9b0e0'];
+  for(let i=0;i<46;i++){ const x=eRnd(i+500)*W, y=EPI_HOUSE.base+20+eRnd(i+600)*(FL-EPI_HOUSE.base-24); if(x>dx-10&&x<560&&y>dy+(x-dx)*0.35) continue;
+    const s=0.6+(y-EPI_HOUSE.base)/(FL-EPI_HOUSE.base)*1.4; c.beginPath(); c.arc(x,y,1.3*s,0,Math.PI*2); c.fillStyle=fc[i%fc.length]; c.fill(); }
+  epiHouse(c,P);
+  return cv;
+}
+// おばあさんの家：木組みの壁・とんがり屋根（こけら板）・煙突・戸・窓・柵
+function epiHouse(c,P){
+  const x=EPI_HOUSE.x, b=EPI_HOUSE.base, w=88, wh=50, top=b-wh, INK='rgba(58,40,24,0.85)';
+  c.save(); c.lineJoin='round';
+  c.beginPath(); c.ellipse(x+w/2+8,b+2,w*0.62,5,0,0,Math.PI*2); c.fillStyle='rgba(30,22,14,0.25)'; c.fill();   // 足もとの影
+  // 壁（太陽は右下から：右の壁が明るい）
+  const wg=c.createLinearGradient(x,0,x+w,0); wg.addColorStop(0,'rgba(0,0,0,0.12)'); wg.addColorStop(1,'rgba(255,230,180,0.12)');
+  c.fillStyle=P.wall; c.fillRect(x,top,w,wh); c.fillStyle=wg; c.fillRect(x,top,w,wh);
+  c.strokeStyle='rgba(92,64,40,0.85)'; c.lineWidth=2.2;                                                       // 木組み
+  c.strokeRect(x,top,w,wh); c.beginPath(); c.moveTo(x,top+wh*0.45); c.lineTo(x+w,top+wh*0.45);
+  c.moveTo(x+w*0.3,top); c.lineTo(x+w*0.3,b); c.moveTo(x+w*0.72,top); c.lineTo(x+w*0.72,b);
+  c.moveTo(x,top); c.lineTo(x+w*0.3,top+wh*0.45); c.moveTo(x+w,top); c.lineTo(x+w*0.72,top+wh*0.45); c.stroke();
+  // 煙突
+  c.fillStyle='#8a6a58'; c.fillRect(x+w*0.68,top-40,12,30); c.strokeStyle=INK; c.lineWidth=1.3; c.strokeRect(x+w*0.68,top-40,12,30);
+  c.fillStyle='#6e5446'; c.fillRect(x+w*0.68-2,top-43,16,4);
+  // 屋根（こけら板の段）
+  c.beginPath(); c.moveTo(x-12,top+2); c.lineTo(x+w/2,top-44); c.lineTo(x+w+12,top+2); c.closePath();
+  const rg=c.createLinearGradient(x,top-44,x+w,top); rg.addColorStop(0,P.roof); rg.addColorStop(1,'rgba(255,200,140,0.0)');
+  c.fillStyle=P.roof; c.fill(); c.fillStyle='rgba(255,210,150,0.10)'; c.fill(); c.strokeStyle=INK; c.lineWidth=1.6; c.stroke();
+  c.save(); c.clip(); c.strokeStyle='rgba(40,20,14,0.35)'; c.lineWidth=1;
+  for(let k=1;k<6;k++){ const y=top+2-k*8; c.beginPath(); c.moveTo(x-14,y); c.lineTo(x+w+14,y); c.stroke();
+    for(let sx=x-12+(k%2)*5;sx<x+w+12;sx+=10){ c.beginPath(); c.moveTo(sx,y); c.lineTo(sx,y+8); c.stroke(); } }
+  c.restore();
+  // 戸（木の板・取っ手）と、窓（十字の桟）
+  c.fillStyle='#6a4a32'; c.fillRect(x+w*0.38,b-30,16,30); c.strokeStyle=INK; c.lineWidth=1.2; c.strokeRect(x+w*0.38,b-30,16,30);
+  c.fillStyle='#d9b25e'; c.beginPath(); c.arc(x+w*0.38+12,b-15,1.4,0,Math.PI*2); c.fill();
+  for(const wx of [x+10, x+w-26]){ c.fillStyle=P.light?'#ffcf72':'#4a4650'; c.fillRect(wx,top+8,16,14);
+    c.strokeStyle=INK; c.lineWidth=1.3; c.strokeRect(wx,top+8,16,14); c.beginPath(); c.moveTo(wx+8,top+8); c.lineTo(wx+8,top+22); c.moveTo(wx,top+15); c.lineTo(wx+16,top+15); c.stroke();
+    c.fillStyle='#7a3b32'; c.fillRect(wx-2,top+22,20,3); }                                   // 窓の下の花箱
+  // 柵（家の左右）
+  c.strokeStyle='rgba(92,70,46,0.9)'; c.lineWidth=1.6;
+  for(const [x0,x1] of [[x-40,x-6],[x+w+8,x+w+44]]){ for(let px=x0;px<=x1;px+=8){ c.beginPath(); c.moveTo(px,b+2); c.lineTo(px,b-12); c.stroke(); }
+    c.beginPath(); c.moveTo(x0-2,b-8); c.lineTo(x1+2,b-8); c.moveTo(x0-2,b-3); c.lineTo(x1+2,b-3); c.stroke(); }
+  c.restore();
+}
+function epiCloud(x,y,s,P,t){
+  ctx.save(); ctx.translate(x,y); ctx.scale(s,s);
+  const parts=[[0,0,38,13],[-30,4,24,10],[30,3,28,11],[-8,-9,22,11],[16,-7,20,9]];
+  for(const [px,py,rx,ry] of parts){ ctx.beginPath(); ctx.ellipse(px,py,rx,ry,0,0,Math.PI*2); ctx.fillStyle=P.cloud; ctx.globalAlpha=0.55; ctx.fill(); }
+  ctx.globalAlpha=0.6; ctx.fillStyle=`rgba(${P.cloudLit},0.9)`;                              // 太陽の側（下・右）のふちが光る
+  for(const [px,py,rx,ry] of parts){ ctx.beginPath(); ctx.ellipse(px+3,py+4,rx*0.85,ry*0.55,0,0,Math.PI); ctx.fill(); }
   ctx.restore();
 }
-// 空と遠くの景色は、いちばん奥（影を落とさない・影の受け手にもならない層）に描く。
+function epiNow(){ const kind=EPI_PAL[ending.kind]?ending.kind:'true', P=EPI_PAL[kind];
+  return epiCache[kind]||(epiCache[kind]={ sky:epiSky(P), near:epiNear(P,kind) }); }
+function drawEpilogue(){
+  if(!isEpi()) return;
+  const kind=EPI_PAL[ending.kind]?ending.kind:'true', P=EPI_PAL[kind], t=performance.now()/1000, FL=H-EDGE;
+  const C=epiNow();
+  ctx.save();
+  ctx.drawImage(C.sky,0,0);
+  // 星（空の上のほう。またたく）
+  for(let i=0;i<36;i++){ const x=eRnd(i+900)*W, y=eRnd(i+950)*170, a=P.stars*(1-y/190)*(0.45+0.55*Math.sin(t*(1.2+eRnd(i)*1.6)+i));
+    if(a<=0.02) continue; ctx.globalAlpha=a; ctx.fillStyle='#fff6dc'; ctx.beginPath(); ctx.arc(x,y,0.7+eRnd(i+3)*1.1,0,Math.PI*2); ctx.fill(); }
+  ctx.globalAlpha=1;
+  // 太陽：大きな光の輪と、ゆっくり回る光の筋（丘のうしろに半分しずむ）
+  const S=EPI_SUN, pulse=0.5+0.5*Math.sin(t*0.9);
+  const sg=ctx.createRadialGradient(S.x,S.y,S.r*0.6,S.x,S.y,S.r*5.5); sg.addColorStop(0,`rgba(${P.glow},${0.55+0.1*pulse})`); sg.addColorStop(1,`rgba(${P.glow},0)`);
+  ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(S.x,S.y,S.r*5.5,0,Math.PI*2); ctx.fill();
+  // 光の筋：太陽のそばは太く、外へ行くほど細くとがる（長い筋と短い筋を交互に）。外ほどうすい
+  const rg=ctx.createRadialGradient(S.x,S.y,S.r,S.x,S.y,S.r*6.5);
+  rg.addColorStop(0,`rgba(${P.glow},${0.5+0.1*pulse})`); rg.addColorStop(0.5,`rgba(${P.glow},${0.18+0.05*pulse})`); rg.addColorStop(1,`rgba(${P.glow},0)`);
+  ctx.save(); ctx.translate(S.x,S.y); ctx.rotate(t*0.03); ctx.translate(-S.x,-S.y); ctx.fillStyle=rg;
+  for(let i=0;i<16;i++){ const a=i/16*Math.PI*2, L=S.r*(i%2?4.2:6.5), w=i%2?0.12:0.17;   // w … 根もとの太さ（角度）
+    ctx.beginPath(); ctx.moveTo(S.x+Math.cos(a-w)*S.r*1.05, S.y+Math.sin(a-w)*S.r*1.05);
+    ctx.lineTo(S.x+Math.cos(a)*L, S.y+Math.sin(a)*L);                                  // 先は、とがる
+    ctx.lineTo(S.x+Math.cos(a+w)*S.r*1.05, S.y+Math.sin(a+w)*S.r*1.05); ctx.closePath(); ctx.fill(); }
+  ctx.restore();
+  // 太陽の円：白いふちの線は描かず、まん中から外へ、やわらかくぼける光の玉に
+  const sd=ctx.createRadialGradient(S.x,S.y,0,S.x,S.y,S.r*1.25);
+  sd.addColorStop(0,'rgba(255,253,242,1)'); sd.addColorStop(0.5,'rgba(255,246,214,1)'); sd.addColorStop(0.72,P.sun); sd.addColorStop(0.86,`rgba(${P.glow},0.6)`); sd.addColorStop(1,`rgba(${P.glow},0)`);
+  ctx.beginPath(); ctx.arc(S.x,S.y,S.r*1.25,0,Math.PI*2); ctx.fillStyle=sd; ctx.fill();
+  const st=ctx.createLinearGradient(S.x-260,0,S.x+260,0); st.addColorStop(0,`rgba(${P.glow},0)`); st.addColorStop(0.5,`rgba(255,248,225,${0.55+0.15*pulse})`); st.addColorStop(1,`rgba(${P.glow},0)`);
+  ctx.fillStyle=st; ctx.fillRect(S.x-260,EPI_HORIZON-4,520,3);                                  // 地平線に、太陽の光の線
+  // 雲（ゆっくり流れる）
+  for(const [x0,y,s,v] of [[120,96,1.1,5],[430,64,0.8,3.5],[640,150,1.25,4.2],[860,110,0.9,6]]){
+    const x=((x0+t*v)%(W+200))-100; epiCloud(x,y,s,P,t); }
+  // 鳥（遠くを、羽ばたきながら）
+  if(P.birds) for(let i=0;i<4;i++){ const x=((i*230+t*(18+i*3))%(W+120))-60, y=170+i*18+Math.sin(t*0.7+i)*8, f=Math.sin(t*7+i*1.7)*3.2;
+    ctx.strokeStyle='rgba(50,36,40,0.7)'; ctx.lineWidth=1.3; ctx.beginPath(); ctx.moveTo(x-6,y-f); ctx.quadraticCurveTo(x-3,y-2,x,y); ctx.quadraticCurveTo(x+3,y-2,x+6,y-f); ctx.stroke(); }
+  // 朝もや（夜明け）：手前の丘のうしろを、ゆっくり流れる
+  if(P.mist) for(let i=0;i<5;i++){ const x=((i*230+t*8)%(W+300))-150, y=EPI_HORIZON-4+i%2*8;
+    const g=ctx.createRadialGradient(x,y,4,x,y,150); g.addColorStop(0,'rgba(240,236,232,0.28)'); g.addColorStop(1,'rgba(240,236,232,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(x,y,150,22,0,0,Math.PI*2); ctx.fill(); }
+  ctx.restore();
+}
+/* 手前の丘（家・道・草地）と、その上に立つ木・茂み：ほかのステージの木と同じ「奥の物」の層（'back'）に描く。
+   → 丘と家と木は、右上に影を落とす。人物の影は、丘や木の上では近く・濃く、丘の向こう（空・遠い丘）では遠く・うすく落ちる */
+function drawEpilogueNear(){
+  if(!isEpi()) return;
+  ctx.drawImage(epiNow().near,0,0);
+  if(window.GTDecor){ const dim=GT.isBright&&!GT.isBright(); ctx.save(); if(dim) ctx.filter='saturate(0.4) brightness(0.55)';   // 暗い場面では、ほかの飾りと同じく色をおさえる
+    for(const d of EPI_BACK_DECOR) GTDecor.draw(ctx,d.kind,d.x,d.y,d.w,d.h); ctx.restore(); }
+}
+/* 煙突の煙・窓の明かり・ホタル：影を落とさない（'backflat'。丘と木の上に描く） */
+function drawEpilogueFx(){
+  if(!isEpi()) return;
+  const kind=EPI_PAL[ending.kind]?ending.kind:'true', P=EPI_PAL[kind], t=performance.now()/1000, FL=H-EDGE;
+  ctx.save();
+  // 煙突の煙と、窓の明かり（救えなかった結末では、どちらもない）
+  const hx=EPI_HOUSE.x, hb=EPI_HOUSE.base, top=hb-50;
+  if(P.light){
+    for(let i=0;i<6;i++){ const k=(t*0.22+i/6)%1, sx=hx+88*0.68+6+Math.sin(k*6+i)*6*k+k*26, sy=top-44-k*90;
+      ctx.globalAlpha=0.32*(1-k); ctx.fillStyle='#e8e0d6'; ctx.beginPath(); ctx.ellipse(sx,sy,5+k*12,4+k*8,0,0,Math.PI*2); ctx.fill(); }
+    const fl=0.75+0.15*Math.sin(t*5)+0.1*Math.sin(t*13);
+    for(const wx of [hx+10, hx+88-26]){ const g=ctx.createRadialGradient(wx+8,top+15,2,wx+8,top+15,26);
+      g.addColorStop(0,`rgba(255,200,110,${0.55*fl})`); g.addColorStop(1,'rgba(255,200,110,0)'); ctx.globalAlpha=1; ctx.fillStyle=g; ctx.fillRect(wx-20,top-10,56,50); }
+  }
+  ctx.globalAlpha=1;
+  // ホタル（夕暮れ）：草地の上を、ふわふわ
+  if(P.fly) for(let i=0;i<12;i++){ const x=(eRnd(i+70)*W+Math.sin(t*0.6+i)*30+W)%W, y=FL-30-eRnd(i+80)*70+Math.sin(t*0.9+i*2)*10, a=0.5+0.5*Math.sin(t*2.4+i*1.3);
+    const g=ctx.createRadialGradient(x,y,0.5,x,y,7); g.addColorStop(0,`rgba(255,240,160,${0.9*a})`); g.addColorStop(1,'rgba(255,240,160,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2); ctx.fill(); }
+  ctx.restore();
+}
+// 空と遠い丘は、いちばん奥（影を落とさない・影の受け手にもならない層）に描く。
 // （'back' に描くと、画面いっぱいの半透明の空が「奥の物」あつかいになり、人物の影が近い影と遠い影の二重になっていた）
 GT.registerDraw(drawEpilogue,'backpre');
+GT.registerDraw(drawEpilogueNear,'back');
+GT.registerDraw(drawEpilogueFx,'backflat');
 
 /* エンディングの画面（最前面） */
 function drawEndCard(){
@@ -459,6 +629,7 @@ GT.registerScene({ id:'ending', type:'end',  label:'第一章 ── 戦いの�
 // 外の場面：少年が歩いて、マリ（と、助かった人たち）に話しかける。マリと話し終えると、エンディングの画面
 GT.registerScene({
   id:'epilogue', type:'story', stage:'epilogue_out', label:'第一章 ── 外',
+  shadowScale:0.6,   // 明るい空の上では影が目立ちすぎるので、ほかの場面の 6割の濃さに
   intro:[ {s:'',c:'narr',get t(){ return OUTSIDE[ending.kind]||OUTSIDE.true; }, act:'epi-setup'},
           {s:'',c:'narr',get t(){ return ending.kind==='bad' ? '……そこには、もう誰もいなかった。' : '外には、見知った顔があった。'; }},],
   npcs:[
@@ -481,7 +652,7 @@ GT.registerUpdate(()=>{ if(!isEpi() || ending.kind!=='bad' || epiSay.said || GT.
 function backToMari(){
   GT.mode='idle';
   GT.beginDialogue([{s:'少年',c:'boy',t:'……マリが待っているページに戻ろう。本を開いて、「森の出口」のページへ。'}],null,()=>{ GT.hideDialogue(); GT.mode='play';
-    GT.guideToBook&&GT.guideToBook('本を開いて、「森の出口」へ','komichi','mari_gate'); });   // 栞の Book と、本の中の「森の出口」のボタンが光る
+    GT.guideToBook&&GT.guideToBook('本を開いて、「森の出口」へ','forest_exit','mari_gate'); });   // 栞の Book と、本の中の「森の出口」のボタンが光る
 }
 /* 本から「森の出口」へもどるとき：お話を読み終えていれば、マリが待っている森の出口（afterword）へ。いまの分岐のまま */
 GT.bookJump=id=>{

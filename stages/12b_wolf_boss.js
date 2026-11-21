@@ -44,6 +44,7 @@ GT.defineStage('wolf_boss', {
 const DIZZY=1.8;                       // 目を回している時間(秒)
 const GRIP=1.4;                        // 裏返されたとき、床にしがみつく時間(秒)。空中では裏返せないので、少年が着地してから裏返し直せる長さにしてある
 const DIZZY_SPEED=900;                 // これより速く打ちつけられると目を回す
+const WOLF_NEAR=14;                    // 少年がこれより近く（左右のずれ）にいれば、狼は歩かずに立ちどまる（真上にいるとき、震えないように）
 let wolf=null;
 GT.getBoss=()=>wolf;   // 現在の狼を取り出す（デバッグ・動作確認用）
 const fx={ pops:[], stars:[], banner:null, hintOff:false, last:performance.now() };   // 演出
@@ -96,8 +97,12 @@ function updateWolf(dt){
     if(wolf.windup<=0 && wolf.onGround){ wolf.vy=-560*wg; wolf.vx=wolf.dir*(wolf.enraged?380:300); }
   }
   else{
-    wolf.lungeCD-=dt; const dir=(player.x<wolf.x)?-1:1; wolf.dir=dir;
-    wolf.x+=dir*speed*dt;
+    wolf.lungeCD-=dt;
+    // 少年のほうへ歩く。中心どうしで比べ、ほぼ真上・真下（WOLF_NEAR 以内）なら立ちどまる。
+    // （前は、一歩で少年を通り越しては向きを変えるのを毎フレームくり返して、ぶるぶる震えていた）
+    const dx=(player.x+player.w/2)-(wolf.x+wolf.w/2);
+    if(Math.abs(dx)>WOLF_NEAR){ const dir=dx<0?-1:1; wolf.dir=dir;
+      wolf.x+=dir*Math.min(speed*dt, Math.abs(dx)-WOLF_NEAR); }   // 通り越さない
     if(wolf.lungeCD<=0&&wolf.onGround){ wolf.windup=wolf.enraged?0.32:0.5; wolf.lungeCD=wolf.enraged?1.0:1.6; }
   }
   wolf.vy+=GT.GRAVITY*wg*dt; wolf.x+=(wolf.vx||0)*dt; wolf.vx=(wolf.vx||0)*0.9;

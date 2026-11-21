@@ -50,7 +50,7 @@ GT.defineStage('cliff', {
 
 GT.registerScene({
   id:'cliff', type:'play', stage:'cliff', clear:'exit', label:'第一章 ── 森の崖',
-  onClear:()=>GT.fillPage('cliff','――道の先に、高い崖があった。少年は、左右で重さの向きがちがうページを使って木箱を天井と床へ運び、踏み台にして崖をのぼった。'),   // 崖を越えたら、本の「森の崖」のページに書きこまれる
+  onClear:()=>GT.fillPage('cliff','――高い崖を、木箱を踏み台にしてのぼった。'),   // 崖を越えたら、本の「森の崖」のページに書きこまれる
   intro:[
     {s:'赤ずきん',c:'hood',f:'surprise',t:'わあ、高い崖……。その本で、なんとかならない？'},
   ],

@@ -67,8 +67,8 @@ function HOOD_LINES(){
 /* 道を決めたら、本の「分かれ道」のページに書きこむ（ピースは、赤ずきんのところから本へ） */
 function crossPage(){
   GT.fillPage('crossroads', GT.flags.route==='shortcut'
-    ? '――分かれ道で、少年は、いばらにおおわれた近道を選んだ。赤ずきんとは、おばあさんの家で会う約束をして別れた。'
-    : '――分かれ道で、少年は、赤ずきんと一緒に、水車小屋をまわる遠回りの道を選んだ。');
+    ? '――少年は、いばらの近道を選び、赤ずきんと別れた。'
+    : '――少年は、赤ずきんと一緒に、遠回りの道を選んだ。');
   GT.storyPiece&&GT.storyPiece('crossroads','crossroads:story','hood');
 }
 const ROUTES={

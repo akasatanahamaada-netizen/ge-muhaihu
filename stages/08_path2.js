@@ -10,7 +10,7 @@
   const isP2=()=>GT.scene&&GT.scene.id==='path2'; let given=false;
   GT.registerSceneReset(()=>{ if(isP2()) given=false; });
   GT.registerUpdate(()=>{ if(!isP2()||given||!GT.enemies.length||GT.enemies.some(e=>e.alive)) return;
-    given=true; const e=GT.enemies[GT.enemies.length-1]; GT.addPagePiece('wolf','wolf:road',{x:e.x,y:e.y-10,w:e.w,h:e.h}); });   // 狼の手下を全部倒すと、お話のかけら（遠回りの「お花を全部摘む」と同じかけら）
+    given=true; const e=GT.enemies[GT.enemies.length-1]; GT.addPagePiece('road','wolf:road',{x:e.x,y:e.y-10,w:e.w,h:e.h}); });   // 敵を全部倒すと、本の「おばあさんの家への道」のピース（遠回りの「お花を全部摘む」と同じピース）
 })();
 GT.defineStage('path2', {
   // お話のかけら（光の玉）：拾わなくても先へ進める（itemsOptional）。拾うと、本の「おばあさんの家への道」のページが埋まっていく
@@ -56,11 +56,12 @@ GT.defineStage('path2', {
     {layer:'front', kind:'fern', x:790, y:400, w:75, h:70},
     {layer:'front', kind:'grass', x:745, y:385, w:60, h:79},
   ],
-  mission:['enemies','items'],   // かけらは拾わなくてもよい（itemsOptional）   // 狼の手下を全部倒すまで、右の端は閉じている（木箱を上から落として倒す）
+  mission:['enemies','items'],   // かけらは拾わなくてもよい（itemsOptional）   // 敵を全部倒すまで、右の端は閉じている（木箱を上から落として倒す）
 });
 
 GT.registerScene({
   id:'path2', type:'play', stage:'path2', clear:'exit',
+  onClear:()=>GT.fillPage('road','――少年は、ひとりで、暗い近道へふみこんだ。'),
   label:'第一章 ── 近道',
   dynamic:'shortcutOnly',   // 近道のときだけ遊ぶ（07_crossroads.js）
 });

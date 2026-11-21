@@ -62,6 +62,7 @@ GT.defineStage('path3', {
 
 GT.registerScene({
   id:'path3', type:'play', stage:'path3', clear:'exit',
+  onClear:()=>GT.fillPage('road','――赤ずきんと、お花を摘みながら、水車小屋への道を歩いた。'),
   companion:'hood',         // 遠回り：赤ずきんが、うしろからついてくる
   label:'第一章 ── 遠回りの道 ①',
   dynamic:'detourOnly',     // 遠回りのときだけ遊ぶ（07_crossroads.js）

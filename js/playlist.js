@@ -25,29 +25,40 @@ GT.chapters = [
 //        そのページの「お話のかけら」を集めるほど読めるようになる。
 //        分岐のあるページは、たどり着く前はこの文章で、たどり着くと、選んだ道の文章（GT.fillPage）になる。
 GT.definePages([
-  {key:'prologue', chapter:'序章',   title:'森での目覚め',
-   base:'――少年は、空から暗い森へ落ちてきた。そばには、ところどころ欠けた本が落ちていた。そして、木の陰にいた少女と出会った。少女は、マリと名乗った。',
+  {key:'wake',     chapter:'序章',   title:'空から落ちて',
+   base:'――少年は、空から暗い森へ落ちてきた。', fillOn:['wake']},   // 目覚め（00a_wake.js）。来たら書きこまれる
+  {key:'prologue', chapter:'序章',   title:'マリとの出会い',
+   base:'――暗い森で、少年は、マリという少女と出会った。',
    // かけら（オープニングの3つ）のほかに、マリとの会話で手に入るピース。これが埋まるまで、reveal の文は読めない
-   extraPieces:[{id:'opening:mari', reveal:'そして、木の陰にいた少女と出会った。少女は、マリと名乗った。'}]},
+   extraPieces:[{id:'opening:mari', reveal:'マリという少女と出会った。'}]},
   {key:'komichi',  chapter:'序章',   title:'森の小道',
-   base:'――少年は、マリと別れて、森の小道を進んだ。本を裏返すと、そのページの重さの向きが変わる。少年は天井を歩いて大木を越え、木箱を押して道をひらいた。森の出口でマリは言った。この先には、絵本の世界が広がっている、と。',
-   extraPieces:[{id:'komichi:foe', reveal:'木箱を押して道をひらいた。'}]},   // 森の小道②の、狼の手下を倒すと手に入る
+   base:'――少年は、本を裏返して、森の小道を進んだ。'},   // 森の小道①（かけらは 01_komichi1.js）
+  {key:'komichi2', chapter:'序章',   title:'道をふさぐ敵',
+   base:'――小道の先で、敵が道をふさいでいた。', fillOn:['komichi2'],
+   extraPieces:[{id:'komichi:foe', reveal:'敵が道をふさいでいた。'}]},   // 森の小道②の、敵を倒すと手に入る
+  {key:'forest_exit', chapter:'序章', title:'森の出口',
+   base:'――森の出口で、マリは言った。この先には、絵本の世界が広がっている、と。', fillOn:['mari_gate']},
   {key:'window',   chapter:'第一章', title:'窓の向こう',
-   base:'――窓の向こうで、母親が赤ずきんにお使いを頼んでいた。カスタードとバターの小瓶を、おばあさんのもとへ。',
-   extraPieces:[{id:'window:story', reveal:'カスタードとバターの小瓶を、おばあさんのもとへ。'}]},   // 窓をのぞいたあと、マリと話すと
+   base:'――窓の向こうで、赤ずきんがお使いを頼まれていた。行き先は、おばあさんの家。',
+   extraPieces:[{id:'window:story', reveal:'行き先は、おばあさんの家。'}]},   // 窓をのぞいたあと、マリと話すと
+  {key:'forest_path', chapter:'第一章', title:'森の道',
+   base:'――少年は、赤ずきんの家をあとにして、森の道を進んだ。', fillOn:['path1']},   // 森の道①（かけらは 04_path1.js）
   {key:'meet',     chapter:'第一章', title:'赤い頭巾の少女',
-   base:'――赤い頭巾の少女と出会い、道連れになった。少年が本を裏返すと、少女も一緒に、水たまりの上を越えた。',
-   extraPieces:[{id:'meet:story', reveal:'赤い頭巾の少女と出会い、道連れになった。'}]},   // 赤ずきんと話したあと
+   base:'――赤い頭巾の少女と、一緒に歩くことになった。',
+   extraPieces:[{id:'meet:story', reveal:'赤い頭巾の少女と、一緒に歩くことになった。'}]},   // 赤ずきんと話したあと
   {key:'cliff',    chapter:'第一章', title:'森の崖',
-   base:'――道の先に、高い崖があった。少年は、左右で重さの向きがちがうページを使って木箱を天井と床へ運び、踏み台にして崖をのぼった。'},   // 森の崖のかけら（05b_cliff.js）。崖を越えると書きこまれる
+   base:'――高い崖を、木箱を踏み台にしてのぼった。'},   // 森の崖のかけら（05b_cliff.js）。崖を越えると書きこまれる
   {key:'wolf',     chapter:'第一章', title:'森で出会った狼',
    base:'――狼は、脇道へ消えていった。',
-   extraPieces:[{id:'wolf:story'},{id:'wolf:road'}]},   // 狼と話したあと／近道で狼の手下を全部倒す・遠回りでお花を全部摘む（どちらでも同じかけら）
+   extraPieces:[{id:'wolf:story'}]},   // 狼と話したあと（このページは、狼との会話だけで埋まる）
   {key:'crossroads', chapter:'第一章', title:'分かれ道',
-   base:'――森の道は、二つに分かれていた。いばらにおおわれた近道と、水車小屋をまわる明るい遠回りの道。',
+   base:'――森の道は、近道と遠回りに分かれていた。',
    extraPieces:[{id:'crossroads:story'}]},   // 分かれ道で、どちらの道を行くか決めたとき
   {key:'road',     chapter:'第一章', title:'おばあさんの家への道',
-   base:'――少年は、おばあさんの家へと急いだ。'},   // 近道①②・遠回りの道①②のかけら（どちらの道でも同じかけら）。道を抜けると、選んだ道の文章が書きこまれる
+   base:'――少年は、おばあさんの家へと急いだ。',   // 近道①・遠回り①のかけら（どちらの道でも同じかけら）。道を抜けると、選んだ道の文章が書きこまれる
+   extraPieces:[{id:'wolf:road'}]},   // 近道①で敵を全部倒す／お花畑でお花を全部摘む（どちらでも同じピース。どちらも、このページのステージ）
+  {key:'road2',    chapter:'第一章', title:'家の近くまで',
+   base:'――森の奥に、おばあさんの家が見えてきた。'},   // 近道②・遠回り②のかけら（どちらの道でも同じかけら）
   {key:'front',    chapter:'第一章', title:'おばあさんの家の前',
    base:'――赤ずきんは掛け金を引き、おばあさんの家へ入っていった。',
    extraPieces:[{id:'front:story'}]},   // 家の前で、決めたあと
@@ -57,6 +68,10 @@ GT.definePages([
   {key:'result',   chapter:'第一章', title:'第一章の結末',
    base:'――赤ずきんは、狼に食べられてしまった。'},
 ]);
+// 分かれ道のないページ（fillOn）は、そのステージに来たら、本に書きこまれる
+GT.onSceneStart(sc=>{ if(!sc) return;
+  for(const p of GT.pageRecord){ const def=GT.pageInfo&&GT.pageInfo[p.key]; if(p.filled || !def || !(def.fillOn||[]).includes(sc.id)) continue;
+    GT.fillPage(p.key, GT.pageBases[p.key]); } });
 
 // 分岐フラグの初期値（各ステージの choices が書き換える）
 GT.flags = { playerName:null, mariNamed:false, bookmarkTip:false, warnedHood:false, route:null, stoppedAtDoor:false, saved:null, grannyAlive:null,
@@ -72,11 +87,11 @@ GT.playlist = [
   'chapter_select', // 章をえらぶ画面（赤ずきんと狼のシルエット。Begin で第一章へ）。本がひらく章のとびら 'chapter1' は、いったん保留
   'house_peek',   // 赤ずきんの家・窓のぞき（story）
   'path1',        // 森の道①（play）
-  'meet_hood',    // 赤ずきんと道連れに（story）
+  'meet_hood',    // 赤ずきんと一緒に歩く（story）
   'cliff',        // 森の崖（play・木箱を天井と床へ運ぶ謎解き）
   'wolf_talk',    // 狼（story・分岐：危険を告げるか）
   'crossroads',   // 分かれ道（story・分岐：近道か遠回りか）
-  'path2',        // 近道①（play・近道のときだけ。狼の手下を全部倒すと進める）
+  'path2',        // 近道①（play・近道のときだけ。敵を全部倒すと進める）
   'path2b',       // 近道②（play・近道のときだけ。いばらのトンネル）
   'flowers',      // お花畑（play・遠回りのときだけ。お花を6本摘む）
   'path3',        // 遠回りの道①（play・遠回りのときだけ）
@@ -133,7 +148,8 @@ GT.sceneMood = {
   afterword:0.3, mari_gate:0.3,
   // 第一章（赤ずきんのお話）は 0：ゴシックにする前と同じ、明るい絵本の雰囲気（色合いをかけない）
   house_peek:0, path1:0, meet_hood:0, cliff:0, wolf_talk:0, crossroads:0, path2:0, path2b:0, flowers:0, path3:0, path4:0,
-  house_front:0, arrive:0, '@boss':0, '@qte':0, ending:0, epilogue:0,
+  house_front:0, arrive:0, '@boss':0, '@qte':0, ending:0,
+  epilogue:f=>f.saved===false?0.3:0,   // 外の場面：赤ずきんも救えなかった結末だけ、少し暗く沈んだ色に（木や草の色も、空に合わせて おさえる）
 };
 
 // 音楽（BGM）：シーンの id ごとに流す曲（assets/music/ フォルダの mp3）。ループ再生する。

@@ -56,6 +56,10 @@ const css=`
 .bv-title .t2{ font-size:clamp(11px,1.9cqw,45px); letter-spacing:0.14em; color:#5a4a33; }
 .bv-title .orn{ color:#b08d57; font-size:clamp(12px,2.2cqw,50px); }
 .bv-title .t3{ font-size:clamp(10px,1.45cqw,35px); color:#8a7350; letter-spacing:0.08em; margin-top:1em; }
+.bv-title .t3.bv-endn{ margin-top:0.25em; }
+.bv-ends{ font-family:'Cormorant Garamond',serif; font-weight:700; font-size:clamp(11px,1.6cqw,38px); color:#b3a283; letter-spacing:0; }   /* 見たエンディングの印（A・B・C。見ていないものは ？）。名前は、カーソルを乗せると出る */
+.bv-ends .seen{ color:#9e2a32; } .bv-ends i{ font-style:normal; color:#c9b993; margin:0 0.1em; }
+.bv-title:has(.bv-ends){ gap:0.3em; } .bv-title:has(.bv-ends) .t3{ margin-top:0.5em; } .bv-title:has(.bv-ends) .t3.bv-endn{ margin-top:0; }   /* 下の赤ずきんと狼の絵にかからないよう、文字をつめて上へ */
 .bv-artwrap{ position:relative; width:78%; margin:0 auto 0.4em; }
 .bv-artwrap .bv-art{ width:100%; margin:0; }
 .bv-arthole{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
@@ -131,10 +135,31 @@ const css=`
 .bv-gos .bv-go:hover{ color:#5a3f1c; background:#f8efd8 linear-gradient(180deg, rgba(255,253,245,0.8), rgba(232,212,170,0.4)); border-color:#d4a94a;
   transform:translate(-1px,1px); box-shadow:inset 0 0 0 2px #fbf3df, inset 0 0 0 3px rgba(212,169,74,0.9), 7px -6px 0 rgba(40,26,14,0.24); }   /* 浮くと、影は遠くへ */
 .bv-gos .bv-go:active{ transform:translate(2px,-2px); box-shadow:inset 0 0 0 2px #f6ecd4, inset 0 0 0 3px rgba(184,145,63,0.75), 2px -1px 0 rgba(40,26,14,0.3); }   /* 押すと、影は近くへ */
-/* 誘導中に光らせるボタン（GT.guideToBook の 3つめの引数。例：お話のあと「森の出口」へ）：金の縁が光る */
-.bv-gos .bv-go.glow{ animation:bvGoGlow 0.9s ease-in-out infinite alternate; }
-@keyframes bvGoGlow{ from{ border-color:#b8913f; box-shadow:inset 0 0 0 2px #f6ecd4, inset 0 0 0 3px rgba(184,145,63,0.75), 5px -4px 0 rgba(40,26,14,0.28), 0 0 0 0 rgba(255,214,110,0); }
-  to{ border-color:#f0c860; box-shadow:inset 0 0 0 2px #fff6dc, inset 0 0 0 3px rgba(240,200,96,1), 5px -4px 0 rgba(40,26,14,0.28), 0 0 16px 5px rgba(255,214,110,0.9); } }
+/* 誘導中に光らせるボタン（GT.guideToBook の 3つめの引数。例：お話のあと「森の出口」へ）。
+   順番：まず栞（Book）が光る → 本を開くと、本が開ききってから（1.3秒後）このボタンが光り、うしろから金色の光の筋が放射状に広がる */
+.bv-gos{ isolation:isolate; transition:opacity .45s ease; }   /* 光の筋（z-index:-1）を、ページの上・ボタンのうしろに描くため */
+.bv-gos .bv-go{ z-index:auto; }   /* 光っているボタンだけが、めくれる紙の上に浮かないように */
+/* ページをめくっているあいだは、ステージのボタンを出さない（めくり終わってから、ふわっと出す） */
+.bv-book.bv-turning .bv-gos{ opacity:0; transition:none; pointer-events:none; }
+.bv-gos .bv-go.glow{ position:relative; animation:bvGoGlow 0.8s ease-in-out 1.3s infinite alternate; }
+@keyframes bvGoGlow{
+  from{ border-color:#d4a94a; background-color:#f6ecd0; transform:scale(1);
+    box-shadow:inset 0 0 0 2px #fff6dc, inset 0 0 0 3px rgba(240,200,96,1), 5px -4px 0 rgba(40,26,14,0.28), 0 0 10px 3px rgba(255,214,110,0.7); }
+  to{ border-color:#ffd970; background-color:#fff4d6; transform:scale(1.08);
+    box-shadow:inset 0 0 0 2px #fffaf0, inset 0 0 0 3px rgba(255,217,112,1), 5px -4px 0 rgba(40,26,14,0.28), 0 0 22px 8px rgba(255,214,110,1), 0 0 46px 16px rgba(255,190,80,0.6); } }
+/* ボタンのうしろから、金色の光の筋が放射状に。回さずに、ピカピカまたたく（本が開ききるまでは出さない）。
+   光は控えめに：筋は細く・うすく、広がりもボタンの 1.6倍まで */
+.bv-gos .bv-go.glow::after{ content:''; position:absolute; left:50%; top:50%; width:160%; aspect-ratio:1; z-index:-1; pointer-events:none;
+  background:repeating-conic-gradient(from 6deg, rgba(255,214,110,0.75) 0deg 3deg, rgba(255,214,110,0) 3deg 22.5deg);
+  -webkit-mask:radial-gradient(circle, #000 22%, rgba(0,0,0,0.4) 42%, transparent 68%); mask:radial-gradient(circle, #000 22%, rgba(0,0,0,0.4) 42%, transparent 68%);
+  opacity:0; transform:translate(-50%,-50%); animation:bvGoTwinkle 1.6s ease-in-out 1.3s infinite; }
+@keyframes bvGoTwinkle{
+  0%  { opacity:0.15; transform:translate(-50%,-50%) scale(0.92); }
+  18% { opacity:0.75; transform:translate(-50%,-50%) scale(1.02); }
+  32% { opacity:0.2;  transform:translate(-50%,-50%) scale(0.95); }
+  50% { opacity:0.65; transform:translate(-50%,-50%) scale(1);    }
+  70% { opacity:0.15; transform:translate(-50%,-50%) scale(0.93); }
+  100%{ opacity:0.15; transform:translate(-50%,-50%) scale(0.92); } }
 .bv-silbox{ position:absolute; inset:2.2% 3%; overflow:hidden; pointer-events:none; }   /* ページのふちの罫の内がわに収める */
 .bv-sil{ position:absolute; bottom:0; width:auto; pointer-events:none; filter:drop-shadow(6px -4px 0 rgba(40,26,14,0.2)); }   /* ページの下の角いっぱいに（ページのふちで切れる） */
 .bv-sil.hood{ left:-14%; height:45%; }    /* 左半身は、ページの左のふちで見切れる */
@@ -190,6 +215,13 @@ const CHAP_SILS={
   '第一章':`<div class="bv-silbox"><img class="bv-sil hood" alt="" src="${encodeURI('assets/character/とびら_赤ずきん上半身.webp')}"><img class="bv-sil wolf" alt="" src="${encodeURI('assets/character/とびら_狼上半身.webp')}"></div>`,
 };
 // どのページにも、同じ「はしの よれ」をつける（よれのないページだけ大きく見えないように、左右のページの大きさをそろえる）
+// 第一章のとびら：見たエンディングの数と名前（見ていないものは「？？？」）。GT.endingsSeen は menu.js、名前は 12_grannys_house.js の GT.ENDINGS
+function endingsHTML(chapter){
+  if(chapter!=='第一章' || !GT.ENDINGS) return '';
+  const seen=GT.endingsSeen?GT.endingsSeen():[], keys=Object.keys(GT.ENDINGS), n=keys.filter(k=>seen.includes(k)).length;
+  return `<div class="t3 bv-endn">見たエンディング　${n} / ${keys.length}</div><div class="bv-ends">${keys.map(k=>{ const e=GT.ENDINGS[k], s=seen.includes(k);
+    return `<span class="${s?'seen':''}" title="${s?esc('エンディング '+e.mark+'「'+e.title+'」'):'まだ見ていないエンディング'}">${s?esc(e.mark):'？'}</span>`; }).join('<i>・</i>')}</div>`;
+}
 function slotHTML(slot){ const h=slotInner(slot); return h.includes('bv-worm') ? h : h+holes(slot,0); }
 function slotInner(slot){
   const rec=GT.pageRecord, en=entries()[slot];
@@ -199,7 +231,7 @@ function slotInner(slot){
     const done=pages.filter(p=>{ const pc=pieces(p); return p.filled && pc.found>=pc.total; }).length;
     return `<div class="bv-title"><div class="orn">❦</div><div class="t1 bv-chap">${esc(c.name)}</div>
       ${c.sub?`<div class="t2">「${esc(c.sub)}」</div>`:''}<div class="orn">· · ·</div>
-      <div class="t3">埋まったページ　${done} / ${pages.length}</div>${CHAP_SILS[en.name]||''}</div>`;
+      <div class="t3">埋まったページ　${done} / ${pages.length}</div>${endingsHTML(en.name)}${CHAP_SILS[en.name]||''}</div>`;
   }
   if(!en || en.type!=='page') return `<div class="bv-blank">❧</div>`;
   const p=en.p, pno=en.no;
@@ -222,17 +254,22 @@ function slotInner(slot){
 }
 /* ページ（playlist.js の GT.definePages の key）と、そのページにふくまれるステージ（シーンの id。物語の順）。
    そのページのボタンから、どのステージへも行ける（一度来たステージだけ出る。近道・遠回りは、通ったほうだけ） */
-const PAGE_SCENES={
-  prologue:['wake','opening'],
-  komichi: ['komichi1','komichi2','mari_gate'],
-  window:  ['house_peek','path1'],
-  meet:    ['meet_hood'],
-  cliff:   ['cliff'],
-  wolf:    ['wolf_talk'],
-  crossroads:['crossroads'],
-  road:    ['path2','path2b','flowers','path3','path4'],
-  front:   ['house_front'],
-  granny:  ['arrive'],
+const PAGE_SCENES={   // 1ページのボタンは、多くても 2つ（近道・遠回りは、通ったほうだけ出る）
+  wake:       ['wake'],
+  prologue:   ['opening'],
+  komichi:    ['komichi1'],
+  komichi2:   ['komichi2'],
+  forest_exit:['mari_gate'],
+  window:     ['house_peek'],
+  forest_path:['path1'],
+  meet:       ['meet_hood'],
+  cliff:      ['cliff'],
+  wolf:       ['wolf_talk'],
+  crossroads: ['crossroads'],
+  road:       ['path2','flowers','path3'],   // 近道① ／ お花畑・遠回り①
+  road2:      ['path2b','path4'],            // 近道② ／ 遠回り②
+  front:      ['house_front'],
+  granny:     ['arrive'],
 };
 // ボタンに出す名前：ステージの label から「第一章 ── 」などの章の名前をはずしたもの
 const stageName=id=>String(GT.sceneName ? GT.sceneName(id) : id).replace(/^.*?──\s*/,'');
@@ -318,7 +355,7 @@ function updateNav(){                                         // 前へ・次へ
    （先に入れかえると、細くなった紙のうしろから、次のページが先に見えてしまう） */
 function turn(dir){
   const to=spread+dir; if(turning || lidAnim || to<0 || to>=spreads()) return;
-  turning=true; GT.sfx&&GT.sfx('page');
+  turning=true; book.classList.add('bv-turning'); GT.sfx&&GT.sfx('page');
   const rect=book.getBoundingClientRect(), BW=rect.width, BH=rect.height, SP=BW/2;
   const frontSlot = dir>0 ? spread*2+1 : spread*2;            // めくる紙の表（いまのページ）
   const backSlot  = dir>0 ? to*2       : to*2+1;              // めくる紙の裏（次の見開きのページ）
@@ -365,7 +402,8 @@ function turn(dir){
     g.font=`700 ${Math.round(fs*1.35)}px 'Caveat', cursive`; g.textAlign='center'; g.textBaseline='middle';
     g.fillText('Turning the page…', BW/2, BH-BH*(38/480)); g.restore();
     if(p<1) requestAnimationFrame(frame);
-    else { show(); front.leaf.remove(); back.leaf.remove(); dimEl.remove(); cv.remove(); turning=false; }   // 紙がおりきったら、倒れた先のページも次の見開きに
+    else { show(); front.leaf.remove(); back.leaf.remove(); dimEl.remove(); cv.remove(); turning=false;
+      requestAnimationFrame(()=>{ if(!turning) book.classList.remove('bv-turning'); }); }   // ボタンは、めくり終わってから出す   // 紙がおりきったら、倒れた先のページも次の見開きに
   }
   requestAnimationFrame(frame);
 }

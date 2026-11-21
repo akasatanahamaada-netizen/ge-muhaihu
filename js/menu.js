@@ -26,12 +26,22 @@ const INIT={ flags:clone(GT.flags), pages:clone(GT.pageRecord) };   // 最初の
 function loadSave(){ try{ const d=JSON.parse(localStorage.getItem(SAVE_KEY)); if(d&&d.scenes) return d; }catch(e){} return {last:null, scenes:{}}; }
 function writeSave(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
 let save=loadSave();
+// 見たエンディング（はじめから遊びなおしても消えない。本の第一章のとびらに数を出す）
+GT.recordEnding=k=>{ if(!k) return; save.endings=save.endings||[]; if(!save.endings.includes(k)){ save.endings.push(k); writeSave(); } };
+GT.endingsSeen=()=>(save.endings||[]).slice();
 
 // 状態をもどす（GT.flags / GT.pageRecord は、ほかのファイルも見ているので中身だけ入れかえる）
 function applyState(st){
   for(const k of Object.keys(GT.flags)) delete GT.flags[k];
   Object.assign(GT.flags, clone(st.flags));
-  GT.pageRecord.length=0; for(const p of clone(st.pages)) GT.pageRecord.push(p);
+  const saved=clone(st.pages||[]);
+  GT.pageRecord.length=0; for(const p of clone(INIT.pages)) GT.pageRecord.push(saved.find(q=>q.key===p.key)||p);   // 新しく足したページは、まっさらのまま入る
+  // ページを分けたので、古いセーブで前のページに入っていた かけら・ピースを、いまのページへ移す
+  const pg=k=>GT.pageRecord.find(p=>p.key===k);
+  for(const [from,to,test] of [['komichi','komichi2',id=>id==='komichi:foe'], ['window','forest_path',id=>/^path1:/.test(id)], ['road','road2',id=>/^wolfroad2:/.test(id)], ['wolf','road',id=>id==='wolf:road']]){
+    const a=pg(from), b=pg(to); if(!a||!b||!a.found) continue;
+    const mv=a.found.filter(test); if(!mv.length) continue;
+    a.found=a.found.filter(id=>!test(id)); b.found=[...new Set([...(b.found||[]),...mv])]; }
 }
 function rebuildScenes(){   // 途中で差しこまれたシーン（ボス戦など）を片づけて、playlist の並びにもどす
   GT.SCENES=GT.playlist.map(id=>GT.sceneRegistry[id]).filter(Boolean);

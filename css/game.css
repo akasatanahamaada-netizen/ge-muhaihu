@@ -522,8 +522,12 @@ html,body, body.gt-full{ background:
 /* 栞の横幅を少し太く（7.6cqw → 8.8cqw） */
 .gt-mark{ width:8.8cqw !important; }
 
-/* 本を開くように誘導しているときの栞（Book）：はっきり光らせる（金色のふち・明るさの脈打ち。前の光はうすくて気づきにくかった） */
-.gt-mark.gt-guide{ animation:gtMarkGuide 0.9s ease-in-out infinite alternate; }
-@keyframes gtMarkGuide{
-  from{ filter:drop-shadow(0 0 2px rgba(255,226,150,0.6)) brightness(1); }
-  to  { filter:drop-shadow(0 0 6px rgba(255,236,170,1)) drop-shadow(0 0 16px rgba(255,200,90,0.95)) brightness(1.25); } }
+/* 本を開くように誘導しているときの栞（Book）：はっきり光らせる。
+   栞は下半分がページのうしろに隠れていて、光もページに隠れてしまうので、いつもより高く引き出す。
+   光は、栞の本体のまわりの光の輪（上の ::before。ひもは光らせない）を、明るく・大きく脈打たせる。「Book」の字も金色に光る */
+.gt-mark.gt-guide{ transform:translateY(-4.5cqw) !important; }
+.gt-mark.gt-guide::before{ animation:gtMarkHaloStrong 0.8s ease-in-out infinite alternate !important; }
+@keyframes gtMarkHaloStrong{
+  from{ opacity:0.55; transform:scale(1);    filter:brightness(1.1); }
+  to  { opacity:1;    transform:scale(1.07); filter:brightness(1.7) drop-shadow(0 0 12px rgba(255,210,110,0.95)); } }
+.gt-mark.gt-guide .word{ color:#fff1c8 !important; text-shadow:0 0 6px rgba(255,220,130,1), 0 0 14px rgba(255,200,90,0.9), 0 1px 2px rgba(0,0,0,0.5) !important; }

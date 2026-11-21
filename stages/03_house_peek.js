@@ -118,7 +118,7 @@ GT.registerUpdate(()=>{
   if(!st.peeked && st.briefed && onWood && !document.getElementById('dlg').classList.contains('show')){ st.peeked=true;
     autoTalk(PEEK, ()=>{ if(!isHouse()) return;                                     // のぞき終わったら：お話のかけら・本のページ・右の端が開く
       GT.storyPiece&&GT.storyPiece('window','window:story');
-      GT.fillPage('window','――窓の向こうで、母親が赤ずきんにお使いを頼んでいた。カスタードとバターの小瓶を、おばあさんのもとへ。');
+      GT.fillPage('window','――窓の向こうで、赤ずきんがお使いを頼まれていた。行き先は、おばあさんの家。');
       GT.openStoryExit&&GT.openStoryExit(); });
   }
 });

@@ -87,7 +87,7 @@ GT.flipModes    = new Set(['play']); // この mode のとき本を裏返せる
 
 GT.defineStage        = (id,def)=>{ def.id=id; GT.STAGE_DEFS[id]=def; };
 GT.registerScene      = (s)=>{ if(s&&s.id) GT.sceneRegistry[s.id]=s; };
-GT.definePages        = (list)=>{ GT.pageBases={}; GT.pageInfo={}; list.forEach(p=>{ GT.pageBases[p.key]=p.base||''; GT.pageInfo[p.key]={title:p.title, chapter:p.chapter||'', extra:p.extraPieces||[]}; });   // もとの文章（セーブから戻したページにも使えるよう、別に持っておく）
+GT.definePages        = (list)=>{ GT.pageBases={}; GT.pageInfo={}; list.forEach(p=>{ GT.pageBases[p.key]=p.base||''; GT.pageInfo[p.key]={title:p.title, chapter:p.chapter||'', extra:p.extraPieces||[], fillOn:p.fillOn||[]}; });   // もとの文章（セーブから戻したページにも使えるよう、別に持っておく）
   GT.pageRecord = list.map(p=>({key:p.key,title:p.title,base:p.base||'',filled:false,text:'',found:[]})); };   // found … 拾ったお話のかけら（'ステージid:番号'）
 /* お話のかけらと、本のページ：ステージの定義に bookPage:'prologue' のように書くと、そのステージのかけらは、そのページのもの。
    そのページのかけらを全部拾うと、本を読みかえす画面で、そのページの欠けた文字・挿絵が埋まる。
@@ -1695,7 +1695,7 @@ function drawMissionHud(){
   const c=missionCount(), parts=[];
   const page=itemLook==='page', verb = page?'を集める':itemLook==='flower'?'を摘む':null;   // 見出しの言いかた
   if(missionReq.items) parts.push(verb ? `${itemLabel}${verb} ${c.items}/${c.itemsAll}` : `${itemLabel} ${c.items}/${c.itemsAll}`);
-  if(missionReq.enemies) parts.push(`狼の手下を倒す ${c.enemies}/${c.enemiesAll}`);
+  if(missionReq.enemies) parts.push(`敵を倒す ${c.enemies}/${c.enemiesAll}`);
   const done = (curStageDef&&curStageDef.itemsOptional) ? (c.items>=c.itemsAll && (!missionReq.enemies||c.enemies>=c.enemiesAll)) : missionDone();
   // そろったときの言葉（絵本の語りのように）
   const doneTxt = 'Complete';   // 全部そろったとき（英語の筆記体）
@@ -1816,7 +1816,9 @@ function drawNpc(n){
   }
   ctx.restore();
   if(n.name){ ctx.save(); ctx.font="600 11px 'Zen Old Mincho',serif"; ctx.textAlign='center';
-    ctx.fillStyle='rgba(74,70,60,0.85)'; ctx.fillText(GT.speakerName(n.who, n.name), cx, g>0 ? headY-12 : headY+20); ctx.restore(); }
+    const nm=GT.speakerName(n.who, n.name), ny=g>0 ? headY-12 : headY+20;
+    ctx.strokeStyle='rgba(246,239,220,0.8)'; ctx.lineWidth=3; ctx.lineJoin='round'; ctx.strokeText(nm, cx, ny);   // うすい紙の色のふち（どんな背景の上でも読めるように）
+    ctx.fillStyle='rgba(74,70,60,0.9)'; ctx.fillText(nm, cx, ny); ctx.restore(); }
   // 話しかけられる人：頭の上に吹き出しマーク（まだ話していない人だけ。会話中は出さない）
   const canTalk = n.talkable && !n.talked && n.lines && !storyTalking && !dlg.classList.contains('show') && GT.mode==='play';
   // 話しかけないと先へ進めない人は「！」、話さなくても進める人（ヒント・寄り道の会話）は「…」
@@ -1849,6 +1851,7 @@ function grabLayer(L){ const g=L.getContext('2d'); g.clearRect(0,0,W,H); g.drawI
 GT.SHADOW={ dx:10, dy:6, alpha:0.82 };   // 影の基本の量（depth で、遠く・うすくなる）
 /* 影を、受ける物ごとに分けて落とす：
    すぐうしろの物（奥の層 layerB の木や家）に映る影は、近く（nearDepth）に。そのさらに奥の背景に映る影は、遠く（depth）に */
+const shadowScaleNow=()=>{ const v=GT.scene&&GT.scene.shadowScale; return v>0?v:1; };   // 場面ごとの影の濃さ（scene.shadowScale。ふつうは 1）
 function castLayerSplit(L,depth,nearDepth){
   const sc=shadowSmall[1]; if(sc.width!==W){ sc.width=W; sc.height=H; }
   const s=sc.getContext('2d'), S=GT.SHADOW, dk=(gradeK||0)>0.02?0.25:0;
@@ -1856,7 +1859,7 @@ function castLayerSplit(L,depth,nearDepth){
     s.setTransform(1,0,0,1,0,0); s.globalCompositeOperation='source-over'; s.clearRect(0,0,W,H);
     s.drawImage(L, Math.round(S.dx+46*d), -Math.round(S.dy+30*d));
     s.globalCompositeOperation='source-in';
-    s.fillStyle=`rgba(10,6,4,${Math.min(0.92,S.alpha-0.36*d+dk).toFixed(3)})`;
+    s.fillStyle=`rgba(10,6,4,${(Math.min(0.92,S.alpha-0.36*d+dk)*shadowScaleNow()).toFixed(3)})`;
     s.fillRect(0,0,W,H);
     s.globalCompositeOperation = inside ? 'destination-in' : 'destination-out';   // 奥の物の上だけ／それ以外だけ
     s.drawImage(layerB,0,0);
@@ -1874,7 +1877,7 @@ function castLayer(L,depth){
   // 影の色でぬる（奥の層ほど濃く、手前ほどうすい。暗い森では、さらに濃く）
   const dk=(gradeK||0)>0.02?0.25:0;
   s.globalCompositeOperation='source-in';
-  s.fillStyle=`rgba(10,6,4,${Math.min(0.92,S.alpha-0.36*d+dk).toFixed(3)})`;
+  s.fillStyle=`rgba(10,6,4,${(Math.min(0.92,S.alpha-0.36*d+dk)*shadowScaleNow()).toFixed(3)})`;
   s.fillRect(0,0,W,H);
   ctx.drawImage(sc,0,0);
 }

@@ -12,7 +12,7 @@ GT.defineStage('path4', {
     {page:'right', x:740, y:282, w:32, h:32},
   ],
   itemsOptional:true,
-  bookPage:'road',   // 本の「おばあさんの家への道」のページ
+  bookPage:'road2',  // 本の「家の近くまで」のページ
   pieceKey:'wolfroad2',   // 近道と遠回りで、同じかけらを数える（どちらの道を通っても、ページを埋められる）
   mission:['items'],
    platforms:[
@@ -49,7 +49,7 @@ GT.defineStage('path4', {
 
 GT.registerScene({
   id:'path4', type:'play', stage:'path4', clear:'exit',
-  onClear:()=>GT.fillPage('road','――赤ずきんは、高い崖の上に咲いたお花まで摘んで、おばあさんへの花束を作った。少年と赤ずきんは、水車小屋をまわる長い道を、ゆっくりと歩いた。'),
+  onClear:()=>GT.fillPage('road2','――赤ずきんと、崖の上のお花も摘んで、家の近くまで来た。'),
   companion:'hood',         // 遠回り：赤ずきんが、うしろからついてくる
   label:'第一章 ── 遠回りの道 ②',
   dynamic:'detourOnly',     // 遠回りのときだけ遊ぶ（07_crossroads.js）

@@ -13,7 +13,7 @@ GT.CHAPTER_NAMES=['第一章「赤い頭巾」','第二章「？？？」','第�
 
 const box=document.createElement('div'); box.id='gtChSel';
 box.innerHTML=`<div class="row"><button class="orn l" type="button" aria-label="前の章">❧</button><canvas class="name" role="img"></canvas><button class="orn r" type="button" aria-label="次の章">❧</button></div>
-  <button class="begin" type="button">Begin</button><div class="note"></div>`;
+  <div class="go"><button class="begin" type="button">Begin</button><div class="note"></div></div>`;
 GT.canvas.parentElement.appendChild(box);
 const st=document.createElement('style'); st.textContent=`
   #gtChSel{ position:absolute; left:0; right:0; top:30%; z-index:3; display:none; flex-direction:column; align-items:center; gap:0.6em; pointer-events:none;
@@ -32,6 +32,10 @@ const st=document.createElement('style'); st.textContent=`
   #gtChSel .begin[disabled]{ opacity:0.35; cursor:default; animation:none; transform:none; }
   @keyframes gtBeginGlow{ to{ box-shadow:inset 0 0 0 1px rgba(255,230,160,1), inset 0 0 0 4px rgba(18,12,6,0.5), inset 0 0 0 5px rgba(255,230,160,0.55), 0 0 24px 4px rgba(240,207,134,0.55); } }
   #gtChSel .note{ font-family:'Zen Old Mincho',serif; font-size:clamp(10px,1.4cqw,32px); color:#e6d8b8; min-height:1.2em; }
+  /* Begin と説明は、章の名前を書き終えてから、ふわっと出す（.ready）。それまでは見えず、押せない */
+  #gtChSel .go{ display:flex; flex-direction:column; align-items:center; gap:0.6em; opacity:0; visibility:hidden; transform:translateY(6px);
+    transition:opacity .9s ease, transform .9s ease, visibility 0s linear .9s; }
+  #gtChSel.ready .go{ opacity:1; visibility:visible; transform:none; transition:opacity .9s ease, transform .9s ease, visibility 0s; }
   .gt-flipping #gtChSel{ visibility:hidden; }`;
 document.head.appendChild(st);
 const nameEl=box.querySelector('.name'), beginEl=box.querySelector('.begin'), noteEl=box.querySelector('.note');
@@ -60,9 +64,10 @@ function drawName(){
     GT.ink.drawChar(nctx,ch,x,chh/2,size,font,'#f1e8d4',ws[n],lt,cp);
     x+=ws[n]+gap; });
   nctx.shadowColor='transparent';
+  box.classList.toggle('ready',done);                                              // 書き終えたら、Begin がふわっと出てくる
   if(!done) wr.raf=requestAnimationFrame(drawName);
 }
-function writeName(str){ wr.str=str; wr.t0=null; wr.pen={}; nameEl.setAttribute('aria-label',str); if(!wr.raf) wr.raf=requestAnimationFrame(drawName); }
+function writeName(str){ box.classList.remove('ready'); wr.str=str; wr.t0=null; wr.pen={}; nameEl.setAttribute('aria-label',str); if(!wr.raf) wr.raf=requestAnimationFrame(drawName); }
 window.addEventListener('resize',()=>{ if(isSel() && !wr.raf) wr.raf=requestAnimationFrame(drawName); });
 document.fonts && document.fonts.load("400 40px 'Zen Old Mincho'").catch(()=>{});
 function refresh(){ const c=GT.titleChapter||0; writeName(GT.CHAPTER_NAMES[c]);
@@ -74,7 +79,7 @@ function step(d){
 }
 box.querySelector('.orn.l').addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); step(-1); });
 box.querySelector('.orn.r').addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); step(1); });
-beginEl.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); if(!isSel()||beginEl.disabled) return;
+beginEl.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); if(!isSel()||beginEl.disabled||!box.classList.contains('ready')) return;
   box.classList.remove('show'); GT.startPageFlip(); });                // 第一章をはじめる（次のシーン＝赤ずきんの家へ）
 GT.registerSceneReset(()=>{ const on=isSel(); box.classList.toggle('show',on); if(on){ GT.titleChapter=GT.titleChapter||0; refresh(); GT.mode='idle'; } });
 })();

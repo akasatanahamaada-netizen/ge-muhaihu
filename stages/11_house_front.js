@@ -132,7 +132,7 @@ GT.registerScene({
     // 遠回りのときだけ：赤ずきん（話しかけると戸を叩く）
     { who:'hood', name:'赤ずきん', page:'left', x:-300, lines:KNOCK, choices:KNOCK_CHOICES,
       onEnd:()=>{ st.talked=true; GT.storyPiece&&GT.storyPiece('front','front:story','hood'); GT.fillPage('front', GT.flags.stoppedAtDoor
-        ? '――戸の向こうの声は、おばあさんのものではなかった。少年は、赤ずきんを止めた。'
+        ? '――少年は、戸の前で赤ずきんを止めた。'
         : '――赤ずきんは掛け金を引き、おばあさんの家へ入っていった。'); } },
     // （近道のときも、マリは出てこない。着くと右の端（戸）が開く）
   ],
