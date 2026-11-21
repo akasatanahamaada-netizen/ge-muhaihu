@@ -192,16 +192,16 @@ GT.sceneFootsteps = {
 
 // 会話の立ち絵（キーはセリフの c）。しゃべっているあいだ、会話の枠の右に出る。
 // 主人公（少年）：ふだん『物憂げな琥珀眼の少年』／嫌そうな顔（f:'disgust'）『主人公嫌そうな顔』
-const BOY_PORTRAIT=l=> l.f==='disgust' ? 'assets/character/主人公嫌そうな顔.webp' : 'assets/character/物憂げな琥珀眼の少年.webp';
+const BOY_PORTRAIT=l=> l.f==='disgust' ? 'assets/character/主人公嫌そうな顔.webp' : l.f==='anxious' ? 'assets/character/主人公不安な顔.webp' : 'assets/character/物憂げな琥珀眼の少年.webp';
 /* 会話の立ち絵は、だれでも左向き（会話の枠の右はしに出るので、枠の文字のほうを向く）。
    右向きに描かれた絵は GT.portraitMirror に入れておくと、左右反転して左向きにする。
-   表情：セリフに f:'smile'（笑顔）/ f:'disgust'（嫌そう）/ f:'surprise'（驚き）/ f:'scared'（怯え）/ f:'granny'（おばあさんに化けた狼）と書くと、その表情の絵になる */
+   表情：セリフに f:'smile'（笑顔）/ f:'disgust'（嫌そう）/ f:'surprise'（驚き）/ f:'scared'（怯え）/ f:'granny'（おばあさんに化けた狼）/ f:'worried'（困り顔）/ f:'distress'（ひどく困った顔）/ f:'cry'（泣き顔）/ f:'anxious'（少年の不安な顔）と書くと、その表情の絵になる */
 const P='assets/character/';
 GT.portraitMirror = [];   // いまの絵は、どれも もとから左向き（反転するものはない）
 // 会話の立ち絵のファイル（ゲームの起動時に先に読みこんでおき、会話で切りかえるとき、前の人の絵が一瞬見えないようにする）
 GT.portraitFiles = [ '物憂げな琥珀眼の少年.webp', '主人公嫌そうな顔.webp', '水彩タッチの赤ずきん少女.webp', '赤ずきん笑顔.webp', '赤ずきん驚き顔.webp',
   '水彩風の優しいお母さん.webp', '優しい笑顔の祖母キャラクター.webp', '杖を握る不安げなおばあさん.webp',
-  'mari honnmono (hidari).webp', 'マリ口開いている.webp', '狡猾な人狼の立ち姿.webp', 'おばあちゃん狼の不敵な微笑み.webp', '黒い狼獣のシルエット.webp', 'おばあちゃん狼の不敵な微笑み_影.webp' ].map(f=>'assets/character/'+f);
+  'mari honnmono (hidari).webp', 'マリ口開いている.webp', '赤ずきん困り顔1.webp', '赤ずきん困り顔2.webp', '赤ずきん泣き顔口閉じている.webp', '赤ずきん泣き顔（口開いている）.webp', '主人公不安な顔.webp', '狡猾な人狼の立ち姿.webp', 'おばあちゃん狼の不敵な微笑み.webp', '黒い狼獣のシルエット.webp', 'おばあちゃん狼の不敵な微笑み_影.webp' ].map(f=>'assets/character/'+f);
 if(GT.preloadPortraits) GT.preloadPortraits(GT.portraitFiles);
 /* 表情の差分（嫌そうな少年・笑顔・驚き・怯え・口を開いたマリ・化けた狼）の webp は、元の PNG から作るときに
    ふだんの絵にぴったり重なる位置・大きさに合わせてある。表情を変えても、人物がずれない */
@@ -211,7 +211,12 @@ GT.portraits = {
   //     正体をかくしているあいだ（f:'disguise'。家の前・家の中で、おばあさんのふりをして話す）は、おばあさんのふりをした狼のシルエット『おばあちゃん狼の不敵な微笑み_影』
   wolf:  l=> l.f==='disguise' ? P+'おばあちゃん狼の不敵な微笑み_影.webp' : l.f==='granny' ? P+'おばあちゃん狼の不敵な微笑み.webp' : P+'狡猾な人狼の立ち姿.webp',
   // 赤ずきん：ふだん『水彩タッチの赤ずきん少女』／笑顔（f:'smile'）『赤ずきん笑顔』／驚き（f:'surprise'）『赤ずきん驚き顔』
-  hood:  l=> l.f==='smile' ? P+'赤ずきん笑顔.webp' : l.f==='surprise' ? P+'赤ずきん驚き顔.webp' : P+'水彩タッチの赤ずきん少女.webp',
+  //   困り顔（f:'worried'）『赤ずきん困り顔2』／ひどく困った顔（f:'distress'）『赤ずきん困り顔1』
+  //   泣き顔（f:'cry'）：たずねる・声をあげるセリフ（？ か ！ がある）は『赤ずきん泣き顔（口開いている）』、ほかは『赤ずきん泣き顔口閉じている』
+  hood:  l=> l.f==='smile' ? P+'赤ずきん笑顔.webp' : l.f==='surprise' ? P+'赤ずきん驚き顔.webp'
+        : l.f==='worried' ? P+'赤ずきん困り顔2.webp' : l.f==='distress' ? P+'赤ずきん困り顔1.webp'
+        : l.f==='cry' ? (/[？！?!]/.test(String(l.t||'')) ? P+'赤ずきん泣き顔（口開いている）.webp' : P+'赤ずきん泣き顔口閉じている.webp')
+        : P+'水彩タッチの赤ずきん少女.webp',
   mother:P+'水彩風の優しいお母さん.webp',                         // お母さん
   // おばあさん：ふだん『優しい笑顔の祖母キャラクター』／怯え（f:'scared'）『杖を握る不安げなおばあさん』
   granny:l=> l.f==='scared' ? P+'杖を握る不安げなおばあさん.webp' : P+'優しい笑顔の祖母キャラクター.webp',

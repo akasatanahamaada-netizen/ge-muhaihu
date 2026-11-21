@@ -82,7 +82,7 @@ const KNOCK_CHOICES=[
       if(GT.flags.warnedHood) return [
         {s:'',c:'narr',t:'少年は、赤ずきんのもとへ駆けだした。',act:'front-run'},
         {s:'',c:'narr',t:'少年が手を掴む。'},
-        {s:'赤ずきん',c:'hood',t:'……どうしたの？'},
+        {s:'赤ずきん',c:'hood',f:'worried',t:'……どうしたの？'},
         {s:'',c:'narr',t:'少年が戸を指し、首を振る。'},
         {s:'赤ずきん',c:'hood',t:'……分かった。'},
       ];
@@ -90,12 +90,12 @@ const KNOCK_CHOICES=[
         {s:'',c:'narr',t:'少年は、赤ずきんのもとへ駆けだした。',act:'front-run'},
         {s:'',c:'narr',t:'少年が手を掴む。そして、見てきたものを指さした。'+foundText()+'。'},
         ...(st.found.glasses?[{s:'赤ずきん',c:'hood',f:'surprise',t:'……これ、おばあちゃんの眼鏡……？'}]:[]),
-        {s:'赤ずきん',c:'hood',t:'……分かった。あなたが、先に。'},
+        {s:'赤ずきん',c:'hood',f:'worried',t:'……分かった。あなたが、先に。'},
       ];
       return [
         {s:'',c:'narr',t:'少年は、赤ずきんのもとへ駆けだした。',act:'front-run'},
         {s:'',c:'narr',t:'少年が手を伸ばす。だが、赤ずきんはもう掛け金を引いていた。'},
-        {s:'赤ずきん',c:'hood',t:'……？　おばあちゃん、待たせちゃ悪いもの。'},
+        {s:'赤ずきん',c:'hood',f:'worried',t:'……？　おばあちゃん、待たせちゃ悪いもの。'},
         {s:'',c:'narr',t:'止める間もなく、赤ずきんは先に中へ入っていく。',act:'front-hood-enter'},
       ];
     }},
