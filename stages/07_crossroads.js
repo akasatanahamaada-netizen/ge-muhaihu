@@ -10,7 +10,7 @@
                         遠回りのときだけ、遠回りの道①②（09_path3.js / 10_path4.js）を通る
 
    ◆ このステージの流れ（道は「歩いて」選ぶ）
-     1) 分かれ道の手前で、赤ずきんが待っている。話しかけると、二つの道を教えてくれる。
+     1) 赤ずきんは、少年のうしろから一緒に歩いてくる。分かれ道の手前（HOOD_WAIT）まで来ると立ちどまり、話しかけると、二つの道を教えてくれる。
      2) 右ページで道が分かれる。
           上の道（近道）… 本を裏返して、天井づたいに行く。暗いいばらの道。狼の足あとが続く。
                           垂れさがるいばらを、ジャンプでよけて進む。
@@ -25,7 +25,7 @@
    ========================================================================== */
 (function(){
 const ctx=GT.ctx, W=GT.W, H=GT.H, EDGE=GT.EDGE, FLOOR=H-GT.EDGE, SPINE=GT.SPINE;
-const HOOD_WAIT=392;                        // 赤ずきんが待っている場所
+const HOOD_WAIT=392;                        // 赤ずきんが立ちどまる場所（分かれ道の手前）。そこまでは少年と一緒に歩いてくる
 const DECIDE_X=780;                         // ここまで来たら「この道を行く？」
 const THORN1={page:'right', x:610, y:EDGE, w:30, h:46, kind:'ceilingLedge'};   // 天井から垂れさがるいばら
 const THORN2={page:'right', x:722, y:EDGE, w:30, h:56, kind:'ceilingLedge'};
@@ -93,7 +93,7 @@ const ROUTES={
 // --- シーン ----------------------------------------------------------------
 GT.registerScene({
   id:'crossroads', type:'story', stage:'crossroads', label:'第一章 ── 分かれ道',
-  intro:{s:'',c:'narr',t:'森の道が、少しひらけた場所に出た。赤ずきんが、少年を待っている。',act:'cross-setup'},
+  intro:{s:'',c:'narr',t:'赤ずきんと並んで歩いていくと、森の道が、少しひらけた場所に出た。',act:'cross-setup'},
   npcs:[
     { who:'hood', name:'赤ずきん', page:'left', x:HOOD_WAIT, lines:HOOD_LINES(),   // 話しかける直前に作り直す
       onEnd:()=>{ st.talked=true; } },
@@ -119,13 +119,14 @@ GT.registerDynamic('detourOnly',   onlyOnRoute('detour'));
 /* ==========================================================================
    進行
    ========================================================================== */
-const st={ talked:false, busy:false, bubble:null, last:performance.now() };
+const st={ talked:false, busy:false, bubble:null, arrived:false, last:performance.now() };
 const isCross=()=>GT.scene&&GT.scene.id==='crossroads';
 const hoodNpc=()=>GT.getNpcs().find(n=>n.who==='hood');
 // いまどちらの道にいるか（右ページを裏返して天井にいれば近道）
 const pathOf=()=> (GT.gravity.right===-1 && GT.player.y<H/2) ? 'shortcut' : 'detour';
-GT.registerSceneReset(()=>{ if(isCross()){ st.talked=false; st.busy=false; st.bubble=null; } });
-GT.registerAct('cross-setup',()=>{ GT.flags.route=null; const h=hoodNpc(); if(h) h.x=HOOD_WAIT; });
+GT.registerSceneReset(()=>{ if(isCross()){ st.talked=false; st.busy=false; st.bubble=null; st.arrived=false; } });
+// 赤ずきんは、少年のすぐうしろから（一緒に歩いてきた）
+GT.registerAct('cross-setup',()=>{ GT.flags.route=null; const h=hoodNpc(); if(h) h.x=Math.max(EDGE,GT.player.x-38); });
 
 function autoTalk(lines,choices,after){
   st.busy=true; GT.mode='idle'; GT.player.vx=0;
@@ -149,16 +150,22 @@ GT.registerUpdate(()=>{
 });
 
 /* 赤ずきんの動き（会話中も動けるよう、描画のついでに進める）
-   赤ずきんは、分かれ道ではずっと左のページ（HOOD_WAIT）にいる。遠回りを選んだときだけ、少年についてくる。
-   近道を選んだときは、左のページから動かない（ページの重力にはしたがう。裏返されると天井に落ちる） */
+   話す前：少年と一緒に歩いてきて、分かれ道の手前（HOOD_WAIT）で立ちどまる（それより先へは行かない）。
+   話したあと：その場で待つ。遠回りを選んだときだけ、少年についてくる。
+   近道を選んだときは、その場から動かない（ページの重力にはしたがう。裏返されると天井に落ちる） */
 function moveHood(){
   const h=hoodNpc(); if(!h) return;
   const now=performance.now(), dt=Math.min(0.05,(now-st.last)/1000); st.last=now;
   h.noGravity = false;
   if(st.bubble){ st.bubble.t-=dt; if(st.bubble.t<=0) st.bubble=null; }
-  if(GT.flags.route!=='detour') return;                     // 話す前・話したあと・近道：その場（左のページ）から動かない
   if(GT.mode!=='play') return;
   const pcx=GT.player.x+GT.player.w/2;
+  if(!st.talked && !GT.flags.route){                        // 話す前：少年と一緒に、分かれ道の手前まで歩く
+    if(!st.arrived){ GT.npcStep(h, Math.min(HOOD_WAIT, pcx+(pcx>h.x+16?-42:42)-16), 200, dt);
+      if(h.x>=HOOD_WAIT-10) st.arrived=true; }               // 着いたら、そこで待つ（少年がもどっても、ついていかない）
+    h.talkable = st.arrived;                                 // 分かれ道の手前に着いてから、話しかけられる（道の話は、そこでする）
+    return; }
+  if(GT.flags.route!=='detour') return;                     // 話したあと・近道：その場から動かない
   GT.npcStep(h, pcx+(pcx>h.x+16?-42:42)-16, 200, dt);       // 遠回り：ついてくる（足場は、すり抜けずに跳び乗る）
 }
 

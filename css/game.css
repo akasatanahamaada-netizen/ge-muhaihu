@@ -521,3 +521,9 @@ html,body, body.gt-full{ background:
 
 /* 栞の横幅を少し太く（7.6cqw → 8.8cqw） */
 .gt-mark{ width:8.8cqw !important; }
+
+/* 本を開くように誘導しているときの栞（Book）：はっきり光らせる（金色のふち・明るさの脈打ち。前の光はうすくて気づきにくかった） */
+.gt-mark.gt-guide{ animation:gtMarkGuide 0.9s ease-in-out infinite alternate; }
+@keyframes gtMarkGuide{
+  from{ filter:drop-shadow(0 0 2px rgba(255,226,150,0.6)) brightness(1); }
+  to  { filter:drop-shadow(0 0 6px rgba(255,236,170,1)) drop-shadow(0 0 16px rgba(255,200,90,0.95)) brightness(1.25); } }

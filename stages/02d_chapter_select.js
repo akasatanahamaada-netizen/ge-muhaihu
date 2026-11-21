@@ -24,8 +24,13 @@ const st=document.createElement('style'); st.textContent=`
   #gtChSel button{ pointer-events:auto; background:none; border:none; cursor:pointer; color:#e3c58a; font:inherit; text-shadow:inherit; }
   #gtChSel .orn{ font-size:1.1em; letter-spacing:0; padding:0.1em 0.3em; } #gtChSel .orn.l{ transform:scaleX(-1); }
   #gtChSel .orn:hover{ color:#fff1d0; }
-  #gtChSel .begin{ font-family:'Great Vibes',cursive; font-size:clamp(22px,4cqw,96px); color:#f1e8d4; }
-  #gtChSel .begin:hover{ color:#fff1d0; } #gtChSel .begin[disabled]{ opacity:0.35; cursor:default; }
+  /* Begin：筆記体のまま、金の縁のボタンに（押せると分かるように、ゆっくり光る） */
+  #gtChSel .begin{ font-family:'Great Vibes',cursive; font-size:clamp(22px,4cqw,96px); line-height:1.1; color:#f1e8d4; margin-top:0.15em; padding:0.02em 1.1em 0.12em; border-radius:999px;
+    background:rgba(18,12,6,0.5); box-shadow:inset 0 0 0 1px rgba(227,197,138,0.9), inset 0 0 0 4px rgba(18,12,6,0.5), inset 0 0 0 5px rgba(227,197,138,0.35), 0 0 10px rgba(240,207,134,0.2);
+    animation:gtBeginGlow 1.4s ease-in-out infinite alternate; transition:background .15s, transform .15s; }
+  #gtChSel .begin:hover{ color:#fff1d0; background:rgba(70,48,20,0.62); transform:scale(1.05); }
+  #gtChSel .begin[disabled]{ opacity:0.35; cursor:default; animation:none; transform:none; }
+  @keyframes gtBeginGlow{ to{ box-shadow:inset 0 0 0 1px rgba(255,230,160,1), inset 0 0 0 4px rgba(18,12,6,0.5), inset 0 0 0 5px rgba(255,230,160,0.55), 0 0 24px 4px rgba(240,207,134,0.55); } }
   #gtChSel .note{ font-family:'Zen Old Mincho',serif; font-size:clamp(10px,1.4cqw,32px); color:#e6d8b8; min-height:1.2em; }
   .gt-flipping #gtChSel{ visibility:hidden; }`;
 document.head.appendChild(st);
@@ -61,7 +66,7 @@ function writeName(str){ wr.str=str; wr.t0=null; wr.pen={}; nameEl.setAttribute(
 window.addEventListener('resize',()=>{ if(isSel() && !wr.raf) wr.raf=requestAnimationFrame(drawName); });
 document.fonts && document.fonts.load("400 40px 'Zen Old Mincho'").catch(()=>{});
 function refresh(){ const c=GT.titleChapter||0; writeName(GT.CHAPTER_NAMES[c]);
-  const ok=c===0; beginEl.disabled=!ok; noteEl.textContent=ok?'':'このお話は、まだ書かれていない'; }
+  const ok=c===0; beginEl.disabled=!ok; noteEl.textContent=ok?(GT.ctl?GT.ctl('クリックして、お話をはじめる','タップして、お話をはじめる'):'クリックして、お話をはじめる'):'このお話は、まだ書かれていない'; }   // 押せることが分かるように、ひとこと添える
 function step(d){
   if(!isSel()) return;
   GT.titleChapter=((GT.titleChapter||0)+d+GT.CHAPTER_NAMES.length)%GT.CHAPTER_NAMES.length;

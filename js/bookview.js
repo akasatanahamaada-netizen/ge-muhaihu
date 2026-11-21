@@ -77,7 +77,6 @@ const css=`
 .bv-gos{ position:absolute; z-index:6; left:7%; right:7%; bottom:8%; display:flex; flex-wrap:wrap-reverse; justify-content:flex-end; align-items:center; gap:0.4em 0.45em; }
 .bv-gos-h{ font-family:'Caveat',cursive; font-size:clamp(14px,1.8cqw,42px); color:#7a5a3a; margin-right:auto; align-self:flex-end; }
 .bv-gos .bv-go{ position:static; font-family:'Zen Old Mincho',serif; font-size:clamp(10px,1.2cqw,28px); padding:0.45em 0.95em; letter-spacing:0.04em; }
-.bv-gos .bv-go.armed{ font-family:'Caveat',cursive; font-size:clamp(13px,1.55cqw,37px); padding:0.2em 0.95em; background:#9a3a32; }
 .bv-hit{ position:absolute; top:0; height:100%; width:50%; z-index:5; cursor:pointer; background:none; border:none; padding:0; }
 .bv-hit.l{ left:0; } .bv-hit.r{ left:50%; }
 .bv-hit[disabled]{ cursor:default; }
@@ -98,7 +97,7 @@ const css=`
 .bv-lid-back{ transform:rotateY(180deg); border-radius:10px 0 0 10px; }
 .bv-lid-shade{ position:absolute; inset:0; background:#140e08; opacity:0; pointer-events:none; }
 
-/* ---- 新しい見た目：メニュー画面とそろえる（すけた背景・羊皮紙・茶色のインク・赤いリボンの栞） ---- */
+/* ---- 新しい見た目：メニュー画面とそろえる（すけた背景・羊皮紙・茶色のインク。赤いリボンの栞は、なくした） ---- */
 #bookModal.bv{ background:transparent !important; backdrop-filter:sepia(0.55) saturate(0.75) brightness(0.5) blur(2px); -webkit-backdrop-filter:sepia(0.55) saturate(0.75) brightness(0.5) blur(2px); }
 #bookModal.bv::before{ content:''; position:fixed; inset:0; pointer-events:none; z-index:-1;
   background:radial-gradient(ellipse at 50% 45%, rgba(30,20,10,0) 35%, rgba(20,12,6,0.7) 100%); }
@@ -115,15 +114,27 @@ const css=`
 .bv-title .t2{ color:#5a3f1c; }
 .bv-title .orn{ color:#9e2a32; }
 .bv-pieces{ color:#9e2a32; }
-.bv-ribbon{ position:absolute; z-index:6; top:-2.4%; right:9%; width:2.4%; height:20%; background:linear-gradient(90deg,#86222a,#a8313a 50%,#86222a);
-  clip-path:polygon(0 0,100% 0,100% 100%,50% 84%,0 100%); box-shadow:0 2px 4px rgba(0,0,0,0.3); pointer-events:none; }   /* 赤いリボンの栞 */
 .bv-bar button{ background:#efe3c6 linear-gradient(180deg, rgba(255,250,236,0.55), rgba(214,190,146,0.35)); border:1px solid rgba(120,86,48,0.6); color:#3a2a18;
   font-family:'Great Vibes',cursive; font-size:22px; padding:3px 18px; box-shadow:0 3px 10px rgba(20,12,6,0.45); }
 .bv-bar button:hover:not([disabled]){ background:#f6ecd4; color:#7a1f26; }
 .bv-bar .bv-count{ color:#efe3c6; text-shadow:0 1px 4px rgba(0,0,0,0.8); }
-.bv-go{ background:#9e2a32; } .bv-go:hover{ background:#c23a3a; }
-.bv-gos .bv-go.armed{ background:#c23a3a; }
-.bv-gos-h{ font-family:'Great Vibes',cursive; color:#5a3f1c; }
+.bv-go{ background:#efe3c6; } .bv-go:hover{ background:#f6ecd4; }
+/* ステージにもどるボタン：羊皮紙の地に、金の縁（二重）。ステージの物と同じく、影は右上へ落とす（光は左下から） */
+.bv-gos{ gap:0.55em 0.6em; }
+.bv-gos-h{ font-family:'Zen Old Mincho',serif; font-weight:700; font-size:clamp(9px,1.1cqw,26px); letter-spacing:0.08em; color:#5a3f1c; margin-right:auto; }
+.bv-gos .bv-go{ display:inline-flex; align-items:center; gap:0.4em; font-weight:700; font-size:clamp(10px,1.3cqw,30px); padding:0.5em 1em 0.5em 0.75em; letter-spacing:0.05em;
+  color:#3a2a18; background:#f3e8cc linear-gradient(180deg, rgba(255,252,240,0.7), rgba(222,200,156,0.45)); border:1.5px solid #b8913f; border-radius:0.35em;
+  box-shadow:inset 0 0 0 2px #f6ecd4, inset 0 0 0 3px rgba(184,145,63,0.75), 5px -4px 0 rgba(40,26,14,0.28);
+  transition:transform .15s, box-shadow .15s, background .15s, color .15s; }
+.bv-gos .bv-go::before{ content:'↺'; display:inline-grid; place-items:center; width:1.35em; height:1.35em; border-radius:50%; font-size:1.05em; line-height:1;
+  color:#7a5a22; background:radial-gradient(circle at 35% 30%, #fbe6a8, #d9b25e); box-shadow:inset 0 0 0 1px #a8822f; flex:none; }
+.bv-gos .bv-go:hover{ color:#5a3f1c; background:#f8efd8 linear-gradient(180deg, rgba(255,253,245,0.8), rgba(232,212,170,0.4)); border-color:#d4a94a;
+  transform:translate(-1px,1px); box-shadow:inset 0 0 0 2px #fbf3df, inset 0 0 0 3px rgba(212,169,74,0.9), 7px -6px 0 rgba(40,26,14,0.24); }   /* 浮くと、影は遠くへ */
+.bv-gos .bv-go:active{ transform:translate(2px,-2px); box-shadow:inset 0 0 0 2px #f6ecd4, inset 0 0 0 3px rgba(184,145,63,0.75), 2px -1px 0 rgba(40,26,14,0.3); }   /* 押すと、影は近くへ */
+/* 誘導中に光らせるボタン（GT.guideToBook の 3つめの引数。例：お話のあと「森の出口」へ）：金の縁が光る */
+.bv-gos .bv-go.glow{ animation:bvGoGlow 0.9s ease-in-out infinite alternate; }
+@keyframes bvGoGlow{ from{ border-color:#b8913f; box-shadow:inset 0 0 0 2px #f6ecd4, inset 0 0 0 3px rgba(184,145,63,0.75), 5px -4px 0 rgba(40,26,14,0.28), 0 0 0 0 rgba(255,214,110,0); }
+  to{ border-color:#f0c860; box-shadow:inset 0 0 0 2px #fff6dc, inset 0 0 0 3px rgba(240,200,96,1), 5px -4px 0 rgba(40,26,14,0.28), 0 0 16px 5px rgba(255,214,110,0.9); } }
 .bv-silbox{ position:absolute; inset:2.2% 3%; overflow:hidden; pointer-events:none; }   /* ページのふちの罫の内がわに収める */
 .bv-sil{ position:absolute; bottom:0; width:auto; pointer-events:none; filter:drop-shadow(6px -4px 0 rgba(40,26,14,0.2)); }   /* ページの下の角いっぱいに（ページのふちで切れる） */
 .bv-sil.hood{ left:-14%; height:45%; }    /* 左半身は、ページの左のふちで見切れる */
@@ -146,7 +157,6 @@ modal.innerHTML=`
     <div class="bv-page l"></div>
     <div class="bv-page r"></div>
     <div class="bv-spine"></div>
-    <div class="bv-ribbon"></div>
     <button class="bv-hit l" aria-label="前のページ"></button>
     <button class="bv-hit r" aria-label="次のページ"></button>
   </div>
@@ -206,8 +216,8 @@ function slotInner(slot){
   const body=(p.filled ? art : '') + `<div class="bv-body">${damagedText(text, pc, slot, !p.filled)}</div>`;   // 虫食いの穴は あけない（ページのふちの よれだけ）
   // このページのステージへ行くボタン（このページにふくまれるステージのうち、一度来たことのあるものだけ。menu.js の GT.canStartFrom / GT.startFrom）
   const ids=(PAGE_SCENES[p.key]||[]).filter(id=>GT.canStartFrom && GT.canStartFrom(id));
-  const go = ids.length ? `<div class="bv-gos"><span class="bv-gos-h">Play again</span>${ids.map(id=>
-    `<button type="button" class="bv-go" data-scene="${esc(id)}" data-name="${esc(stageName(id))}">${esc(stageName(id))}</button>`).join('')}</div>` : '';
+  const go = ids.length ? `<div class="bv-gos"><span class="bv-gos-h">このステージから、やり直す</span>${ids.map(id=>
+    `<button type="button" class="bv-go${id===glowScene?' glow':''}" title="「${esc(stageName(id))}」のはじめから、やり直す" data-scene="${esc(id)}" data-name="${esc(stageName(id))}">${esc(stageName(id))}</button>`).join('')}</div>` : '';
   return head+body+go+`<div class="bv-no">— ${pno} —</div>`;
 }
 /* ページ（playlist.js の GT.definePages の key）と、そのページにふくまれるステージ（シーンの id。物語の順）。
@@ -431,11 +441,12 @@ document.addEventListener('fullscreenchange',refit); document.addEventListener('
 const guideBtn=document.getElementById('openBook');
 let guiding=false;
 let guidePage=null;   // 誘導中に本を開いたとき、開くページ（key）。無ければ、いちばん新しく書かれたページ
-GT.guideToBook=function(text,pageKey){
-  if(!guideBtn) return; guiding=true; guidePage=pageKey||null;
+let guideScene=null, glowScene=null;   // 誘導中に本を開いたとき、光らせる「ステージにもどる」ボタン（シーンの id）。本を閉じるまで光る
+GT.guideToBook=function(text,pageKey,sceneId){   // sceneId … 本の中で光らせる、ステージにもどるボタン（例：'mari_gate'）
+  if(!guideBtn) return; guiding=true; guidePage=pageKey||null; guideScene=sceneId||null;
   guideBtn.dataset.guide=text||'本を開いてみよう'; guideBtn.classList.add('gt-guide');
 };
-GT.clearBookGuide=function(){ guiding=false; guidePage=null; if(guideBtn){ guideBtn.classList.remove('gt-guide'); delete guideBtn.dataset.guide; } };
+GT.clearBookGuide=function(){ guiding=false; guidePage=null; guideScene=null; if(guideBtn){ guideBtn.classList.remove('gt-guide'); delete guideBtn.dataset.guide; } };
 GT.registerSceneReset(()=>GT.clearBookGuide());
 function spreadOf(key){ const i=entries().findIndex(en=>en.type==='page' && en.p.key===key); return i<0?latestSpread():Math.floor(i/2); }
 function latestSpread(){                                      // いちばん新しく書かれたページがある見開き
@@ -446,7 +457,7 @@ function latestSpread(){                                      // いちばん新
 function open(){
   if(modal.classList.contains('show')) return;
   fitBook();
-  spread = guiding ? (guidePage ? spreadOf(guidePage) : latestSpread()) : 0; GT.clearBookGuide(); show();
+  spread = guiding ? (guidePage ? spreadOf(guidePage) : latestSpread()) : 0; glowScene = guiding ? guideScene : null; GT.clearBookGuide(); show();
   wasPaused=!!GT.paused; GT.paused=true;
   if(reduced()){ modal.style.opacity=''; modal.classList.add('show'); GT.sfx&&GT.sfx('page'); return; }
   // 閉じた本を、ふわっと出してから開く
@@ -459,7 +470,7 @@ function open(){
 }
 function close(){
   if(!modal.classList.contains('show') || lidAnim) return;
-  const finish=()=>{ modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=wasPaused; };
+  const finish=()=>{ glowScene=null; modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=wasPaused; };
   if(reduced() || turning){ GT.sfx&&GT.sfx('close'); finish(); return; }
   lidAnim=true; bar.style.opacity='0';
   const lid=mkLid(spread*2); lidAt(lid,180);
@@ -476,11 +487,9 @@ btnPrev.addEventListener('click',()=>turn(-1)); btnNext.addEventListener('click'
 hitL.addEventListener('click',()=>turn(-1));    hitR.addEventListener('click',()=>turn(1));
 modal.querySelector('.bv-close').addEventListener('click',close);
 // 「このページへもどる」：本をすぐに閉じて、その場面のはじめから（来たときの分岐・本のページの状態にもどる）
-//   1回押すと「もう一度押すと、もどる」。2.5秒以内にもう一度押すと、もどる（うっかり押して、いまの進みがなくならないように）
+//   1回押すだけで、もどる（前は「Tap again」で2回押す必要があった）
 modal.addEventListener('click',e=>{ const g=e.target.closest('.bv-go'); if(!g) return; e.stopPropagation();
-  if(!(g._armT>performance.now())){ g._armT=performance.now()+2500; g.textContent='Tap again'; g.classList.add('armed');
-    setTimeout(()=>{ if(!(g._armT>performance.now())){ g.textContent=g.dataset.name; g.classList.remove('armed'); } },2600); return; }
-  const id=g.dataset.scene; modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=false;
+  const id=g.dataset.scene; glowScene=null; modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=false;
   if(GT.bookJump && GT.bookJump(id)) return;   // お話を読み終えたあとの「森の出口」など（12_grannys_house.js）
   if(GT.startFrom) GT.startFrom(id); }, true);
 modal.addEventListener('click',e=>{ if(e.target===modal) close(); });
