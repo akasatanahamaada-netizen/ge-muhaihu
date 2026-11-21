@@ -3,7 +3,6 @@
    ----------------------------------------------------------------------------
    ・ゲームを開くと、まずこの画面が出る（タイトルともくじ）
        （ゲーム中は つづける）はじめから / つづきから / 物語を振り返る / あそびかた / せってい
-   ・しおりを挟む … いまのステージに、しおり（Ⅰ・Ⅱ…）を挟む。本の上のしおりを押すと、そのステージのはじめにもどれる（5枚まで）
    ・ゲーム中は、左上の「≡ メニュー」ボタンか Esc キーで開く（開いているあいだは止まる）
    ・進み具合は、ブラウザに自動でセーブされる（ステージが始まるたび）
        → 「つづきから」で最後のステージから遊べる。一度来たステージへは、本を読み返す画面（bookview.js）の各ページから行ける
@@ -15,7 +14,6 @@
 (function(){
 "use strict";
 const SAVE_KEY='gravityTale.ep1.save';
-const BOOKMARK_MAX=5;                 // しおりは5枚まで（下の「しおり」）
 const TITLE_BG='assets/background/タイトル背景_森.webp';   // タイトル画面の背景（霧の薔薇の森。紫をぬいて、霧の深い緑がかった灰色に。もとは『ゴシックの森とタイトル背景png.png』）
 const TITLE_LOGO='assets/background/タイトルロゴ_金.webp'; // タイトルのロゴ（ふちが透明）。文字といばらを古びた金色にしたもの（もとの色は『タイトルロゴ.webp』）
 const NAMES={ arrive:'おばあさんの家', ending:'結末' };      // label の無いシーンの名前
@@ -324,7 +322,6 @@ menu.querySelectorAll('.gtm-range').forEach(r=>{
     if(r.dataset.vol==='se'){ const now=performance.now(); if(now-seTry>250){ seTry=now; GT.sfx&&GT.sfx('land'); } }   // 大きさの見本
   });
 });
-function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 const pageSound=()=>{ GT.sfx&&GT.sfx('page'); };   // メニューを開いたとき・メニューの中で何かを選んだときは、ページをめくる音
 function showMenu(sound){ menu.classList.toggle('title-live', !inGame && !!(GT.scene&&GT.scene.id==='title')); menu.classList.toggle('game-live', inGame && !!GT.scene);   // ゲームの途中：いまの場面をすかして見せる
@@ -349,7 +346,6 @@ menu.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]'); if(!b || b.disabled) return;
   switch(b.dataset.act){
     case 'resume':   hideMenu(); break;
-    case 'bookmark': addBookmark(); hideMenu(); break;
     case 'new':      startNew(); break;
     case 'continue': startFrom(save.last); break;
     case 'howto':    setView('howto'); break;
@@ -367,7 +363,7 @@ window.addEventListener('keydown',e=>{
     return;
   }
   if(bookOpen) return;
-  e.stopPropagation();                                   // engine.js のキー操作に渡さない
+  e.stopPropagation();                                   // js/engine/ のキー操作に渡さない
   if(e.key==='Escape'){
     e.preventDefault();
     const sub=menu.querySelector('.gtm-view.show:not([data-view="main"])');
@@ -391,29 +387,4 @@ GT.startNewGame=startNew;
 GT.restoreStateOf=id=>{ applyState(save.scenes[id]||INIT); rebuildScenes(); };
 GT.startFrom=startFrom; GT.canStartFrom=id=>!!save.scenes[id]; GT.sceneName=sceneName;   // 本を読み返す画面の、各ページのステージのボタンで使う
 
-/* ---- しおり：メニューの「しおりを挟む」で、いまのステージにしおりを挟む。本の上に色ちがいのしおりが増え、
-   押すと、そのステージのはじめにもどれる（挟んだときの分岐・本のページも、いっしょにもどる）。
-   しおりは BOOKMARK_MAX 枚まで（いっぱいのときは挟めない。右クリックで外す）。セーブといっしょにブラウザに残る ---- */
-const bookmarkHooks=[];
-function bookmarks(){ return save.bookmarks||(save.bookmarks=[]); }
-function changed(){ writeSave(); for(const f of bookmarkHooks) f(); }
-function addBookmark(){
-  const id=GT.scene && GT.scene.id, st=id && save.scenes[id]; if(!st) return;
-  const list=bookmarks();
-  const used=new Set(list.map(b=>b.color));
-  const color=[0,1,2].find(c=>!used.has(c)) ?? (list[0] ? list[0].color : 0);
-  if(list.length>=BOOKMARK_MAX) return;                       // 5枚まで（いっぱいのときは挟めない。しおりを右クリックで外せる）
-  list.push({ id, name:sceneName(id), state:clone(st), color });
-  GT.sfx&&GT.sfx('page'); changed();
-}
-// 机の上の まっさらな栞（js/page.js）を押しても挟める。挟めたら true
-GT.addBookmark=()=>{ const n=bookmarks().length; if(inGame) addBookmark(); return bookmarks().length>n; };
-GT.bookmarksFull=()=>bookmarks().length>=BOOKMARK_MAX;
-GT.getBookmarks=()=>bookmarks().map(b=>({id:b.id, name:b.name, color:b.color}));
-GT.onBookmarksChange=fn=>{ bookmarkHooks.push(fn); };
-GT.jumpBookmark=i=>{ const b=bookmarks()[i]; if(!b) return;
-  applyState(b.state); rebuildScenes();
-  const idx=GT.SCENES.findIndex(s=>s.id===b.id); if(idx<0) return;
-  inGame=true; hideMenu(); GT.flipToScene(idx, b.state.pageNo||1); };          // ページをめくって、しおりのページへ
-GT.removeBookmark=i=>{ bookmarks().splice(i,1); changed(); };
 })();

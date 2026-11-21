@@ -28,11 +28,7 @@
     const parts=['.hud','.canvas-wrap','.gt-cover','.gt-marks','.under','#btnLeft','#btnRight','#btnFlip','#btnJump'].map(q=>frame.querySelector(q));
     const fits=gw=>{ frame.style.setProperty('--gw',gw+'px'); frame.style.setProperty('--gs',Math.max(1,gw/900).toFixed(3)); const f=frame.getBoundingClientRect();
       return parts.every(el=>{ if(!el) return true; const r=el.getBoundingClientRect(); if(!r.width && !r.height) return true;   // 見えていない部品は数えない（SVG は offsetParent を持たないので、大きさで見る）
-        // しおりは上にひも（V の字）が、旗はカーソルを乗せると左へ出るぶんがあるので、そのぶんも画面に入れる（切れないように）
-        const cq=(wrap.getBoundingClientRect().width||900)/100;
-        const top = el.classList.contains('gt-tabs') ? r.top-2.6*cq : r.top;   // 引き出したぶん（ひもは絵の中）
-        const left= el.classList.contains('gt-flags') ? r.left-2.6*cq : r.left;
-        return left>=f.left+4 && r.right<=f.right-4 && top>=f.top+4 && r.bottom<=f.bottom-4; }); };
+        return r.left>=f.left+4 && r.right<=f.right-4 && r.top>=f.top+4 && r.bottom<=f.bottom-4; }); };
     let lo=200, hi=Math.min(frame.clientWidth, window.innerHeight*900/480);
     if(fits(hi)) return;
     for(let i=0;i<14;i++){ const mid=(lo+hi)/2; if(fits(mid)) lo=mid; else hi=mid; }
@@ -59,7 +55,7 @@
   fit();                                         // 開いたときも、窓の大きさに合わせる
   GT.enterFullscreen=enter; GT.exitFullscreen=exit;
 })();
-/* ページの見出し：重力が反転しているページは赤くする（engine.js が文字を書きかえるのを見張る） */
+/* ページの見出し：重力が反転しているページは赤くする（js/engine/ が文字を書きかえるのを見張る） */
 (function(){
   for(const id of ['hudLeft','hudRight']){ const el=document.getElementById(id);
     const upd=()=>el.classList.toggle('rev', el.textContent.indexOf('反転')>=0);
@@ -118,7 +114,7 @@
   // ページの上下のふちは、ゆるやかに曲げる（背表紙のそばで少し沈むだけ）
   const pagePathD=(dx,dy)=>`M ${-40-dx} ${-20+dy} C 140 ${-26+dy} 340 ${-24+dy} 446 ${-13+dy} L 454 ${-13+dy} C 560 ${-24+dy} 760 ${-26+dy} ${940+dx} ${-20+dy}
       L ${942+dx} ${504+dy} C 760 ${499+dy} 560 ${500+dy} 454 ${509+dy} L 446 ${509+dy} C 340 ${500+dy} 140 ${499+dy} ${-42-dx} ${504+dy} Z`;
-  // ページの紙の色に、ゲーム画面と同じ色合い（engine.js の GRADE_MUL）をかける（さかいが目立たないように）
+  // ページの紙の色に、ゲーム画面と同じ色合い（js/engine/ の GRADE_MUL）をかける（さかいが目立たないように）
   const tintPage=svg=>GT.tintHex ? svg.replace(/#[0-9a-fA-F]{6}\b/g, GT.tintHex) : svg;
   let stack='';
   for(let k=12;k>=1;k--){ const d=k*1.05;                                  // 紙の束：奥の紙ほど少し外へ・下へ。ふちは、明るい線と暗い線がこまかく交互に
@@ -145,14 +141,14 @@
       <path d="M 447 -10 L 447 520 M 453 -10 L 453 520" stroke="rgba(255,250,238,0.35)" stroke-width="1.2"/>
     </g>`;
   pages.innerHTML=tintPage(PAGE_DEFS+stack+PAGE_SHEET);
-  // ページをめくるときの紙にも、同じ紙（いちばん上の一枚）の絵を使う（engine.js の toPage が使う GT.pageSheet）。
-  //   紙の大きさは、ゲーム画面のまわりに GT.PAGE_PAD（engine.js）だけ広い
+  // ページをめくるときの紙にも、同じ紙（いちばん上の一枚）の絵を使う（js/engine/ の toPage が使う GT.pageSheet）。
+  //   紙の大きさは、ゲーム画面のまわりに GT.PAGE_PAD（js/engine/）だけ広い
   if(GT.PAGE_PAD){ const p=GT.PAGE_PAD, ew=900+p.x*2, eh=480+p.top+p.bot;
     const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${ew}" height="${eh}" viewBox="${-p.x} ${-p.top} ${ew} ${eh}">${tintPage(PAGE_DEFS+PAGE_SHEET)}</svg>`;
     const im=new Image(); im.onload=()=>{ GT.pageSheet=im; }; im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg); }
   wrap.insertBefore(pages, wrap.firstChild); wrap.insertBefore(cover, pages);
   // 本の上に横にして置いた栞（作者の絵 assets/komono/栞.png）：「Reread」＝本を読み返す（index.html の #openBook）、「menu」＝メニュー（menu.js のボタン）
-  //   カーソルを乗せると、すこし持ち上がる。やり直すボタンは、ゲーム画面の右上（engine.js の「↺ やり直す」）
+  //   カーソルを乗せると、すこし持ち上がる。やり直すボタンは、ゲーム画面の右上（js/engine/ の「↺ やり直す」）
   const marks=document.createElement('div'); marks.className='gt-marks'; wrap.appendChild(marks);
   const asMark=(el,word,label)=>{ if(!el) return; el.className='gt-mark'; el.innerHTML='<span class="word"></span>';
     el.querySelector('.word').textContent=word; el.title=label; el.setAttribute('aria-label',label); el.removeAttribute('style'); marks.appendChild(el); };

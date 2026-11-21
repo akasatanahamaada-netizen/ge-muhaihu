@@ -8,7 +8,7 @@
    ・分岐のあるページは、たどり着くと、選んだ道の文章になる
    ・埋まったページでも、そのページの「お話のかけら」がそろうまでは、ところどころ欠けている
      （文字がにじんで読めない・ページのふちの虫食い。挿絵には穴をあけない）。かけらを拾うたびに少しずつ読めるようになり、
-     全部そろうと、文字も挿絵も元どおりになる（engine.js の GT.pagePieces）
+     全部そろうと、文字も挿絵も元どおりになる（js/engine/ の GT.pagePieces）
    操作：◀ ▶ ボタン / ページの左右をクリック / ← → キー / スワイプ でめくる。Esc・閉じる で閉じる。
    開いているあいだ、ゲームは止まる。
 
@@ -273,12 +273,11 @@ const PAGE_SCENES={   // 1ページのボタンは、多くても 2つ（近道�
 };
 // ボタンに出す名前：ステージの label から「第一章 ── 」などの章の名前をはずしたもの
 const stageName=id=>String(GT.sceneName ? GT.sceneName(id) : id).replace(/^.*?──\s*/,'');
-/* そのページのお話のかけら（engine.js）。かけらのないページは、いつも完全 */
+/* そのページのお話のかけら（js/engine/）。かけらのないページは、いつも完全 */
 function pieces(p){ return GT.pagePieces ? GT.pagePieces(p.key) : {found:0,total:0,ids:[],foundIds:[],extra:[]}; }
 /* 欠けた文章：かけらが足りないぶんだけ、ところどころの文字がにじんだり、なくなったりしている。
    どの文字が欠けるかは決まっていて、かけらを拾うたびに、欠けた文字が少しずつ読めるようになる */
 const MAX_LACK=0.72;              // かけらが 1 個もないときに、読めない文字の割合
-function lackOf(p, pc){ return pc.total ? 1-Math.min(1,pc.found/pc.total) : (p.filled ? 0 : 0.85); }   // 0＝欠けなし、1＝いちばん欠けている
 function damagedText(text, pc, seed, unread){
   // かけら 0 個で 7割くらいが読めない。かけらを 1 個拾うごとに、同じだけ読めるようになり、全部そろうと元どおり
   // （欠ける文字は決まっていて、拾うたびに、そのうちの一部が読めるようになる＝だんだん見えてくる）
@@ -346,7 +345,7 @@ function updateNav(){                                         // 前へ・次へ
   btnPrev.disabled=hitL.disabled=spread<=0; btnNext.disabled=hitR.disabled=spread>=last;
   count.textContent=`${spread+1} / ${last+1}`;
 }
-/* 1枚めくる：ゲームのページめくり（engine.js の drawFlip）と同じ動き。
+/* 1枚めくる：ゲームのページめくり（js/engine/ の drawFlip）と同じ動き。
    めくれる紙は、ページとまったく同じ大きさで、表にはいまのページ、裏には次の見開きのページが描いてある
    （白紙ではなく、文字や挿絵が入ったまま めくれる）。
    紙は背表紙を軸に横へ縮みながら反対側へ倒れ、上下のふちが少し反る。めくっているあいだは見開きが少し暗くなり、

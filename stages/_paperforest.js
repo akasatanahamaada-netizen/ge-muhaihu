@@ -8,7 +8,7 @@
        層と層のあいだに、やわらかい影
      ・画面の左右のはしに、背の高い紙の木（場面のふち取り）
    kind：'day'（昼）／'evening'（夕方）。一度描いたら、取っておく
-   使いかた：js/playlist.js の背景に {paper:'day'} と書く（js/engine.js の drawStageBackground が描く）
+   使いかた：js/playlist.js の背景に {paper:'day'} と書く（js/engine/ の drawStageBackground が描く）
    ========================================================================== */
 (function(){
 const W=GT.W, H=GT.H, FLOOR=GT.H-GT.EDGE;

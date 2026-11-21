@@ -25,7 +25,16 @@ gravity_tale/
 ├─ css/
 │  └─ game.css       ← ゲーム画面の見た目（本の枠・ボタン・会話の枠など）
 ├─ js/               ← ゲームの土台。基本さわらない（★の2つだけは、よく直す）
-│  ├─ engine.js      ← 物理・会話・ステージ読み込み・描画のまとめ役
+│  ├─ engine/        ← ゲームの土台（エンジン）。index.html で core → … → boot の順に読む
+│  │  ├─ core.js      ← 画面・定数・共有する状態・登録のしくみ・本のページ・背景・ステージ読み込み・ミッション
+│  │  ├─ input.js     ← キー・タッチの入力、本を裏返す操作
+│  │  ├─ scene.js     ← 場面の進行・ハートとゲームオーバー・人物に話しかけるしくみ
+│  │  ├─ pageflip.js  ← ページめくりの演出
+│  │  ├─ dialogue.js  ← 会話（文字送り・スキップ・選択肢・立ち絵・画面の案内）
+│  │  ├─ physics.js   ← 毎フレームの更新（動き・当たり判定・かけらを拾う）
+│  │  ├─ draw.js      ← 少年・敵・かけら・ハート・人物などの描き方
+│  │  ├─ render.js    ← 1フレームの描画（層・影・色合い・ページめくりの絵）
+│  │  └─ boot.js      ← 起動
 │  ├─ paper.js       ← 本の紙（紙の色・古い紙のしみ・ふちのよれ）
 │  ├─ sprites.js     ← キャラクターの絵（どの画像のどこを切り出すか・白い縁取り）
 │  ├─ playlist.js    ← ★ステージの並び順・ページ一覧・初期状態・BGM・立ち絵。ここで全体を決める
@@ -131,7 +140,7 @@ story ステージは `npcs:[{who, name, page, x, lines:[...], choices:[...], on
 
 ## 6. もっと凝った仕掛けを足したい人へ
 
-ボス戦・QTE・窓のぞき映像のような「特別な仕掛け」は、`js/engine.js` を書き換えずに
+ボス戦・QTE・窓のぞき映像のような「特別な仕掛け」は、`js/engine/` を書き換えずに
 **登録（register）するだけ**で足せます（例は `12_grannys_house.js` / `03_house_peek.js`）。
 
 | したいこと | 使う関数 |
@@ -164,7 +173,7 @@ story ステージは `npcs:[{who, name, page, x, lines:[...], choices:[...], on
 GT.stageBackgrounds = { opening:'assets/background/ohiru no mori.webp', wolf_talk:'assets/background/yuugata no mori.webp', ... };  // キーは地形の id
 GT.portraits = { hood:'assets/character/水彩タッチの赤ずきん少女.webp', mother:'assets/character/水彩風の優しいお母さん.webp' }; // キーはセリフの c
 ```
-- 背景は見開き全体に広げ、紙の色を薄くかぶせて描きます（濃さは `js/engine.js` の `BG_WASH`）。表に無いステージは背景画像なし。
+- 背景は見開き全体に広げ、紙の色を薄くかぶせて描きます（濃さは `js/engine/` の `BG_WASH`）。表に無いステージは背景画像なし。
 - `{src:'…', page:'spread'}` と書くと、ふちを切りぬかずに**見開き全体に敷きます**（序章 `opening` がこれ）。
 - 立ち絵は、そのキャラ（セリフの `c`）がしゃべっているあいだ、会話の枠の右うしろに出ます。透明背景の PNG を使ってください。
 - 主人公・マリ・狼の立ち絵は、画像ができたら `mari:'assets/character/mari.webp'` のように1行足せば出ます。
@@ -181,7 +190,7 @@ GT.portraits = { hood:'assets/character/水彩タッチの赤ずきん少女.web
 - **仕組み**：種類は **`stages/_decor.js` 1ファイル**にまとまっています。
 
 ### 飾りを「増やす」手順（1ファイルだけ）
-`stages/_decor.js` の `TYPES` に 1 行足すだけ。`index.html`・`editor.html`・`js/engine.js` は触りません。
+`stages/_decor.js` の `TYPES` に 1 行足すだけ。`index.html`・`editor.html`・`js/engine/` は触りません。
 
 ```js
 // stages/_decor.js の TYPES に追加する例
@@ -209,7 +218,7 @@ F.crate(GT.boxes[0]);     // 木目のある木箱
 F.ground({flowers:[[x,色0〜3],...], mushrooms:[[x,大きさ],...]});  F.air();  // 床の花・ちょうちょ・舞う葉
 ```
 
-> 仕組みのメモ：`js/engine.js` に「奥（最背面）レイヤー」の描画口を1つ足しました
+> 仕組みのメモ：`js/engine/` に「奥（最背面）レイヤー」の描画口を1つ足しました
 > （`GT.registerDraw(fn, 'back')`）。飾りの手前側は従来の `'overlay'` を使っています。
 
 ---
@@ -229,7 +238,7 @@ F.ground({flowers:[[x,色0〜3],...], mushrooms:[[x,大きさ],...]});  F.air();
 空中で裏返しを連打して浮き続ける裏技は使わないので、「浮遊しないと届かない」ステージはクリアできない判定になります。
 
 > 注意：判定用の物理は `editor.html` の中に **engine.js の写し**として入っています（`GTSolver`）。
-> `js/engine.js` の物理や数値（重力・速さ・ジャンプ力・沼など）を変えたら、こちらも同じように直してください。
+> `js/engine/` の物理や数値（重力・速さ・ジャンプ力・沼など）を変えたら、こちらも同じように直してください。
 
 ---
 
@@ -274,7 +283,7 @@ GT.defineStage('id', {
 - 進み具合は、**ステージが始まるたびにブラウザへ自動でセーブ**されます（`localStorage`）。そのステージに来たときのフラグと本のページも一緒に記録します。
 - ステージ一覧の名前は、各ステージの `label` を使います。`label` の無いシーンは `js/menu.js` の `NAMES` で決めます。
 - タイトルの背景は `js/menu.js` の `TITLE_BG` で変えられます。
-- `js/engine.js` に足した口：`GT.onSceneStart(fn)` / `GT.jumpToScene(番号, ページ)` / `GT.paused` / `GT.getPageNo()`。`GT.showMenu` があると、起動時にそこから始まります。
+- `js/engine/` に足した口：`GT.onSceneStart(fn)` / `GT.jumpToScene(番号, ページ)` / `GT.paused` / `GT.getPageNo()`。`GT.showMenu` があると、起動時にそこから始まります。
 
 ### 本を読みかえす画面（`js/bookview.js`）
 見開きの本で、1枚ずつページをめくって読みます。最初の左ページはとびら（題名と、埋まったページの数）、そのあと `GT.definePages` の順に1ページずつ並び、まだ埋まっていないページは虫食いの白紙です。
@@ -300,12 +309,12 @@ GTDecor.paint.flower(ctx, x, 地面のy, 大きさ, 色0〜3, 種);       // 花
 
 ## 12. 人物も重力にしたがう・何回も逆さにすると怒られる
 
-- 赤ずきん・マリ・狼・おばあさんも、いるページの重力の向きに落ちます（天井にいるときは上下さかさま）。しくみは `js/engine.js` の `GT.fallBody(b, dt)`。
+- 赤ずきん・マリ・狼・おばあさんも、いるページの重力の向きに落ちます（天井にいるときは上下さかさま）。しくみは `js/engine/` の `GT.fallBody(b, dt)`。
 - 何回も逆さにすると、吹き出しで怒られます（1回目は何も言わない。回数が増えるほど怒る。しばらく反転しないとおさまる）。
-  セリフは `js/engine.js` の `GT.GRUMBLE` で、キャラごとに5段階（だんだん怒る順）。ステージ独自の人物には `GT.grumble(b, 'hood')` を呼ぶと同じしくみが使えます。
+  セリフは `js/engine/` の `GT.GRUMBLE` で、キャラごとに5段階（だんだん怒る順）。ステージ独自の人物には `GT.grumble(b, 'hood')` を呼ぶと同じしくみが使えます。
 
 ---
 
 ## クレジット
 
-- 章のとびらの文字の書き順データ：[KanjiVG](https://kanjivg.tagaini.net)（Ulrich Apel ほか、CC BY-SA 3.0）。`js/inkwrite.js` の `KVG` に、使う字の分だけ入れています（章をえらぶ画面・章のとびらで使う）。
+- 章をえらぶ画面の文字の書き順データ：[KanjiVG](https://kanjivg.tagaini.net)（Ulrich Apel ほか、CC BY-SA 3.0）。`js/inkwrite.js` の `KVG` に、使う字の分だけ入れています（章をえらぶ画面・章のとびらで使う）。

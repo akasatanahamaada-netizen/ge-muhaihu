@@ -4,7 +4,6 @@
    タイトル画面と同じ森の場面（stages/00t_title.js の title_view。赤ずきんと狼のシルエット）。
    章の名前の左右の ❧ で、前の章・次の章へ（場面がぺらっとめくれる）。
    「Begin」で、その章をはじめる（いまは第一章だけ。ほかの章は、まだ書かれていない）。
-   （本がひらく章のとびら chapter1 は、いったん使わない）
    ========================================================================== */
 (function(){
 GT.registerScene({ id:'chapter_select', type:'story', stage:'title_view', label:'Gravity Tales', npcs:[] });

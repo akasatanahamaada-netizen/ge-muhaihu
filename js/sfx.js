@@ -2,7 +2,7 @@
    効果音（assets/koukaonn/ フォルダの mp3）
    GT.sfx('名前') で鳴らす。同じ音を重ねて鳴らせる（すぐに連続したときだけは間引く）。
    どこで鳴らすか：
-     flip    … 本を裏返して重力が反転したとき（engine.js）
+     flip    … 本を裏返して重力が反転したとき（js/engine/）
      page    … ページをめくるとき（ステージの移りかわり・本を読みかえす画面）
      close   … 本を読みかえす画面を閉じるとき
      write   … （いまは鳴らしていない）本のページに文字が書きこまれたとき用
@@ -46,7 +46,7 @@ const SRC={
   hit:   'assets/koukaonn/打撃1.mp3',
   gore:  'assets/koukaonn/グロテスクな音.mp3',
 };
-const VOL={ land:0.45, write:3, swamp:0.7, page:3, gore:2.4 };   // write … 章のとびらのペンの音（大きめ）   // 音ごとの大きさ（書いていない音は 1）
+const VOL={ land:0.45, write:3, swamp:0.7, page:3, gore:2.4 };   // write … 章の名前を書くペンの音（大きめ）   // 音ごとの大きさ（書いていない音は 1）
 const MAX_LEN={ write:1.6, dizzy:1.8 };          // 長い音は、この秒数で止める
 const base={}, lastT={};
 for(const k in SRC){ const a=new Audio(encodeURI(SRC[k])); a.preload='auto'; base[k]=a; }

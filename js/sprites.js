@@ -6,7 +6,7 @@
      GT.sprite('boyStand') … 読みこみ済みの絵（まだなら undefined）   GT.drawSprite(絵,x,y,w,h) … 縁取りぶんを合わせて置く
      GT.hasSprite / GT.wolfRunPose
    どの絵のどこを切り出すかは、下の HOOD_SPRITE（box:[左,上,右,下] ＝ 画像の中のピクセル位置）。
-   読み込む順番：js/engine.js のあと（GT.PLAYER_H を使う）。
+   読み込む順番：js/engine/ のあと（GT.PLAYER_H を使う）。
    ========================================================================== */
 (function(){
 "use strict";

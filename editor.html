@@ -259,10 +259,10 @@
 /* ==========================================================================
    クリア判定（ソルバー）  window.GTSolver
    ----------------------------------------------------------------------------
-   engine.js の物理（update / resolveBodyCollisions / 沼 / 会話の開始）を
+   エンジン（js/engine/） の物理（update / resolveBodyCollisions / 沼 / 会話の開始）を
    そのまま写し、「←→・止まる × ジャンプ × 本を裏返す」を 0.1 秒刻みで
    組み合わせて、クリアまで届く操作の列を A* 探索で探す。
-   ★ engine.js の物理や定数を変えたら、ここも同じように直すこと。
+   ★ エンジン（js/engine/） の物理や定数を変えたら、ここも同じように直すこと。
    ========================================================================== */
 (function(){
 "use strict";
@@ -273,7 +273,7 @@ const DT=1/60;                 // 1フレーム
 const K=6;                     // 1手 = 6フレーム（0.1秒）同じ操作を続ける
 const PLAYER_START={x:60,y:H-EDGE-34,w:26,h:34};
 
-const OVERLAP_EPS=1e-6;       // engine.js と同じ：計算誤差だけの重なりは数えない
+const OVERLAP_EPS=1e-6;       // エンジン（js/engine/） と同じ：計算誤差だけの重なりは数えない
 const overlap=(a,b)=> a.x<b.x+b.w-OVERLAP_EPS && a.x+a.w>b.x+OVERLAP_EPS && a.y<b.y+b.h-OVERLAP_EPS && a.y+a.h>b.y+OVERLAP_EPS;
 const pageOf=e=> (e.x+e.w/2)<SPINE ? 'left' : 'right';
 
@@ -298,7 +298,7 @@ function prepare(world){
   const all=edges.concat(world.platforms);
   const L=all.filter(p=>p.page==='left'), R=all.filter(p=>p.page==='right');
   const m=world.mission||[];
-  // アイテムは engine.js の itemHitbox と同じく、四角の内側 20% にしぼった当たり判定で扱う
+  // アイテムは エンジン（js/engine/） の itemHitbox と同じく、四角の内側 20% にしぼった当たり判定で扱う
   const items=(world.items||[]).map(it=>{ const ix=it.w*0.2, iy=it.h*0.2; return {x:it.x+ix, y:it.y+iy, w:it.w-2*ix, h:it.h-2*iy}; });
   return { mode:world.mode, swamps:world.swamps||[], goal:world.goal||null, npcs:world.npcs||[],
     platsL:L, platsROpen:R, platsRClosed:R.concat([rightWall]),
@@ -324,13 +324,13 @@ function clone(s){
     enemies:s.enemies.map(e=>({page:e.page,x:e.x,y:e.y,w:e.w,h:e.h,dir:e.dir,vy:e.vy,alive:e.alive,minX:e.minX,maxX:e.maxX})) };
 }
 
-/* ミッション（engine.js の missionDone と同じ） */
+/* ミッション（エンジン（js/engine/） の missionDone と同じ） */
 function missionDone(w,s){
   if(w.needItems && s.got!==w.allItems) return false;
   if(w.needEnemies && s.enemies.some(e=>e.alive)) return false;
   return true;
 }
-/* 右端が開いているか。engine.js と同じく、フレームのはじめに決めて s.open に入れる */
+/* 右端が開いているか。エンジン（js/engine/） と同じく、フレームのはじめに決めて s.open に入れる */
 const exitOpen=(w,s)=> (w.mode==='exit' || (w.mode==='story' && s.talked!==0)) && missionDone(w,s);
 const grav=(s,page)=> page==='left'?s.gl:s.gr;
 const plats=(w,s,page)=> page==='left'?w.platsL:(s.open?w.platsROpen:w.platsRClosed);
@@ -340,7 +340,7 @@ function swampFactor(w,body,key){
   for(const sw of w.swamps){ if(overlap(body,sw)) f=Math.min(f,sw[key]!=null?sw[key]:def); }
   return f;
 }
-/* engine.js の resolveBodyCollisions / pickSide と同じ：
+/* エンジン（js/engine/） の resolveBodyCollisions / pickSide と同じ：
    そのフレームのはじめにいた側（px,py）へ押し戻す。はじめから重なっていたら一番浅い向きへ */
 function pickSide(body,axis,plat){
   const E=0.01;
@@ -375,11 +375,11 @@ function nearNpc(w,s){
   return idx;
 }
 
-/* engine.js の update() 1フレーム分。戻り値：1=クリア / -1=やられた / 0=つづく */
+/* エンジン（js/engine/） の update() 1フレーム分。戻り値：1=クリア / -1=やられた / 0=つづく */
 function step(w,s,dir,jump,talk){
   const p=s.p, boxes=s.boxes, enemies=s.enemies;
   for(const b of [p,...boxes,...enemies]){ b.px=b.x; b.py=b.y; }   // フレームのはじめの位置（押し戻しの向き用）
-  s.open=exitOpen(w,s);                                          // engine.js の updateExitGate
+  s.open=exitOpen(w,s);                                          // エンジン（js/engine/） の updateExitGate
   const npc=nearNpc(w,s);
   if(talk&&npc>=0){ s.talked|=(1<<npc); p.vx=0; }         // Enter で話しかける
   const page=pageOf(p), g=grav(s,page);
@@ -664,7 +664,7 @@ window.GTSolver={ solve, replay, passable, STEP_SEC:K*DT };
 <script>
 /* ==========================================================================
    Gravity Tale ステージエディタ v2 ── 地形＋キャラ＋会話＋飾り
-   ・engine.js と同じ 900×480・綴じ目 x=450
+   ・エンジン（js/engine/） と同じ 900×480・綴じ目 x=450
    ・書き出しは 00_opening.js / 04_house_peek.js と同じ story 形式にそろえてある
    ========================================================================== */
 (function(){
@@ -799,7 +799,7 @@ function drawObj(o){
   ctx.restore();
 }
 
-/* 人物（engine.js の見た目を簡略化して再現） */
+/* 人物（エンジン（js/engine/） の見た目を簡略化して再現） */
 function drawNpc(n){
   const cx=n.x+n.w/2, w=n.w, h=n.h;
   ctx.save();
@@ -1172,8 +1172,8 @@ function buildStageCode(){
 function buildJS(){ return `/* stages/XX_${(state.meta.id||'my_stage').trim()}.js  ── ステージエディタで作成 */\n`+buildStageCode(); }
 
 /* ==========================================================================
-   テストプレイ ── 本物の engine.js を iframe で起動し、編集中の1ステージを遊ぶ
-   （editor.html は gravity_tale フォルダのいちばん上に置いてください。js/engine.js を読みます）
+   テストプレイ ── 本物のエンジン（js/engine/）を iframe で起動し、編集中の1ステージを遊ぶ
+   （editor.html は gravity_tale フォルダのいちばん上に置いてください。js/engine/ のファイルを読みます）
    ========================================================================== */
 const playModal=el('playModal'), playFrame=el('playFrame');
 function buildPlaytestSrcdoc(){
@@ -1182,7 +1182,7 @@ function buildPlaytestSrcdoc(){
   const pages=`GT.definePages([{key:'prologue',chapter:'序章',title:'森での目覚め'},{key:'window',title:'窓の向こう'},{key:'meet',title:'赤い頭巾の少女'},{key:'wolf',title:'森で出会った狼'},{key:'granny',title:'おばあさんの家'},{key:'result',title:'第一章の結末'}]);`;
   const endScene=`GT.registerScene({id:'__end',type:'talk',label:'テスト終了',lines:[{s:'',c:'narr',t:'― テストプレイ終了。「閉じる」で編集に戻ります。'}]});`;
   const flags=`GT.flags={warnedHood:false,route:null,stoppedAtDoor:false,saved:null,grannyAlive:null};`;
-  const init=`(function(){if(!window.GT){document.body.innerHTML='<div class="loaderr">⚠ js/engine.js を読み込めませんでした。editor.html を gravity_tale フォルダの中に置いて開いてください。</div>';return;}${pages}${stage}${endScene}${flags}GT.playlist=['${id}','__end'];})();`;
+  const init=`(function(){if(!window.GT){document.body.innerHTML='<div class="loaderr">⚠ js/engine/ のファイルを読み込めませんでした。editor.html を gravity_tale フォルダの中に置いて開いてください。</div>';return;}${pages}${stage}${endScene}${flags}GT.playlist=['${id}','__end'];})();`;
   const CSS=`*{box-sizing:border-box;}
 body{margin:0;background:radial-gradient(ellipse at center,#3a3226,#201b14);font-family:'Zen Old Mincho',serif;color:#e8dcc0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px;overflow-y:auto;min-height:100vh;}
 .loaderr{color:#e8c38a;font-family:sans-serif;padding:30px;line-height:1.9;font-size:14px;text-align:center;}
@@ -1232,7 +1232,7 @@ canvas#game{display:block;width:100%;height:auto;aspect-ratio:900/480;border-rad
 <div class="touch-ui"><div class="touch-group"><div class="b2" id="btnLeft">◀</div><div class="b2" id="btnRight">▶</div></div><div class="b2 flip" id="btnFlip">裏返す</div><div class="touch-group"><div class="b2" id="btnJump">▲</div></div></div>
 <button class="bookbtn" id="openBook">📖 本を開く</button>
 <div class="modal" id="bookModal"><div class="book-inner"><h2>『Gravity Tales』</h2><div id="pageList"></div><div class="close"><button id="closeBook">閉じる</button></div></div></div>`;
-  return `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Zen+Old+Mincho:wght@500;700&display=swap" rel="stylesheet"><style>${CSS}</style></head><body>${SCAFFOLD}<script src="js/engine.js"><\/script><script src="js/paper.js"><\/script><script src="js/sprites.js"><\/script><script src="stages/_decor.js"><\/script><script>${init}<\/script></body></html>`;
+  return `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Zen+Old+Mincho:wght@500;700&display=swap" rel="stylesheet"><style>${CSS}</style></head><body>${SCAFFOLD}<script src="js/engine/core.js"><\/script><script src="js/engine/input.js"><\/script><script src="js/engine/scene.js"><\/script><script src="js/engine/pageflip.js"><\/script><script src="js/engine/dialogue.js"><\/script><script src="js/engine/physics.js"><\/script><script src="js/engine/draw.js"><\/script><script src="js/engine/render.js"><\/script><script src="js/engine/boot.js"><\/script><script src="js/paper.js"><\/script><script src="js/sprites.js"><\/script><script src="stages/_decor.js"><\/script><script>${init}<\/script></body></html>`;
 }
 function startPlay(){ playFrame.srcdoc=buildPlaytestSrcdoc(); playFrame.onload=()=>{ try{ playFrame.contentWindow.focus(); }catch(e){} }; }
 function openPlaytest(){

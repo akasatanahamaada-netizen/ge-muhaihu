@@ -84,7 +84,7 @@ GT.playlist = [
   'komichi1',     // 森の小道①（play）
   'komichi2',     // 森の小道②（play）
   'mari_gate',    // チュートリアルのおわり：森の出口でマリと話す（この先は絵本の世界）
-  'chapter_select', // 章をえらぶ画面（赤ずきんと狼のシルエット。Begin で第一章へ）。本がひらく章のとびら 'chapter1' は、いったん保留
+  'chapter_select', // 章をえらぶ画面（赤ずきんと狼のシルエット。Begin で第一章へ）
   'house_peek',   // 赤ずきんの家・窓のぞき（story）
   'path1',        // 森の道①（play）
   'meet_hood',    // 赤ずきんと一緒に歩く（story）
@@ -117,7 +117,6 @@ const S=src=>({src,page:'spread'});
 // ゴシック：明るい森の絵は、暗く・色を抜き・赤紫をかぶせて使う（タイトル画面の霧の薔薇の森に合わせる）
 // m … 不気味さ（0〜1）。大きいほど、絵を暗く・色を抜く（お話が進むほど大きくする）
 const G=(src,m=0.5)=>({src,page:'spread',filter:`brightness(${(0.95-0.45*m).toFixed(2)}) saturate(${(0.8-0.45*m).toFixed(2)}) contrast(1.05) blur(0.8px)`,tint:'rgb(178,172,164)',wash:'rgba(244,240,230,0.06)'});
-const BG_TITLE='assets/background/タイトル背景_森.webp';   // 紫をぬいた版（もとは タイトル背景.webp）   // タイトル画面の背景（道のある、霧の薔薇の森）
 const DARK={src:BG_DARK,page:'spread',wash:'rgba(244,240,230,0.08)',filter:'brightness(1.45) saturate(0.8) blur(0.8px)'};   // 暗い森の絵は、明るめにして見やすく   // 暗い森は、紙の色を薄くかぶせる（ふつうの 0.28 だと白っぽくなって、暗さが消える）
 const ROSE={src:BG_ROSE,page:'spread',wash:'rgba(244,240,230,0.08)'};
 // 赤ずきんのお話（明るい場面）は、今までの背景の絵のまま。まわりに紙の劇場のふち取り（stages/_papertheater.js）
@@ -138,9 +137,8 @@ GT.stageBackgrounds = {
   house_front:f=>f.route==='shortcut'?S(BG_DAY):S(BG_EVENING),
 };
 
-/* 不気味さ（0〜1）：お話が進むほど、暗く・色が抜け・冷たい色になり、霧が出る（js/engine.js の drawGothicWorld）。
+/* 不気味さ（0〜1）：お話が進むほど、暗く・色が抜け・冷たい色になり、霧が出る（js/engine/ の drawGothicWorld）。
    書いていないシーンは 0.5。'@boss' のように、種類でも決められる */
-const GOOD_END=f=>f.route==='shortcut' && f.saved!==false;
 GT.sceneMood = {
   // ゴシック（暗い森）は、序章（目覚め〜チュートリアル）と、赤ずきんのお話のあと（afterword）だけ
   title:0, chapter_select:0,   // タイトル画面のうしろの場面：明るい絵本（影あり）
@@ -158,9 +156,8 @@ GT.sceneMood = {
 const M=n=>'assets/music/'+n+'.mp3';
 const BGM_ADVENTURE=M('小さな勇者の探検');   // 冒険（アクションのステージ）
 const BGM_THORN=M('荊の庭');                 // 近道（いばらの道）
-const BGM_SAD=M('堕ちる');                    // 悲しい曲（おばあさんを助けられなかった結末）
 GT.sceneMusic = {
-  // wake（ひとりで目覚める）と chapter1（章のとびら）は、曲なし（静けさ）
+  // wake（ひとりで目覚める）は、曲なし（静けさ）
   // opening（マリと出会う）も、曲なし
   // afterword（最後にマリと話す森の出口）も、曲なし
   // チュートリアル（森の小道①②）は、曲なし

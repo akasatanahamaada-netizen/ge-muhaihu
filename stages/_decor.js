@@ -3,7 +3,7 @@
    ----------------------------------------------------------------------------
    ★ 飾りの「種類」はこのファイル 1つで決まります。
      ここに 1つ足すだけで、ゲームにもエディタ(editor.html)にも自動で出ます。
-     （index.html / editor.html / engine.js は、もう触らなくてOK）
+     （index.html / editor.html / js/engine/ は、もう触らなくてOK）
 
    - layer:'back'  … 奥（地形より後ろ）に描く
    - layer:'front' … 手前（プレイヤーより前）に描く
@@ -383,7 +383,7 @@ function drawRock(ctx,x,y,w,h){
   ctx.moveTo(x+w*0.55,y+h*0.1); ctx.lineTo(x+w*0.82,y+h*0.4); ctx.lineTo(x+w*0.6,y+h*0.45); ctx.closePath(); ctx.fill();
   ctx.restore();
 }
-/* 床の足場（engine.js の ledge）と同じ見た目：古い挿絵ふう（水彩のぬり・インクの輪郭・斜線）。
+/* 床の足場（js/engine/ の ledge）と同じ見た目：古い挿絵ふう（水彩のぬり・インクの輪郭・斜線）。
    重力が逆のページでは、光の縁と影の向きも上下が入れかわる */
 function drawLedge(ctx,x,y,w,h){
   const G=window.GT, page=(G&&x+w/2>=G.SPINE)?'right':'left';
@@ -455,7 +455,7 @@ api.FLAT=FLAT;
    GTDecor.forest.crate(箱)              … 木目のある木箱（engine の箱の上に重ねる）
    GTDecor.forest.ground({flowers:[[x,色],..], mushrooms:[[x,大きさ],..], lights:[[x,ずれ],..]}) … 床の花・きのこ・木漏れ日
    GTDecor.forest.air()                  … ちょうちょと舞う葉
-   どれも engine.js の GT.ctx に描く（ゲームの中で呼ぶ）。足場の当たり判定は変えない。 */
+   どれも js/engine/ の GT.ctx に描く（ゲームの中で呼ぶ）。足場の当たり判定は変えない。 */
 (function(){
 const GT=window.GT; if(!GT||!GT.ctx) return;
 const ctx=GT.ctx, W=GT.W, H=GT.H, EDGE=GT.EDGE, FLOOR=H-GT.EDGE;
@@ -773,7 +773,7 @@ const paperWrap=fn=>function(){ if(!brightNow()) return fn.apply(this,arguments)
 api.forest={ butterfly:drawButterfly, rock:paperWrap(drawRock), trunk:paperWrap(drawTrunk), crown:paperWrap(drawCrown), vine:paperWrap(drawVine), log:paperWrap(drawLog), crate:paperWrap(drawCrate), ground:drawGround, air:drawAir };
 })();
 
-/* ===== ゲーム本体に組み込む（engine.js があるときだけ動く） =============== */
+/* ===== ゲーム本体に組み込む（js/engine/ があるときだけ動く） =============== */
 if(window.GT && GT.registerDraw){
   const FRONT_DROP=16;   // 手前の飾りを、床より何px下に置くか
   function drawLayer(layer){

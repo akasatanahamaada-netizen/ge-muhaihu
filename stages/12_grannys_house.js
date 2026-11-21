@@ -61,7 +61,6 @@ function drawHoodSmall(x,foot,alpha){
 /* 部屋にいる人も、ページの重力にしたがって床か天井へ落ちる（GT.fallBody）。
    天井に落ちたときは、上下さかさまに描く。 */
 const castBody={ granny:{x:84,w:24,h:30}, hood:{x:184,w:24,h:30} };
-let castLast=performance.now();
 GT.registerSceneReset(()=>{ for(const k in castBody){ castBody[k].y=null; castBody[k].vy=0; castBody[k].g=1; castBody[k].onGround=true; } });
 GT.registerUpdate(dt=>{
   if(!isRoom()) return;

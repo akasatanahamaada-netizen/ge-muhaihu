@@ -71,6 +71,6 @@ function build(){
 }
 GT.paperTheater=function(){ if(!cv) build(); return cv; };
 
-const bright=()=>GT.isBright && GT.isBright() && GT.scene && !['chapter1'].includes(GT.scene.id) && GT.scene.type!=='boss' && GT.scene.type!=='qte' && GT.scene.type!=='end' && GT.scene.dynamic!=='arriveHouse';
-GT.drawPaperTheater=()=>{ if(bright()) GT.ctx.drawImage(GT.paperTheater(),0,0); };   // js/engine.js が、手前の飾りのあと（色合いの前）に呼ぶ
+const bright=()=>GT.isBright && GT.isBright() && GT.scene && GT.scene.type!=='boss' && GT.scene.type!=='qte' && GT.scene.type!=='end' && GT.scene.dynamic!=='arriveHouse';
+GT.drawPaperTheater=()=>{ if(bright()) GT.ctx.drawImage(GT.paperTheater(),0,0); };   // js/engine/ が、手前の飾りのあと（色合いの前）に呼ぶ
 })();

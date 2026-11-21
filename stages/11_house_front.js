@@ -19,7 +19,7 @@
        見つけた数は flags.houseClues に入る。
    ここで決めた flags.stoppedAtDoor は、次の「おばあさんの家」（12_grannys_house.js）で使われます。
 
-   ◆ このファイルが持っている独自の仕掛け（engine.js は触らない）
+   ◆ このファイルが持っている独自の仕掛け（js/engine/ は触らない）
      act：'front-setup'（はじめの位置）/ 'front-knock'（戸を叩く）/ 'front-run'（少年が駆けよる）
           'front-hood-enter'（赤ずきんが中へ入る）/ 'front-peek-on'・'front-peek-off'（窓の中の大きな映像を開く／閉じる）
      GT.registerUpdate        … はじめの語り・気づいたことの場所を見つける
@@ -34,7 +34,7 @@ const WIN  ={x:568, y:322, w:60, h:50};                               // 家の�
 const DOOR ={x:806, y:362, w:52};                                     // 家の戸（右の端）
 const PRINTS={x:470, w:300};                                          // 獣の足あと
 const GLASSES_X=716;                                                  // 落ちている眼鏡
-const MARI_GATE=372, HOOD_DOOR=742;
+const HOOD_DOOR=742;
 
 // --- 地形 ------------------------------------------------------------------
 GT.defineStage('house_front', {

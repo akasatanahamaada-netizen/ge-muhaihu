@@ -1,36 +1,19 @@
 /* Gravity Tale ── ゲーム画面の見た目（index.html から読む） */
-:root{
-  --parchment:#e8dcc0; --parchment-dark:#d9c9a3; --ink:#2b2e4a; --ink-soft:#4a4e6d;
-  --gold:#b08d57; --moss:#57644a; --rose:#8b5e63; --spine:#3a3226;
-}
-*{box-sizing:border-box;}
+:root{ --parchment:#e8dcc0; --parchment-dark:#d9c9a3; --ink:#2b2e4a; --ink-soft:#4a4e6d; --gold:#b08d57; --moss:#57644a; --rose:#8b5e63; --spine:#3a3226; }
+*{ box-sizing:border-box; }
 /* ---- 画面外：夜の書斎の机（ランプの灯り・木目・ただようほこり） ---- */
-html,body{
-  margin:0; padding:0; min-height:100%;
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,196,120,0.16), rgba(255,196,120,0) 70%),
-    radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%),
-    repeating-linear-gradient(92deg, rgba(255,255,255,0.012) 0 2px, rgba(0,0,0,0.035) 2px 5px, rgba(255,255,255,0) 5px 11px),
-    linear-gradient(180deg, #33281c 0%, #241c13 60%, #1a140d 100%);
-  background-attachment:fixed;
-  display:flex; align-items:flex-start; justify-content:center;
-  font-family:'Zen Old Mincho', serif; overflow-y:auto; overflow-x:hidden; color:#e8dcc0;
-}
+html,body{ margin:0; padding:0; min-height:100%; display:flex; align-items:flex-start; justify-content:center; font-family:'Zen Old Mincho', serif; overflow-y:auto; overflow-x:hidden; }
 html{ display:block; } body{ width:100%; min-height:100vh; }   /* 狭い画面でも、本が画面の幅におさまるように */
 .ambient{ position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-.ambient i{ position:absolute; bottom:-10px; width:3px; height:3px; border-radius:50%;
-  background:rgba(255,222,160,0.55); box-shadow:0 0 6px rgba(255,210,140,0.6); opacity:0;
-  animation:mote linear infinite; }
+.ambient i{ position:absolute; bottom:-10px; width:3px; height:3px; border-radius:50%; background:rgba(255,222,160,0.55); box-shadow:0 0 6px rgba(255,210,140,0.6); opacity:0; animation:mote linear infinite; }
 @keyframes mote{ 0%{ transform:translate(0,0); opacity:0 } 15%{ opacity:0.8 } 85%{ opacity:0.5 } 100%{ transform:translate(var(--dx),-105vh); opacity:0 } }
 @media (prefers-reduced-motion:reduce){ .ambient{ display:none; } }
 
-.stage{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; max-width:960px; padding:18px 10px 28px; }
+.stage{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; }
 
 /* ---- 題字 ---- */
 .masthead{ text-align:center; }
-h1{ font-family:'Cormorant Garamond',serif; font-weight:700; letter-spacing:0.22em; font-size:clamp(22px,3.4vw,32px); margin:0; line-height:1.1;
-  background:linear-gradient(180deg,#f6e7bf 0%,#d8b46e 55%,#a9803f 100%); -webkit-background-clip:text; background-clip:text; color:transparent;
-  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
+h1{ font-family:'Cormorant Garamond',serif; font-weight:700; letter-spacing:0.22em; font-size:clamp(22px,3.4vw,32px); margin:0; line-height:1.1; background:linear-gradient(180deg,#f6e7bf 0%,#d8b46e 55%,#a9803f 100%); -webkit-background-clip:text; background-clip:text; color:transparent; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
 .flourish{ display:flex; align-items:center; justify-content:center; gap:10px; margin-top:6px; color:#b08d57; font-size:12px; }
 .flourish::before,.flourish::after{ content:''; width:clamp(40px,10vw,110px); height:1px; background:linear-gradient(90deg,rgba(176,141,87,0),rgba(176,141,87,0.8)); }
 .flourish::after{ transform:scaleX(-1); }
@@ -38,36 +21,20 @@ h1{ font-family:'Cormorant Garamond',serif; font-weight:700; letter-spacing:0.22
 .tagline{ color:#8f8264; font-size:11px; letter-spacing:0.1em; margin-top:3px; font-style:italic; }
 
 /* ---- 本の表紙（革・金の箔押しの枠・しおりのリボン） ---- */
-.book-frame{
-  position:relative; border-radius:10px; padding:12px 16px 16px;
-  width:100%; max-width:932px;
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.06), rgba(255,255,255,0) 60%),
-    radial-gradient(circle at 80% 90%, rgba(0,0,0,0.25), rgba(0,0,0,0) 50%),
-    linear-gradient(160deg,#5a3a26 0%,#432a1b 45%,#2e1d13 100%);
-  box-shadow: 0 30px 70px rgba(0,0,0,0.6), 0 6px 0 #1c120b, inset 0 1px 0 rgba(255,230,190,0.12), inset 0 0 40px rgba(0,0,0,0.45);
-}
-.book-frame::before{   /* 金の箔押しの二重線 */
-  content:''; position:absolute; inset:5px; border-radius:7px; pointer-events:none;
-  border:1px solid rgba(214,178,110,0.55); box-shadow:inset 0 0 0 3px rgba(0,0,0,0.15), inset 0 0 0 4px rgba(214,178,110,0.25);
-}
-.book-frame::after{    /* 四すみの飾り */
-  content:''; position:absolute; inset:9px; pointer-events:none; border-radius:5px;
-  --c:rgba(214,178,110,0.85);
-  background:
+.book-frame{ position:relative; width:100%; max-width:932px; }
+.book-frame::before{ /* 金の箔押しの二重線 */
+  content:''; position:absolute; inset:5px; border-radius:7px; pointer-events:none; border:1px solid rgba(214,178,110,0.55); box-shadow:inset 0 0 0 3px rgba(0,0,0,0.15), inset 0 0 0 4px rgba(214,178,110,0.25); }
+.book-frame::after{ /* 四すみの飾り */
+  content:''; position:absolute; inset:9px; pointer-events:none; border-radius:5px; --c:rgba(214,178,110,0.85); background:
     linear-gradient(var(--c),var(--c)) top left/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) top left/2px 18px no-repeat,
     linear-gradient(var(--c),var(--c)) top right/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) top right/2px 18px no-repeat,
     linear-gradient(var(--c),var(--c)) bottom left/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) bottom left/2px 18px no-repeat,
-    linear-gradient(var(--c),var(--c)) bottom right/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) bottom right/2px 18px no-repeat;
-}
-.ribbon{ position:absolute; top:-6px; right:clamp(40px,9%,90px); width:22px; height:calc(100% + 34px); z-index:-1; pointer-events:none;
-  background:linear-gradient(90deg,#7a2a26,#a8423a 45%,#7a2a26); box-shadow:2px 4px 8px rgba(0,0,0,0.5);
-  clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 10px),0 100%); }
+    linear-gradient(var(--c),var(--c)) bottom right/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) bottom right/2px 18px no-repeat; }
+.ribbon{ position:absolute; top:-6px; right:clamp(40px,9%,90px); width:22px; height:calc(100% + 34px); z-index:-1; pointer-events:none; background:linear-gradient(90deg,#7a2a26,#a8423a 45%,#7a2a26); box-shadow:2px 4px 8px rgba(0,0,0,0.5); clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 10px),0 100%); }
 
 /* ---- ページの上の見出し（左右の重力・いまの章） ---- */
 .hud{ position:relative; display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:8px; width:100%; padding:2px 6px 8px; font-size:12px; color:#cbb98f; letter-spacing:0.05em; }
-#hudLeft,#hudRight{ justify-self:start; padding:3px 12px; border-radius:20px; border:1px solid rgba(176,141,87,0.45); background:rgba(0,0,0,0.22);
-  transition:color .3s, border-color .3s, background .3s; white-space:nowrap; }
+#hudLeft,#hudRight{ justify-self:start; padding:3px 12px; border-radius:20px; border:1px solid rgba(176,141,87,0.45); background:rgba(0,0,0,0.22); transition:color .3s, border-color .3s, background .3s; white-space:nowrap; }
 #hudRight{ justify-self:end; }
 #hudLeft,#hudRight{ max-width:100%; overflow:hidden; text-overflow:ellipsis; }
 .book-frame,.canvas-wrap{ min-width:0; }
@@ -83,65 +50,47 @@ h1{ font-family:'Cormorant Garamond',serif; font-weight:700; letter-spacing:0.22
 #hudStage::after{ content:'❧'; margin-left:10px; color:#b08d57; }
 
 .canvas-wrap{ container-type:inline-size; position:relative; width:100%; border-radius:4px; box-shadow:0 0 0 1px rgba(0,0,0,0.5), 0 0 0 4px rgba(214,178,110,0.18), 0 8px 18px rgba(0,0,0,0.45); }
-canvas#game{ display:block; border-radius:3px; width:100%; height:auto; aspect-ratio:900/480; }
+canvas#game{ display:block; width:100%; height:auto; aspect-ratio:900/480; }
 
-.dialogue{
-  position:absolute; left:0; right:0; bottom:0; padding:1.55cqw 1.8cqw 1.8cqw 1.8cqw;   /* cqw：ゲーム画面の幅に合わせて大きくなる */
-  background:linear-gradient(180deg, rgba(20,17,12,0) 0%, rgba(20,17,12,0.82) 30%, rgba(20,17,12,0.94) 100%);
-  display:none; flex-direction:column; gap:0.9cqw; border-radius:0 0 3px 3px;
-}
+.dialogue{ position:absolute; left:0; right:0; bottom:0; padding:1.55cqw 1.8cqw 1.8cqw 1.8cqw; display:none; flex-direction:column; gap:0.9cqw; border-radius:0 0 3px 3px; }
 .dialogue.show{ display:flex; }
 .dialogue.hold{ opacity:0; pointer-events:none; }   /* 人物が動いているあいだは、会話の枠を消す（GT.holdDialogue） */
-.speaker{ font-family:'Cormorant Garamond',serif; font-size:clamp(12px,1.67cqw,40px); letter-spacing:0.1em; color:#d9b877; font-weight:700; }
+.speaker{ font-family:'Cormorant Garamond',serif; font-size:clamp(12px,1.67cqw,40px); letter-spacing:0.1em; font-weight:700; }
 .speaker.mari{ color:#a9b0d6; } .speaker.wolf{ color:#c9503f; } .speaker.hood{ color:#d98a90; }
-.speaker.granny{ color:#c8b78f; } .speaker.narr{ color:#8a8266; font-style:italic; }
-.speaker.mother{ color:#d9a77a; } .speaker.boy{ color:#a9bf93; }
-.dline{ font-size:clamp(14px,1.78cqw,44px); line-height:1.7; color:#efe6cf; min-height:1.7em; letter-spacing:0.02em; }
+.speaker.granny{ color:#c8b78f; } .speaker.narr{ font-style:italic; }
+.speaker.mother{ color:#d9a77a; }
+.dline{ font-size:clamp(14px,1.78cqw,44px); line-height:1.7; min-height:1.7em; letter-spacing:0.02em; }
 .dline.big{ font-size:clamp(22px,2.9cqw,72px); font-weight:900; line-height:1.4; letter-spacing:0.06em; color:#fff3dc; text-shadow:0 2px 0 rgba(90,20,15,0.55); }   /* 叫ぶセリフ（big:true） */
-.dhint{ font-size:clamp(10px,1.22cqw,30px); color:#8a8266; text-align:right; letter-spacing:0.08em; }
+.dhint{ text-align:right; }
 .choices{ display:flex; flex-direction:column; gap:0.9cqw; margin-top:0.45cqw; }
-.choice{
-  background:rgba(176,141,87,0.12); border:1px solid rgba(176,141,87,0.5); border-radius:8px;
-  padding:1.2cqw 1.55cqw; font-size:clamp(13px,1.67cqw,40px); color:#efe6cf; cursor:pointer; text-align:left;
-  font-family:'Zen Old Mincho',serif; transition:background .15s;
-}
-.choice:hover,.choice:active{ background:rgba(176,141,87,0.28); }
+.choice{ border:1px solid rgba(176,141,87,0.5); border-radius:8px; padding:1.2cqw 1.55cqw; font-size:clamp(13px,1.67cqw,40px); cursor:pointer; text-align:left; font-family:'Zen Old Mincho',serif; transition:background .15s; }
 .choice.locked, .choice.locked:hover{ opacity:0.45; cursor:default; background:none; font-style:italic; }   /* まだ選べない選択肢 */
 .name-ask{ display:flex; gap:0.9cqw; align-items:stretch; flex-wrap:wrap; }
-.name-ask input{ flex:1; min-width:140px; font-family:'Zen Old Mincho',serif; font-size:clamp(14px,1.9cqw,46px); color:#2b2418;
-  background:#f3ead0; border:2px solid #b08d57; border-radius:8px; padding:0.35em 0.7em; outline:none; letter-spacing:0.08em; }
+.name-ask input{ flex:1; min-width:140px; font-family:'Zen Old Mincho',serif; font-size:clamp(14px,1.9cqw,46px); border:2px solid #b08d57; border-radius:8px; padding:0.35em 0.7em; outline:none; letter-spacing:0.08em; }
 .name-ask input:focus{ border-color:#d8b46e; box-shadow:0 0 0 3px rgba(216,180,110,0.35); }
 .name-ask .choice{ flex:none; text-align:center; }
 .name-ask input.shake{ animation:nameShake .35s; }
 @keyframes nameShake{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 
-.qte{ position:absolute; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; gap:10px; background:rgba(20,17,12,0.35); }
+.qte{ position:absolute; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; gap:10px; }
 .qte.show{ display:flex; }
 .qte .big{ font-size:clamp(16px,2.45cqw,60px); color:#e8dcc0; letter-spacing:0.1em; text-shadow:0 2px 8px #000; }
-.qte .flipnow{ background:rgba(201,80,63,0.25); border:2px solid #c9503f; color:#fff; padding:1.55cqw 2.9cqw; border-radius:3.3cqw; font-size:clamp(14px,2cqw,50px); letter-spacing:0.08em; animation:pulse .5s infinite alternate; }
+.qte .flipnow{ border:2px solid #c9503f; color:#fff; padding:1.55cqw 2.9cqw; border-radius:3.3cqw; letter-spacing:0.08em; animation:pulse .5s infinite alternate; }
 @keyframes pulse{ from{transform:scale(1);} to{transform:scale(1.08);} }
 
 /* ---- 本の下：操作の説明（キーの形）・タッチ用ボタン・本を開くボタン ---- */
 .under{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; flex-wrap:wrap; }
 .controls{ display:flex; gap:6px 14px; color:#b5a580; font-size:12px; letter-spacing:0.03em; flex-wrap:wrap; flex:1; min-width:260px; }
 .controls span{ display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
-.controls kbd{ font-family:'Zen Old Mincho',serif; font-size:11px; color:#2b2418; min-width:22px; text-align:center;
-  padding:2px 6px; border-radius:4px; background:linear-gradient(180deg,#f1e6c9,#d6c49a);
-  box-shadow:0 2px 0 #8a7350, 0 3px 4px rgba(0,0,0,0.4); }
-.bookbtn{ display:inline-flex; align-items:center; gap:8px; font-size:13px; color:#f1e4c2; letter-spacing:0.08em; cursor:pointer; font-family:'Zen Old Mincho',serif;
-  padding:8px 16px 8px 14px; border-radius:6px; border:1px solid rgba(214,178,110,0.6);
-  background:linear-gradient(180deg,rgba(176,141,87,0.28),rgba(120,88,48,0.22)); box-shadow:0 3px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,235,200,0.15);
-  transition:transform .15s, background .15s, box-shadow .15s; white-space:nowrap; }
+.controls kbd{ font-family:'Zen Old Mincho',serif; font-size:11px; color:#2b2418; min-width:22px; text-align:center; padding:2px 6px; border-radius:4px; background:linear-gradient(180deg,#f1e6c9,#d6c49a); box-shadow:0 2px 0 #8a7350, 0 3px 4px rgba(0,0,0,0.4); }
+.bookbtn{ display:inline-flex; align-items:center; gap:8px; font-size:13px; color:#f1e4c2; letter-spacing:0.08em; cursor:pointer; font-family:'Zen Old Mincho',serif; padding:8px 16px 8px 14px; border-radius:6px; border:1px solid rgba(214,178,110,0.6); background:linear-gradient(180deg,rgba(176,141,87,0.28),rgba(120,88,48,0.22)); box-shadow:0 3px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,235,200,0.15); transition:transform .15s, background .15s, box-shadow .15s; white-space:nowrap; }
 .bookbtn:hover{ transform:translateY(-1px); background:linear-gradient(180deg,rgba(176,141,87,0.42),rgba(120,88,48,0.3)); box-shadow:0 6px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,235,200,0.2); }
 .bookbtn:focus-visible{ outline:2px solid #d8b46e; outline-offset:2px; }
 .bookbtn svg{ width:18px; height:18px; flex:none; }
 /* 本を開くように誘導しているとき（js/bookview.js の GT.guideToBook）：ボタンが光り、上に吹き出しが出る */
 .bookbtn.gt-guide{ position:relative; border-color:#f0cf86; animation:gtGuideGlow 1.1s ease-in-out infinite alternate; }
-.bookbtn.gt-guide::after{ content:attr(data-guide); position:absolute; left:50%; bottom:calc(100% + 12px); transform:translateX(-50%);
-  padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-size:13px; letter-spacing:0.06em; white-space:nowrap;
-  box-shadow:0 4px 10px rgba(0,0,0,0.45); pointer-events:none; animation:gtGuideBob 1.1s ease-in-out infinite alternate; z-index:5; }
-.bookbtn.gt-guide::before{ content:''; position:absolute; left:50%; bottom:calc(100% + 4px); transform:translateX(-50%);
-  border:8px solid transparent; border-top-color:#f3ead0; border-bottom:0; pointer-events:none; animation:gtGuideBob 1.1s ease-in-out infinite alternate; z-index:5; }
+.bookbtn.gt-guide::after{ content:attr(data-guide); position:absolute; left:50%; bottom:calc(100% + 12px); transform:translateX(-50%); padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-size:13px; letter-spacing:0.06em; white-space:nowrap; box-shadow:0 4px 10px rgba(0,0,0,0.45); pointer-events:none; animation:gtGuideBob 1.1s ease-in-out infinite alternate; z-index:5; }
+.bookbtn.gt-guide::before{ content:''; position:absolute; left:50%; bottom:calc(100% + 4px); transform:translateX(-50%); border:8px solid transparent; border-top-color:#f3ead0; border-bottom:0; pointer-events:none; animation:gtGuideBob 1.1s ease-in-out infinite alternate; z-index:5; }
 @keyframes gtGuideGlow{ from{ box-shadow:0 3px 8px rgba(0,0,0,0.35), 0 0 0 0 rgba(240,207,134,0.0); }
                         to  { box-shadow:0 3px 8px rgba(0,0,0,0.35), 0 0 18px 4px rgba(240,207,134,0.75); background:linear-gradient(180deg,rgba(214,178,110,0.5),rgba(150,110,60,0.35)); } }
 @keyframes gtGuideBob{ from{ margin-bottom:0; } to{ margin-bottom:5px; } }
@@ -150,21 +99,14 @@ canvas#game{ display:block; border-radius:3px; width:100%; height:auto; aspect-r
 .touch-ui{ display:none; justify-content:space-between; align-items:center; width:100%; margin-top:12px; gap:10px; }
 @media (hover:none), (pointer:coarse){ .touch-ui{ display:flex; } .controls{ display:none; } .under{ justify-content:center; } }
 .touch-group{ display:flex; gap:10px; }
-.btn{ width:58px; height:58px; border-radius:50%; color:#3a2a14; font-size:20px; display:flex; align-items:center; justify-content:center;
-  user-select:none; -webkit-user-select:none; touch-action:none;
-  background:radial-gradient(circle at 35% 30%,#f6e2b0 0%,#d2ab62 45%,#9a7334 100%);
-  box-shadow:0 4px 0 #5e4420, 0 6px 10px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,240,200,0.35), inset 0 -3px 6px rgba(80,50,15,0.35);
-  transition:transform .06s, box-shadow .06s; }
+.btn{ width:58px; height:58px; border-radius:50%; color:#3a2a14; font-size:20px; display:flex; align-items:center; justify-content:center; user-select:none; -webkit-user-select:none; touch-action:none; background:radial-gradient(circle at 35% 30%,#f6e2b0 0%,#d2ab62 45%,#9a7334 100%); box-shadow:0 4px 0 #5e4420, 0 6px 10px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,240,200,0.35), inset 0 -3px 6px rgba(80,50,15,0.35); transition:transform .06s, box-shadow .06s; }
 .btn:active{ transform:translateY(3px); box-shadow:0 1px 0 #5e4420, 0 2px 4px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,240,200,0.35), inset 0 -2px 4px rgba(80,50,15,0.35); }
-.btn.flip{ flex:none; white-space:nowrap; width:auto; padding:0 20px; border-radius:30px; color:#f8e9e4; font-size:12px; line-height:1.15; text-align:center; letter-spacing:0.06em;   /* 封蝋の赤 */
-  background:radial-gradient(circle at 35% 30%,#d0675a 0%,#a23b31 50%,#6e2019 100%);
-  box-shadow:0 4px 0 #4a140f, 0 6px 10px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,200,190,0.25), inset 0 -3px 6px rgba(60,10,5,0.4); }
+.btn.flip{ flex:none; white-space:nowrap; width:auto; padding:0 20px; border-radius:30px; color:#f8e9e4; line-height:1.15; text-align:center; letter-spacing:0.06em; /* 封蝋の赤 */
+  background:radial-gradient(circle at 35% 30%,#d0675a 0%,#a23b31 50%,#6e2019 100%); box-shadow:0 4px 0 #4a140f, 0 6px 10px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,200,190,0.25), inset 0 -3px 6px rgba(60,10,5,0.4); }
 .btn.flip:active{ box-shadow:0 1px 0 #4a140f, 0 2px 4px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,200,190,0.25); }
 
-
 /* ---- 全画面：本を画面いっぱいに広げる（ゲーム画面は縦横の比をたもったまま、入るだけ大きく） ---- */
-.book-frame.is-full{ position:fixed; inset:0; z-index:40; max-width:none; width:100%; height:100%; border-radius:0;
-  padding:10px 16px 12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+.book-frame.is-full{ position:fixed; inset:0; z-index:40; max-width:none; width:100%; height:100%; border-radius:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
 .book-frame.is-full .hud, .book-frame.is-full .canvas-wrap, .book-frame.is-full .under, .book-frame.is-full .touch-ui{ width:var(--gw,100%); flex:none; }
 .book-frame.is-full .under, .book-frame.is-full .touch-ui{ margin-top:6px; }
 .book-frame.is-full .ribbon{ display:none; }
@@ -175,9 +117,7 @@ body.gt-full{ overflow:hidden; }
    左の列：上に 全画面・本を開く／下に ◀ ▶（横ならび。左の親指）
    右の列：▲ と、その上に「本を裏返す」（右の親指） */
 @media (hover:none) and (orientation:landscape), (pointer:coarse) and (orientation:landscape){
-  .book-frame.is-full{ display:grid; grid-template-columns:auto var(--gw,60vw) auto; grid-template-rows:1fr auto;
-    align-content:stretch; justify-content:center; column-gap:10px; row-gap:10px;
-    padding:10px calc(10px + env(safe-area-inset-right,0px)) 12px calc(10px + env(safe-area-inset-left,0px)); }
+  .book-frame.is-full{ display:grid; grid-template-columns:auto var(--gw,60vw) auto; grid-template-rows:1fr auto; align-content:stretch; justify-content:center; column-gap:10px; row-gap:10px; padding:10px calc(10px + env(safe-area-inset-right,0px)) 12px calc(10px + env(safe-area-inset-left,0px)); }
   .book-frame.is-full .hud{ display:none; }
   .book-frame.is-full .canvas-wrap{ grid-column:2; grid-row:1 / span 2; align-self:center; margin:0; }
   .book-frame.is-full .touch-ui{ display:contents; }
@@ -194,15 +134,6 @@ body.gt-full{ overflow:hidden; }
 .credit{ color:#6f6450; font-size:11px; letter-spacing:0.12em; text-align:center; margin-top:2px; }
 .modal{ position:fixed; inset:0; background:rgba(10,8,5,0.86); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
 .modal.show{ display:flex; }
-.book-inner{ background:linear-gradient(180deg,#efe4c8,#e2d3ab); color:#2b2e4a; max-width:560px; width:100%; border-radius:6px; padding:26px 28px; box-shadow:0 20px 60px rgba(0,0,0,0.6); font-size:15px; line-height:1.8; max-height:80vh; overflow:auto; }
-.book-inner h2{ font-family:'Cormorant Garamond',serif; letter-spacing:0.12em; margin:0 0 14px; font-size:22px; }
-.page-entry{ border-bottom:1px dashed rgba(58,50,38,0.35); padding:10px 0; }
-.page-entry .title{ font-weight:700; color:#3a2f2a; }
-.page-entry .body{ color:#4a4e6d; white-space:pre-line; }
-.page-entry.empty .body{ color:#a89a6f; font-style:italic; }
-.wormhole{ letter-spacing:2px; color:#b0a074; }
-.modal .close{ margin-top:16px; }
-.modal .close button{ background:#3a2f2a; color:#e8dcc0; border:none; border-radius:6px; padding:9px 18px; cursor:pointer; font-family:'Zen Old Mincho',serif; font-size:14px; }
 
 /* ---- スマホ・タブレット（指で触る画面） ---- */
 html{ touch-action:manipulation; }                       /* ダブルタップで拡大しない */
@@ -227,7 +158,6 @@ html{ touch-action:manipulation; }                       /* ダブルタップ�
   .book-frame.is-full .bookbtn.gt-guide::after{ left:auto; right:0; transform:none; white-space:nowrap; }
 }
 
-
 /* ==========================================================================
    見た目：参考画像２（参考画像２.jpg）のデザイン
      ・机：灰色の木目（assets/ui/desk_wood.webp）
@@ -247,204 +177,81 @@ body.gt-full{ background:#7e7570 url('../assets/ui/desk_wood.webp') center/1024p
 .book-frame{ background:none; box-shadow:none; border-radius:0; padding:0; }
 .book-frame::before, .book-frame::after{ display:none; }
 /* ゲーム画面のまわりに、表紙とページのふちのぶんの余白（--gw … 全画面のときのゲーム画面の幅。js/page.js） */
-.canvas-wrap, .book-frame.is-full .canvas-wrap{ z-index:1; box-shadow:none; border-radius:0;
-  margin:calc(var(--gw,900px) * 0.14) calc(var(--gw,900px) * 0.16) calc(var(--gw,900px) * 0.06) calc(var(--gw,900px) * 0.16) !important; }   /* 左右おなじ：本は真ん中 */
+.canvas-wrap, .book-frame.is-full .canvas-wrap{ z-index:1; box-shadow:none; border-radius:0; }   /* 左右おなじ：本は真ん中 */
 canvas#game{ border-radius:0; }
 /* 表紙と、開いたページ（ゲーム画面のうしろ。ゲーム画面のまわりだけが見える） */
 .gt-cover, .gt-pages{ position:absolute; left:-11.111%; top:-14.583%; width:122.222%; height:129.167%; pointer-events:none; overflow:visible; }
 .gt-cover{ z-index:-3; } .gt-pages{ z-index:-1; }   /* あいだ（z-index:-2）に、しおりと旗 */
 /* 左がわの赤いリボンの旗（Book・menu）：右はしはページのあいだに挟まっている。カーソルを乗せると、すーっと引き出される */
-/* 旗・しおりは、ページより手前（切れて見えないように、形がぜんぶ見える）。ゲーム画面にはかからない、ページのふちの上で止まる */
-.gt-flags{ position:absolute; right:calc(100% + 0.6cqw); top:16%; display:flex; flex-direction:column; gap:2.6cqw; z-index:0; }
-.gt-flag{ position:relative; width:17cqw; min-width:100px; height:7.2cqw; min-height:40px; border:none; padding:0 0 0 3.4cqw; cursor:pointer;
-  background:var(--flag); color:#fbf4ea; font-family:'Caveat',cursive; font-weight:500; font-size:clamp(17px,3.6cqw,66px); line-height:1; text-align:left;
-  clip-path:polygon(0 0,calc(100% - 0.6cqw) 0,100% 0.6cqw,100% calc(100% - 0.6cqw),calc(100% - 0.6cqw) 100%,0 100%,2.6cqw 50%);   /* 左はしは、リボンの切りこみ。右はしは角を落とす */
-  filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25)); transform:translateX(0) rotate(-1.2deg);
-  transition:transform .45s cubic-bezier(.25,.8,.3,1); }
-.gt-flag:nth-child(2){ transform:translateX(0) rotate(0.8deg); }
-.gt-flag:hover, .gt-flag:focus-visible, .gt-flag.gt-guide{ transform:translateX(-3.4cqw) rotate(0); }                  /* すーっと引き出す */
-.gt-flag:focus-visible{ outline:2px solid #f3d7a0; outline-offset:2px; }
-.gt-flag svg, .gt-flag small{ display:none; }
-.gt-flag.gt-guide{ animation:gtFlagGlow 1.1s ease-in-out infinite alternate; clip-path:none; }
-@keyframes gtFlagGlow{ from{ filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25)); } to{ filter:drop-shadow(0 0 10px rgba(255,220,140,0.95)); } }
-.gt-flag.gt-guide::after{ content:attr(data-guide); position:absolute; left:0; bottom:calc(100% + 10px);   /* 上に出す（下の旗に隠れないように） */ white-space:nowrap; pointer-events:none;
-  padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
 /* 上の紺色のしおり（挟んだしおり Ⅰ〜Ⅴ）：ほぼ正方形。上のまん中に、ひもを通す白い四角。上の二すみに、金の飾り。
    下のはしはページのあいだに挟まっている。カーソルを乗せると、すーっと上へ引き出される */
-/* しおりは、ページのあいだに挟まっている（ページのうしろ）。下に長くのびているので、引き出しても下のはしは見えない */
-.gt-tabs{ position:absolute; left:4cqw; top:calc(-1 * var(--tabTop,10cqw)); display:flex; align-items:flex-start; gap:1.2cqw; z-index:-2; }
-.gt-tab{ --h:20cqw; --hide:0px; align-items:flex-start; position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
-  width:8.4cqw; min-width:52px; height:var(--h); background:var(--tab); border:none; border-radius:2px;
-  color:#f6f0e4; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:clamp(16px,3.2cqw,58px); padding:2.4cqw 0 0;
-  box-shadow:0 -1px 4px rgba(0,0,0,0.25); transform:translateY(var(--hide)); transition:transform .45s cubic-bezier(.25,.8,.3,1); }
-.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(-2.4cqw); }                                  /* すーっと引き出す */
-.gt-tab:focus-visible{ outline:2px solid var(--tab-gold); outline-offset:2px; }
-.gt-tab .orn{ position:absolute; left:0.5cqw; right:0.5cqw; top:0.5cqw; height:2.4cqw; pointer-events:none;              /* 上の二すみの、金の曲がった飾り */
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 22 V9 Q3 3 9 3 H22 M7 15 Q7 7 15 7' fill='none' stroke='%23cdb06a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") left top/2.4cqw 2.4cqw no-repeat,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 22 V9 Q21 3 15 3 H2 M17 15 Q17 7 9 7' fill='none' stroke='%23cdb06a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") right top/2.4cqw 2.4cqw no-repeat; }
-.gt-tab::before{ content:''; position:absolute; left:50%; bottom:calc(100% - 1.2cqw); width:4.4cqw; min-width:28px; height:6.4cqw; min-height:40px; transform:translateX(-50%);
-  background:var(--tab); clip-path:polygon(0 0,26% 0,50% 74%,74% 0,100% 0,62% 100%,38% 100%); z-index:-1; }          /* ひも（V の字） */
-.gt-tab::after{ content:''; position:absolute; left:50%; top:0.5cqw; width:1.7cqw; min-width:10px; height:1.7cqw; min-height:10px; transform:translateX(-50%);
-  border:2px solid #f6f0e4; border-radius:3px; background:var(--tab); }                                               /* ひもを通す白い四角 */
-.gt-tab .ask{ display:none; position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%); white-space:nowrap; z-index:2;
-  padding:5px 10px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:12px; font-weight:500; box-shadow:0 4px 10px rgba(0,0,0,0.35); }
-.gt-tab.armed .ask{ display:block; }
 /* 全画面ボタン：机の右上に小さく */
-#fsBtn{ position:fixed; top:12px; right:14px; z-index:45; background:rgba(69,55,47,0.85); color:#f1e8dc; border-color:rgba(205,176,106,0.6); }
+#fsBtn{ position:fixed; top:12px; right:14px; z-index:45; color:#f1e8dc; }
 #fsBtn #fsLabel{ display:none; }
-.book-frame.is-full{ background:none; padding:12px !important; }
+.book-frame.is-full{ background:none; }
 /* スマホを横にした全画面：まん中の列（ゲーム画面）に、表紙・旗のぶんの余白（左 0.18・右 0.07）もふくめる */
 @media (hover:none) and (orientation:landscape), (pointer:coarse) and (orientation:landscape){
   .book-frame.is-full{ grid-template-columns:auto calc(var(--gw,60vw) * 1.32) auto !important; padding:6px 8px !important; }
 }
-/* 全画面でないとき：本の上に、しおり（ひも・引き出したぶん）が切れずに入る余白 */
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.15) !important; }
-
 /* メニューの画面（タイトルの絵）のふちを、まわりのページへ ぼかしてなじませる */
-.gtm{ -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%),linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%);
-  -webkit-mask-composite:source-in; mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%),linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%);
-  mask-composite:intersect; border-radius:0; }
-.gt-tab .num{ position:absolute; left:0; right:0; top:3cqw; text-align:center; line-height:1; }   /* 数字は、ページから出ている部分に */
+.gtm{ -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%),linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%); -webkit-mask-composite:source-in; mask-image:linear-gradient(90deg,transparent 0,#000 3%,#000 97%,transparent 100%),linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%); mask-composite:intersect; border-radius:0; }
+/* 数字は、ページから出ている部分に */
 
-.gt-flag:nth-child(3){ transform:translateX(0) rotate(-0.6deg); }
-.gt-flag.reset.armed{ transform:translateX(-3.4cqw) rotate(0); background:#c2453b; }   /* 1回押したとき：出たまま、明るい赤で「Again?」 */
+/* 1回押したとき：出たまま、明るい赤で「Again?」 */
 
-/* ---- しおり：作者の絵（assets/komono/栞.png。数字を消した shiori_blank.webp を使い、数字 Ⅰ〜Ⅴ はここで重ねる） ----
-   細長いしおり。上（ひも・飾り・数字・星）がページの上から出ていて、下はページのあいだに挟まっている。
-   カーソルを乗せると、すーっと引き出される（下のはしは、引き出してもページのうしろ） */
-.gt-tabs{ top:calc(-1 * (16cqw * 0.64 + 1.4cqw)); gap:1cqw; }
-.gt-tab{ --h:16cqw; width:4.6cqw; min-width:30px; flex:none; height:var(--h); padding:0; border:none; border-radius:0; box-shadow:none;
-  background:url('../assets/komono/shiori_blank.webp') center top/100% 100% no-repeat; }
-.gt-tab::before, .gt-tab::after, .gt-tab .orn{ display:none; }
-.gt-tab .num{ position:absolute; left:0; right:0; top:36%; height:20%; display:flex; align-items:center; justify-content:center;
-  font-family:'Cormorant Garamond',serif; font-weight:700; font-size:clamp(14px,2.6cqw,50px); line-height:1; color:#f3e3bd; }
-.gt-tab:hover, .gt-tab:focus-visible, .gt-tab.armed{ transform:translateY(-2.2cqw); }
+/* 旗（Book など）と同じ太さ・大きさ */
 
-/* 机の上（本の右）の、まっさらな栞（数字なし）。押すと、いまのページに挟む */
-.gt-spare{ position:absolute; left:calc(100% + 9cqw); top:22%; width:4.6cqw; min-width:28px; height:16cqw; padding:0; border:none; cursor:pointer;
-  background:url('../assets/komono/shiori_blank.webp') center/100% 100% no-repeat; transform:rotate(9deg);
-  filter:drop-shadow(2px 4px 3px rgba(0,0,0,0.3)); transition:transform .45s cubic-bezier(.25,.8,.3,1), opacity .3s; z-index:0; }
-.gt-spare:hover, .gt-spare:focus-visible{ transform:rotate(4deg) translateY(-1cqw); }
-.gt-spare.full{ opacity:0.45; cursor:default; }
-.gt-spare.nope{ animation:gtDeny .4s ease; }
-.gtm.show ~ .gt-spare{ pointer-events:none; }
+/* ページをめくっているあいだも、旗はめくる紙より手前 */
 
-/* ゲーム画面を大きくするため、旗を少し小さく（左の余白を詰める） */
-.gt-flag{ width:12cqw; min-width:76px; height:5.6cqw; min-height:32px; padding-left:2.8cqw; font-size:clamp(14px,2.8cqw,52px); clip-path:polygon(0 0,calc(100% - 0.6cqw) 0,100% 0.6cqw,100% calc(100% - 0.6cqw),calc(100% - 0.6cqw) 100%,0 100%,2.2cqw 50%); }
-.gt-flags{ gap:2cqw; }
-.gt-flag:hover, .gt-flag:focus-visible, .gt-flag.gt-guide, .gt-flag.reset.armed{ transform:translateX(-2.4cqw) rotate(0); }
-.gt-spare{ left:calc(100% + 8cqw); }
-/* 栞は縦にまっすぐ。ゲーム画面をもう少し大きく（しおりを少し小さく、旗を本に寄せ、まわりの余白を詰める） */
-.gt-spare, .gt-spare:hover, .gt-spare:focus-visible{ transform:none; }
-.gt-spare:hover, .gt-spare:focus-visible{ transform:translateY(-1cqw); }
-.gt-tabs{ top:calc(-1 * (14cqw * 0.66 + 1.4cqw)); }
-.gt-tab{ --h:14cqw; width:4cqw; }
-.gt-flags{ right:100%; }
-.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin:calc(var(--gw,900px) * 0.12) calc(var(--gw,900px) * 0.145) calc(var(--gw,900px) * 0.05) calc(var(--gw,900px) * 0.145) !important; }
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.13) !important; }
-/* しおりを大きく。机の上の栞は、本の上（右がわ）に横にして置く */
-.gt-tabs{ top:calc(-1 * (17.4cqw * 0.66 + 1.4cqw)); }
-.gt-tab{ --h:17.4cqw; width:5cqw; }
-.gt-tab .num{ font-size:clamp(15px,3cqw,56px); }
-.gt-spare{ left:calc(100% - 24cqw); top:-17.7cqw; width:5cqw; height:17.4cqw; transform:rotate(90deg); }
-.gt-spare, .gt-spare:hover, .gt-spare:focus-visible{ transform:rotate(90deg); }
-.gt-spare:hover, .gt-spare:focus-visible{ transform:rotate(90deg) translateX(-1cqw); }
-.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.155) !important; }
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.165) !important; }
-/* 横に置いた栞の「Save」（筆記体。栞は90度まわしてあるので、文字は逆にまわして横書きに） */
-.gt-spare .word{ position:absolute; left:50%; top:81%; transform:translate(-50%,-50%) rotate(-90deg); white-space:nowrap; pointer-events:none;
-  font-family:'Caveat',cursive; font-weight:500; font-size:clamp(14px,2.8cqw,52px); line-height:1; color:#f3e3bd; }   /* 旗（Book など）と同じ太さ・大きさ */
-
-/* はじめての選択肢で、しおりの説明をしているあいだ：「Save」の栞が光る */
-.gt-spare.gt-guide{ animation:gtSpareGlow 1s ease-in-out infinite alternate; }
-@keyframes gtSpareGlow{ from{ filter:drop-shadow(0 0 0 rgba(255,220,140,0)); } to{ filter:drop-shadow(0 0 10px rgba(255,220,140,0.95)); } }
-
-/* まわりの本のページを大きく（ゲーム画面のまわりに、ページが広くのぞく）。そのぶん、本のまわりの余白も広げる */
-.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin:calc(var(--gw,900px) * 0.18) calc(var(--gw,900px) * 0.165) calc(var(--gw,900px) * 0.085) calc(var(--gw,900px) * 0.165) !important; }
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.19) !important; }
-.gt-flags{ right:calc(100% + 2.4cqw); }
-.gt-tabs{ top:calc(-1 * (17.4cqw * 0.66 + 3.8cqw)); }
-.gt-spare{ top:-18.7cqw; }
-.gt-flags{ z-index:4; }   /* ページをめくっているあいだも、旗はめくる紙より手前 */
-
-/* ==== セーブ（しおり）をやめて、栞は「Reread」と「menu」のボタンに。付箋（赤い旗）はなし ==== */
-.gt-flags, .gt-tabs, .gt-spare{ display:none !important; }
-.gt-marks{ position:absolute; left:6cqw; top:-15.5cqw; display:flex; gap:3cqw; z-index:4; }
-.gt-mark{ position:relative; width:5cqw; min-width:28px; height:17.4cqw; padding:0; border:none; cursor:pointer; flex:none;
-  margin:0 6.2cqw;                                                                                  /* 90度まわすぶんの すきま */
-  background:url('../assets/komono/shiori_blank.webp') center/100% 100% no-repeat; transform:rotate(90deg);
-  filter:drop-shadow(2px 4px 3px rgba(0,0,0,0.3)); transition:transform .45s cubic-bezier(.25,.8,.3,1); }
+.gt-marks{ position:absolute; display:flex; }
+.gt-mark{ position:relative; min-width:28px; padding:0; border:none; cursor:pointer; flex:none; /* 90度まわすぶんの すきま */
+  background:url('../assets/komono/shiori_blank.webp') center/100% 100% no-repeat; }
 .gt-mark:hover, .gt-mark:focus-visible{ transform:rotate(90deg) translateX(-1cqw); }
 .gt-mark:focus-visible{ outline:2px solid #f3d7a0; outline-offset:2px; }
-.gt-mark .word{ position:absolute; left:50%; top:76%; transform:translate(-50%,-50%) rotate(-90deg); white-space:nowrap; pointer-events:none;
-  font-family:'Caveat',cursive; font-weight:500; font-size:clamp(14px,2.6cqw,50px); line-height:1; color:#f3e3bd; }
-.gt-mark.gt-guide{ animation:gtSpareGlow 1s ease-in-out infinite alternate; }
-.gt-mark.gt-guide::after{ content:attr(data-guide); position:absolute; left:50%; top:110%; transform:translateX(-50%) rotate(-90deg); transform-origin:center;
-  white-space:nowrap; padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); pointer-events:none; }
-.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin:calc(var(--gw,900px) * 0.155) calc(var(--gw,900px) * 0.12) calc(var(--gw,900px) * 0.085) calc(var(--gw,900px) * 0.12) !important; }
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.165) !important; }
-.gt-mark{ background-image:url('../assets/komono/shiori_plain.webp'); }   /* 星の飾りを消した栞（文字をまん中に） */
-.gt-mark .word{ top:60%; font-size:clamp(15px,2.9cqw,54px); }
+.gt-mark .word{ position:absolute; left:50%; white-space:nowrap; pointer-events:none; line-height:1; color:#f3e3bd; }
+.gt-mark.gt-guide::after{ content:attr(data-guide); position:absolute; white-space:nowrap; padding:6px 12px; border-radius:6px; background:#f3ead0; color:#3a2a1a; font-family:'Zen Old Mincho',serif; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.35); pointer-events:none; }
 /* 案内の吹き出しは、栞の下に（栞は90度まわしてあるので、まわし返して横書きに） */
-.gt-mark.gt-guide::after{ left:calc(100% + 1.2cqw); top:50%; transform:translate(-50%,-50%) rotate(-90deg) translateY(50%); transform-origin:50% 50%; }
+.gt-mark.gt-guide::after{ transform-origin:50% 50%; }
 
 /* ==== 最初の参考画像のように：栞を縦にして、本の上のふちに挟む（上の部分だけページから出ている）。
         栞に「menu」「Reread」と書く。カーソルを乗せると、すーっと引き出される ==== */
-.gt-marks{ left:5cqw; top:calc(-1 * (20.9cqw * 0.55 + 3.6cqw)); gap:1.6cqw; z-index:-2; align-items:flex-start; }
-.gt-mark{ width:6cqw; height:20.9cqw; margin:0; transform:none; filter:none; transition:transform .45s cubic-bezier(.25,.8,.3,1); }
+.gt-marks{ z-index:-2; align-items:flex-start; }
+.gt-mark{ margin:0; transform:none; filter:none; transition:transform .45s cubic-bezier(.25,.8,.3,1); }
 .gt-mark:hover, .gt-mark:focus-visible, .gt-mark.gt-guide{ transform:translateY(-2cqw); }
-.gt-mark .word{ top:43%; transform:translate(-50%,-50%); font-size:clamp(13px,2.3cqw,44px); }
-.gt-mark.gt-guide::after{ left:calc(100% + 10px); top:18%; transform:none; }
-.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.175) !important; }
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.185) !important; }
-.gt-marks{ top:calc(-1 * (20.9cqw * 0.6 + 3.6cqw)); }
-.gt-mark .word{ top:38%; font-size:clamp(12px,2.1cqw,40px); }
-.gt-mark.gt-guide::after{ left:calc(200% + 2.6cqw); top:22%; }   /* 案内の吹き出しは、となりの menu の栞よりも右に */
+.gt-mark .word{ transform:translate(-50%,-50%); }
+.gt-mark.gt-guide::after{ transform:none; }
+.gt-mark.gt-guide::after{ top:22%; }   /* 案内の吹き出しは、となりの menu の栞よりも右に */
 /* 栞を幅広く（ページから出る高さは、前とほぼ同じ） */
-.gt-mark{ width:7.6cqw; height:26.5cqw; }
-.gt-marks{ top:calc(-1 * (26.5cqw * 0.47 + 3.6cqw)); gap:1.8cqw; }
-.gt-mark .word{ top:30%; font-size:clamp(14px,2.7cqw,50px); }
-
+.gt-mark{ height:26.5cqw; }
+.gt-marks{ gap:1.8cqw; }
 /* ==== ゲーム画面をできるだけ大きく：本のまわり（表紙・ページのふち）を細くし、栞はページから出る部分を短く ==== */
 .canvas-wrap, .book-frame.is-full .canvas-wrap{ margin:calc(var(--gw,900px) * 0.15) calc(var(--gw,900px) * 0.075) calc(var(--gw,900px) * 0.062) calc(var(--gw,900px) * 0.075) !important; }
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.155) !important; }
-.gt-marks{ top:calc(-1 * (26.5cqw * 0.4 + 2.2cqw)); left:4cqw; }
-.gt-mark .word{ top:27%; }
+.gt-marks{ left:4cqw; }
 .book-frame.is-full{ padding:6px !important; }
-.gt-marks{ top:calc(-1 * (26.5cqw * 0.35 + 2.2cqw)); }
-.gt-mark .word{ top:25%; }
-.canvas-wrap, .book-frame.is-full .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.12) !important; }
-.book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.125) !important; }
 .gt-marks{ top:calc(-1 * (26.5cqw * 0.39 + 2.2cqw)); }
-.gt-mark .word{ top:29.5%; font-size:clamp(13px,2.4cqw,46px); }
+.gt-mark .word{ top:29.5%; }
 .canvas-wrap, .book-frame.is-full .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.13) !important; }
 .book-frame:not(.is-full) .canvas-wrap{ margin-top:calc(var(--gw,900px) * 0.135) !important; }
 
 /* ---- 机の上の、ほかの本（ゲームの本のまわりに、ななめに置いてある。index.html の .desk-books） ----
    一冊ずつ：--c 表紙の色、--w 幅、--r かたむき。場所は left/right/top/bottom（画面のはしから少しはみ出させる）
    描き方は参考画像２に合わせる：焦げ茶の線、表紙の右と下から、クリーム色のページのふち（紙の重なりの線）がのぞく */
-.desk-books{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; filter:saturate(0.85) brightness(0.93); }   /* ゲームの本より目立たないように、少し沈ませる */
-.db{ position:absolute; width:clamp(130px,var(--w),460px); aspect-ratio:0.72; transform:rotate(var(--r)); border-radius:2px 5px 5px 2px;
-  background:
+.desk-books{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }   /* ゲームの本より目立たないように、少し沈ませる */
+.db{ position:absolute; width:clamp(130px,var(--w),460px); aspect-ratio:0.72; transform:rotate(var(--r)); border-radius:2px 5px 5px 2px; background:
     repeating-linear-gradient(90deg,#efe6d4 0 2px,#c9b48a 2px 3px) right top/5.5% 100% no-repeat,     /* 右のページのふち（小口） */
     repeating-linear-gradient(0deg,#efe6d4 0 2px,#c9b48a 2px 3px) left bottom/100% 4% no-repeat,       /* 下のページのふち */
-    #e6dcc6;
-  outline:2px solid rgba(52,38,28,0.75); outline-offset:-1px;
-  box-shadow:5px 9px 16px rgba(0,0,0,0.32), 1px 2px 3px rgba(0,0,0,0.25); }
-.db::before{ content:''; position:absolute; left:-1.5%; top:-1.2%; right:4%; bottom:3%; border-radius:3px 6px 6px 3px;       /* 表紙 */
+    #e6dcc6; outline:2px solid rgba(52,38,28,0.75); outline-offset:-1px; box-shadow:5px 9px 16px rgba(0,0,0,0.32), 1px 2px 3px rgba(0,0,0,0.25); }
+.db::before{ content:''; position:absolute; left:-1.5%; top:-1.2%; right:4%; bottom:3%; border-radius:3px 6px 6px 3px; /* 表紙 */
   background:
     linear-gradient(90deg,rgba(0,0,0,0.30) 0 11%,rgba(255,255,255,0.10) 11% 12%,rgba(0,0,0,0) 12%),                            /* 背の折り目 */
     radial-gradient(ellipse 80% 60% at 35% 25%,rgba(255,255,255,0.10),rgba(255,255,255,0) 70%),                                 /* うすい光 */
     radial-gradient(ellipse 120% 90% at 50% 50%,rgba(0,0,0,0) 55%,rgba(0,0,0,0.28) 100%),                                       /* すみのくすみ */
-    var(--c);
-  border:2px solid rgba(40,28,20,0.8); box-shadow:inset 0 0 0 3px rgba(255,255,255,0.04); }
-.db::after{ content:''; position:absolute; left:-1.5%; top:-1.2%; width:12%; bottom:3%;                                          /* 背の金の帯 */
+    var(--c); border:2px solid rgba(40,28,20,0.8); box-shadow:inset 0 0 0 3px rgba(255,255,255,0.04); }
+.db::after{ content:''; position:absolute; left:-1.5%; top:-1.2%; width:12%; bottom:3%; /* 背の金の帯 */
   background:
     linear-gradient(#cdb06a,#cdb06a) 0 13%/100% 2px no-repeat, linear-gradient(#cdb06a,#cdb06a) 0 16%/100% 1px no-repeat,
-    linear-gradient(#cdb06a,#cdb06a) 0 84%/100% 1px no-repeat, linear-gradient(#cdb06a,#cdb06a) 0 87%/100% 2px no-repeat;
-  opacity:0.8; }
-.db b{ position:absolute; left:28%; top:20%; width:48%; height:15%; border:1.5px solid rgba(205,176,106,0.75); border-radius:2px;   /* 題名の枠 */
+    linear-gradient(#cdb06a,#cdb06a) 0 84%/100% 1px no-repeat, linear-gradient(#cdb06a,#cdb06a) 0 87%/100% 2px no-repeat; opacity:0.8; }
+.db b{ position:absolute; left:28%; top:20%; width:48%; height:15%; border:1.5px solid rgba(205,176,106,0.75); border-radius:2px; /* 題名の枠 */
   box-shadow:inset 0 0 0 3px rgba(0,0,0,0), inset 0 0 0 4px rgba(205,176,106,0.35); }
 .db b::after{ content:''; position:absolute; left:18%; right:18%; top:46%; height:2px; background:rgba(205,176,106,0.55); }          /* 題名（読めない金の線） */
 /* 机の上の小物（万年筆・インク瓶・インクのしみ・つけペン）。ゲームの本のうしろ。場所と大きさ・かたむきはここで決める */
@@ -454,11 +261,6 @@ canvas#game{ border-radius:0; }
 .dk-stain{ width:clamp(60px,6vw,110px); right:15.5vw; top:clamp(30px,7vh,70px); transform:rotate(-14deg); }
 .dk-dpen{ width:clamp(220px,27vw,480px); left:24vw; bottom:clamp(2px,1.2vh,14px); transform:rotate(2.5deg); filter:drop-shadow(3px 5px 3px rgba(0,0,0,0.35)); }
 
-/* 栞（Reread・menu）が光るとき：栞とひもの形にそって、ふちだけ細く光る（四角くぼやけないように、ぼかしを小さく重ねる） */
-.gt-mark.gt-guide{ animation:gtMarkGlow 1s ease-in-out infinite alternate; }
-@keyframes gtMarkGlow{
-  from{ filter:drop-shadow(0 0 0 rgba(255,222,150,0)) drop-shadow(0 0 0 rgba(255,210,130,0)); }
-  to{ filter:drop-shadow(0 0 2px rgba(255,236,180,1)) drop-shadow(0 0 6px rgba(255,214,130,0.8)); } }
 /* 会話の「▶ Tap / Click」・名前の「OK」・本を裏返すボタン・「Now! Flip the book」は英語の筆記体（物語のセリフや選択肢は日本語のまま） */
 .dhint{ font-family:'Caveat',cursive; font-size:clamp(14px,1.7cqw,40px); letter-spacing:0.03em; }
 .choice.ui-en{ font-family:'Caveat',cursive; font-size:1.35em; line-height:1; letter-spacing:0.03em; }
@@ -472,8 +274,7 @@ canvas#game{ border-radius:0; }
 /* ==== ゴシック（タイトル画面の、霧の薔薇の森に合わせる） ==== */
 /* 会話の枠・選択肢：赤紫の黒に、くすんだ金のふち */
 .dialogue{ background:linear-gradient(180deg, rgba(22,8,16,0) 0%, rgba(22,8,16,0.84) 30%, rgba(18,6,13,0.95) 100%) !important; }
-.dialogue::before{ content:''; position:absolute; left:4%; right:4%; top:22%; height:1px; pointer-events:none;
-  background:linear-gradient(90deg, rgba(201,160,112,0), rgba(201,160,112,0.55) 20%, rgba(201,160,112,0.55) 80%, rgba(201,160,112,0)); }
+.dialogue::before{ content:''; position:absolute; left:4%; right:4%; top:22%; height:1px; pointer-events:none; background:linear-gradient(90deg, rgba(201,160,112,0), rgba(201,160,112,0.55) 20%, rgba(201,160,112,0.55) 80%, rgba(201,160,112,0)); }
 .dline{ color:#f1e3e6; }
 .speaker{ color:#d9a9b5; } .speaker.narr{ color:#9c8590; } .speaker.boy{ color:#b7c3a2; }
 .dhint{ color:#9c8590; }
@@ -486,24 +287,18 @@ canvas#game{ border-radius:0; }
 html,body, body.gt-full{ background:
     radial-gradient(ellipse 55% 60% at 18% 8%, rgba(255,176,96,0.20), rgba(255,176,96,0) 70%),
     radial-gradient(ellipse 120% 100% at 50% 45%, rgba(8,3,6,0.55), rgba(8,3,6,0.88) 100%),
-    #3a3230 url('../assets/ui/desk_wood.webp') center/1024px 512px repeat;
-  background-attachment:fixed; }
+    #3a3230 url('../assets/ui/desk_wood.webp') center/1024px 512px repeat; background-attachment:fixed; }
 .desk-books{ filter:saturate(0.6) brightness(0.42) sepia(0.15); }
-.desk-books::after{ content:''; position:absolute; inset:0; pointer-events:none;
-  background:radial-gradient(ellipse 55% 60% at 18% 8%, rgba(255,190,110,0.32), rgba(255,190,110,0) 70%); mix-blend-mode:screen; }
+.desk-books::after{ content:''; position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 55% 60% at 18% 8%, rgba(255,190,110,0.32), rgba(255,190,110,0) 70%); mix-blend-mode:screen; }
 #fsBtn{ background:rgba(34,12,24,0.85) !important; border-color:rgba(201,160,112,0.55) !important; }
-
 
 /* 栞（Reread・menu）は赤（青い絵の色を、深い赤に変えた絵。もとの青は shiori_plain.webp） */
 .gt-mark{ background-image:url('../assets/komono/shiori_plain_red.webp') !important; }
 
 /* 栞が光るとき（読み返す案内・かけらが吸いこまれたとき）：ひもは光らせず、栞の本体のふちの外だけ光る。
    光の絵 shiori_glow.webp は、本体の形からつくった光の輪（栞の絵より上下左右に 24px 大きい → -12% / -3.45%） */
-.gt-mark::before{ content:''; position:absolute; left:-12%; right:-12%; top:-3.45%; bottom:-3.45%; pointer-events:none; opacity:0;
-  background:url('../assets/komono/shiori_glow.webp') center/100% 100% no-repeat; }
+.gt-mark::before{ content:''; position:absolute; left:-12%; right:-12%; top:-3.45%; bottom:-3.45%; pointer-events:none; opacity:0; background:url('../assets/komono/shiori_glow.webp') center/100% 100% no-repeat; }
 .gt-mark.gt-guide{ animation:none !important; filter:none !important; }
-.gt-mark.gt-guide::before{ animation:gtMarkHalo 1s ease-in-out infinite alternate; }
-@keyframes gtMarkHalo{ from{ opacity:0.1; } to{ opacity:1; } }
 #openBook.gt-absorb{ animation:gtMarkPop .75s ease-out !important; box-shadow:none !important; }
 #openBook.gt-absorb::before{ animation:gtMarkFlash .75s ease-out; }
 @keyframes gtMarkPop{ 0%{ transform:scale(1); } 30%{ transform:scale(1.07); } 100%{ transform:scale(1); } }
@@ -516,8 +311,7 @@ html,body, body.gt-full{ background:
 .speaker{ min-height:1.3em; padding-right:9cqw; }
 
 /* 栞（Reread・menu）の文字は、つづけ字の筆記体（Great Vibes）。Caveat より細いので、少し大きく */
-.gt-mark .word{ font-family:'Great Vibes',cursive !important; font-weight:400 !important; font-size:clamp(14px,2.6cqw,48px) !important; letter-spacing:0 !important;
-  text-shadow:0 1px 2px rgba(0,0,0,0.45); }
+.gt-mark .word{ font-family:'Great Vibes',cursive !important; font-weight:400 !important; font-size:clamp(14px,2.6cqw,48px) !important; letter-spacing:0 !important; text-shadow:0 1px 2px rgba(0,0,0,0.45); }
 
 /* 栞の横幅を少し太く（7.6cqw → 8.8cqw） */
 .gt-mark{ width:8.8cqw !important; }

@@ -25,7 +25,7 @@
      5) マリと話す。拾った数でセリフが変わる。話したあとも、何度でもヒントをくれる。
      6) 話し終えて、かけらを全部拾うと、右の端が開く。
 
-   ◆ このファイルが持っている独自の仕掛け（engine.js は触らない）
+   ◆ このファイルが持っている独自の仕掛け（js/engine/ は触らない）
      GT.registerAct      … 'opening-lie' 'opening-book-on' 'opening-book-off'
      GT.registerUpdate   … マリの動き・セリフの切り替え
      GT.registerDraw     … 木漏れ日・落ち葉・散らばったページ・マリの木・本の絵・まぶた
@@ -215,13 +215,6 @@ function drawPages(){
     const sz=GT.pageScrapSize(it);
     GT.drawPageScrap(0,0,sz.w,sz.h,rot,GT.pageScrapSeed(it),0); ctx.restore();
   });
-}
-
-/* はじめて動きだしたら、「落ちている紙きれ＝お話のかけら」を教える（1つ拾うまで） */
-function drawScrapHint(){
-  if(GT.mode!=='play' || !st.movedFar || GT.items.some(i=>i.got)) return;
-  const it=GT.items[0]; if(!it || it.hidden) return;
-  GT.drawHint(it.x+it.w/2, it.y-58, ['光にさわる → お話のかけら']);
 }
 
 /* 月あかりの筋（青白く、うすく） */
