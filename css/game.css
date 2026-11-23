@@ -261,11 +261,11 @@ canvas#game{ border-radius:0; }
 .dk-stain{ width:clamp(60px,6vw,110px); right:15.5vw; top:clamp(30px,7vh,70px); transform:rotate(-14deg); }
 .dk-dpen{ width:clamp(220px,27vw,480px); left:24vw; bottom:clamp(2px,1.2vh,14px); transform:rotate(2.5deg); filter:drop-shadow(3px 5px 3px rgba(0,0,0,0.35)); }
 
-/* 会話の「▶ Tap / Click」・名前の「OK」・本を裏返すボタン・「Now! Flip the book」は英語の筆記体（物語のセリフや選択肢は日本語のまま） */
+/* 会話の「▶ Tap / Click」・名前の「OK」・本を裏返すボタンは英語の筆記体（物語のセリフや選択肢は日本語のまま）。「今だ！ 本を裏返せ！」は日本語の明朝 */
 .dhint{ font-family:'Caveat',cursive; font-size:clamp(14px,1.7cqw,40px); letter-spacing:0.03em; }
 .choice.ui-en{ font-family:'Caveat',cursive; font-size:1.35em; line-height:1; letter-spacing:0.03em; }
-.qte .flipnow, .btn.flip{ font-family:'Caveat',cursive; letter-spacing:0.03em; }
-.qte .flipnow{ font-size:clamp(19px,2.7cqw,66px); }
+.btn.flip{ font-family:'Caveat',cursive; letter-spacing:0.03em; }
+.qte .flipnow{ font-family:'Zen Old Mincho',serif; font-weight:700; letter-spacing:0.08em; font-size:clamp(15px,2.1cqw,52px); }
 .btn.flip{ font-size:20px; }
 
 /* メニュー（タイトル画面）を開いているあいだは、ゲーム画面の「↺ Reset」を隠す（ゲームの上のボタンなので、メニューでは使わない） */

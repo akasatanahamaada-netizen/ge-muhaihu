@@ -4,6 +4,7 @@
    場所：水たまりを越えたあと（05_meet_hood.js）と、狼と出会う前（06_wolf_talk.js）のあいだ
    担当：
    ----------------------------------------------------------------------------
+   ◆ 赤ずきんが、少年のうしろからついてくる（scene の companion）。少年が崖に登ると、あとから登ってくる
    ◆ ねらい：「左右のページで重力が別々」を使う謎解き。木箱を、天井と床を行き来させて運ぶ
      右ページの崖（高さ 124）は、ジャンプ（約93px）では登れない。天井がわも、垂れた茂みでふさがっている。
      木箱を崖の前に置いて踏み台にすれば、登れる。
@@ -50,6 +51,7 @@ GT.defineStage('cliff', {
 
 GT.registerScene({
   id:'cliff', type:'play', stage:'cliff', clear:'exit', label:'第一章 ── 森の崖',
+  companion:'hood',         // 赤ずきんが、うしろからついてくる
   onClear:()=>GT.fillPage('cliff','――高い崖を、木箱を踏み台にしてのぼった。'),   // 崖を越えたら、本の「森の崖」のページに書きこまれる
   intro:[
     {s:'赤ずきん',c:'hood',f:'surprise',t:'わあ、高い崖……。その本で、なんとかならない？'},
@@ -83,4 +85,13 @@ GT.registerDraw(()=>{ if(!isHere()) return;
   for(const b of GT.boxes) F.crate(b);
 }, 'world');
 GT.registerDraw(()=>{ if(!isHere()) return; F.air(); }, 'overlay');
+
+/* ついてくる赤ずきん：崖は高くて、ひとりでは跳び乗れない（js/engine/scene.js の npcStep は 120px まで）。
+   少年が崖の上に立ったら、崖の下で止まっている赤ずきんも、踏み台（木箱）を使って登ってくる */
+GT.registerUpdate(()=>{ if(!isHere()) return;
+  const c=GT.getCompanion&&GT.getCompanion(), pl=GT.player; if(!c) return;
+  const plOnTop = pl.onGround && Math.abs(pl.y+pl.h-CLIFF.y)<2 && pl.x+pl.w>CLIFF.x;
+  const hoodBelow = c.onGround && c.g===1 && Math.abs(c.y+c.h-(GT.H-GT.EDGE))<2 && c.x+c.w>=CLIFF.x-10 && c.x<CLIFF.x;
+  if(plOnTop && hoodBelow){ c.vy=-Math.sqrt(2*GT.GRAVITY*(CLIFF.h+20)); c.onGround=false; }
+});
 })();

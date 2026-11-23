@@ -10,11 +10,10 @@
      遠回り（flags.route==='detour'）
        赤ずきんと一緒。赤ずきんに話しかけると戸を叩き、中から低い声。
        「赤ずきんを止める／何もしない」を選ぶ（flags.stoppedAtDoor）。
-         止められるのは、狼のことを伝えていた（flags.warnedHood）か、
-         ここで「気づいたこと」を 2つ以上見つけていたとき。
-       止められなかったときは、赤ずきんが先に中へ入っていく。
+         止められるのは、狼のことを伝えていた（flags.warnedHood）ときだけ。
+       伝えていなかったときは、ここで見たものを話しても聞いてくれず、赤ずきんが先に中へ入っていく。
      どちらの道でも、まわりを見ると「気づいたこと」が見つかる（3つ。見なくても進める）
-       ・戸口へ続く獣の足あと　・ひびの入った眼鏡　・窓の中（窓の下の樽に乗る）
+       ・戸口へ続く獣の足あと　・破れたストール　・窓の中（窓の下の樽に乗る）
        近づいただけでは気づかない。その場所で 画面タップ／Enter をしたときだけ調べる。
        見つけた数は flags.houseClues に入る。
    ここで決めた flags.stoppedAtDoor は、次の「おばあさんの家」（12_grannys_house.js）で使われます。
@@ -24,7 +23,7 @@
           'front-hood-enter'（赤ずきんが中へ入る）/ 'front-peek-on'・'front-peek-off'（窓の中の大きな映像を開く／閉じる）
      GT.registerUpdate        … はじめの語り・気づいたことの場所を見つける
      GT.registerDraw          … 空気感（昼の木かげ／夕日）・影・水車小屋・垣根・家（窓明かり・ランプ）・飛び石と草花
-                                 足あと・眼鏡・樽・石垣・物音・霧・気づいたことのありか（？）
+                                 足あと・ストール・樽・石垣・物音・霧・気づいたことのありか（？）
    ========================================================================== */
 (function(){
 const ctx=GT.ctx, W=GT.W, H=GT.H, EDGE=GT.EDGE, FLOOR=H-GT.EDGE, SPINE=GT.SPINE;
@@ -33,7 +32,7 @@ const BUTT ={page:'right', x:560, y:412, w:44, h:52, kind:'ledge'};   // 窓の�
 const WIN  ={x:568, y:322, w:60, h:50};                               // 家の窓
 const DOOR ={x:806, y:362, w:52};                                     // 家の戸（右の端）
 const PRINTS={x:470, w:300};                                          // 獣の足あと
-const GLASSES_X=716;                                                  // 落ちている眼鏡
+const STOLE_X=716;                                                    // 落ちているストール
 const HOOD_DOOR=742;
 
 // --- 地形 ------------------------------------------------------------------
@@ -76,7 +75,7 @@ const KNOCK=[
   {s:'',c:'narr',t:'……おばあさんの声にしては、少しおかしい。'},
   {s:'',c:'narr',t:'赤ずきんが、戸に手を伸ばす。'},
 ];
-const canStop=()=> GT.flags.warnedHood || clueCount()>=2;
+const canStop=()=> !!GT.flags.warnedHood;   // 森で狼のことを伝えていなければ、ここで止めても聞いてくれない
 const KNOCK_CHOICES=[
   { label:'赤ずきんを止める', set:()=>{ GT.flags.stoppedAtDoor = canStop(); GT.musicMute && GT.musicMute(false); }, after:()=>{
       if(GT.flags.warnedHood) return [
@@ -86,16 +85,14 @@ const KNOCK_CHOICES=[
         {s:'',c:'narr',t:'少年が戸を指し、首を振る。'},
         {s:'赤ずきん',c:'hood',t:'……分かった。'},
       ];
-      if(canStop()) return [
-        {s:'',c:'narr',t:'少年は、赤ずきんのもとへ駆けだした。',act:'front-run'},
-        {s:'',c:'narr',t:'少年が手を掴む。そして、見てきたものを指さした。'+foundText()+'。'},
-        ...(st.found.glasses?[{s:'赤ずきん',c:'hood',f:'surprise',t:'……これ、おばあちゃんの眼鏡……？'}]:[]),
-        {s:'赤ずきん',c:'hood',f:'worried',t:'……分かった。あなたが、先に。'},
-      ];
+      // 狼のことを伝えていなかった：見てきたものを話しても、聞いてくれない
       return [
         {s:'',c:'narr',t:'少年は、赤ずきんのもとへ駆けだした。',act:'front-run'},
-        {s:'',c:'narr',t:'少年が手を伸ばす。だが、赤ずきんはもう掛け金を引いていた。'},
-        {s:'赤ずきん',c:'hood',f:'worried',t:'……？　おばあちゃん、待たせちゃ悪いもの。'},
+        ...(clueCount()>0 ? [{s:'',c:'narr',t:'少年が手を掴む。そして、見てきたものを話した。'+foundText()+'。'}]
+                          : [{s:'',c:'narr',t:'少年が手を掴む。'}]),
+        ...(st.found.stole?[{s:'赤ずきん',c:'hood',t:'ストール？　おばあちゃん、落としちゃったのかな。'}]:[]),
+        {s:'赤ずきん',c:'hood',t:'もう、心配しすぎだよ。おばあちゃん、待ってるもの。'},
+        {s:'',c:'narr',t:'赤ずきんは手をほどき、掛け金を引いた。'},
         {s:'',c:'narr',t:'止める間もなく、赤ずきんは先に中へ入っていく。',act:'front-hood-enter'},
       ];
     }},
@@ -107,8 +104,8 @@ const CLUES=[
   { key:'prints', text:'戸口へ続く足あと', lines:()=>[
     {s:'',c:'narr',t:'大きな獣の足あとが、まっすぐ戸口へ続いている。'},
     ...(GT.flags.route==='shortcut'?[{s:'',c:'narr',t:'まだ新しい。土が、湿っている。'}]:[{s:'',c:'narr',t:'足あとの上を、もう落ち葉がおおいはじめている。'}]) ]},
-  { key:'glasses', text:'ひびの入った眼鏡', lines:()=>[
-    {s:'',c:'narr',t:'戸口の前に、丸い眼鏡が落ちている。片方のレンズに、ひびが入っていた。'} ]},
+  { key:'stole', text:'破れたストール', lines:()=>[
+    {s:'',c:'narr',t:'戸口の前に、ストールが落ちている。端が、何かに引き裂かれたように破れていた。'} ]},
   { key:'window', text:'窓の中', lines:()=> GT.flags.route==='shortcut' ? [
     {s:'',c:'narr',t:'樽の上で背伸びして、窓の中をのぞく。',act:'front-peek-on'},
     {s:'',c:'narr',t:'窓の向こうで、真っ黒な大きな影が、ベッドの上のおばあさんに爪をふりあげている。'},
@@ -176,7 +173,7 @@ GT.registerUpdate(()=>{
   const onFloor = pl.onGround && Math.abs(pl.y+pl.h-FLOOR)<2;
   const spots={
     prints:  onFloor && pcx>PRINTS.x+30 && pcx<PRINTS.x+110,
-    glasses: onFloor && Math.abs(pcx-GLASSES_X)<22,
+    stole:   onFloor && Math.abs(pcx-STOLE_X)<22,
     window:  pl.onGround && Math.abs(pl.y+pl.h-BUTT.y)<2 && pcx>BUTT.x-6 && pcx<BUTT.x+BUTT.w+6,
   };
   // 近づいただけでは気づかない。その場所で Enter／画面タップをしたときだけ調べる（下の inspect）
@@ -261,7 +258,7 @@ function drawWatermill(t){
     body: sc?'rgba(90,72,56,0.6)':'rgba(70,48,52,0.66)', wheel: sc?'rgba(80,64,50,0.62)':'rgba(64,44,48,0.66)',
     water: sc?'rgba(150,180,190,0.42)':'rgba(190,150,140,0.4)', light: sc?null:`rgba(255,200,120,${0.55+0.15*Math.sin(t*5)})` });
 }
-/* 戸口への飛び石と、草花（足あと・眼鏡は、この上に描く） */
+/* 戸口への飛び石と、草花（足あと・ストールは、この上に描く） */
 function drawGround(){
   for(let i=0;i<7;i++){ const x=478+i*50+(i%2)*6;
     ell(x,FLOOR-2,14,4,'rgba(120,110,95,0.65)'); ell(x-3,FLOOR-3.5,8,1.6,'rgba(255,250,235,0.25)'); }
@@ -287,10 +284,16 @@ function drawBack(){
   // 足あと
   for(let i=0;i<8;i++){ const x=PRINTS.x+12+i*36, y=FLOOR-3+(i%2);
     ell(x,y,6,2.4,'rgba(40,32,24,0.5)'); for(let k=-1;k<=1;k++) ell(x+5+k*4,y-3,1.6,1.2,'rgba(40,32,24,0.5)'); }
-  // 眼鏡
-  ctx.strokeStyle='#5a4630'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.arc(GLASSES_X-5,FLOOR-4,4,0,Math.PI*2); ctx.arc(GLASSES_X+5,FLOOR-4,4,0,Math.PI*2); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(GLASSES_X+3,FLOOR-7); ctx.lineTo(GLASSES_X+7,FLOOR-2); ctx.stroke();
+  // ストール（くしゃっと落ちた毛織りの布。右の端が裂けて、ふさがほつれている）
+  { const x=STOLE_X, y=FLOOR-1;
+    ctx.beginPath(); ctx.moveTo(x-18,y); ctx.quadraticCurveTo(x-16,y-10,x-5,y-9); ctx.quadraticCurveTo(x+4,y-12,x+11,y-6);
+    ctx.lineTo(x+14,y-4); ctx.lineTo(x+10,y-2.5); ctx.lineTo(x+16,y-1); ctx.lineTo(x+12,y); ctx.closePath();
+    ctx.fillStyle='#8e5f7a'; ctx.fill(); ctx.strokeStyle='#5a3a4c'; ctx.lineWidth=1; ctx.stroke();
+    ctx.strokeStyle='rgba(240,220,200,0.55)'; ctx.lineWidth=0.9;                     // 織りのしま
+    ctx.beginPath(); ctx.moveTo(x-14,y-3); ctx.quadraticCurveTo(x-3,y-9,x+9,y-4); ctx.stroke();
+    ctx.strokeStyle='#5a3a4c'; ctx.lineWidth=0.8;                                    // ふさ（左の端）
+    for(let k=0;k<5;k++){ ctx.beginPath(); ctx.moveTo(x-18+k*2,y); ctx.lineTo(x-20+k*2,y+0.6); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(x+15,y-1); ctx.quadraticCurveTo(x+20,y-3,x+24,y); ctx.stroke(); }   // 裂けて、ほつれた糸
   ctx.restore();
 }
 /* おばあさんの家（石積みの壁・わらぶき屋根・煙突・窓・戸）。
@@ -658,8 +661,6 @@ function drawRoomView(c,t,sc,big){
     ell(132,174-30*br+22,9,6,'#3a2f2a');
     ctx.fillStyle='#e8dcc0'; for(let i=0;i<3;i++){ const cx=138+i*0.5, cy=170-30*br+22+i*4; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+6,cy+1.5); ctx.lineTo(cx,cy+3); ctx.closePath(); ctx.fill(); }
     }
-    // 床に落ちた、おばあさんの肩掛け
-    ctx.fillStyle='#5e5670'; ctx.beginPath(); ctx.moveTo(30,FL+4); ctx.quadraticCurveTo(60,FL-6,94,FL+6); ctx.lineTo(86,FL+16); ctx.lineTo(38,FL+14); ctx.closePath(); ctx.fill();
     drawCurtains(gL, gR, fl);
     // カーテンの布に、向こうの狼の影がうつる（ランプの光で）
     if(wolfSil){ ctx.save(); ctx.beginPath(); ctx.rect(0,10,gL,V.h); ctx.rect(gR,10,V.w-gR,V.h); ctx.clip();
@@ -873,7 +874,7 @@ function drawHud(){
     const msg=GT.ctl('タップ / Enter で しらべる','タップで しらべる'); ctx.strokeText(msg,pl.x+pl.w/2,y); ctx.fillText(msg,pl.x+pl.w/2,y); ctx.globalAlpha=1;
   }
   if(!st.found.prints)  mark(PRINTS.x+70,FLOOR-24);
-  if(!st.found.glasses) mark(GLASSES_X,FLOOR-24);
+  if(!st.found.stole) mark(STOLE_X,FLOOR-24);
   if(!st.found.window)  mark(WIN.x+WIN.w/2,WIN.y-20);
   ctx.restore();
 }

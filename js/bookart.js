@@ -451,7 +451,7 @@ const SCENES={
       figure(c,IMG.mari,470,314,150);
     } else if(f.ending==='normal'){
       figure(c,IMG.hoodR,220,314,150,{filter:'saturate(0.85)'});
-      c.save(); c.translate(222,262); c.beginPath(); c.ellipse(0,0,24,12,0.15,0,Math.PI*2); inked(c,'#9a7a9a',1.6); c.restore();   // 胸に抱いた肩掛け
+      c.save(); c.translate(222,262); c.beginPath(); c.ellipse(0,0,24,12,0.15,0,Math.PI*2); inked(c,'#9a7a9a',1.6); c.restore();   // 胸に抱いたストール
       boy(c,340,306,1.4,{face:1,book:true});
       figure(c,IMG.mari,460,314,150);
     } else {

@@ -76,8 +76,7 @@ function defeatWolf(){
 }
 // 狼にぶつかられた：はじき飛ばされる（はじめの場所へは戻されない）
 function hurtPlayer(){                                    // ハートが減る（3回でゲームオーバー → ページがもどって、戦いをやり直す）
-  const pl=GT.player;
-  if(GT.damagePlayer(wolf.x+wolf.w/2,'wolf') && !GT.isGameOver()) pop('いたっ',pl.x+pl.w/2,pl.y-6,'#4a4e6d');
+  GT.damagePlayer(wolf.x+wolf.w/2,'wolf');
 }
 function updateWolf(dt){
   const gravity=GT.gravity, player=GT.player;
@@ -214,11 +213,10 @@ function drawBossHud(){
     GT.roundRect(x,by+3,(bw-34)/wolf.maxhp-6,12,6); ctx.fillStyle=i<wolf.hp?(wolf.enraged?'#e0563f':'#c9503f'):'rgba(232,220,192,0.18)'; ctx.fill(); }
   // ヒント（はじめて当てるまで）
   if(!fx.hintOff && GT.mode==='boss'){
-    ctx.textAlign='center'; ctx.font="700 13px 'Zen Old Mincho',serif";
-    GT.roundRect(W/2-210,122,420,48,12); ctx.fillStyle='rgba(43,36,24,0.72)'; ctx.fill();
+    ctx.textAlign='center'; ctx.font="700 15px 'Zen Old Mincho',serif";
+    GT.roundRect(W/2-110,124,220,36,12); ctx.fillStyle='rgba(43,36,24,0.72)'; ctx.fill();
     ctx.globalAlpha=0.8+0.2*Math.sin(now/300); ctx.fillStyle='#f3ead0';
-    ctx.fillText('狼が家具と重なったら そのページを裏返し、着地したら すぐもう一度',W/2,137);
-    ctx.fillText('しがみつく狼の頭に、飛んでいった家具が落ちてくる',W/2,157);
+    ctx.fillText('狼に家具を落とそう！',W/2,147);
     ctx.globalAlpha=1;
   }
   // ポップ文字

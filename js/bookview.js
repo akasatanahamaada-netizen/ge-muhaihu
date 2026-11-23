@@ -134,6 +134,7 @@ const css=`
   color:#7a5a22; background:radial-gradient(circle at 35% 30%, #fbe6a8, #d9b25e); box-shadow:inset 0 0 0 1px #a8822f; flex:none; }
 .bv-gos .bv-go:hover{ color:#5a3f1c; background:#f8efd8 linear-gradient(180deg, rgba(255,253,245,0.8), rgba(232,212,170,0.4)); border-color:#d4a94a;
   transform:translate(-1px,1px); box-shadow:inset 0 0 0 2px #fbf3df, inset 0 0 0 3px rgba(212,169,74,0.9), 7px -6px 0 rgba(40,26,14,0.24); }   /* 浮くと、影は遠くへ */
+.bv-gos .bv-go[disabled]{ opacity:0.4; cursor:default; pointer-events:none; filter:grayscale(0.6); }   /* 押せないボタン（お話の最後は「森の出口」だけ） */
 .bv-gos .bv-go:active{ transform:translate(2px,-2px); box-shadow:inset 0 0 0 2px #f6ecd4, inset 0 0 0 3px rgba(184,145,63,0.75), 2px -1px 0 rgba(40,26,14,0.3); }   /* 押すと、影は近くへ */
 /* 誘導中に光らせるボタン（GT.guideToBook の 3つめの引数。例：お話のあと「森の出口」へ）。
    順番：まず栞（Book）が光る → 本を開くと、本が開ききってから（1.3秒後）このボタンが光り、うしろから金色の光の筋が放射状に広がる */
@@ -248,8 +249,9 @@ function slotInner(slot){
   const body=(p.filled ? art : '') + `<div class="bv-body">${damagedText(text, pc, slot, !p.filled)}</div>`;   // 虫食いの穴は あけない（ページのふちの よれだけ）
   // このページのステージへ行くボタン（このページにふくまれるステージのうち、一度来たことのあるものだけ。menu.js の GT.canStartFrom / GT.startFrom）
   const ids=(PAGE_SCENES[p.key]||[]).filter(id=>GT.canStartFrom && GT.canStartFrom(id));
+  const only=GT.bookOnlyScene && GT.bookOnlyScene();   // 押せるボタンを 1つにしぼる場面（お話の最後は「森の出口」だけ。12_grannys_house.js）
   const go = ids.length ? `<div class="bv-gos"><span class="bv-gos-h">このステージから、やり直す</span>${ids.map(id=>
-    `<button type="button" class="bv-go${id===glowScene?' glow':''}" title="「${esc(stageName(id))}」のはじめから、やり直す" data-scene="${esc(id)}" data-name="${esc(stageName(id))}">${esc(stageName(id))}</button>`).join('')}</div>` : '';
+    `<button type="button" class="bv-go${(id===glowScene||id===only)?' glow':''}"${only&&id!==only?' disabled':''} title="「${esc(stageName(id))}」のはじめから、やり直す" data-scene="${esc(id)}" data-name="${esc(stageName(id))}">${esc(stageName(id))}</button>`).join('')}</div>` : '';
   return head+body+go+`<div class="bv-no">— ${pno} —</div>`;
 }
 /* ページ（playlist.js の GT.definePages の key）と、そのページにふくまれるステージ（シーンの id。物語の順）。
@@ -525,7 +527,7 @@ hitL.addEventListener('click',()=>turn(-1));    hitR.addEventListener('click',()
 modal.querySelector('.bv-close').addEventListener('click',close);
 // 「このページへもどる」：本をすぐに閉じて、その場面のはじめから（来たときの分岐・本のページの状態にもどる）
 //   1回押すだけで、もどる（前は「Tap again」で2回押す必要があった）
-modal.addEventListener('click',e=>{ const g=e.target.closest('.bv-go'); if(!g) return; e.stopPropagation();
+modal.addEventListener('click',e=>{ const g=e.target.closest('.bv-go'); if(!g) return; e.stopPropagation(); if(g.disabled) return;
   const id=g.dataset.scene; glowScene=null; modal.classList.remove('show'); modal.style.opacity=''; bar.style.opacity=''; GT.paused=false;
   if(GT.bookJump && GT.bookJump(id)) return;   // お話を読み終えたあとの「森の出口」など（12_grannys_house.js）
   if(GT.startFrom) GT.startFrom(id); }, true);
