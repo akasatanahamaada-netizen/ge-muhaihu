@@ -167,7 +167,9 @@ let css=`
 .gtm-howto{ color:#e8e0cc; } .gtm-howto b{ color:#e3c58a; } .gtm-howto li{ border-bottom-color:rgba(201,160,112,0.22); }
 .gtm-vol{ color:#efe6d2; } .gtm-vol:focus-within{ background:rgba(201,160,112,0.14); } .gtm-vol output{ color:#c9a070; }
 .gtm-range{ accent-color:#c4344d; }
-.gtm:not([data-view="main"]) .gtm-howto{ font-size:clamp(10px,1.5cqw,32px); line-height:1.45; }   /* How to Play が枠に入りきるように */
+.gtm:not([data-view="main"]) .gtm-howto{ font-size:clamp(10px,1.5cqw,32px); line-height:1.45; }
+.gtm-view[data-view="credits"] .gtm-howto li{ display:flex; }   /* Credits：長い行が折り返しても、文字の頭がそろう */
+.gtm-view[data-view="credits"] .gtm-howto b{ flex:none; }   /* How to Play が枠に入りきるように */
 .gtm:not([data-view="main"]) .gtm-card h3{ margin-bottom:0.35em; padding-bottom:0.3em; }
 @media (max-width:640px){ .gtm:not([data-view="main"]) .gtm-card{ left:6%; width:88%; top:5%; height:90%; } }
 /* メニューの英語は、つづけ字の筆記体（Great Vibes）。細い字なので、少し大きく・ふちに影 */
@@ -234,6 +236,7 @@ menu.innerHTML=`
       <label class="gtm-vol"><span>Music</span><input type="range" class="gtm-range" data-vol="bgm" min="0" max="100" step="5"><output></output></label>
       <label class="gtm-vol"><span>Sound</span><input type="range" class="gtm-range" data-vol="se" min="0" max="100" step="5"><output></output></label>
       <p class="gtm-howto gtm-pc" style="margin-top:0.4em">← → で大きさを変える（↑ ↓ で選ぶ）</p>
+      <button class="gtm-btn" data-act="credits">Credits</button>
       <button class="gtm-btn gtm-back" data-act="back">← Back</button>
     </div>
     <div class="gtm-view" data-view="howto">
@@ -258,6 +261,18 @@ menu.innerHTML=`
       </ul>
       <p class="gtm-howto" style="margin-top:0.6em">右ページの右の端まで行くと、ページがめくれて次へ進む。</p>
       <button class="gtm-btn gtm-back" data-act="back">← Back</button>
+    </div>
+    <div class="gtm-view" data-view="credits">
+      <h3>Credits</h3>
+      <ul class="gtm-howto">
+        <li><b>Team</b>企画・シナリオ・原画・デザイン・ゲーム設計：クウォーター</li>
+        <li><b>Music</b>DOVA-SYNDROME（dova-s.jp）</li>
+        <li><b>Sound</b>効果音ラボ（soundeffect-lab.info）</li>
+        <li><b>Fonts</b>Google Fonts：Zen Old Mincho / Cormorant Garamond / Caveat / Great Vibes / Yuji Syuku（SIL Open Font License）</li>
+        <li><b>Kanji</b>KanjiVG（Ulrich Apel ほか、CC BY-SA 3.0）</li>
+        <li><b>AI</b>イラスト：ChatGPT・Gemini・Copilot ／ プログラム：Claude</li>
+      </ul>
+      <button class="gtm-btn gtm-back" data-act="settings">← Back</button>
     </div>
   </div>
   <div class="gtm-foot"></div>`;   // （「本を裏返すと、世界の重力が反転する」は出さない）
@@ -350,6 +365,7 @@ menu.addEventListener('click',e=>{
     case 'continue': startFrom(save.last); break;
     case 'howto':    setView('howto'); break;
     case 'settings': setView('settings'); break;
+    case 'credits':  setView('credits'); break;
     case 'book':     GT.openBookModal(); break;
     case 'back':     setView('main'); break;
   }
