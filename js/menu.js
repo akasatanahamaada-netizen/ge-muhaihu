@@ -168,8 +168,10 @@ let css=`
 .gtm-vol{ color:#efe6d2; } .gtm-vol:focus-within{ background:rgba(201,160,112,0.14); } .gtm-vol output{ color:#c9a070; }
 .gtm-range{ accent-color:#c4344d; }
 .gtm:not([data-view="main"]) .gtm-howto{ font-size:clamp(10px,1.5cqw,32px); line-height:1.45; }
-.gtm-view[data-view="credits"] .gtm-howto li{ display:flex; }   /* Credits：長い行が折り返しても、文字の頭がそろう */
-.gtm-view[data-view="credits"] .gtm-howto b{ flex:none; }   /* How to Play が枠に入りきるように */
+.gtm-view[data-view="credits"] .gtm-howto li{ display:flex; word-break:keep-all; overflow-wrap:anywhere; }   /* Credits：長い行が折り返しても、文字の頭がそろう */
+.gtm-view[data-view="credits"] .gtm-howto b{ flex:none; }
+.gtm-view[data-view="credits"]{ min-height:0; }
+.gtm-view[data-view="credits"] .gtm-howto{ flex:1; min-height:0; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(138,115,80,0.5) transparent; padding-right:0.4em; }   /* 長いときは、枠の中でスクロール */   /* How to Play が枠に入りきるように */
 .gtm:not([data-view="main"]) .gtm-card h3{ margin-bottom:0.35em; padding-bottom:0.3em; }
 @media (max-width:640px){ .gtm:not([data-view="main"]) .gtm-card{ left:6%; width:88%; top:5%; height:90%; } }
 /* メニューの英語は、つづけ字の筆記体（Great Vibes）。細い字なので、少し大きく・ふちに影 */
@@ -266,8 +268,18 @@ menu.innerHTML=`
       <h3>Credits</h3>
       <ul class="gtm-howto">
         <li><b>Team</b>企画・シナリオ・原画・デザイン・ゲーム設計：クウォーター</li>
-        <li><b>Music</b>DOVA-SYNDROME（dova-s.jp）</li>
-        <li><b>Sound</b>効果音ラボ（soundeffect-lab.info）</li>
+        <li><b>Music</b><span>OpenTracks<br>
+          Heitaro Ashibe 様「Foehn Wind」<br>
+          こばっと 様「お騒がせなオバケたち」<br>
+          のる 様「かくれんぼの庭。」「ふしぎな絵本」<br>
+          こおろぎ 様「悪魔の悪戯」「魔法の扉は夜開く」<br>
+          蒲鉾さちこ 様「異世界へようこそ」<br>
+          roku 様「虚像」<br>
+          稿屋 隆 様「荊の庭」<br>
+          MATSU 様「時を刻む森」「時計図書館」「小さな勇者の探検」<br>
+          もっぴーさうんど 様「堕ちる」<br>
+          秦暁 様「世界の最果てで、自由を謳う」「魔法使いの箱庭」「抒情歌「二つの草」」</span></li>
+        <li><b>Sound</b><span>OpenTracks ── Causality Sound 様「グロテスクな音」<br>効果音ラボ 様</span></li>
         <li><b>Fonts</b>Google Fonts：Zen Old Mincho / Cormorant Garamond / Caveat / Great Vibes / Yuji Syuku（SIL Open Font License）</li>
         <li><b>Kanji</b>KanjiVG（Ulrich Apel ほか、CC BY-SA 3.0）</li>
         <li><b>AI</b>イラスト：ChatGPT・Gemini・Copilot ／ プログラム：Claude</li>

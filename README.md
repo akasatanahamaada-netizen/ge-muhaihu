@@ -73,8 +73,20 @@
 - 企画・シナリオ・イラスト・プログラム：（チーム名・クウォーター）
 
 ### 素材
-- BGM：[DOVA-SYNDROME](https://dova-s.jp/)
-- 効果音：[効果音ラボ](https://soundeffect-lab.info/)
+- BGM：OpenTracks
+  - Heitaro Ashibe 様「Foehn Wind」
+  - こばっと 様「お騒がせなオバケたち」
+  - のる 様「かくれんぼの庭。」「ふしぎな絵本」
+  - こおろぎ 様「悪魔の悪戯」「魔法の扉は夜開く」
+  - 蒲鉾さちこ 様「異世界へようこそ」
+  - roku 様「虚像」
+  - 稿屋 隆 様「荊の庭」
+  - MATSU 様「時を刻む森」「時計図書館」「小さな勇者の探検」
+  - もっぴーさうんど 様「堕ちる」
+  - 秦暁 様「世界の最果てで、自由を謳う」「魔法使いの箱庭」「抒情歌「二つの草」」
+- 効果音：
+  - OpenTracks：Causality Sound 様「グロテスクな音」
+  - [効果音ラボ](https://soundeffect-lab.info/)
 - フォント：[Google Fonts](https://fonts.google.com/)（SIL Open Font License）
   Zen Old Mincho / Cormorant Garamond / Caveat / Great Vibes / Yuji Syuku
 - 漢字の書き順データ：[KanjiVG](https://kanjivg.tagaini.net)（Ulrich Apel ほか、CC BY-SA 3.0）
